@@ -109,6 +109,12 @@
       ...
     }:
     let
+      supportedSystems = [
+        "aarch64-darwin"
+        "x86_64-linux"
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+
       marketplaceInputs = {
         inherit
           anthropic-agent-skills
@@ -129,34 +135,37 @@
       };
     in
     {
-      # Full AI CLI home-manager module
-      homeManagerModules.default = {
-        imports = [ ./modules/default.nix ];
-        _module.args = {
-          inherit
-            ai-assistant-instructions
-            marketplaceInputs
-            claude-code-plugins
-            claude-cookbooks
-            ;
+      # Home-manager modules
+      homeManagerModules = {
+        # Full AI CLI module
+        default = {
+          imports = [ ./modules/default.nix ];
+          _module.args = {
+            inherit
+              ai-assistant-instructions
+              marketplaceInputs
+              claude-code-plugins
+              claude-cookbooks
+              ;
+          };
         };
-      };
 
-      # Individual modules for selective import
-      homeManagerModules.claude = {
-        imports = [ ./modules/claude ];
-        _module.args = {
-          inherit
-            ai-assistant-instructions
-            marketplaceInputs
-            claude-code-plugins
-            claude-cookbooks
-            ;
+        # Individual modules for selective import
+        claude = {
+          imports = [ ./modules/claude ];
+          _module.args = {
+            inherit
+              ai-assistant-instructions
+              marketplaceInputs
+              claude-code-plugins
+              claude-cookbooks
+              ;
+          };
         };
-      };
 
-      homeManagerModules.maestro = {
-        imports = [ ./modules/maestro ];
+        maestro = {
+          imports = [ ./modules/maestro ];
+        };
       };
 
       # CI-friendly outputs
@@ -199,8 +208,19 @@
         versions = import ./lib/versions.nix;
       };
 
+      # Quality checks (formatting, linting, dead code)
+      checks = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        import ./lib/checks.nix {
+          inherit pkgs;
+          src = ./.;
+        }
+      );
+
       # Formatter
-      formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt-tree;
-      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-tree;
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
     };
 }

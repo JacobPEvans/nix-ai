@@ -96,35 +96,40 @@ in
   ];
 
   config = {
-    # AI development tools (MCP servers, linters, CLI wrappers)
-    home.packages = (import ./ai-tools.nix { inherit pkgs; }).packages;
+    home = {
+      # AI development tools (MCP servers, linters, CLI wrappers)
+      inherit (import ./ai-tools.nix { inherit pkgs; }) packages;
 
-    home.file = geminiFiles.file // codexFiles // geminiCommands // copilotFiles // agentsMdSymlinks;
+      file = geminiFiles.file // codexFiles // geminiCommands // copilotFiles // agentsMdSymlinks;
 
-    home.activation = geminiFiles.activation // {
-      # Claude Code Settings Validation (post-rebuild)
-      validateClaudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        $DRY_RUN_CMD ${./scripts/validate-claude-settings.sh} \
-          "${config.home.homeDirectory}/.claude/settings.json" \
-          "${userConfig.ai.claudeSchemaUrl}"
-      '';
+      activation = geminiFiles.activation // {
+        # Claude Code Settings Validation (post-rebuild)
+        validateClaudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          $DRY_RUN_CMD ${./scripts/validate-claude-settings.sh} \
+            "${config.home.homeDirectory}/.claude/settings.json" \
+            "${userConfig.ai.claudeSchemaUrl}"
+        '';
 
-      # open-webui: installed via uv
-      installOpenWebui = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q "^open-webui"; then
-          echo "-> Installing open-webui via uv (Python 3.12)..."
-          $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install open-webui --python 3.12
-        fi
-      '';
+        # open-webui: installed via uv
+        installOpenWebui = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q "^open-webui"; then
+            echo "-> Installing open-webui via uv (Python 3.12)..."
+            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install open-webui --python 3.12
+          fi
+        '';
+      };
     };
 
-    # Claude Code declarative configuration
-    programs.claude = claudeConfig;
+    # Programs configuration
+    programs = {
+      # Claude Code declarative configuration
+      claude = claudeConfig;
 
-    # Claude Code powerline statusline
-    programs.claudeStatusline.enable = true;
+      # Claude Code powerline statusline
+      claudeStatusline.enable = true;
 
-    # GitHub CLI extension for AI workflows
-    programs.gh.extensions = [ ghExtensions.gh-aw ];
+      # GitHub CLI extension for AI workflows
+      gh.extensions = [ ghExtensions.gh-aw ];
+    };
   };
 }
