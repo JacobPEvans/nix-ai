@@ -1,0 +1,254 @@
+# Claude Code Settings
+#
+# Generates ~/.claude/settings.json with all configuration.
+# Merges plugin marketplaces, permissions, MCP servers, etc.
+#
+# NOTE: Uses toClaudeMarketplaceFormat from lib/claude-registry.nix as
+# SINGLE SOURCE OF TRUTH for marketplace format transformation.
+#
+# VALIDATION: Environment variable names are validated at build time against
+# POSIX convention (^[A-Z_][A-Z0-9_]*$). Full JSON Schema validation against
+# https://json.schemastore.org/claude-code-settings.json is available via
+# `nix flake check` but requires network access.
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+
+let
+  cfg = config.programs.claude;
+  homeDir = config.home.homeDirectory;
+
+  # Import the single source of truth for marketplace formatting
+  claudeRegistry = import ../../lib/claude-registry.nix { inherit lib; }; # lastUpdated not needed here
+  inherit (claudeRegistry) toClaudeMarketplaceFormat;
+
+  # Build the env attribute (merge user env vars with API_KEY_HELPER if enabled)
+  # Environment variable names must match POSIX convention: ^[A-Z_][A-Z0-9_]*$
+  envAttrs =
+    cfg.settings.env
+    // lib.optionalAttrs cfg.apiKeyHelper.enable {
+      API_KEY_HELPER = "${homeDir}/${cfg.apiKeyHelper.scriptPath}";
+    };
+
+  # Validate POSIX environment variable names
+  # POSIX requires: starts with letter or underscore, followed by letters, digits, or underscores
+  # We enforce uppercase for convention: ^[A-Z_][A-Z0-9_]*$
+  isValidEnvVarName = name: builtins.match "^[A-Z_][A-Z0-9_]*$" name != null;
+  invalidEnvVars = lib.filterAttrs (name: _: !isValidEnvVarName name) envAttrs;
+
+  # Build Claude Code JSON for enabled (non-disabled) MCP servers.
+  # Stdio servers: { command, args, env? }
+  # SSE/HTTP servers: { type, url, headers? }
+  activeMcpServers = lib.filterAttrs (_: v: !v.disabled) cfg.mcpServers;
+  mcpServersJson = builtins.toJSON (
+    lib.mapAttrs (
+      _: v:
+      if v.type == "stdio" then
+        { inherit (v) command args; } // lib.optionalAttrs (v.env != { }) { inherit (v) env; }
+      else
+        { inherit (v) type url; } // lib.optionalAttrs (v.headers != { }) { inherit (v) headers; }
+    ) activeMcpServers
+  );
+
+  # Build the settings object
+  settings = {
+    "$schema" = cfg.settings.schemaUrl;
+    inherit (cfg.settings) alwaysThinkingEnabled cleanupPeriodDays;
+    inherit (cfg)
+      autoUpdatesChannel
+      teammateMode
+      showTurnDuration
+      effortLevel
+      ;
+  }
+  // lib.optionalAttrs (cfg.attribution != { }) { inherit (cfg) attribution; }
+  // {
+
+    # Permissions
+    permissions = {
+      inherit (cfg.settings.permissions) allow deny ask;
+      inherit (cfg.settings) additionalDirectories;
+    };
+
+    # Plugin configuration
+    # Uses toClaudeMarketplaceFormat (single source of truth from lib/claude-registry.nix)
+    extraKnownMarketplaces = lib.mapAttrs toClaudeMarketplaceFormat cfg.plugins.marketplaces;
+
+    enabledPlugins = cfg.plugins.enabled;
+
+    # Environment variables (user-defined + apiKeyHelper if enabled)
+  }
+  // lib.optionalAttrs (cfg.model != null) { inherit (cfg) model; }
+  // lib.optionalAttrs (cfg.remoteControlAtStartup != null) { inherit (cfg) remoteControlAtStartup; }
+  // lib.optionalAttrs (envAttrs != { }) { env = envAttrs; }
+
+  # Status line (only include if we have valid configuration)
+  # Include when: enhanced mode with package, OR custom script (with enhanced disabled)
+  # Do NOT include empty statusLine object (breaks Claude Code schema)
+  // (
+    let
+      # Extract duplicate condition to avoid divergence between outer and inner checks
+      hasEnhancedStatusLine = cfg.statusLine.enhanced.enable && cfg.statusLine.enhanced.package != null;
+      hasCustomScript = cfg.statusLine.script != null && !cfg.statusLine.enhanced.enable;
+    in
+    lib.optionalAttrs (cfg.statusLine.enable && (hasEnhancedStatusLine || hasCustomScript)) {
+      statusLine = {
+        type = "command";
+        command =
+          if
+            hasEnhancedStatusLine
+          # Reference package built by statusline.nix (single source of truth)
+          then
+            "${cfg.statusLine.enhanced.package}/bin/claude-code-statusline"
+          else
+            "${homeDir}/.claude/statusline-command.sh";
+      };
+    }
+  )
+
+  # Sandbox configuration (Dec 2025 feature)
+  # Only include when sandbox is actually enabled to avoid confusing disabled state with configuration
+  // lib.optionalAttrs cfg.settings.sandbox.enabled {
+    sandbox = {
+      inherit (cfg.settings.sandbox) enabled autoAllowBashIfSandboxed;
+    }
+    // lib.optionalAttrs (cfg.settings.sandbox.excludedCommands != [ ]) {
+      inherit (cfg.settings.sandbox) excludedCommands;
+    };
+  };
+
+  # Pretty-print JSON
+  settingsJson =
+    pkgs.runCommand "claude-settings.json"
+      {
+        nativeBuildInputs = [ pkgs.jq ];
+        passAsFile = [ "json" ];
+        json = builtins.toJSON settings;
+      }
+      ''
+        jq '.' "$jsonPath" > $out
+      '';
+
+  # Status line script (if using simple script mode)
+  statusLineScript =
+    lib.optionalAttrs
+      (cfg.statusLine.enable && cfg.statusLine.script != null && !cfg.statusLine.enhanced.enable)
+      {
+        ".claude/statusline-command.sh" = {
+          text = cfg.statusLine.script;
+          executable = true;
+        };
+      };
+
+  # Hook scripts generator
+  # Converts hook options to executable scripts in ~/.claude/hooks/
+  hookFiles =
+    let
+      # Map of hook names to their filenames
+      hookMapping = {
+        preToolUse = "pre-tool-use.sh";
+        postToolUse = "post-tool-use.sh";
+        userPromptSubmit = "user-prompt-submit.sh";
+        stop = "stop.sh";
+        subagentStop = "subagent-stop.sh";
+        sessionStart = "session-start.sh";
+        sessionEnd = "session-end.sh";
+      };
+
+      # Generate a single hook file attribute
+      mkHookFile =
+        _hookName: fileName: hookValue:
+        if hookValue == null then
+          { }
+        else if builtins.isPath hookValue then
+          {
+            ".claude/hooks/${fileName}" = {
+              source = hookValue;
+              executable = true;
+            };
+          }
+        else
+          {
+            ".claude/hooks/${fileName}" = {
+              text = hookValue;
+              executable = true;
+            };
+          };
+
+      # Generate all hook files
+      allHookFiles = lib.mapAttrs' (
+        hookName: fileName: lib.nameValuePair hookName (mkHookFile hookName fileName cfg.hooks.${hookName})
+      ) hookMapping;
+
+      # Merge all non-null hook files into a single attrset
+      # Note: lib.mkMerge is for option values, not attrsets. Use foldl' for regular merging.
+      mergedHookFiles = lib.foldl' (a: b: a // b) { } (builtins.attrValues allHookFiles);
+    in
+    mergedHookFiles;
+
+in
+{
+  config = lib.mkIf cfg.enable {
+    # Merge runtime keys into ~/.claude.json (global config) at activation time.
+    # These keys live in the global config file, not settings.json, so home.file cannot be
+    # used directly (the file is runtime-mutable). jq merges only specific keys idempotently.
+    home.activation =
+      lib.optionalAttrs (cfg.remoteControlAtStartup != null) {
+        claudeRemoteControlAtStartup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          export PATH="${pkgs.jq}/bin:$PATH"
+          RC_VALUE=${if cfg.remoteControlAtStartup then "true" else "false"}
+          . ${./scripts/remote-control-startup.sh}
+        '';
+      }
+      // {
+        claudeMcpServers = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          export PATH="${pkgs.jq}/bin:$PATH"
+          MCP_SERVERS_JSON=${lib.escapeShellArg mcpServersJson}
+          . ${./scripts/mcp-servers-merge.sh}
+        '';
+      };
+
+    # Validate configuration before generating settings.json
+    assertions = [
+      {
+        assertion = invalidEnvVars == { };
+        message = ''
+          Invalid environment variable names in programs.claude.settings.env:
+            ${lib.concatStringsSep ", " (builtins.attrNames invalidEnvVars)}
+
+          Environment variable names must match POSIX convention: ^[A-Z_][A-Z0-9_]*$
+          (uppercase letters, digits, and underscores only; must start with letter or underscore)
+        '';
+      }
+      {
+        assertion = lib.all (v: v.type != "stdio" || v.command != null) (
+          builtins.attrValues cfg.mcpServers
+        );
+        message = ''
+          MCP servers with type "stdio" must have a command set.
+          Check programs.claude.mcpServers for entries with type = "stdio" and command = null.
+        '';
+      }
+      {
+        assertion = lib.all (v: v.type == "stdio" || v.url != null) (builtins.attrValues cfg.mcpServers);
+        message = ''
+          MCP servers with type "sse" or "http" must have a url set.
+          Check programs.claude.mcpServers for entries with type = "sse"/"http" and url = null.
+        '';
+      }
+    ];
+
+    home.file = {
+      ".claude/settings.json" = {
+        source = settingsJson;
+        force = true;
+      };
+    }
+    // statusLineScript
+    // hookFiles;
+
+  };
+}

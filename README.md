@@ -1,0 +1,99 @@
+# nix-ai
+
+### Your AI coding toolkit, declared once. Reproduced everywhere.
+
+Ever spent hours configuring Claude Code plugins, Gemini settings, and MCP servers — only to lose it all when you switch machines? **nix-ai** captures your entire AI setup as code using [Nix](https://nixos.org/). One command rebuilds everything, identically, every time.
+
+---
+
+## What it manages
+
+| Tool | What you get |
+|------|-------------|
+| **Claude Code** | Plugins, marketplace, statusline, settings, autonomous agents, hooks |
+| **Gemini CLI** | Settings, custom commands, permission rules |
+| **GitHub Copilot** | Configuration, permissions |
+| **OpenAI Codex** | Settings |
+| **MCP Servers** | 15+ servers — GitHub, Terraform, Context7, PAL, filesystem, memory, and more |
+| **Plugin Marketplace** | 14 curated plugin repositories |
+| **AI Dev Tools** | cclint, doppler-mcp, claude-flow, sync-ollama-models |
+| **Ollama** | Local model management with macOS launchd integration |
+
+## Quick start
+
+Add to your Nix flake:
+
+```nix
+{
+  inputs.nix-ai = {
+    url = "github:JacobPEvans/nix-ai";
+    inputs.nixpkgs.follows = "nixpkgs";
+    inputs.home-manager.follows = "home-manager";
+  };
+}
+```
+
+Then in your home-manager config:
+
+```nix
+sharedModules = [ nix-ai.homeManagerModules.default ];
+```
+
+That's it. Every AI tool, every plugin, every permission rule — managed by Nix.
+
+## How it works
+
+nix-ai exports [home-manager](https://github.com/nix-community/home-manager) modules that merge into your existing configuration:
+
+| Export | What it includes |
+|--------|-----------------|
+| `homeManagerModules.default` | Full AI stack — Claude, Gemini, Copilot, Codex, MCP, Ollama, dev tools |
+| `homeManagerModules.claude` | Just Claude Code |
+| `homeManagerModules.maestro` | Just Maestro orchestration |
+| `lib.ci.claudeSettingsJson` | Pure JSON for CI validation (no derivations needed) |
+
+### Self-contained design
+
+The module injects its own dependencies via `_module.args`. Your consuming flake only needs two lines:
+
+```nix
+inputs.nixpkgs.follows = "nixpkgs";
+inputs.home-manager.follows = "home-manager";
+```
+
+No AI-specific inputs to wire up. No extra configuration. It just works.
+
+## Repository structure
+
+```
+modules/
+├── claude/          # Claude Code (settings, plugins, statusline, auto-claude)
+├── maestro/         # Maestro agent orchestration
+├── mcp/             # 15+ MCP server definitions
+├── common/          # Shared permission engine
+├── gh-extensions/   # GitHub CLI extensions (gh-aw)
+├── permissions/     # Per-tool permission rules
+├── ollama.nix       # Local model management
+├── ai-tools.nix     # AI development tool packages
+├── gemini.nix       # Gemini CLI configuration
+├── copilot.nix      # GitHub Copilot configuration
+└── codex.nix        # OpenAI Codex configuration
+lib/
+├── claude-settings.nix    # Pure settings generator
+├── claude-registry.nix    # Marketplace format functions
+└── security-policies.nix  # Permission policy engine
+```
+
+## Part of a trio
+
+This repo is one of three that work together:
+
+| Repo | What it does |
+|------|-------------|
+| **nix-ai** (you are here) | AI coding tools |
+| [nix-home](https://github.com/JacobPEvans/nix-home) | Dev environment (git, zsh, VS Code, tmux) |
+| [nix-config](https://github.com/JacobPEvans/nix-config) | macOS system config (consumes both) |
+
+## License
+
+MIT

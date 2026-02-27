@@ -1,0 +1,338 @@
+{
+  "nodes": {
+    "ai-assistant-instructions": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772172261,
+        "narHash": "sha256-4HDlJfa5prY1rZqSbP85ZF9ximdTlPnPbyB2Qt+iIQ0=",
+        "owner": "JacobPEvans",
+        "repo": "ai-assistant-instructions",
+        "rev": "992402a9492923cefdb47a714c545a57bbdf6d74",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JacobPEvans",
+        "repo": "ai-assistant-instructions",
+        "type": "github"
+      }
+    },
+    "anthropic-agent-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1771993718,
+        "narHash": "sha256-mZZ0rlj/kju7we1h+MvUjgFAVjcZ/qKkMbNZfhfCSvk=",
+        "owner": "anthropics",
+        "repo": "skills",
+        "rev": "3d59511518591fa82e6cfcf0438d68dd5dad3e76",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "skills",
+        "type": "github"
+      }
+    },
+    "bills-claude-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1770604054,
+        "narHash": "sha256-1adQzMCc6ikpeJCKZfRs9wfBTA45h89ukIKjyJV3tUs=",
+        "owner": "BillChirico",
+        "repo": "bills-claude-skills",
+        "rev": "9a236799eddb0b1751a341da01dbe43c487cf1e0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BillChirico",
+        "repo": "bills-claude-skills",
+        "type": "github"
+      }
+    },
+    "cc-dev-tools": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772030703,
+        "narHash": "sha256-LObfBQTFExInqe6EZBJzx8EheSbHCPQ7l2+YezTLEMQ=",
+        "owner": "Lucklyric",
+        "repo": "cc-dev-tools",
+        "rev": "d8b3b6435eb0d5c44f2598c325c44371b029c2cb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Lucklyric",
+        "repo": "cc-dev-tools",
+        "type": "github"
+      }
+    },
+    "cc-marketplace": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1768758615,
+        "narHash": "sha256-BnH8+reZQRy4st+5zwA1EEDLIc2nVIp8CVBizUIkjXo=",
+        "owner": "ananddtyagi",
+        "repo": "cc-marketplace",
+        "rev": "b643305146890bda9b2e694d2c42206ae4d0a4df",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ananddtyagi",
+        "repo": "cc-marketplace",
+        "type": "github"
+      }
+    },
+    "claude-code-plugins": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772157328,
+        "narHash": "sha256-aaMSkKK7vB0W99L8qe4LNyHEB6YGb0kVnPV+QWU90rI=",
+        "owner": "anthropics",
+        "repo": "claude-code",
+        "rev": "1f48d799b9ef25a5c9cec36dd9a4c6f409b722f6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "claude-code",
+        "type": "github"
+      }
+    },
+    "claude-code-plugins-plus": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772168009,
+        "narHash": "sha256-eW0Fq5jd0f8mDKg7+Qwgybdkv5K5vIEKtV5v9t8NBUk=",
+        "owner": "jeremylongshore",
+        "repo": "claude-code-plugins-plus",
+        "rev": "7232ef065682ea452f70b39ff0f5422f7ed23608",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jeremylongshore",
+        "repo": "claude-code-plugins-plus",
+        "type": "github"
+      }
+    },
+    "claude-code-workflows": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1771678070,
+        "narHash": "sha256-RTgjKk4m1Oq8SoC6VUy4lujhvtOFEgGzbC8D+brUlpY=",
+        "owner": "wshobson",
+        "repo": "agents",
+        "rev": "ade0c7a211d04fa1354d10359737cace5c6fc5b0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "wshobson",
+        "repo": "agents",
+        "type": "github"
+      }
+    },
+    "claude-cookbooks": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772040211,
+        "narHash": "sha256-so4ceNOENK4ECzAj6qcTX6kBk4s5DksEzAww/yTy/G8=",
+        "owner": "anthropics",
+        "repo": "claude-cookbooks",
+        "rev": "0e8a6bfd65cbaa8f8b02f151bbf54f6e385bc5a5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "claude-cookbooks",
+        "type": "github"
+      }
+    },
+    "claude-plugins-official": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1771993700,
+        "narHash": "sha256-pcMIh9sgdMDs0dlc0POomxnPOLoP5/EOdCGMKoESmoc=",
+        "owner": "anthropics",
+        "repo": "claude-plugins-official",
+        "rev": "55b58ec6e5649104f926ba7558b567dc8d33c5ff",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "claude-plugins-official",
+        "type": "github"
+      }
+    },
+    "claude-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1771748657,
+        "narHash": "sha256-5ZfmFvWXxg5c/PnKjoi9iKQza+l6g45gG883JrYTFBw=",
+        "owner": "secondsky",
+        "repo": "claude-skills",
+        "rev": "6ebd12ce868f83fcb95c226e4c12f136a6e9af4f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "secondsky",
+        "repo": "claude-skills",
+        "type": "github"
+      }
+    },
+    "home-manager": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1772020340,
+        "narHash": "sha256-aqBl3GNpCadMoJ/hVkWTijM1Aeilc278MjM+LA3jK6g=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "36e38ca0d9afe4c55405fdf22179a5212243eecc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "ref": "release-25.11",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
+    "jacobpevans-cc-plugins": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772173804,
+        "narHash": "sha256-OxzYT/MfDQMwx1zvbyPoPcnMJetg55A+t3uhZ47cJ0w=",
+        "owner": "JacobPEvans",
+        "repo": "claude-code-plugins",
+        "rev": "d5a25c4e436337be9abf2160d4b598213d68042b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JacobPEvans",
+        "repo": "claude-code-plugins",
+        "type": "github"
+      }
+    },
+    "lunar-claude": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1771937456,
+        "narHash": "sha256-H487qwWEUrhgJf21IrvXblxnLjVGv5h4MhCDdmg14Ys=",
+        "owner": "basher83",
+        "repo": "lunar-claude",
+        "rev": "b9ae7b82c9c5cca0c4db1be50c3f328dcd183dc6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "basher83",
+        "repo": "lunar-claude",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1772068791,
+        "narHash": "sha256-2JWs4yBVGdWHkHAVtGhzRjqHmwCmyxuql5EoAtg/Huc=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "a669fd57cfdf64a6d93d8f854958df35009dc46f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-25.11-darwin",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "obsidian-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1770766319,
+        "narHash": "sha256-sCJlf9u3JCo0YliGH6fcZSjwGR/nQOehAYx9wK04RfA=",
+        "owner": "kepano",
+        "repo": "obsidian-skills",
+        "rev": "be978124b80dc6b60586773e1d125d1cdf36d26a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kepano",
+        "repo": "obsidian-skills",
+        "type": "github"
+      }
+    },
+    "obsidian-visual-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1770862721,
+        "narHash": "sha256-28hLlKPifZ0GT3vc3eYuIN0C2DQm6vtZhJIKEomRp0M=",
+        "owner": "axtonliu",
+        "repo": "axton-obsidian-visual-skills",
+        "rev": "1265976d9746a84858b4b7b42fb86a215aa93de9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "axtonliu",
+        "repo": "axton-obsidian-visual-skills",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "ai-assistant-instructions": "ai-assistant-instructions",
+        "anthropic-agent-skills": "anthropic-agent-skills",
+        "bills-claude-skills": "bills-claude-skills",
+        "cc-dev-tools": "cc-dev-tools",
+        "cc-marketplace": "cc-marketplace",
+        "claude-code-plugins": "claude-code-plugins",
+        "claude-code-plugins-plus": "claude-code-plugins-plus",
+        "claude-code-workflows": "claude-code-workflows",
+        "claude-cookbooks": "claude-cookbooks",
+        "claude-plugins-official": "claude-plugins-official",
+        "claude-skills": "claude-skills",
+        "home-manager": "home-manager",
+        "jacobpevans-cc-plugins": "jacobpevans-cc-plugins",
+        "lunar-claude": "lunar-claude",
+        "nixpkgs": "nixpkgs",
+        "obsidian-skills": "obsidian-skills",
+        "obsidian-visual-skills": "obsidian-visual-skills",
+        "superpowers-marketplace": "superpowers-marketplace",
+        "wakatime": "wakatime"
+      }
+    },
+    "superpowers-marketplace": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772062092,
+        "narHash": "sha256-WYBDGBT7dEEc8vjW3bnbvSGbG+wtsx4U25Z1Y5Z1Peg=",
+        "owner": "obra",
+        "repo": "superpowers-marketplace",
+        "rev": "6934cf9addf96fff83ba25aeeb25b3cda7651958",
+        "type": "github"
+      },
+      "original": {
+        "owner": "obra",
+        "repo": "superpowers-marketplace",
+        "type": "github"
+      }
+    },
+    "wakatime": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1771304265,
+        "narHash": "sha256-i+t78VSlJ931kNIEQLptlvqJnJ5qneXmLNy/cMjiPGs=",
+        "owner": "wakatime",
+        "repo": "claude-code-wakatime",
+        "rev": "9de34cbac2447cd6ffc5bc7cc797457f76de1e35",
+        "type": "github"
+      },
+      "original": {
+        "owner": "wakatime",
+        "repo": "claude-code-wakatime",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
