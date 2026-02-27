@@ -32,6 +32,22 @@
         "type": "github"
       }
     },
+    "axton-obsidian-visual-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1770862721,
+        "narHash": "sha256-28hLlKPifZ0GT3vc3eYuIN0C2DQm6vtZhJIKEomRp0M=",
+        "owner": "axtonliu",
+        "repo": "axton-obsidian-visual-skills",
+        "rev": "1265976d9746a84858b4b7b42fb86a215aa93de9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "axtonliu",
+        "repo": "axton-obsidian-visual-skills",
+        "type": "github"
+      }
+    },
     "bills-claude-skills": {
       "flake": false,
       "locked": {
@@ -200,11 +216,11 @@
     "jacobpevans-cc-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1772173804,
-        "narHash": "sha256-OxzYT/MfDQMwx1zvbyPoPcnMJetg55A+t3uhZ47cJ0w=",
+        "lastModified": 1772212799,
+        "narHash": "sha256-0gxUADZJdS8pMea3KS1IzO8ncuGY8qs9dlm8CC8b67U=",
         "owner": "JacobPEvans",
         "repo": "claude-code-plugins",
-        "rev": "d5a25c4e436337be9abf2160d4b598213d68042b",
+        "rev": "81ab6af92f9074fb44f33111d3228a076d753d8f",
         "type": "github"
       },
       "original": {
@@ -261,26 +277,11 @@
         "type": "github"
       }
     },
-    "obsidian-visual-skills": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1770862721,
-        "narHash": "sha256-28hLlKPifZ0GT3vc3eYuIN0C2DQm6vtZhJIKEomRp0M=",
-        "owner": "axtonliu",
-        "repo": "axton-obsidian-visual-skills",
-        "rev": "1265976d9746a84858b4b7b42fb86a215aa93de9",
-        "type": "github"
-      },
-      "original": {
-        "owner": "axtonliu",
-        "repo": "axton-obsidian-visual-skills",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "ai-assistant-instructions": "ai-assistant-instructions",
         "anthropic-agent-skills": "anthropic-agent-skills",
+        "axton-obsidian-visual-skills": "axton-obsidian-visual-skills",
         "bills-claude-skills": "bills-claude-skills",
         "cc-dev-tools": "cc-dev-tools",
         "cc-marketplace": "cc-marketplace",
@@ -295,7 +296,6 @@
         "lunar-claude": "lunar-claude",
         "nixpkgs": "nixpkgs",
         "obsidian-skills": "obsidian-skills",
-        "obsidian-visual-skills": "obsidian-visual-skills",
         "superpowers-marketplace": "superpowers-marketplace",
         "wakatime": "wakatime"
       }
