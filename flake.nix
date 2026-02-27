@@ -71,7 +71,7 @@
       url = "github:kepano/obsidian-skills";
       flake = false;
     };
-    obsidian-visual-skills = {
+    axton-obsidian-visual-skills = {
       url = "github:axtonliu/axton-obsidian-visual-skills";
       flake = false;
     };
@@ -103,7 +103,7 @@
       jacobpevans-cc-plugins,
       lunar-claude,
       obsidian-skills,
-      obsidian-visual-skills,
+      axton-obsidian-visual-skills,
       superpowers-marketplace,
       wakatime,
       ...
@@ -122,7 +122,7 @@
           jacobpevans-cc-plugins
           lunar-claude
           obsidian-skills
-          obsidian-visual-skills
+          axton-obsidian-visual-skills
           superpowers-marketplace
           wakatime
           ;

@@ -185,7 +185,7 @@ let
     };
 
     # Independent visual diagram skills (Excalidraw, Mermaid, Canvas Creator)
-    "obsidian-visual-skills" = {
+    "axton-obsidian-visual-skills" = {
       source = {
         type = "github";
         url = "axtonliu/axton-obsidian-visual-skills";

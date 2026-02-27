@@ -56,9 +56,6 @@ _:
     # DISABLED - New Opus 4.6 and Agent Teams sort of handle this
     "ralph-loop@claude-plugins-official" = false;
 
-    # Explicitly disabled - tracked for visibility
-    "example-plugin@claude-plugins-official" = false;
-
     # External plugins (GitHub, Slack, Context7, etc.) moved to external.nix
   };
 }
