@@ -1,0 +1,44 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.21.0
+    hooks:
+      - id: markdownlint-cli2
+        files: \.md$
+
+  - repo: local
+    hooks:
+      - id: nix-fmt-check
+        name: Nix formatting (nixfmt-rfc-style)
+        entry: "bash -c 'nixfmt --check \"$@\" || (echo \"Run: nix fmt\"; exit 1)' --"
+        language: system
+        files: \.nix$
+        types: [file]
+
+      - id: nix-statix
+        name: Nix linting (statix)
+        entry: statix check
+        language: system
+        files: \.nix$
+        types: [file]
+        pass_filenames: false
+
+      - id: nix-deadnix
+        name: Nix dead code (deadnix)
+        entry: deadnix -L --fail
+        language: system
+        files: \.nix$
+        types: [file]
+        pass_filenames: false

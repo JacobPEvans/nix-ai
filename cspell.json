@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "cclint",
+    "deadnix",
+    "nixpkgs",
+    "ollama",
+    "Ollama",
+    "statix",
+    "worktree",
+    "worktrees"
+  ],
+  "ignorePaths": [
+    "flake.lock",
+    "*.lock",
+    "node_modules",
+    ".git"
+  ]
+}
