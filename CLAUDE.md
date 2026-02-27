@@ -57,4 +57,4 @@ sudo darwin-rebuild switch --flake . --override-input nix-ai /Users/you/git/nix-
 | ---- | ------- |
 | **nix-ai** (this repo) | AI coding tools |
 | [nix-home](https://github.com/JacobPEvans/nix-home) | Dev environment (git, zsh, VS Code, tmux) |
-| [nix-config](https://github.com/JacobPEvans/nix) | macOS system config (consumes both) |
+| [nix-darwin](https://github.com/JacobPEvans/nix-darwin) | macOS system config (consumes both) |
