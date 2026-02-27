@@ -92,7 +92,7 @@ This repo is one of three that work together:
 | ---- | ------------ |
 | **nix-ai** (you are here) | AI coding tools |
 | [nix-home](https://github.com/JacobPEvans/nix-home) | Dev environment (git, zsh, VS Code, tmux) |
-| [nix-config](https://github.com/JacobPEvans/nix-config) | macOS system config (consumes both) |
+| [nix-darwin](https://github.com/JacobPEvans/nix-darwin) | macOS system config (consumes both) |
 
 ## License
 
