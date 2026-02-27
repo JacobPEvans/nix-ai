@@ -1,6 +1,6 @@
 # nix-ai
 
-### Your AI coding toolkit, declared once. Reproduced everywhere.
+## Your AI coding toolkit, declared once. Reproduced everywhere
 
 Ever spent hours configuring Claude Code plugins, Gemini settings, and MCP servers — only to lose it all when you switch machines? **nix-ai** captures your entire AI setup as code using [Nix](https://nixos.org/). One command rebuilds everything, identically, every time.
 
@@ -9,7 +9,7 @@ Ever spent hours configuring Claude Code plugins, Gemini settings, and MCP serve
 ## What it manages
 
 | Tool | What you get |
-|------|-------------|
+| ---- | ------------ |
 | **Claude Code** | Plugins, marketplace, statusline, settings, autonomous agents, hooks |
 | **Gemini CLI** | Settings, custom commands, permission rules |
 | **GitHub Copilot** | Configuration, permissions |
@@ -46,7 +46,7 @@ That's it. Every AI tool, every plugin, every permission rule — managed by Nix
 nix-ai exports [home-manager](https://github.com/nix-community/home-manager) modules that merge into your existing configuration:
 
 | Export | What it includes |
-|--------|-----------------|
+| ------ | --------------- |
 | `homeManagerModules.default` | Full AI stack — Claude, Gemini, Copilot, Codex, MCP, Ollama, dev tools |
 | `homeManagerModules.claude` | Just Claude Code |
 | `homeManagerModules.maestro` | Just Maestro orchestration |
@@ -65,7 +65,7 @@ No AI-specific inputs to wire up. No extra configuration. It just works.
 
 ## Repository structure
 
-```
+```text
 modules/
 ├── claude/          # Claude Code (settings, plugins, statusline, auto-claude)
 ├── maestro/         # Maestro agent orchestration
@@ -89,7 +89,7 @@ lib/
 This repo is one of three that work together:
 
 | Repo | What it does |
-|------|-------------|
+| ---- | ------------ |
 | **nix-ai** (you are here) | AI coding tools |
 | [nix-home](https://github.com/JacobPEvans/nix-home) | Dev environment (git, zsh, VS Code, tmux) |
 | [nix-config](https://github.com/JacobPEvans/nix-config) | macOS system config (consumes both) |
