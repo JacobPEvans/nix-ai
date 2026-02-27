@@ -33,6 +33,8 @@ let
         "schemas"
         ".claude-plugin"
         ".github"
+        "scripts"
+        "tests"
       ];
       isPluginDir =
         name: type: type == "directory" && !(lib.hasPrefix "." name) && !(builtins.elem name nonPluginDirs);
