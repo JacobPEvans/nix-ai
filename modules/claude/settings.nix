@@ -51,41 +51,16 @@ let
       { inherit (v) type url; } // lib.optionalAttrs (v.headers != { }) { inherit (v) headers; }
   ) activeMcpServers;
 
-  # Discover repos in trusted dirs at build time.
-  # For each dir in trustedProjectDirs, lists all subdirectory names and generates
-  # a "$dir/$repo/main" path. Silently skips non-existent dirs.
-  trustedProjectPaths =
-    let
-      discoverRepos =
-        baseDir:
-        let
-          expanded = builtins.replaceStrings [ "~" ] [ homeDir ] baseDir;
-          entries = if builtins.pathExists expanded then builtins.readDir expanded else { };
-          dirs = lib.filterAttrs (_: type: type == "directory") entries;
-        in
-        map (name: "${expanded}/${name}/main") (builtins.attrNames dirs);
-    in
-    lib.concatMap discoverRepos cfg.trustedProjectDirs;
-
-  # Trust flags written to ~/.claude.json projects entries
-  projectTrustEntry = {
-    hasClaudeMdExternalIncludesApproved = true;
-    hasClaudeMdExternalIncludesWarningShown = true;
-    hasTrustDialogAccepted = true;
-  };
-
-  # Complete JSON overlay — everything merged into ~/.claude.json at activation time.
+  # Static JSON overlay — keys merged into ~/.claude.json at activation time.
   # - mcpServers: Nix is sole manager; manual `claude mcp add --scope user` entries are overwritten.
   # - remoteControlAtStartup: only included when set (not null).
-  # - projects: trust entries deep-merged into existing project data (runtime keys preserved).
+  # Project trust entries are generated at activation time by claude-json-merge.sh
+  # (filesystem discovery cannot happen at Nix evaluation time in pure flake mode).
   claudeJsonOverlay = {
     mcpServers = mcpServersAttrs;
   }
   // lib.optionalAttrs (cfg.remoteControlAtStartup != null) {
     inherit (cfg) remoteControlAtStartup;
-  }
-  // lib.optionalAttrs (trustedProjectPaths != [ ]) {
-    projects = lib.genAttrs trustedProjectPaths (_: projectTrustEntry);
   };
 
   # Build the overlay as a pretty-printed JSON derivation
@@ -246,6 +221,7 @@ in
       claudeJsonMerge = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         export PATH="${pkgs.jq}/bin:$PATH"
         OVERLAY_FILE="${claudeJsonOverlayFile}"
+        TRUSTED_PROJECT_DIRS=${lib.escapeShellArg (builtins.toJSON cfg.trustedProjectDirs)}
         . ${./scripts/claude-json-merge.sh}
       '';
     };
