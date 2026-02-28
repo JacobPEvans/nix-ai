@@ -1,0 +1,37 @@
+name: Trigger Nix Flake Update
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  trigger-nix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read  # Minimal permissions
+
+    steps:
+      - name: Trigger nix-darwin flake update
+        run: |
+          gh api repos/JacobPEvans/nix-darwin/dispatches \
+            --method POST \
+            --field event_type='upstream-repo-updated' \
+            --field client_payload[flake_input_name]='nix-ai' \
+            --field client_payload[source_repo]="$SOURCE_REPO" \
+            --field client_payload[source_ref]="$SOURCE_REF" \
+            --field client_payload[commit_sha]="$COMMIT_SHA"
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT_WORKFLOW_DISPATCH }}
+          SOURCE_REPO: ${{ github.repository }}
+          SOURCE_REF: ${{ github.ref }}
+          COMMIT_SHA: ${{ github.sha }}
+
+      - name: Log dispatch
+        run: |
+          echo "✅ Triggered nix-darwin flake update workflow"
+          echo "Source: $SOURCE_REPO"
+          echo "Commit: $COMMIT_SHA"
+        env:
+          SOURCE_REPO: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
