@@ -1,0 +1,16 @@
+name: Auto Merge
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    uses: JacobPEvans/.github/.github/workflows/_auto-merge.yml@main
+    permissions:
+      contents: write
+      pull-requests: write

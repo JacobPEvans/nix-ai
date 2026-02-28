@@ -1,0 +1,72 @@
+name: Issue Auto-Resolve
+
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Issue number to resolve"
+        required: true
+        type: string
+      skip_triage:
+        description: "Skip triage (labels pre-applied)"
+        type: string
+        default: "false"
+
+permissions:
+  actions: write
+  contents: write
+  id-token: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  dispatch:
+    if: github.event_name == 'issues'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Dispatch as workflow_dispatch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW_NAME: ${{ github.workflow }}
+          ISSUE_NUM: ${{ github.event.issue.number }}
+          IS_BOT: ${{ github.event.sender.type == 'Bot' }}
+          HAS_AI_LABEL: ${{ contains(github.event.issue.labels.*.name, 'ai:created') }}
+        run: |
+          if [[ "$IS_BOT" == "true" && "$HAS_AI_LABEL" != "true" ]]; then
+            echo "Bot issue without ai:created label — skipping"
+            exit 0
+          fi
+          SKIP="false"
+          if [[ "$IS_BOT" == "true" ]]; then
+            SKIP="true"
+          fi
+          gh workflow run "$WORKFLOW_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            -f issue_number="$ISSUE_NUM" \
+            -f skip_triage="$SKIP"
+
+  run-triage:
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      inputs.skip_triage != 'true'
+    uses: JacobPEvans/ai-workflows/.github/workflows/issue-triage.yml@v0.5.1
+    secrets: inherit
+    with:
+      issue_number: ${{ inputs.issue_number }}
+
+  resolve-issue:
+    needs: [run-triage]
+    if: >-
+      always() &&
+      github.event_name == 'workflow_dispatch' &&
+      (needs.run-triage.result == 'success' || needs.run-triage.result == 'skipped')
+    uses: JacobPEvans/ai-workflows/.github/workflows/issue-resolver.yml@v0.5.1
+    secrets: inherit
+    with:
+      repo_context: "Nix home-manager modules for AI CLI tools (Claude, Gemini, Copilot, MCP servers)"
+      extra_tools: "Bash(nix:*)"
+      issue_number: ${{ inputs.issue_number }}

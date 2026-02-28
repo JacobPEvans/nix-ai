@@ -1,0 +1,41 @@
+name: Post-Merge Docs Review
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: 'Commit SHA to review'
+        required: false
+        type: string
+
+permissions:
+  actions: write
+  contents: write
+  id-token: write
+  pull-requests: write
+
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Re-trigger as workflow_dispatch
+        env:
+          WORKFLOW_NAME: ${{ github.workflow }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run "$WORKFLOW_NAME" \
+            --repo "${{ github.repository }}" \
+            --ref main \
+            -f commit_sha="${{ github.sha }}"
+
+  review:
+    if: github.event_name == 'workflow_dispatch'
+    uses: JacobPEvans/ai-workflows/.github/workflows/post-merge-docs-review.yml@v0.5.1
+    with:
+      commit_sha: ${{ inputs.commit_sha || github.sha }}
+    secrets: inherit

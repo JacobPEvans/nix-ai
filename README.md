@@ -2,7 +2,10 @@
 
 ## Your AI coding toolkit, declared once. Reproduced everywhere
 
-Ever spent hours configuring Claude Code plugins, Gemini settings, and MCP servers — only to lose it all when you switch machines? **nix-ai** captures your entire AI setup as code using [Nix](https://nixos.org/). One command rebuilds everything, identically, every time.
+Ever spent hours configuring Claude Code plugins, Gemini settings, and MCP servers
+-- only to lose it all when you switch machines?
+**nix-ai** captures your entire AI setup as code using [Nix](https://nixos.org/).
+One command rebuilds everything, identically, every time.
 
 ---
 

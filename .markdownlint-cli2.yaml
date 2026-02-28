@@ -1,6 +1,16 @@
 config:
   default: true
-  MD013: false
-  MD033: false
-  MD041: false
+  MD013:
+    line_length: 160
+    heading_line_length: 120
+    code_block_line_length: 160
+    tables: false
+  MD033:
+    allowed_elements:
+      - br
+      - details
+      - summary
+  MD041: true
+  MD060: false
 fix: true
+gitignore: true

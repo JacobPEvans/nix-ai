@@ -1,0 +1,19 @@
+name: Final PR Review
+
+on:
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+
+permissions:
+  checks: read
+  contents: read
+  id-token: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  review:
+    uses: JacobPEvans/ai-workflows/.github/workflows/final-pr-review.yml@v0.5.1
+    secrets: inherit
