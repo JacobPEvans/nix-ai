@@ -43,15 +43,37 @@ let
   # Stdio servers: { command, args, env? }
   # SSE/HTTP servers: { type, url, headers? }
   activeMcpServers = lib.filterAttrs (_: v: !v.disabled) cfg.mcpServers;
-  mcpServersJson = builtins.toJSON (
-    lib.mapAttrs (
-      _: v:
-      if v.type == "stdio" then
-        { inherit (v) command args; } // lib.optionalAttrs (v.env != { }) { inherit (v) env; }
-      else
-        { inherit (v) type url; } // lib.optionalAttrs (v.headers != { }) { inherit (v) headers; }
-    ) activeMcpServers
-  );
+  mcpServersAttrs = lib.mapAttrs (
+    _: v:
+    if v.type == "stdio" then
+      { inherit (v) command args; } // lib.optionalAttrs (v.env != { }) { inherit (v) env; }
+    else
+      { inherit (v) type url; } // lib.optionalAttrs (v.headers != { }) { inherit (v) headers; }
+  ) activeMcpServers;
+
+  # Static JSON overlay — keys merged into ~/.claude.json at activation time.
+  # - mcpServers: Nix is sole manager; manual `claude mcp add --scope user` entries are overwritten.
+  # - remoteControlAtStartup: only included when set (not null).
+  # Project trust entries are generated at activation time by claude-json-merge.sh
+  # (filesystem discovery cannot happen at Nix evaluation time in pure flake mode).
+  claudeJsonOverlay = {
+    mcpServers = mcpServersAttrs;
+  }
+  // lib.optionalAttrs (cfg.remoteControlAtStartup != null) {
+    inherit (cfg) remoteControlAtStartup;
+  };
+
+  # Build the overlay as a pretty-printed JSON derivation
+  claudeJsonOverlayFile =
+    pkgs.runCommand "claude-json-overlay.json"
+      {
+        nativeBuildInputs = [ pkgs.jq ];
+        passAsFile = [ "json" ];
+        json = builtins.toJSON claudeJsonOverlay;
+      }
+      ''
+        jq '.' "$jsonPath" > $out
+      '';
 
   # Build the settings object
   settings = {
@@ -176,22 +198,15 @@ in
   config = lib.mkIf cfg.enable {
     # Merge runtime keys into ~/.claude.json (global config) at activation time.
     # These keys live in the global config file, not settings.json, so home.file cannot be
-    # used directly (the file is runtime-mutable). jq merges only specific keys idempotently.
-    home.activation =
-      lib.optionalAttrs (cfg.remoteControlAtStartup != null) {
-        claudeRemoteControlAtStartup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          export PATH="${pkgs.jq}/bin:$PATH"
-          RC_VALUE=${if cfg.remoteControlAtStartup then "true" else "false"}
-          . ${./scripts/remote-control-startup.sh}
-        '';
-      }
-      // {
-        claudeMcpServers = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          export PATH="${pkgs.jq}/bin:$PATH"
-          MCP_SERVERS_JSON=${lib.escapeShellArg mcpServersJson}
-          . ${./scripts/mcp-servers-merge.sh}
-        '';
-      };
+    # used directly (the file is runtime-mutable). One unified script deep-merges all keys.
+    home.activation = {
+      claudeJsonMerge = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        export PATH="${pkgs.jq}/bin:$PATH"
+        OVERLAY_FILE="${claudeJsonOverlayFile}"
+        TRUSTED_PROJECT_DIRS=${lib.escapeShellArg (builtins.toJSON cfg.trustedProjectDirs)}
+        . ${./scripts/claude-json-merge.sh}
+      '';
+    };
 
     # Validate configuration before generating settings.json
     assertions = [

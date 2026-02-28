@@ -82,6 +82,11 @@ in
   # Requires a Claude Max subscription; no-op if not logged in.
   remoteControlAtStartup = true;
 
+  # Auto-approve CLAUDE.md external imports for all repos discovered under ~/git/.
+  # Generates hasClaudeMdExternalIncludesApproved = true entries in ~/.claude.json
+  # for each ~/git/<repo>/main path found at home-manager activation time (runtime) via claude-json-merge.sh.
+  trustedProjectDirs = [ "~/git" ];
+
   effortLevel = "medium";
 
   # Minimal commit attribution — replaces verbose Co-Authored-By trailer
