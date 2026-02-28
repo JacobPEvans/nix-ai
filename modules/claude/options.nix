@@ -254,7 +254,7 @@ in
       default = [ ];
       description = ''
         Base directories containing git repos (worktree layout).
-        At build time, discovers all subdirectories and generates
+        At activation time, discovers all subdirectories and generates
         trust entries (hasClaudeMdExternalIncludesApproved, hasTrustDialogAccepted)
         for each "$baseDir/$repo/main" path in ~/.claude.json.
       '';
