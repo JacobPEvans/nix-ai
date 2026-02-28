@@ -395,34 +395,6 @@ in
         type = types.nullOr types.lines;
         default = null;
       };
-      enhanced = {
-        enable = mkOption {
-          type = types.bool;
-          default = false;
-        };
-        source = mkOption {
-          type = types.nullOr types.path;
-          default = null;
-          description = "Flake input path to claude-code-statusline repo";
-        };
-        configFile = mkOption {
-          type = types.nullOr types.path;
-          default = null;
-          description = "Path to Config.toml for local/full display (defaults to examples/Config.toml from source)";
-        };
-        mobileConfigFile = mkOption {
-          type = types.nullOr types.path;
-          default = null;
-          description = "Path to minimal Config.toml for SSH/mobile terminals (single-line display)";
-        };
-        # Internal: package built by statusline.nix, used by settings.nix
-        package = mkOption {
-          type = types.nullOr types.package;
-          default = null;
-          internal = true;
-          description = "Internal: built statusline package";
-        };
-      };
     };
 
     # Feature Flags

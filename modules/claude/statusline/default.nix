@@ -28,23 +28,5 @@ in
     ./powerline.nix
   ];
 
-  config = lib.mkIf cfg.enable {
-    assertions = [
-      # Prevent conflicts between old and new statusline modules
-      {
-        assertion = !(config.programs.claude.statusLine.enhanced.enable or false);
-        message = ''
-          Both programs.claude.statusLine.enhanced and programs.claudeStatusline are enabled.
-
-          This creates a conflict as both modules will try to deploy the statusline.
-          Please use only one statusline module. The programs.claudeStatusline module
-          is the new recommended interface.
-
-          To fix:
-          1. Set programs.claude.statusLine.enhanced.enable = false;
-          2. Use programs.claudeStatusline with the powerline theme
-        '';
-      }
-    ];
-  };
+  config = lib.mkIf cfg.enable { };
 }

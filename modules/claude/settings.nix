@@ -85,29 +85,14 @@ let
   // lib.optionalAttrs (cfg.remoteControlAtStartup != null) { inherit (cfg) remoteControlAtStartup; }
   // lib.optionalAttrs (envAttrs != { }) { env = envAttrs; }
 
-  # Status line (only include if we have valid configuration)
-  # Include when: enhanced mode with package, OR custom script (with enhanced disabled)
+  # Status line (only include if script is configured)
   # Do NOT include empty statusLine object (breaks Claude Code schema)
-  // (
-    let
-      # Extract duplicate condition to avoid divergence between outer and inner checks
-      hasEnhancedStatusLine = cfg.statusLine.enhanced.enable && cfg.statusLine.enhanced.package != null;
-      hasCustomScript = cfg.statusLine.script != null && !cfg.statusLine.enhanced.enable;
-    in
-    lib.optionalAttrs (cfg.statusLine.enable && (hasEnhancedStatusLine || hasCustomScript)) {
-      statusLine = {
-        type = "command";
-        command =
-          if
-            hasEnhancedStatusLine
-          # Reference package built by statusline.nix (single source of truth)
-          then
-            "${cfg.statusLine.enhanced.package}/bin/claude-code-statusline"
-          else
-            "${homeDir}/.claude/statusline-command.sh";
-      };
-    }
-  )
+  // lib.optionalAttrs (cfg.statusLine.enable && cfg.statusLine.script != null) {
+    statusLine = {
+      type = "command";
+      command = "${homeDir}/.claude/statusline-command.sh";
+    };
+  }
 
   # Sandbox configuration (Dec 2025 feature)
   # Only include when sandbox is actually enabled to avoid confusing disabled state with configuration
@@ -132,16 +117,13 @@ let
         jq '.' "$jsonPath" > $out
       '';
 
-  # Status line script (if using simple script mode)
-  statusLineScript =
-    lib.optionalAttrs
-      (cfg.statusLine.enable && cfg.statusLine.script != null && !cfg.statusLine.enhanced.enable)
-      {
-        ".claude/statusline-command.sh" = {
-          text = cfg.statusLine.script;
-          executable = true;
-        };
-      };
+  # Status line script (if configured)
+  statusLineScript = lib.optionalAttrs (cfg.statusLine.enable && cfg.statusLine.script != null) {
+    ".claude/statusline-command.sh" = {
+      text = cfg.statusLine.script;
+      executable = true;
+    };
+  };
 
   # Hook scripts generator
   # Converts hook options to executable scripts in ~/.claude/hooks/
