@@ -4,16 +4,9 @@ on:
   push:
     branches:
       - main
-  # Also trigger on successful PR merges
-  pull_request:
-    types: [closed]
-    branches:
-      - main
 
 jobs:
   trigger-nix:
-    # Only run on push to main OR on merged PRs
-    if: github.event_name == 'push' || (github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
     permissions:
       contents: read  # Minimal permissions
