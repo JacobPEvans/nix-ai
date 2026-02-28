@@ -40,7 +40,7 @@ _:
     "gitlab@claude-plugins-official" = false;
 
     # Greptile - AI-powered codebase search
-    # Requires: Greptile API key
+    # Requires: GREPTILE_API_KEY env var
     "greptile@claude-plugins-official" = true;
 
     # =========================================================================
