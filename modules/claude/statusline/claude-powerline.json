@@ -7,9 +7,6 @@
     "lines": [
       {
         "segments": {
-          "directory": { "enabled": true, "style": "fish" },
-          "model": { "enabled": true },
-          "context": { "enabled": true, "showPercentageOnly": false },
           "git": {
             "enabled": true,
             "showRepoName": true,
@@ -22,6 +19,9 @@
             "showUpstream": false,
             "showStash": false
           },
+          "directory": { "enabled": true, "style": "fish" },
+          "model": { "enabled": true },
+          "context": { "enabled": true, "showPercentageOnly": false },
           "metrics": {
             "enabled": true,
             "showResponseTime": false,
