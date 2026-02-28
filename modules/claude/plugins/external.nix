@@ -41,7 +41,7 @@ _:
 
     # Greptile - AI-powered codebase search
     # Requires: Greptile API key
-    "greptile@claude-plugins-official" = false;
+    "greptile@claude-plugins-official" = true;
 
     # =========================================================================
     # Documentation & Context
