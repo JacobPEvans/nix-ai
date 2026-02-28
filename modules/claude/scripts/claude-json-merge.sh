@@ -27,7 +27,8 @@ _build_trust_overlay() {
         repo_name=$(basename "$repo_dir")
         # Skip hidden dirs and non-repo-looking entries
         [[ "$repo_name" == .* ]] && continue
-        path="${base_dir}/${repo_name}/main"
+        path="${repo_dir}/main"
+        [ -d "$path" ] || continue
         projects=$(jq -n --argjson p "$projects" --arg k "$path" --argjson v "$trust_entry" '$p + {($k): $v}')
       done < <(find "$base_dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null)
     fi
@@ -45,14 +46,8 @@ if [ -f "$CLAUDE_JSON" ]; then
     --argjson trust "$trust_projects" \
     '
       .[0] as $existing | .[1] as $overlay |
-      ($overlay | del(.projects)) as $topLevel |
-      $existing * $topLevel |
-      .projects = (
-        ($existing.projects // {}) as $ep |
-        reduce ($trust | keys[]) as $k ($ep;
-          .[$k] = ((.[$k] // {}) * $trust[$k])
-        )
-      )
+      # Replace top-level keys from overlay (mcpServers etc.), deep-merge .projects.
+      ($existing + ($overlay | del(.projects))) | .projects = (($existing.projects // {}) * ($overlay.projects // {}) * $trust)
     ' "$CLAUDE_JSON" "$OVERLAY_FILE" > "$TMP"; then
     $DRY_RUN_CMD mv "$TMP" "$CLAUDE_JSON"
     trap - EXIT
@@ -66,7 +61,10 @@ else
   if jq --argjson trust "$trust_projects" '. + {projects: $trust}' "$OVERLAY_FILE" > "$TMP"; then
     $DRY_RUN_CMD mv "$TMP" "$CLAUDE_JSON"
     trap - EXIT
+  else
+    echo "warning: Failed to create \"$CLAUDE_JSON\" from overlay; jq returned an error." >&2
+    rm -f "$TMP"
   fi
 fi
 
-$DRY_RUN_CMD chmod 600 "$CLAUDE_JSON"
+[ -f "$CLAUDE_JSON" ] && $DRY_RUN_CMD chmod 600 "$CLAUDE_JSON"
