@@ -203,15 +203,6 @@ in
 
   statusLine = {
     enable = true;
-    enhanced = {
-      # Disabled: upstream repository no longer available (404)
-      # Repository: https://github.com/rz1989s/claude-code-statusline
-      enable = false;
-      # Full config for local terminal
-      # configFile = statuslineConfigFull;
-      # Mobile config for SSH sessions (single-line, minimal)
-      # mobileConfigFile = statuslineConfigMobile;
-    };
   };
 
   # Hooks: Event-driven automation for Claude Code
