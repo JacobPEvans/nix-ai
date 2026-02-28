@@ -43,15 +43,62 @@ let
   # Stdio servers: { command, args, env? }
   # SSE/HTTP servers: { type, url, headers? }
   activeMcpServers = lib.filterAttrs (_: v: !v.disabled) cfg.mcpServers;
-  mcpServersJson = builtins.toJSON (
-    lib.mapAttrs (
-      _: v:
-      if v.type == "stdio" then
-        { inherit (v) command args; } // lib.optionalAttrs (v.env != { }) { inherit (v) env; }
-      else
-        { inherit (v) type url; } // lib.optionalAttrs (v.headers != { }) { inherit (v) headers; }
-    ) activeMcpServers
-  );
+  mcpServersAttrs = lib.mapAttrs (
+    _: v:
+    if v.type == "stdio" then
+      { inherit (v) command args; } // lib.optionalAttrs (v.env != { }) { inherit (v) env; }
+    else
+      { inherit (v) type url; } // lib.optionalAttrs (v.headers != { }) { inherit (v) headers; }
+  ) activeMcpServers;
+
+  # Discover repos in trusted dirs at build time.
+  # For each dir in trustedProjectDirs, lists all subdirectory names and generates
+  # a "$dir/$repo/main" path. Silently skips non-existent dirs.
+  trustedProjectPaths =
+    let
+      discoverRepos =
+        baseDir:
+        let
+          expanded = builtins.replaceStrings [ "~" ] [ homeDir ] baseDir;
+          entries = if builtins.pathExists expanded then builtins.readDir expanded else { };
+          dirs = lib.filterAttrs (_: type: type == "directory") entries;
+        in
+        map (name: "${expanded}/${name}/main") (builtins.attrNames dirs);
+    in
+    lib.concatMap discoverRepos cfg.trustedProjectDirs;
+
+  # Trust flags written to ~/.claude.json projects entries
+  projectTrustEntry = {
+    hasClaudeMdExternalIncludesApproved = true;
+    hasClaudeMdExternalIncludesWarningShown = true;
+    hasTrustDialogAccepted = true;
+  };
+
+  # Complete JSON overlay — everything merged into ~/.claude.json at activation time.
+  # - mcpServers: Nix is sole manager; manual `claude mcp add --scope user` entries are overwritten.
+  # - remoteControlAtStartup: only included when set (not null).
+  # - projects: trust entries deep-merged into existing project data (runtime keys preserved).
+  claudeJsonOverlay = {
+    mcpServers = mcpServersAttrs;
+  }
+  // lib.optionalAttrs (cfg.remoteControlAtStartup != null) {
+    inherit (cfg) remoteControlAtStartup;
+  }
+  // lib.optionalAttrs (trustedProjectPaths != [ ]) {
+    projects = lib.genAttrs trustedProjectPaths (_: projectTrustEntry);
+  };
+
+  # Build the overlay as a pretty-printed JSON derivation
+  claudeJsonOverlayFile =
+    pkgs.runCommand "claude-json-overlay.json"
+      {
+        nativeBuildInputs = [ pkgs.jq ];
+        passAsFile = [ "json" ];
+        json = builtins.toJSON claudeJsonOverlay;
+      }
+      ''
+        jq '.' "$jsonPath" > $out
+      '';
 
   # Build the settings object
   settings = {
@@ -194,22 +241,14 @@ in
   config = lib.mkIf cfg.enable {
     # Merge runtime keys into ~/.claude.json (global config) at activation time.
     # These keys live in the global config file, not settings.json, so home.file cannot be
-    # used directly (the file is runtime-mutable). jq merges only specific keys idempotently.
-    home.activation =
-      lib.optionalAttrs (cfg.remoteControlAtStartup != null) {
-        claudeRemoteControlAtStartup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          export PATH="${pkgs.jq}/bin:$PATH"
-          RC_VALUE=${if cfg.remoteControlAtStartup then "true" else "false"}
-          . ${./scripts/remote-control-startup.sh}
-        '';
-      }
-      // {
-        claudeMcpServers = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          export PATH="${pkgs.jq}/bin:$PATH"
-          MCP_SERVERS_JSON=${lib.escapeShellArg mcpServersJson}
-          . ${./scripts/mcp-servers-merge.sh}
-        '';
-      };
+    # used directly (the file is runtime-mutable). One unified script deep-merges all keys.
+    home.activation = {
+      claudeJsonMerge = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        export PATH="${pkgs.jq}/bin:$PATH"
+        OVERLAY_FILE="${claudeJsonOverlayFile}"
+        . ${./scripts/claude-json-merge.sh}
+      '';
+    };
 
     # Validate configuration before generating settings.json
     assertions = [

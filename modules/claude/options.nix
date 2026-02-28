@@ -247,6 +247,20 @@ in
       '';
     };
 
+    # Trusted project directories for CLAUDE.md external import approval.
+    # Stored in ~/.claude.json under projects.<path> at activation time.
+    trustedProjectDirs = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = ''
+        Base directories containing git repos (worktree layout).
+        At build time, discovers all subdirectories and generates
+        trust entries (hasClaudeMdExternalIncludesApproved, hasTrustDialogAccepted)
+        for each "$baseDir/$repo/main" path in ~/.claude.json.
+      '';
+      example = [ "~/git" ];
+    };
+
     model = mkOption {
       type = types.nullOr types.str;
       default = null;
