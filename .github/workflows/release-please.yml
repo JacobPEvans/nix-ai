@@ -1,0 +1,9 @@
+name: Release Please
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  release-please:
+    uses: JacobPEvans/.github/.github/workflows/_release-please.yml@main
