@@ -87,6 +87,7 @@
 
   outputs =
     {
+      self,
       nixpkgs,
       home-manager,
       claude-code-plugins,
@@ -208,15 +209,16 @@
         versions = import ./lib/versions.nix;
       };
 
-      # Quality checks (formatting, linting, dead code)
+      # Quality checks (formatting, linting, dead code, shellcheck, module-eval)
       checks = forAllSystems (
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
         in
         import ./lib/checks.nix {
-          inherit pkgs;
+          inherit pkgs home-manager;
           src = ./.;
+          aiModule = self.homeManagerModules.default;
         }
       );
 
