@@ -12,6 +12,23 @@
             "showRepoName": true,
             "showWorktree": true,
             "showBranch": true,
+            "showBehind": false,
+            "showClean": false,
+            "showChanges": false,
+            "showSha": false,
+            "showUpstream": false,
+            "showStash": false
+          },
+          "directory": { "enabled": true, "style": "fish" }
+        }
+      },
+      {
+        "segments": {
+          "git": {
+            "enabled": true,
+            "showRepoName": false,
+            "showWorktree": false,
+            "showBranch": false,
             "showBehind": true,
             "showClean": true,
             "showChanges": true,
@@ -19,7 +36,6 @@
             "showUpstream": false,
             "showStash": false
           },
-          "directory": { "enabled": true, "style": "fish" },
           "model": { "enabled": true },
           "context": { "enabled": true, "showPercentageOnly": false },
           "metrics": {
