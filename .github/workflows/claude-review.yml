@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   review:
-    uses: JacobPEvans/ai-workflows/.github/workflows/claude-review.yml@v0.6.1
+    uses: JacobPEvans/ai-workflows/.github/workflows/claude-review.yml@v0.7.0
     with:
       review_prompt: "Focus on Nix flake patterns, home-manager module structure, AI tool configuration best practices"
     secrets: inherit
