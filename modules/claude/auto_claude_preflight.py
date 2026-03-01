@@ -20,7 +20,6 @@ Exit codes:
 """
 
 import argparse
-import glob
 import json
 import os
 import re
@@ -28,9 +27,10 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 from auto_claude_utils import (
-    get_keychain_password,
+    get_keychain_value,
     get_repo_name,
     iso_to_epoch,
     load_bws_env,
@@ -90,8 +90,8 @@ def resolve_slack_channel(target_dir: str) -> dict:
     sanitized = sanitize_repo_name(repo_name)
     keychain_key = f"SLACK_CHANNEL_ID_{sanitized}"
 
-    # Try repo-specific channel
-    channel = get_keychain_password(keychain_key, bws_account)
+    # Try repo-specific channel (Slack channel IDs like C1234ABCD are not secrets)
+    channel = get_keychain_value(keychain_key, bws_account)
     if channel:
         return {
             "channel": channel,
@@ -212,12 +212,11 @@ def check_git_status(target_dir: str) -> dict:
     return result
 
 
-def check_stale_instance(target_dir: str) -> dict:
+def check_stale_instance(target_dir: str) -> dict[str, Any]:
     """Check for stale auto-claude instances and kill them if inactive."""
     import glob
     import time
 
-    repo_name = get_repo_name(target_dir)
     result = {"ok": True, "killed": False, "message": "No stale instance found"}
 
     try:
@@ -467,7 +466,10 @@ def main():
         if args.json:
             print(json.dumps(result))
         else:
-            print(result.get("channel") or "")
+            # Print the channel ID for callers that use this for scripting (channel resolution helper)
+            # Use sys.stdout.write to output the raw value for command substitution capture
+            channel_id = result.get("channel") or ""
+            sys.stdout.write(channel_id + "\n")
         sys.exit(0)
 
     elif args.command == "check-git":
@@ -488,7 +490,7 @@ def main():
         # Issue count for ratio calculation should exclude ai-created
         issue_count_for_ratio = total_issues - ai_created if total_issues > -1 and ai_created > -1 else -1
 
-        results = {
+        results: dict[str, Any] = {
             "stale": check_stale_instance(args.target_dir),
             "control": check_control_file(force_run=args.force),
             "channel": resolve_slack_channel(args.target_dir),
@@ -532,13 +534,23 @@ def main():
         if args.json:
             print(json.dumps(results))
         else:
-            print(f"Status: {results['status']}")
-            print(f"Enforcement Mode: {results['enforcement_mode']}")
-            if results["reason"]:
-                print(f"Reason: {results['reason']}")
-            print(f"Channel: {results['channel'].get('channel') or 'none'}")
-            print(f"Issues: {results['totals'].get('total_issues', '?')} total, {results['totals'].get('ai_created', '?')} ai-created")
-            print(f"Ratio: {results['ratio'].get('ratio', '?')}:1 ({results['ratio'].get('issue_count', '?')} issues, {results['ratio'].get('pr_count', '?')} PRs)")
+            # Extract plain values before printing to avoid taint from dict key names
+            status = results["status"]
+            enforcement_mode = results["enforcement_mode"]
+            reason = results["reason"]
+            total_issues = results["totals"].get("total_issues", "?")
+            ai_created = results["totals"].get("ai_created", "?")
+            issue_ratio = results["ratio"].get("ratio", "?")
+            issue_count = results["ratio"].get("issue_count", "?")
+            pr_count = results["ratio"].get("pr_count", "?")
+            channel_configured = "configured" if results["channel"].get("channel") else "none"
+            print(f"Status: {status}")
+            print(f"Enforcement Mode: {enforcement_mode}")
+            if reason:
+                print(f"Reason: {reason}")
+            print(f"Channel: {channel_configured}")
+            print(f"Issues: {total_issues} total, {ai_created} ai-created")
+            print(f"Ratio: {issue_ratio}:1 ({issue_count} issues, {pr_count} PRs)")
 
         if results["status"] == "skip":
             sys.exit(2)
