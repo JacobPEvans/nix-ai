@@ -28,6 +28,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 from auto_claude_utils import (
     get_keychain_value,
@@ -467,9 +468,10 @@ def main():
         if args.json:
             print(json.dumps(result))
         else:
-            # Slack channel IDs (e.g. C1234ABCD) are identifiers, not credentials
-            slack_channel_id = result.get("channel") or ""
-            print(slack_channel_id)
+            # Print the channel ID for callers that use this for scripting (channel resolution helper)
+            # Use sys.stdout.write to output the raw value for command substitution capture
+            channel_id = result.get("channel") or ""
+            sys.stdout.write(channel_id + "\n")
         sys.exit(0)
 
     elif args.command == "check-git":
@@ -490,7 +492,7 @@ def main():
         # Issue count for ratio calculation should exclude ai-created
         issue_count_for_ratio = total_issues - ai_created if total_issues > -1 and ai_created > -1 else -1
 
-        results = {
+        results: dict[str, Any] = {
             "stale": check_stale_instance(args.target_dir),
             "control": check_control_file(force_run=args.force),
             "channel": resolve_slack_channel(args.target_dir),
@@ -538,18 +540,17 @@ def main():
             status = results["status"]
             enforcement_mode = results["enforcement_mode"]
             reason = results["reason"]
-            # Slack channel IDs (e.g. C1234ABCD) are identifiers, not credentials
-            slack_channel_id = results["channel"].get("channel") or "none"
             total_issues = results["totals"].get("total_issues", "?")
             ai_created = results["totals"].get("ai_created", "?")
             issue_ratio = results["ratio"].get("ratio", "?")
             issue_count = results["ratio"].get("issue_count", "?")
             pr_count = results["ratio"].get("pr_count", "?")
+            channel_configured = "configured" if results["channel"].get("channel") else "none"
             print(f"Status: {status}")
             print(f"Enforcement Mode: {enforcement_mode}")
             if reason:
                 print(f"Reason: {reason}")
-            print(f"Channel: {slack_channel_id}")
+            print(f"Channel: {channel_configured}")
             print(f"Issues: {total_issues} total, {ai_created} ai-created")
             print(f"Ratio: {issue_ratio}:1 ({issue_count} issues, {pr_count} PRs)")
 

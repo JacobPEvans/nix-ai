@@ -157,7 +157,7 @@ def main():
             # Slack channel IDs (e.g. C1234ABCD) are identifiers, not credentials
             channel_id = get_keychain_value(keychain_key, bws_account)
             if channel_id:
-                results.pass_(f"Repo-specific channel: {keychain_key} -> {channel_id}")
+                results.pass_(f"Repo-specific channel: {keychain_key} (found)")
             else:
                 results.warn(f"No repo-specific channel for {keychain_key}")
 
