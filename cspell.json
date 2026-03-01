@@ -3,11 +3,15 @@
   "version": "0.2",
   "language": "en",
   "words": [
+    "Bitwarden",
     "cclint",
     "deadnix",
+    "nixfmt",
     "nixpkgs",
     "ollama",
     "Ollama",
+    "powerline",
+    "shellcheck",
     "statix",
     "worktree",
     "worktrees"
