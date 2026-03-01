@@ -23,6 +23,7 @@ import argparse
 import glob
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -220,9 +221,12 @@ def check_stale_instance(target_dir: str) -> dict:
     result = {"ok": True, "killed": False, "message": "No stale instance found"}
 
     try:
-        # Find auto-claude processes for this repo
+        # Find auto-claude processes for this repo.
+        # Escape target_dir to prevent regex metacharacters from being interpreted
+        # by pgrep's -f pattern matching (fix: regex injection via target_dir).
+        escaped_target_dir = re.escape(target_dir)
         ps_result = subprocess.run(
-            ["pgrep", "-f", f"auto-claude.sh.*{target_dir}"],
+            ["pgrep", "-f", f"auto-claude.sh.*{escaped_target_dir}"],
             capture_output=True, text=True,
         )
 

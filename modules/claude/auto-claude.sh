@@ -191,6 +191,11 @@ pushd "$TARGET_DIR" >/dev/null || {
 # Determine default branch dynamically
 DEFAULT_BRANCH=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null | sed 's@^origin/@@')
 [[ -z "$DEFAULT_BRANCH" ]] && DEFAULT_BRANCH="main"
+# Validate branch name before use in subprocess calls to prevent flag/argument injection
+if ! [[ "$DEFAULT_BRANCH" =~ ^[a-zA-Z0-9/_.-]+$ ]]; then
+  echo "[$RUN_ID] ERROR: Unsafe branch name detected: $DEFAULT_BRANCH" >> "$FAILURES_LOG"
+  exit 1
+fi
 
 git fetch origin 2>&1 | tee -a "$FAILURES_LOG" || {
   popd >/dev/null
