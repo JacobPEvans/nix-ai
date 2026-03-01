@@ -311,8 +311,25 @@ def parse_log_file(log_path: str) -> dict:
     start_time = None
     end_time = None
 
+    # Validate that the resolved path is within an allowed directory before opening.
+    # This prevents path traversal attacks where an attacker controls the log_file argument.
+    resolved = Path(log_path).resolve()
+    allowed_prefixes = [
+        Path.home() / ".claude" / "logs",
+        Path("/tmp"),
+    ]
+    if not any(str(resolved).startswith(str(p) + "/") or str(resolved) == str(p) for p in allowed_prefixes):
+        print(f"Error: Log file path not in an allowed directory: {log_path}", file=sys.stderr)
+        return {
+            "completed": [],
+            "blocked": [],
+            "prs": [],
+            "total_cost": 0.0,
+            "duration_minutes": 0,
+        }
+
     try:
-        with open(log_path, encoding="utf-8") as f:
+        with open(resolved, encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if not line:
