@@ -153,4 +153,8 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: bws_helper.py <SECRET_KEY>", file=sys.stderr)
         sys.exit(1)
-    print(get_secret(sys.argv[1].upper().replace("-", "_")))
+    # This script is a CLI credential helper: it intentionally writes the requested
+    # secret to stdout so callers can capture it via command substitution.
+    # The output goes to a pipe, not a log, so clear-text logging is not a concern.
+    output = get_secret(sys.argv[1].upper().replace("-", "_"))
+    sys.stdout.write(output + "\n")

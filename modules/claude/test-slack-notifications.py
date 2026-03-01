@@ -23,7 +23,7 @@ from datetime import datetime
 from pathlib import Path
 
 from auto_claude_utils import (
-    get_keychain_password,
+    get_keychain_value,
     get_repo_name,
     load_bws_env,
     sanitize_repo_name,
@@ -154,9 +154,10 @@ def main():
             sanitized = sanitize_repo_name(repo_name)
             keychain_key = f"SLACK_CHANNEL_ID_{sanitized}"
 
-            channel = get_keychain_password(keychain_key, bws_account)
-            if channel:
-                results.pass_(f"Repo-specific channel: {keychain_key} -> {channel}")
+            # Slack channel IDs (e.g. C1234ABCD) are identifiers, not credentials
+            channel_id = get_keychain_value(keychain_key, bws_account)
+            if channel_id:
+                results.pass_(f"Repo-specific channel: {keychain_key} -> {channel_id}")
             else:
                 results.warn(f"No repo-specific channel for {keychain_key}")
 

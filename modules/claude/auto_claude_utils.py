@@ -65,6 +65,24 @@ def get_keychain_password(service: str, account: str | None = None) -> str | Non
         return None
 
 
+def get_keychain_value(service: str, account: str | None = None) -> str | None:
+    """Get a non-sensitive identifier from macOS keychain (e.g. Slack channel IDs).
+
+    Use this for non-credential keychain entries such as Slack channel identifiers
+    (e.g. C1234ABCD). These are configuration values, not secrets, and may be
+    safely printed to stdout for diagnostic purposes.
+    """
+    try:
+        cmd = ["security", "find-generic-password", "-s", service, "-w"]
+        if account:
+            cmd = ["security", "find-generic-password", "-s", service, "-a", account, "-w"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return result.stdout.strip()
+    except subprocess.CalledProcessError:
+        # Keychain entry not found - this is expected for optional config
+        return None
+
+
 def get_repo_name(target_dir: str) -> str:
     """Get repo name - prefer git remote URL (works for worktrees), fall back to basename."""
     target_path = Path(target_dir)

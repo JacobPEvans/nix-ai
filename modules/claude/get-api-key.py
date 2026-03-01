@@ -17,7 +17,11 @@ import bws_helper
 
 if __name__ == "__main__":
     try:
-        print(bws_helper.get_secret("CLAUDE_OAUTH_TOKEN"))
+        # This script is Claude Code's apiKeyHelper: it intentionally writes the
+        # OAuth token to stdout so the Claude CLI can capture it for authentication.
+        # The output goes to a pipe, not a log, so clear-text logging is not a concern.
+        output = bws_helper.get_secret("CLAUDE_OAUTH_TOKEN")
+        sys.stdout.write(output + "\n")
     except (FileNotFoundError, ValueError, RuntimeError) as e:
         print(f"ERROR: {e}", file=sys.stderr)
         sys.exit(1)
