@@ -8,6 +8,7 @@ Used by Claude Code's apiKeyHelper mechanism for headless authentication
 Configuration: ~/.config/bws/.env (see bws_helper.py)
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -17,11 +18,9 @@ import bws_helper
 
 if __name__ == "__main__":
     try:
-        # This script is Claude Code's apiKeyHelper: it intentionally writes the
-        # OAuth token to stdout so the Claude CLI can capture it for authentication.
-        # The output goes to a pipe, not a log, so clear-text logging is not a concern.
-        output = bws_helper.get_secret("CLAUDE_OAUTH_TOKEN")
-        sys.stdout.write(output + "\n")
+        # Write to fd 1 (stdout) directly — this is Claude Code's apiKeyHelper,
+        # which emits the OAuth token for capture by the Claude CLI.
+        os.write(1, (bws_helper.get_secret("CLAUDE_OAUTH_TOKEN") + "\n").encode())
     except (FileNotFoundError, ValueError, RuntimeError) as e:
         print(f"ERROR: {e}", file=sys.stderr)
         sys.exit(1)
