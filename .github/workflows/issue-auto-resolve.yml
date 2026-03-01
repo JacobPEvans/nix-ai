@@ -2,17 +2,13 @@ name: Issue Auto-Resolve
 
 on:
   issues:
-    types: [opened]
+    types: [opened, labeled]
   workflow_dispatch:
     inputs:
       issue_number:
         description: "Issue number to resolve"
         required: true
         type: string
-      skip_triage:
-        description: "Skip triage (labels pre-applied)"
-        type: string
-        default: "false"
 
 permissions:
   actions: write
@@ -27,33 +23,48 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: write
+      issues: write
     steps:
       - name: Dispatch as workflow_dispatch
         env:
           GH_TOKEN: ${{ github.token }}
           WORKFLOW_NAME: ${{ github.workflow }}
+          REPO: ${{ github.repository }}
           ISSUE_NUM: ${{ github.event.issue.number }}
-          IS_BOT: ${{ github.event.sender.type == 'Bot' }}
-          HAS_AI_LABEL: ${{ contains(github.event.issue.labels.*.name, 'ai:created') }}
+          EVENT_ACTION: ${{ github.event.action }}
+          LABEL_NAME: ${{ github.event.label.name }}
         run: |
-          if [[ "$IS_BOT" == "true" && "$HAS_AI_LABEL" != "true" ]]; then
-            echo "Bot issue without ai:created label — skipping"
+          # Filter labeled events to only ai:ready
+          if [[ "$EVENT_ACTION" == "labeled" && "$LABEL_NAME" != "ai:ready" ]]; then
+            echo "Label '$LABEL_NAME' is not ai:ready — skipping"
             exit 0
           fi
-          SKIP="false"
-          if [[ "$IS_BOT" == "true" ]]; then
-            SKIP="true"
+
+          # Daily dispatch limit (cost control safety valve)
+          TODAY=$(date -u +%Y-%m-%d)
+          COUNT=$(gh run list \
+            --workflow "$WORKFLOW_NAME" \
+            --repo "$REPO" \
+            --event workflow_dispatch \
+            --created ">=$TODAY" \
+            --json databaseId --jq 'length')
+          if [[ "$COUNT" -ge 5 ]]; then
+            echo "Daily dispatch limit reached ($COUNT/5) — skipping"
+            exit 0
           fi
+
+          # Remove ai:ready label so it can be re-applied to re-trigger
+          if [[ "$EVENT_ACTION" == "labeled" && "$LABEL_NAME" == "ai:ready" ]]; then
+            gh issue edit "$ISSUE_NUM" --repo "$REPO" --remove-label "ai:ready" || true
+          fi
+
           gh workflow run "$WORKFLOW_NAME" \
-            --repo "$GITHUB_REPOSITORY" \
-            -f issue_number="$ISSUE_NUM" \
-            -f skip_triage="$SKIP"
+            --repo "$REPO" \
+            -f issue_number="$ISSUE_NUM"
 
   run-triage:
-    if: >-
-      github.event_name == 'workflow_dispatch' &&
-      inputs.skip_triage != 'true'
-    uses: JacobPEvans/ai-workflows/.github/workflows/issue-triage.yml@v0.5.1
+    if: github.event_name == 'workflow_dispatch'
+    uses: JacobPEvans/ai-workflows/.github/workflows/issue-triage.yml@v0.6.1
     secrets: inherit
     with:
       issue_number: ${{ inputs.issue_number }}
@@ -64,9 +75,9 @@ jobs:
       always() &&
       github.event_name == 'workflow_dispatch' &&
       (needs.run-triage.result == 'success' || needs.run-triage.result == 'skipped')
-    uses: JacobPEvans/ai-workflows/.github/workflows/issue-resolver.yml@v0.5.1
+    uses: JacobPEvans/ai-workflows/.github/workflows/issue-resolver.yml@v0.6.1
     secrets: inherit
     with:
-      repo_context: "Nix home-manager modules for AI CLI tools (Claude, Gemini, Copilot, MCP servers)"
+      repo_context: "Nix AI tools configuration using home-manager modules"
       extra_tools: "Bash(nix:*)"
       issue_number: ${{ inputs.issue_number }}

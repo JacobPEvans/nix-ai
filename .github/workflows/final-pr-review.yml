@@ -15,5 +15,5 @@ permissions:
 
 jobs:
   review:
-    uses: JacobPEvans/ai-workflows/.github/workflows/final-pr-review.yml@v0.5.1
+    uses: JacobPEvans/ai-workflows/.github/workflows/final-pr-review.yml@v0.6.1
     secrets: inherit
