@@ -64,6 +64,9 @@
         modules = [
           aiModule
           {
+            _module.args.userConfig = {
+              ai.claudeSchemaUrl = "https://json.schemastore.org/claude-code-settings.json";
+            };
             home = {
               username = "test-user";
               homeDirectory = "/home/test-user";
@@ -73,5 +76,7 @@
         ];
       };
     in
-    hmConfig.activationPackage;
+    pkgs.runCommand "check-module-eval" { } ''
+      echo ${hmConfig.activationPackage.drvPath} > $out
+    '';
 }
