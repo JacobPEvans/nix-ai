@@ -1,0 +1,58 @@
+# Zizmor security scanner configuration
+# See: https://docs.zizmor.sh/configuration/
+#
+# Pre-commit uses: --persona=regular --min-severity=medium --min-confidence=medium
+# This catches high-signal security issues while reducing noise.
+#
+# To run a full audit: zizmor --persona=auditor .github/workflows/
+
+rules:
+  # IGNORED: Requires pinning all actions to SHA hashes
+  # TODO: Create a separate PR to pin all actions to commit SHAs
+  # This is a significant change requiring updates across all workflows
+  unpinned-uses:
+    ignore:
+      - auto-merge.yml
+      - ci-fail-issue.yml
+      - ci-fix.yml
+      - ci-gate.yml
+      - claude-review.yml
+      - final-pr-review.yml
+      - issue-auto-resolve.yml
+      - post-merge-docs-review.yml
+      - post-merge-tests.yml
+      - release-please.yml
+      - trigger-nix-update.yml
+
+  # IGNORED: workflow_run trigger is required for post-CI workflows that need
+  # write permissions. These workflows only run on completed CI Gate events
+  # on the main branch. The risk is accepted and tracked.
+  # TODO: Evaluate migrating to pull_request_target or environment protection rules
+  dangerous-triggers:
+    ignore:
+      - ci-fail-issue.yml
+      - ci-fix.yml
+
+  # IGNORED: These workflows use reusable workflows from ai-workflows that require
+  # secrets for authentication (API keys, tokens). secrets: inherit is intentional
+  # as the reusable workflows are owned by the same org and need these secrets.
+  # TODO: Audit and enumerate explicit secrets instead of inheriting all
+  secrets-inherit:
+    ignore:
+      - ci-fail-issue.yml
+      - ci-fix.yml
+      - claude-review.yml
+      - final-pr-review.yml
+      - issue-auto-resolve.yml
+      - post-merge-docs-review.yml
+      - post-merge-tests.yml
+
+  # IGNORED: These workflows delegate to reusable workflows that require broad
+  # permissions. The permissions are set at the workflow level because the reusable
+  # workflows need them and cannot be narrowed without refactoring upstream.
+  # TODO: Narrow permissions in upstream ai-workflows reusable workflows
+  excessive-permissions:
+    ignore:
+      - issue-auto-resolve.yml
+      - post-merge-docs-review.yml
+      - post-merge-tests.yml

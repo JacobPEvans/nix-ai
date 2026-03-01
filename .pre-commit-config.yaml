@@ -42,3 +42,9 @@ repos:
         files: \.nix$
         types: [file]
         pass_filenames: false
+
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.22.0
+    hooks:
+      - id: zizmor
+        args: ['--persona=regular', '--min-severity=medium', '--min-confidence=medium']
