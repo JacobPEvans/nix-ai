@@ -14,7 +14,7 @@ permissions:
 jobs:
   handle-failure:
     if: github.event.workflow_run.conclusion == 'failure'
-    uses: JacobPEvans/ai-workflows/.github/workflows/ci-fail-issue.yml@v0.6.1
+    uses: JacobPEvans/ai-workflows/.github/workflows/ci-fail-issue.yml@v0.7.0
     with:
       workflow_name: "CI Gate"
     secrets: inherit
