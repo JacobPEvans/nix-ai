@@ -20,7 +20,6 @@ Exit codes:
 """
 
 import argparse
-import glob
 import json
 import os
 import re
@@ -213,12 +212,11 @@ def check_git_status(target_dir: str) -> dict:
     return result
 
 
-def check_stale_instance(target_dir: str) -> dict:
+def check_stale_instance(target_dir: str) -> dict[str, Any]:
     """Check for stale auto-claude instances and kill them if inactive."""
     import glob
     import time
 
-    repo_name = get_repo_name(target_dir)
     result = {"ok": True, "killed": False, "message": "No stale instance found"}
 
     try:
