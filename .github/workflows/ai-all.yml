@@ -1,0 +1,57 @@
+name: AI Workflows
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  issue_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: "Commit SHA to review (leave blank for latest main)"
+        required: false
+        type: string
+
+permissions: {}
+
+jobs:
+  # Push to main → re-dispatch as workflow_dispatch so post-merge suites
+  # can use the commit SHA via inputs.commit_sha (workflow_run context workaround).
+  post-merge-dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Re-trigger as workflow_dispatch
+        env:
+          WORKFLOW_NAME: ${{ github.workflow }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run "$WORKFLOW_NAME" \
+            --repo "${{ github.repository }}" \
+            --ref main \
+            -f commit_sha="${{ github.sha }}"
+
+  # All non-push events → suite-all routes to correct sub-suite
+  all:
+    if: github.event_name != 'push'
+    permissions:
+      actions: read
+      checks: read
+      contents: write
+      id-token: write
+      issues: write
+      pull-requests: write
+    uses: JacobPEvans/ai-workflows/.github/workflows/suite-all.yml@v0.8.0
+    with:
+      caller_event: ${{ github.event_name }}
+      review_prompt: "Focus on Nix flake patterns, home-manager module structure, AI tool configuration best practices"
+      commit_sha: ${{ inputs.commit_sha || github.sha }}
+    secrets: inherit

@@ -1,4 +1,4 @@
-name: CI Fix (Claude)
+name: AI CI
 
 on:
   workflow_run:
@@ -13,17 +13,15 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: ci-fix-${{ github.event.workflow_run.head_branch }}
+  group: ai-ci-${{ github.event.workflow_run.head_branch }}
   cancel-in-progress: true
 
 jobs:
-  fix:
-    if: >-
-      github.event.workflow_run.conclusion == 'failure' &&
-      github.event.workflow_run.head_branch != 'main'
-    uses: JacobPEvans/ai-workflows/.github/workflows/ci-fix.yml@v0.7.0
+  ci-suite:
+    uses: JacobPEvans/ai-workflows/.github/workflows/suite-ci.yml@v0.8.0
     with:
       repo_context: "Nix home-manager modules for AI CLI tools (Claude, Gemini, Copilot, MCP servers)"
       ci_structure: "ci-gate.yml (dorny/paths-filter + nix-check + markdown-lint + alls-green gate)"
+      workflow_name: "CI Gate"
       extra_tools: "Bash(nix:*)"
     secrets: inherit
