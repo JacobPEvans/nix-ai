@@ -53,5 +53,5 @@ jobs:
     with:
       caller_event: ${{ github.event_name }}
       review_prompt: "Focus on Nix flake patterns, home-manager module structure, AI tool configuration best practices"
-      commit_sha: ${{ inputs.commit_sha || github.sha }}
+      commit_sha: ${{ github.event_name == 'workflow_dispatch' && (inputs.commit_sha || github.sha) || (github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.head.sha || '' }}
     secrets: inherit
