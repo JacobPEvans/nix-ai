@@ -31,7 +31,6 @@ _:
 
     # Code Review (essential)
     "code-review@claude-plugins-official" = true;
-    "code-simplifier@claude-plugins-official" = true;
     "pr-review-toolkit@claude-plugins-official" = true;
 
     # Feature Development (useful)
