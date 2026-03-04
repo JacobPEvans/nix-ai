@@ -164,7 +164,7 @@ in
       # No native settings.json key exists; env var removes only 1M variants
       CLAUDE_CODE_DISABLE_1M_CONTEXT = "1";
 
-      # Adaptive thinking for Opus 4.6/Sonnet 4.6 (explicitly enabled)
+      # Ensure adaptive thinking is not disabled (0 = do not disable)
       CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING = "0";
 
       # DEFAULT VALUES (upstream) - reference only, do not uncomment unless tuning
