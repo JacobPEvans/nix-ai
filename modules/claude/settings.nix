@@ -245,7 +245,7 @@ in
       }
     ];
 
-    home.file = { } // statusLineScript // hookFiles;
+    home.file = statusLineScript // hookFiles;
 
   };
 }
