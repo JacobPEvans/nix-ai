@@ -2,7 +2,7 @@
 #
 # Generates the settings attrset without any derivations or platform-specific code.
 # Used by:
-#   - modules/home-manager/ai-cli/claude.nix (for deployment with jq pretty-printing)
+#   - modules/claude/settings.nix (for deployment with jq pretty-printing)
 #   - flake.nix CI output (for cross-platform schema validation)
 #
 # This separation enables pure Nix evaluation for CI while keeping
@@ -59,6 +59,5 @@ in
 
   # NOTE: MCP servers are NOT configured in settings.json
   # Claude Code reads MCP servers from ~/.claude.json (user scope) or .mcp.json (project scope)
-  # Use `claude mcp add --scope user` to add servers declaratively
-  # Available servers: pal, github, terraform (add via CLI as needed)
+  # Nix manages MCP servers in ~/.claude.json via the claudeJsonMerge activation script
 }
