@@ -83,9 +83,9 @@ let
       autoUpdatesChannel
       teammateMode
       showTurnDuration
-      effortLevel
       ;
   }
+  // lib.optionalAttrs (cfg.effortLevel != null) { inherit (cfg) effortLevel; }
   // lib.optionalAttrs (cfg.attribution != { }) { inherit (cfg) attribution; }
   // {
 

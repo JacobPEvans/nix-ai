@@ -87,7 +87,10 @@ in
   # for each ~/git/<repo>/main path found at home-manager activation time (runtime) via claude-json-merge.sh.
   trustedProjectDirs = [ "~/git" ];
 
-  effortLevel = "medium";
+  # effortLevel = "medium";
+  # Claude Code v2.1.68+ defaults to medium effort for Max/Team subscribers.
+  # Use /model effort slider or "ultrathink" keyword to override per-session.
+  # Uncomment to pin a specific effort level.
 
   # Minimal commit attribution — replaces verbose Co-Authored-By trailer
   # Claude Code appends this string to every commit message automatically
@@ -161,6 +164,9 @@ in
       # No native settings.json key exists; env var removes only 1M variants
       CLAUDE_CODE_DISABLE_1M_CONTEXT = "1";
 
+      # Adaptive thinking for Opus 4.6/Sonnet 4.6 (explicitly enabled)
+      CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING = "0";
+
       # DEFAULT VALUES (upstream) - reference only, do not uncomment unless tuning
       # MAX_THINKING_TOKENS = "31999";
       # CLAUDE_CODE_MAX_OUTPUT_TOKENS = "32000";
@@ -169,6 +175,15 @@ in
       # SLASH_COMMAND_TOOL_CHAR_BUDGET = "16000";
       # BASH_DEFAULT_TIMEOUT_MS = "120000";  # 2 minutes
       # BASH_MAX_TIMEOUT_MS = "600000";      # 10 minutes
+
+      # Claude.ai MCP servers (enabled by default for logged-in users)
+      # ENABLE_CLAUDEAI_MCP_SERVERS = "true";
+
+      # Plugin git operations timeout (default: 120000ms / 2 minutes)
+      # CLAUDE_CODE_PLUGIN_GIT_TIMEOUT_MS = "120000";
+
+      # Effort level via env var (alternative to settings.json key)
+      # CLAUDE_CODE_EFFORT_LEVEL = "medium";
     };
 
     # Permissions from unified ai-assistant-instructions system
