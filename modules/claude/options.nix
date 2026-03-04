@@ -272,18 +272,21 @@ in
     };
 
     effortLevel = mkOption {
-      type = types.enum [
-        "low"
-        "medium"
-        "high"
-      ];
-      default = "high";
+      type = types.nullOr (
+        types.enum [
+          "low"
+          "medium"
+          "high"
+        ]
+      );
+      default = null;
       description = ''
-        Adaptive reasoning effort for Opus 4.6.
-        - "high": Full reasoning (upstream default)
-        - "medium": Balanced cost/quality for routine tasks
+        Adaptive reasoning effort for Opus 4.6 and Sonnet 4.6.
+        - null: Use upstream default (medium for Max/Team as of v2.1.68)
+        - "high": Full reasoning
+        - "medium": Balanced cost/quality
         - "low": Minimal reasoning, fastest and cheapest
-        Override per-session via /model effort slider.
+        Override per-session via /model effort slider or "ultrathink" keyword.
       '';
     };
 
