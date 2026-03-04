@@ -2,8 +2,8 @@
 #
 # Generates the settings attrset without any derivations or platform-specific code.
 # Used by:
-#   - modules/claude/settings.nix (for deployment with jq pretty-printing)
 #   - flake.nix CI output (for cross-platform schema validation)
+#   - external callers via lib.claude-settings (for reuse in other Nix expressions)
 #
 # This separation enables pure Nix evaluation for CI while keeping
 # pretty-printed JSON for local deployment.

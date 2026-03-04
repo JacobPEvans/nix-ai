@@ -40,7 +40,7 @@ inputs.nix-ai.inputs.home-manager.follows = "home-manager";
 - `modules/claude/` — Claude Code settings, plugins, statusline, auto-claude
 - `modules/mcp/` — MCP server definitions
 - `modules/common/` — Shared permission engine and formatters
-- `lib/claude-settings.nix` — Pure settings generator (CI-only; deployment uses modules/claude/settings.nix)
+- `lib/claude-settings.nix` — Pure settings generator (exported as `lib.claude-settings`; CI uses `lib.ci.claudeSettingsJson`; deployment uses `modules/claude/settings.nix`)
 - `lib/claude-registry.nix` — Marketplace format functions
 
 ## Testing Locally
