@@ -17,7 +17,7 @@ Testing procedures for the auto-claude.sh autonomous maintenance script.
 Verify the script has valid zsh syntax:
 
 ```bash
-zsh -n modules/home-manager/ai-cli/claude/auto-claude.sh && echo "Syntax OK"
+zsh -n modules/claude/auto-claude.sh && echo "Syntax OK"
 ```
 
 Expected: `Syntax OK`
@@ -27,7 +27,7 @@ Expected: `Syntax OK`
 Run without arguments to verify usage message:
 
 ```bash
-zsh modules/home-manager/ai-cli/claude/auto-claude.sh
+zsh modules/claude/auto-claude.sh
 ```
 
 Expected output:
@@ -43,7 +43,7 @@ Exit code: 1
 Test directory validation:
 
 ```bash
-zsh modules/home-manager/ai-cli/claude/auto-claude.sh /nonexistent 10
+zsh modules/claude/auto-claude.sh /nonexistent 10
 ```
 
 Expected output:
@@ -59,7 +59,7 @@ Exit code: 1
 Test budget validation with negative number:
 
 ```bash
-zsh modules/home-manager/ai-cli/claude/auto-claude.sh /tmp -5
+zsh modules/claude/auto-claude.sh /tmp -5
 ```
 
 Expected output:
@@ -75,7 +75,7 @@ Exit code: 1
 Test that decimal budgets are accepted:
 
 ```bash
-zsh modules/home-manager/ai-cli/claude/auto-claude.sh /tmp 0.5 2>&1 | head -5
+zsh modules/claude/auto-claude.sh /tmp 0.5 2>&1 | head -5
 ```
 
 Expected: Script starts executing (shows Claude initialization output)

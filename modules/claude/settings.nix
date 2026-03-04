@@ -1,7 +1,7 @@
 # Claude Code Settings
 #
-# Generates ~/.claude/settings.json with all configuration.
-# Merges plugin marketplaces, permissions, MCP servers, etc.
+# Manages ~/.claude/settings.json via activation-time merge (not home.file symlink).
+# Merges plugin marketplaces, permissions, hooks, etc.
 #
 # NOTE: Uses toClaudeMarketplaceFormat from lib/claude-registry.nix as
 # SINGLE SOURCE OF TRUTH for marketplace format transformation.
@@ -206,6 +206,13 @@ in
         TRUSTED_PROJECT_DIRS=${lib.escapeShellArg (builtins.toJSON cfg.trustedProjectDirs)}
         . ${./scripts/claude-json-merge.sh}
       '';
+
+      claudeSettingsMerge = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        $DRY_RUN_CMD ${../scripts/merge-json-settings.sh} \
+          "${settingsJson}" \
+          "${homeDir}/.claude/settings.json" \
+          "${lib.getExe pkgs.jq}"
+      '';
     };
 
     # Validate configuration before generating settings.json
@@ -238,14 +245,7 @@ in
       }
     ];
 
-    home.file = {
-      ".claude/settings.json" = {
-        source = settingsJson;
-        force = true;
-      };
-    }
-    // statusLineScript
-    // hookFiles;
+    home.file = { } // statusLineScript // hookFiles;
 
   };
 }

@@ -144,9 +144,8 @@ in
       };
     };
 
-    # Hooks (Phase 2 - not yet implemented)
-    # These options are declared for future hook support.
-    # Implementation will generate ~/.claude/hooks/ scripts.
+    # Hooks - fully implemented in modules/claude/settings.nix
+    # Generates executable scripts in ~/.claude/hooks/ via home.file.
     hooks = {
       preToolUse = mkOption {
         type = hookType;
