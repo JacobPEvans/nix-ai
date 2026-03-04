@@ -282,7 +282,7 @@ in
       default = null;
       description = ''
         Adaptive reasoning effort for Opus 4.6 and Sonnet 4.6.
-        - null: Use upstream default (medium for Max/Team as of v2.1.68)
+        - null: Use upstream default (e.g., medium for Max/Team subscribers)
         - "high": Full reasoning
         - "medium": Balanced cost/quality
         - "low": Minimal reasoning, fastest and cheapest

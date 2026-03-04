@@ -85,7 +85,7 @@ Key enable toggles exposed by the default module:
 | `programs.claude.settings.alwaysThinkingEnabled` | bool | true | Extended thinking mode |
 | `programs.claude.remoteControlAtStartup` | bool or null | null | Remote Control auto-start |
 | `programs.claude.model` | string or null | null | Override default model (e.g. `"opus"`, `"sonnet"`) |
-| `programs.claude.effortLevel` | enum or null | `null` | Adaptive reasoning effort (`"low"`, `"medium"`, `"high"`); null = upstream default (medium for Max/Team as of v2.1.68) |
+| `programs.claude.effortLevel` | enum or null | `null` | Adaptive reasoning effort (`"low"`, `"medium"`, `"high"`); `null` uses the upstream default. |
 | `programs.claude.trustedProjectDirs` | list of str | `[]` | Base directories for auto-trust of CLAUDE.md imports |
 
 For the full option set, see [`modules/claude/options.nix`](modules/claude/options.nix).

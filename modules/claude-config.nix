@@ -88,7 +88,7 @@ in
   trustedProjectDirs = [ "~/git" ];
 
   # effortLevel = "medium";
-  # Claude Code v2.1.68+ defaults to medium effort for Max/Team subscribers.
+  # Claude Code now defaults to medium effort for Max/Team subscribers.
   # Use /model effort slider or "ultrathink" keyword to override per-session.
   # Uncomment to pin a specific effort level.
 
