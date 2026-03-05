@@ -93,6 +93,11 @@ in
     env = {
       # Enable ALL PAL tools (default disables: analyze,refactor,testgen,secaudit,docgen,tracer)
       DISABLED_TOOLS = "";
+      # Default to latest available Gemini model.
+      # PAL has no model allowlist — DEFAULT_MODEL is the only restriction lever.
+      # gemini-3-pro-preview deprecated March 9 2026; update to gemini-3.1-pro-preview
+      # once BeehiveInnovations adds PAL support for it.
+      DEFAULT_MODEL = "gemini-3-pro-preview";
       # Conversation limits
       CONVERSATION_TIMEOUT_HOURS = "6";
       MAX_CONVERSATION_TURNS = "50";
