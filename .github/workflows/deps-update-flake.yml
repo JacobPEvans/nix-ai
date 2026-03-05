@@ -1,0 +1,117 @@
+# Automated flake.lock updates with verified commits
+#
+# Uses JacobPEvans-github-actions App for:
+# - Signed & verified commits via GitHub's REST API
+# - Enabling auto-merge for approved updates
+#
+# Triggers:
+# - Daily at noon UTC (schedule)
+# - Instant sync when upstream repos push (repository_dispatch)
+# - Manual (workflow_dispatch)
+#
+# Update Strategy:
+# - repository_dispatch (upstream-repo-updated): Updates specified flake input (fast sync)
+# - Other triggers: Updates all AI-focused inputs
+# - Claude Code Philosophy: Always update when available. Accept updates; revert only if issues found.
+name: Update flake.lock
+
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  repository_dispatch:
+    types:
+      - upstream-repo-updated
+  workflow_dispatch:
+
+jobs:
+  update:
+    name: Update flake inputs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      AI_INPUTS: >-
+        nixpkgs
+        ai-assistant-instructions
+        jacobpevans-cc-plugins
+        claude-code-plugins
+        claude-cookbooks
+        claude-plugins-official
+        anthropic-agent-skills
+        superpowers-marketplace
+        bills-claude-skills
+        cc-dev-tools
+        lunar-claude
+        obsidian-skills
+    steps:
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Determine inputs to update
+        id: inputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          FLAKE_INPUT_NAME: ${{ github.event.client_payload.flake_input_name }}
+        run: |
+          if [[ "$EVENT_NAME" == "repository_dispatch" ]]; then
+            if [[ -z "$FLAKE_INPUT_NAME" ]]; then
+              echo "::error::flake_input_name not provided in client_payload"
+              exit 1
+            fi
+            if [[ ! "$FLAKE_INPUT_NAME" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+              echo "::error::Invalid flake_input_name '$FLAKE_INPUT_NAME'"
+              exit 1
+            fi
+            echo "inputs=$FLAKE_INPUT_NAME" >> "$GITHUB_OUTPUT"
+            echo "::notice::Fast sync: updating $FLAKE_INPUT_NAME"
+          else
+            echo "inputs=$AI_INPUTS" >> "$GITHUB_OUTPUT"
+            echo "::notice::Scheduled/manual: updating all AI inputs"
+          fi
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@73327eb48f028efaaf5013656ba216ca3cdeca7b # v3
+
+      - name: Update flake inputs
+        env:
+          FLAKE_INPUTS: ${{ steps.inputs.outputs.inputs }}
+        run: |
+          # shellcheck disable=SC2086
+          nix flake update $FLAKE_INPUTS
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          sign-commits: true
+          branch: update_flake_lock_action
+          delete-branch: true
+          commit-message: |
+            chore(deps): update flake inputs
+
+            Automated update of Nix flake dependencies.
+          title: "chore(deps): update flake inputs"
+          body: |
+            Automated Nix flake dependency update.
+
+            See the flake.lock diff below for specific version bumps.
+
+            ## Review Notes
+            - Always accept AI tool updates; revert only if issues found
+            - After merge, nix-darwin flake.lock auto-updates via trigger workflow
+
+            ---
+            *Created by JacobPEvans-github-actions*
+          labels: dependencies
+          assignees: JacobPEvans
+          reviewers: JacobPEvans
