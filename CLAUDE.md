@@ -18,7 +18,7 @@ nix fmt            # Fix formatting
 
 ## Architecture
 
-This repo exports home-manager modules consumed by nix-config (nix-darwin):
+This repo exports home-manager modules consumed by nix-darwin:
 
 - `homeManagerModules.default` — Full AI stack
 - `homeManagerModules.claude` — Claude Code only
@@ -45,7 +45,7 @@ inputs.nix-ai.inputs.home-manager.follows = "home-manager";
 
 ## Testing Locally
 
-From nix-config (nix-darwin), test changes with:
+From nix-darwin, test changes with:
 
 ```bash
 sudo darwin-rebuild switch --flake . --override-input nix-ai /Users/you/git/nix-ai/main
