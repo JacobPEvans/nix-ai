@@ -17,5 +17,5 @@ concurrency:
 
 jobs:
   best-practices:
-    uses: JacobPEvans/ai-workflows/.github/workflows/best-practices.yml@v0.8.0
+    uses: JacobPEvans/ai-workflows/.github/workflows/best-practices.yml@v0.9.0
     secrets: inherit # zizmor: ignore[secrets-inherit]
