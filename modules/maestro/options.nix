@@ -34,7 +34,7 @@
 
       targetRepository = lib.mkOption {
         type = lib.types.str;
-        default = "${config.home.homeDirectory}/git/nix-config/main";
+        default = "${config.home.homeDirectory}/git/nix-darwin/main";
         description = "Target repository for issue resolution";
       };
     };
