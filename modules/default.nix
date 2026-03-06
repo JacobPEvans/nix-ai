@@ -93,6 +93,7 @@ in
     ./claude
     ./maestro
     ./ollama.nix
+    ./open-webui.nix
   ];
 
   config = {
@@ -110,7 +111,7 @@ in
             "${userConfig.ai.claudeSchemaUrl}"
         '';
 
-        # open-webui: installed via uv
+        # open-webui: installed via uv (nixpkgs broken on darwin — see modules/open-webui.nix)
         installOpenWebui = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q "^open-webui"; then
             echo "-> Installing open-webui via uv (Python 3.12)..."
