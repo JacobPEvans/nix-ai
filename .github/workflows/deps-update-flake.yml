@@ -11,7 +11,7 @@
 #
 # Update Strategy:
 # - repository_dispatch (upstream-repo-updated): Updates specified flake input (fast sync)
-# - Other triggers: Updates all AI-focused inputs
+# - Other triggers: Updates all inputs
 # - Claude Code Philosophy: Always update when available. Accept updates; revert only if issues found.
 name: Update flake.lock
 
@@ -30,20 +30,6 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    env:
-      AI_INPUTS: >-
-        nixpkgs
-        ai-assistant-instructions
-        jacobpevans-cc-plugins
-        claude-code-plugins
-        claude-cookbooks
-        claude-plugins-official
-        anthropic-agent-skills
-        superpowers-marketplace
-        bills-claude-skills
-        cc-dev-tools
-        lunar-claude
-        obsidian-skills
     steps:
       - name: Generate GitHub App Token
         id: app-token
@@ -75,8 +61,8 @@ jobs:
             echo "inputs=$FLAKE_INPUT_NAME" >> "$GITHUB_OUTPUT"
             echo "::notice::Fast sync: updating $FLAKE_INPUT_NAME"
           else
-            echo "inputs=$AI_INPUTS" >> "$GITHUB_OUTPUT"
-            echo "::notice::Scheduled/manual: updating all AI inputs"
+            echo "inputs=" >> "$GITHUB_OUTPUT"
+            echo "::notice::Scheduled/manual: updating all inputs"
           fi
 
       - name: Install Nix
