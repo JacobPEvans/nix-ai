@@ -15,7 +15,7 @@
 #     issueResolver = {
 #       enable = true;
 #       schedule = { hour = 9; minute = 0; };
-#       targetRepository = "~/git/nix-config/main";
+#       targetRepository = "~/git/nix-darwin/main";
 #     };
 #   };
 
