@@ -1,0 +1,13 @@
+name: Code Simplifier
+on:
+  schedule:
+    - cron: "0 4 * * 0,3,6"
+  workflow_dispatch:
+permissions:
+  contents: write
+  id-token: write
+  pull-requests: write
+jobs:
+  simplify:
+    uses: JacobPEvans/ai-workflows/.github/workflows/code-simplifier.yml@a5620445cea6a3f94143755a5a4bdea4e530c39d # v0.8.0
+    secrets: inherit # zizmor: ignore[secrets-inherit]

@@ -1,0 +1,14 @@
+name: Issue Hygiene
+on:
+  schedule:
+    - cron: "0 7 * * 0"
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+  pull-requests: read
+jobs:
+  hygiene:
+    uses: JacobPEvans/ai-workflows/.github/workflows/issue-hygiene.yml@a5620445cea6a3f94143755a5a4bdea4e530c39d # v0.8.0
+    secrets: inherit # zizmor: ignore[secrets-inherit]
