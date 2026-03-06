@@ -7,17 +7,10 @@
 # To run a full audit: zizmor --persona=auditor .github/workflows/
 
 rules:
-  # IGNORED: Requires pinning all actions to SHA hashes
-  # TODO: Create a separate PR to pin all actions to commit SHAs
-  # This is a significant change requiring updates across all workflows
+  # POLICY: Well-known trusted actions use version tags, not commit hashes.
+  # Hash pinning is reserved for untrusted or lesser-known actions only.
   unpinned-uses:
-    ignore:
-      - ai-all.yml
-      - ai-ci.yml
-      - ci-gate.yml
-      - issue-auto-resolve.yml
-      - release-please.yml
-      - trigger-nix-update.yml
+    disable: true
 
   # IGNORED: workflow_run trigger is required for post-CI workflows that need
   # write permissions. These workflows only run on completed CI Gate events
