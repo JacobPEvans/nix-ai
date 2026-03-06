@@ -7,6 +7,11 @@ permissions:
   contents: read
   id-token: write
   pull-requests: write
+
+concurrency:
+  group: best-practices-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   best-practices:
     uses: JacobPEvans/ai-workflows/.github/workflows/best-practices.yml@a5620445cea6a3f94143755a5a4bdea4e530c39d # v0.8.0
