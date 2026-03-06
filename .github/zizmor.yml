@@ -14,7 +14,6 @@ rules:
     ignore:
       - ai-all.yml
       - ai-ci.yml
-      - auto-merge.yml
       - ci-gate.yml
       - issue-auto-resolve.yml
       - release-please.yml
