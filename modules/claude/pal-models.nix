@@ -16,6 +16,7 @@
   config,
   lib,
   pkgs,
+  pal-mcp-server,
   ...
 }:
 
@@ -26,6 +27,14 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
+    # Pin PAL to the flake-locked Nix store path instead of live git URL.
+    programs.claude.mcpServers.pal.args = lib.mkForce [
+      "uvx"
+      "--from"
+      "${pal-mcp-server}"
+      "pal-mcp-server"
+    ];
+
     # Inject CUSTOM_MODELS_CONFIG_PATH into PAL server env.
     # Merges with the env block defined in mcp/default.nix (DISABLED_TOOLS, etc.).
     programs.claude.mcpServers.pal.env.CUSTOM_MODELS_CONFIG_PATH = outputFile;

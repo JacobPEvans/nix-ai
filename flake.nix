@@ -83,6 +83,12 @@
       url = "github:wakatime/claude-code-wakatime";
       flake = false;
     };
+
+    # PAL MCP server - pinned for supply-chain safety; auto-bumped by deps-update-flake.yml
+    pal-mcp-server = {
+      url = "github:BeehiveInnovations/pal-mcp-server";
+      flake = false;
+    };
   };
 
   outputs =
@@ -107,6 +113,7 @@
       axton-obsidian-visual-skills,
       superpowers-marketplace,
       wakatime,
+      pal-mcp-server,
       ...
     }:
     let
@@ -147,6 +154,7 @@
               marketplaceInputs
               claude-code-plugins
               claude-cookbooks
+              pal-mcp-server
               ;
           };
         };
@@ -160,6 +168,7 @@
               marketplaceInputs
               claude-code-plugins
               claude-cookbooks
+              pal-mcp-server
               ;
           };
         };
