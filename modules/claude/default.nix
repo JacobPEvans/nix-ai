@@ -69,15 +69,24 @@ in
     home.activation = {
       # WakaTime config - fetches API key from Doppler at activation time.
       # Always overwrites on rebuild. Graceful fallback if Doppler is unreachable.
+      # umask 077 subshell: file created with 600 perms atomically (no race window).
       wakatimeConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        WAKA_KEY=$(${pkgs.doppler}/bin/doppler secrets get WAKATIME_API_KEY \
-          -p ai-ci-automation -c prd --plain 2>/dev/null) || true
-        if [ -n "$WAKA_KEY" ]; then
-          printf '[settings]\napi_key = %s\n' "$WAKA_KEY" \
-            > "${config.home.homeDirectory}/.wakatime.cfg"
-          chmod 600 "${config.home.homeDirectory}/.wakatime.cfg"
+        if [ -n "$DRY_RUN_CMD" ]; then
+          echo "wakatime: dry-run — skipping Doppler fetch" >&2
         else
-          echo "wakatime: Doppler unreachable — keeping existing config" >&2
+          WAKA_KEY=$(${pkgs.doppler}/bin/doppler secrets get WAKATIME_API_KEY \
+            -p ai-ci-automation -c prd --plain 2>/dev/null) || true
+          if [ -n "$WAKA_KEY" ]; then
+            (
+              umask 077
+              printf '[settings]\napi_key = %s\n' "$WAKA_KEY" \
+                > "${config.home.homeDirectory}/.wakatime.cfg"
+            )
+          elif [ -f "${config.home.homeDirectory}/.wakatime.cfg" ]; then
+            echo "wakatime: Doppler unreachable — keeping existing config" >&2
+          else
+            echo "wakatime: Doppler unreachable — no config created" >&2
+          fi
         fi
       '';
     };
