@@ -45,9 +45,10 @@ in
   };
 
   # GitHub - github-mcp-server from nixpkgs
-  # Requires: GITHUB_PERSONAL_ACCESS_TOKEN env var
+  # Requires: GITHUB_PERSONAL_ACCESS_TOKEN env var (not yet in Doppler)
   github = {
     command = "github-mcp-server";
+    disabled = true;
   };
 
   # ================================================================
@@ -76,10 +77,7 @@ in
   #
   # Non-secret config is set in env below (belongs in Nix, not Doppler).
 
-  # TODO: Pin to a specific commit once the project publishes tagged releases.
-  # Pulling from HEAD on every invocation means a compromised upstream can execute
-  # arbitrary code with access to AI provider API keys and other secrets.
-  #
+  # Source pinned via flake input; args overridden in claude/pal-models.nix.
   # Wrapped with doppler-mcp to inject Doppler secrets at subprocess launch time.
   # Secrets are never written to ~/.claude.json or any file Claude Code can read.
   pal = {

@@ -67,11 +67,18 @@ in
     # NOTE: "local" marketplace setup removed - Claude Code doesn't use it by default.
     # See docs/CLAUDE-MARKETPLACE-ARCHITECTURE.md for details.
     home.activation = {
-      # WakaTime config file - created once with placeholder API key.
-      # See: https://wakatime.com/settings/account
+      # WakaTime config - fetches API key from Doppler at activation time.
+      # Always overwrites on rebuild. Graceful fallback if Doppler is unreachable.
       wakatimeConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        WAKATIME_CFG="${config.home.homeDirectory}/.wakatime.cfg"
-        . ${./scripts/wakatime-config.sh}
+        WAKA_KEY=$(${pkgs.doppler}/bin/doppler secrets get WAKATIME_API_KEY \
+          -p ai-ci-automation -c prd --plain 2>/dev/null) || true
+        if [ -n "$WAKA_KEY" ]; then
+          printf '[settings]\napi_key = %s\n' "$WAKA_KEY" \
+            > "${config.home.homeDirectory}/.wakatime.cfg"
+          chmod 600 "${config.home.homeDirectory}/.wakatime.cfg"
+        else
+          echo "wakatime: Doppler unreachable — keeping existing config" >&2
+        fi
       '';
     };
   };
