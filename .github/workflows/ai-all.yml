@@ -44,6 +44,9 @@ jobs:
   # --- END DISABLED ---
 
   all:
+    # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
+    # if: github.event_name != 'push'
+    # --- END DISABLED ---
     permissions:
       actions: read
       checks: read
