@@ -1,14 +1,16 @@
 name: Issue Auto-Resolve
 
 on:
-  issues:
-    types: [opened, labeled]
   workflow_dispatch:
     inputs:
       issue_number:
         description: "Issue number to resolve"
         required: true
         type: string
+  # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
+  # issues:
+  #   types: [opened, labeled]
+  # --- END DISABLED ---
 
 permissions:
   actions: write
@@ -18,49 +20,51 @@ permissions:
   pull-requests: write
 
 jobs:
-  dispatch:
-    if: github.event_name == 'issues'
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      issues: write
-    steps:
-      - name: Dispatch as workflow_dispatch
-        env:
-          GH_TOKEN: ${{ github.token }}
-          WORKFLOW_NAME: ${{ github.workflow }}
-          REPO: ${{ github.repository }}
-          ISSUE_NUM: ${{ github.event.issue.number }}
-          EVENT_ACTION: ${{ github.event.action }}
-          LABEL_NAME: ${{ github.event.label.name }}
-        run: |
-          # Filter labeled events to only ai:ready
-          if [[ "$EVENT_ACTION" == "labeled" && "$LABEL_NAME" != "ai:ready" ]]; then
-            echo "Label '$LABEL_NAME' is not ai:ready — skipping"
-            exit 0
-          fi
-
-          # Daily dispatch limit (cost control safety valve)
-          TODAY=$(date -u +%Y-%m-%d)
-          COUNT=$(gh run list \
-            --workflow "$WORKFLOW_NAME" \
-            --repo "$REPO" \
-            --event workflow_dispatch \
-            --created ">=$TODAY" \
-            --json databaseId --jq 'length')
-          if [[ "$COUNT" -ge 5 ]]; then
-            echo "Daily dispatch limit reached ($COUNT/5) — skipping"
-            exit 0
-          fi
-
-          # Remove ai:ready label so it can be re-applied to re-trigger
-          if [[ "$EVENT_ACTION" == "labeled" && "$LABEL_NAME" == "ai:ready" ]]; then
-            gh issue edit "$ISSUE_NUM" --repo "$REPO" --remove-label "ai:ready" || true
-          fi
-
-          gh workflow run "$WORKFLOW_NAME" \
-            --repo "$REPO" \
-            -f issue_number="$ISSUE_NUM"
+  # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
+  # dispatch:
+  #   if: github.event_name == 'issues'
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     actions: write
+  #     issues: write
+  #   steps:
+  #     - name: Dispatch as workflow_dispatch
+  #       env:
+  #         GH_TOKEN: ${{ github.token }}
+  #         WORKFLOW_NAME: ${{ github.workflow }}
+  #         REPO: ${{ github.repository }}
+  #         ISSUE_NUM: ${{ github.event.issue.number }}
+  #         EVENT_ACTION: ${{ github.event.action }}
+  #         LABEL_NAME: ${{ github.event.label.name }}
+  #       run: |
+  #         # Filter labeled events to only ai:ready
+  #         if [[ "$EVENT_ACTION" == "labeled" && "$LABEL_NAME" != "ai:ready" ]]; then
+  #           echo "Label '$LABEL_NAME' is not ai:ready — skipping"
+  #           exit 0
+  #         fi
+  #
+  #         # Daily dispatch limit (cost control safety valve)
+  #         TODAY=$(date -u +%Y-%m-%d)
+  #         COUNT=$(gh run list \
+  #           --workflow "$WORKFLOW_NAME" \
+  #           --repo "$REPO" \
+  #           --event workflow_dispatch \
+  #           --created ">=$TODAY" \
+  #           --json databaseId --jq 'length')
+  #         if [[ "$COUNT" -ge 5 ]]; then
+  #           echo "Daily dispatch limit reached ($COUNT/5) — skipping"
+  #           exit 0
+  #         fi
+  #
+  #         # Remove ai:ready label so it can be re-applied to re-trigger
+  #         if [[ "$EVENT_ACTION" == "labeled" && "$LABEL_NAME" == "ai:ready" ]]; then
+  #           gh issue edit "$ISSUE_NUM" --repo "$REPO" --remove-label "ai:ready" || true
+  #         fi
+  #
+  #         gh workflow run "$WORKFLOW_NAME" \
+  #           --repo "$REPO" \
+  #           -f issue_number="$ISSUE_NUM"
+  # --- END DISABLED ---
 
   run-triage:
     if: github.event_name == 'workflow_dispatch'

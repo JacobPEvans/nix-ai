@@ -1,9 +1,11 @@
 name: Best Practices
 
 on:
-  schedule:
-    - cron: "0 3 * * 2,5"
   workflow_dispatch:
+  # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
+  # schedule:
+  #   - cron: "0 3 * * 2,5"
+  # --- END DISABLED ---
 
 permissions:
   contents: read

@@ -1,9 +1,12 @@
 name: AI CI
 
 on:
-  workflow_run:
-    workflows: ["CI Gate"]
-    types: [completed]
+  workflow_dispatch:
+  # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
+  # workflow_run:
+  #   workflows: ["CI Gate"]
+  #   types: [completed]
+  # --- END DISABLED ---
 
 permissions:
   actions: read
@@ -12,9 +15,11 @@ permissions:
   issues: write
   pull-requests: write
 
-concurrency:
-  group: ai-ci-${{ github.event.workflow_run.head_branch }}
-  cancel-in-progress: true
+# --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
+# concurrency:
+#   group: ai-ci-${{ github.event.workflow_run.head_branch }}
+#   cancel-in-progress: true
+# --- END DISABLED ---
 
 jobs:
   ci-suite:
