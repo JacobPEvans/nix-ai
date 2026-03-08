@@ -1,47 +1,49 @@
 name: AI Workflows
 
 on:
-  pull_request:
-    types: [opened, synchronize]
-  issue_comment:
-    types: [created]
-  pull_request_review:
-    types: [submitted]
-  check_suite:
-    types: [completed]
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
       commit_sha:
         description: "Commit SHA to review (leave blank for latest main)"
         required: false
         type: string
+  # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
+  # pull_request:
+  #   types: [opened, synchronize]
+  # issue_comment:
+  #   types: [created]
+  # pull_request_review:
+  #   types: [submitted]
+  # check_suite:
+  #   types: [completed]
+  # push:
+  #   branches: [main]
+  # --- END DISABLED ---
 
 permissions: {}
 
 jobs:
-  # Push to main → re-dispatch as workflow_dispatch so post-merge suites
-  # can use the commit SHA via inputs.commit_sha (workflow_run context workaround).
-  post-merge-dispatch:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-    steps:
-      - name: Re-trigger as workflow_dispatch
-        env:
-          WORKFLOW_NAME: ${{ github.workflow }}
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh workflow run "$WORKFLOW_NAME" \
-            --repo "${{ github.repository }}" \
-            --ref main \
-            -f commit_sha="${{ github.sha }}"
+  # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
+  # # Push to main → re-dispatch as workflow_dispatch so post-merge suites
+  # # can use the commit SHA via inputs.commit_sha (workflow_run context workaround).
+  # post-merge-dispatch:
+  #   if: github.event_name == 'push'
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     actions: write
+  #   steps:
+  #     - name: Re-trigger as workflow_dispatch
+  #       env:
+  #         WORKFLOW_NAME: ${{ github.workflow }}
+  #         GH_TOKEN: ${{ github.token }}
+  #       run: |
+  #         gh workflow run "$WORKFLOW_NAME" \
+  #           --repo "${{ github.repository }}" \
+  #           --ref main \
+  #           -f commit_sha="${{ github.sha }}"
+  # --- END DISABLED ---
 
-  # All non-push events → suite-all routes to correct sub-suite
   all:
-    if: github.event_name != 'push'
     permissions:
       actions: read
       checks: read

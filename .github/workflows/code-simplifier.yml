@@ -1,8 +1,10 @@
 name: Code Simplifier
 on:
-  schedule:
-    - cron: "0 4 * * 0,3,6"
   workflow_dispatch:
+  # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
+  # schedule:
+  #   - cron: "0 4 * * 0,3,6"
+  # --- END DISABLED ---
 permissions:
   contents: write
   id-token: write

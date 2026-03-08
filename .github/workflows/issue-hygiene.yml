@@ -1,8 +1,10 @@
 name: Issue Hygiene
 on:
-  schedule:
-    - cron: "0 7 * * 0"
   workflow_dispatch:
+  # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
+  # schedule:
+  #   - cron: "0 7 * * 0"
+  # --- END DISABLED ---
 permissions:
   contents: read
   id-token: write
