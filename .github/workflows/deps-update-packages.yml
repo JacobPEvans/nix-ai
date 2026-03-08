@@ -1,0 +1,70 @@
+# Automated custom package updates with verified commits
+#
+# Uses JacobPEvans-github-actions App for:
+# - Signed & verified commits via GitHub REST API
+# - Triggering downstream workflows (CI Gate, Review)
+#
+# Updates:
+# - gh-aw: GitHub Agentic Workflows CLI extension (Go module)
+#   Uses nix-update to automatically update version, hash, and vendorHash
+#
+# Triggers:
+# - Weekly Monday at 8am UTC (schedule)
+# - Manual (workflow_dispatch)
+name: Update Custom Packages
+
+on:
+  schedule:
+    - cron: "0 8 * * 1"  # Weekly Monday 8am UTC
+  workflow_dispatch: {}
+
+jobs:
+  update-gh-aw:
+    name: Update gh-aw
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Update gh-aw
+        run: nix run nixpkgs#nix-update -- --flake gh-aw
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          sign-commits: true
+          branch: chore/update-gh-aw
+          delete-branch: true
+          commit-message: |
+            chore(deps): update gh-aw to latest version
+
+            Automated update via nix-update.
+          title: "chore(deps): update gh-aw"
+          body: |
+            Automated gh-aw version update via nix-update.
+
+            nix-update automatically fetches the latest release from GitHub
+            and updates the version, hash, and vendorHash in
+            `modules/gh-extensions/gh-aw.nix`.
+
+            ---
+            *Created by JacobPEvans-github-actions*
+          labels: dependencies
+          assignees: JacobPEvans
+          reviewers: JacobPEvans
