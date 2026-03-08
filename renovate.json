@@ -10,7 +10,7 @@
       "customType": "regex",
       "fileMatch": ["modules/ai-tools\\.nix"],
       "matchStrings": [
-        "bunx\\s+--bun\\s+(?<depName>(?:@[^@/]+\\/)?[^@\\s]+)@(?<currentValue>[\\d.]+)"
+        "bunx\\s+--bun\\s+(?<depName>(?:@[^@/]+\\/)?[^@\\s]+)@(?<currentValue>[\\d]+(?:\\.[\\d]+)*)"
       ],
       "datasourceTemplate": "npm"
     }
