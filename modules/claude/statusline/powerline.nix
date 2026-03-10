@@ -14,6 +14,7 @@
 
 let
   cfg = config.programs.claudeStatusline;
+  daniel3303Cfg = config.programs.claudeStatuslineDaniel3303;
 
   # JSON config in separate file to preserve segment order and enable IDE validation
   configFile = ./claude-powerline.json;
@@ -21,6 +22,17 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
+    # Ensure only one statusline implementation is enabled
+    assertions = [
+      {
+        assertion = !daniel3303Cfg.enable;
+        message = ''
+          Cannot enable both programs.claudeStatusline (powerline) and programs.claudeStatuslineDaniel3303 (daniel3303) simultaneously.
+          Choose one statusline implementation or disable both to use Claude Code's default.
+        '';
+      }
+    ];
+
     programs.claude.statusLine = {
       enable = true;
       script = ''

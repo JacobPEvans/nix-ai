@@ -126,8 +126,9 @@ in
       # Claude Code declarative configuration
       claude = claudeConfig;
 
-      # Claude Code powerline statusline
-      claudeStatusline.enable = true;
+      # Claude Code statusline (switched from powerline to daniel3303)
+      claudeStatusline.enable = false; # Disabled (kept for easy re-enable)
+      claudeStatuslineDaniel3303.enable = true; # Active: ClaudeCodeStatusLine (2-line)
 
       # GitHub CLI extension for AI workflows
       gh.extensions = [ ghExtensions.gh-aw ];

@@ -26,6 +26,8 @@ in
   imports = [
     ./options.nix
     ./powerline.nix
+    ./daniel3303-options.nix
+    ./daniel3303.nix
   ];
 
   config = lib.mkIf cfg.enable { };
