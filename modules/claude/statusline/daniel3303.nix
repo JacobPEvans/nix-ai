@@ -12,8 +12,8 @@
 #   - 5-hour and 7-day rate limit tracking
 #   - Effort level (low/med/high reasoning) indicator
 #   - Color-coded warnings: green <50% → yellow → orange → red ≥90%
-#   - 60-second caching of API responses at /tmp/claude/statusline-usage-cache.json
-#   - Runtime dependencies: jq, bc, curl, git (wired through Nix)
+#   - 60-second caching of API responses at ~/.cache/claude/statusline-usage-cache.json
+#   - Runtime dependencies: jq, bc, curl, git, stat (wired through Nix)
 #
 {
   config,
@@ -55,11 +55,15 @@ let
 
     # Get git info: current branch and uncommitted changes
     get_git_info() {
-      local branch unstaged staged
+      local branch
       if branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); then
-        # Count unstaged+staged changes
-        local changes=$(git diff --stat 2>/dev/null | tail -1 | awk '{print $NF}' || echo "")
-        [[ -n "$changes" ]] && branch="''${branch}+''${changes}" || branch="''${branch}"
+        # Count changed files using --name-only (more reliable than --stat parsing)
+        local changes
+        changes=$(git diff --name-only 2>/dev/null | wc -l || echo "0")
+        # Append change count if non-zero
+        if [[ "$changes" != "0" ]]; then
+          branch="''${branch}+''${changes}"
+        fi
       else
         branch="—"
       fi
@@ -74,10 +78,16 @@ let
     }
 
     # Fetch Claude API rate limit usage (with 60s cache)
+    # Uses XDG_CACHE_HOME or ~/.cache for cache directory (not /tmp for security)
     get_rate_limit_data() {
-      local cache_dir="/tmp/claude"
+      local cache_dir="''${XDG_CACHE_HOME:-''${HOME}/.cache}/claude"
       local cache_file="$cache_dir/statusline-usage-cache.json"
-      local cache_age=$(($(date +%s) - $(stat -c %Y "$cache_file" 2>/dev/null || stat -f%m "$cache_file" 2>/dev/null || echo 0)))
+      # Get file modification time portably (works on GNU/BSD stat)
+      local mtime=0
+      if [[ -f "$cache_file" ]]; then
+        mtime=$(stat -f%m "$cache_file" 2>/dev/null || stat -c %Y "$cache_file" 2>/dev/null || echo 0)
+      fi
+      local cache_age=$(($(date +%s) - mtime))
 
       # Use cache if valid (< 60 seconds old)
       if [[ -f "$cache_file" && $cache_age -lt 60 ]]; then
@@ -108,8 +118,15 @@ let
       local label=$3
       local reset=$4
 
-      # Calculate percentage (0-100)
-      local percent=$([[ "$current" -gt 0 && "$limit" -gt 0 ]] && echo "scale=0; (100 * $current) / $limit" | ${pkgs.bc}/bin/bc || echo 0)
+      # Validate numeric inputs; default to 0 if non-numeric
+      if ! [[ "$current" =~ ^[0-9]+$ ]]; then current=0; fi
+      if ! [[ "$limit" =~ ^[0-9]+$ ]]; then limit=0; fi
+
+      # Calculate percentage (0-100) only if inputs are valid numbers
+      local percent=0
+      if [[ $current -gt 0 && $limit -gt 0 ]]; then
+        percent=$(echo "scale=0; (100 * $current) / $limit" | ${pkgs.bc}/bin/bc 2>/dev/null || echo 0)
+      fi
 
       # Select color based on threshold
       local color="$COLOR_GREEN"
@@ -117,7 +134,7 @@ let
       [[ $percent -ge 75 ]] && color="$COLOR_ORANGE"
       [[ $percent -ge 90 ]] && color="$COLOR_RED"
 
-      # Format: label percent% (reset_time)
+      # Format: label percent%
       printf "%b%s %d%%''${COLOR_RESET}" "$color" "$label" "$percent"
     }
 
@@ -166,5 +183,9 @@ in
         exec ${statuslineScript} "$@"
       '';
     };
+
+    # Ensure only one statusline module sets the status line configuration
+    # Both daniel3303 and powerline set programs.claude.statusLine, but mkIf ensures
+    # only the enabled one applies (later in merge order wins in NixOS)
   };
 }
