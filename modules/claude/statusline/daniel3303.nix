@@ -1,7 +1,10 @@
-# ClaudeCodeStatusLine Implementation (daniel3303)
+# ClaudeCodeStatusLine Implementation (daniel3303, locally forked)
 #
-# Uses daniel3303's real ClaudeCodeStatusLine script from:
+# Based on daniel3303's ClaudeCodeStatusLine:
 # https://github.com/daniel3303/ClaudeCodeStatusLine
+#
+# Local fork at modules/claude/statusline/claude-statusline.sh
+# Patch: cwd shows last 2 path components (e.g., nix-ai/main) instead of basename only
 #
 # The script:
 #   - Reads JSON from stdin with Claude Code status data
@@ -20,11 +23,8 @@
 let
   cfg = config.programs.claudeStatuslineDaniel3303;
 
-  # Fetch the real statusline.sh from daniel3303's repository
-  statuslineScript = pkgs.fetchurl {
-    url = "https://raw.githubusercontent.com/daniel3303/ClaudeCodeStatusLine/refs/heads/main/statusline.sh";
-    hash = "sha256-5B8b0pU0BWffhRCmQAeCktitfR8zxSD25VqiC0jn9iU=";
-  };
+  # Local fork of daniel3303's script with cwd patch applied
+  statuslineScript = ./claude-statusline.sh;
 
 in
 {
@@ -33,7 +33,7 @@ in
       enable = true;
       script = ''
         #!/usr/bin/env bash
-        # ClaudeCodeStatusLine by daniel3303
+        # Based on ClaudeCodeStatusLine by daniel3303
         # https://github.com/daniel3303/ClaudeCodeStatusLine
         exec ${pkgs.bash}/bin/bash ${statuslineScript} "$@"
       '';
