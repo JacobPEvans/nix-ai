@@ -1,19 +1,14 @@
 # ClaudeCodeStatusLine Implementation (daniel3303)
 #
-# 2-LINE STATUSLINE STANDARD:
-# All statusline implementations should output exactly 2 lines:
-#   Line 1 (context): what am I working on — model, location, token state
-#   Line 2 (limits):  what are my constraints — rate limits, effort, extras
+# Uses daniel3303's real ClaudeCodeStatusLine script from:
+# https://github.com/daniel3303/ClaudeCodeStatusLine
 #
-# This is a 2-line variant of https://github.com/daniel3303/ClaudeCodeStatusLine
-# Original focuses on rate limits and token usage with color thresholds.
-#
-# Features:
-#   - 5-hour and 7-day rate limit tracking
-#   - Effort level (low/med/high reasoning) indicator
-#   - Color-coded warnings: green <50% → yellow → orange → red ≥90%
-#   - 60-second caching of API responses at ~/.cache/claude/statusline-usage-cache.json
-#   - Runtime dependencies: jq, bc, curl, git, stat (wired through Nix)
+# The script:
+#   - Reads JSON from stdin with Claude Code status data
+#   - Outputs 1 line with pipe-delimited segments: model | cwd@branch | tokens/total | effort | 5h % | 7d % | extra
+#   - Supports multiple auth methods (env var, macOS Keychain, .credentials.json, GNOME Keyring)
+#   - Caches usage data for 60 seconds at /tmp/claude/statusline-usage-cache.json
+#   - Color thresholds: green <50% → yellow ≥50% → orange ≥70% → red ≥90%
 #
 {
   config,
@@ -25,152 +20,11 @@
 let
   cfg = config.programs.claudeStatuslineDaniel3303;
 
-  # 2-line statusline script (daniel3303 variant)
-  statuslineScript = pkgs.writeShellScript "claude-statusline-daniel3303" ''
-    #!/usr/bin/env bash
-    set -e
-
-    # ANSI color codes for threshold warnings
-    COLOR_GREEN='\033[32m'
-    COLOR_YELLOW='\033[33m'
-    COLOR_ORANGE='\033[38;5;214m'
-    COLOR_RED='\033[31m'
-    COLOR_RESET='\033[0m'
-    DIM='\033[2m'
-
-    # Parse CLAUDE_STATUS_LINE_DATA from Claude Code environment
-    # Format: model|effort|tokens|...
-    parse_statusline_data() {
-      local data="$CLAUDE_STATUS_LINE_DATA"
-      [[ "$data" =~ ([^|]+)\|([^|]+)\|([^|]+) ]] && {
-        MODEL="''${BASH_REMATCH[1]}"
-        EFFORT="''${BASH_REMATCH[2]}"
-        TOKENS="''${BASH_REMATCH[3]}"
-      }
-      # Defaults if not set
-      MODEL="''${MODEL:-claude-sonnet}"
-      EFFORT="''${EFFORT:-—}"
-      TOKENS="''${TOKENS:-—}"
-    }
-
-    # Get git info: current branch and uncommitted changes
-    get_git_info() {
-      local branch
-      if branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); then
-        # Count changed files using --name-only (more reliable than --stat parsing)
-        local changes
-        changes=$(git diff --name-only 2>/dev/null | wc -l || echo "0")
-        # Append change count if non-zero
-        if [[ "$changes" != "0" ]]; then
-          branch="''${branch}+''${changes}"
-        fi
-      else
-        branch="—"
-      fi
-      echo "$branch"
-    }
-
-    # Get current working directory (relative to home if possible)
-    get_working_dir() {
-      local cwd="''${PWD#$HOME/}"
-      [[ "$cwd" == "$PWD" ]] && cwd="$PWD"
-      echo "$cwd"
-    }
-
-    # Fetch Claude API rate limit usage (with 60s cache)
-    # Uses XDG_CACHE_HOME or ~/.cache for cache directory (not /tmp for security)
-    get_rate_limit_data() {
-      local cache_dir="''${XDG_CACHE_HOME:-''${HOME}/.cache}/claude"
-      local cache_file="$cache_dir/statusline-usage-cache.json"
-      # Get file modification time portably (works on GNU/BSD stat)
-      local mtime=0
-      if [[ -f "$cache_file" ]]; then
-        mtime=$(stat -f%m "$cache_file" 2>/dev/null || stat -c %Y "$cache_file" 2>/dev/null || echo 0)
-      fi
-      local cache_age=$(($(date +%s) - mtime))
-
-      # Use cache if valid (< 60 seconds old)
-      if [[ -f "$cache_file" && $cache_age -lt 60 ]]; then
-        cat "$cache_file"
-        return 0
-      fi
-
-      # Fetch fresh data (requires ANTHROPIC_API_KEY)
-      if [[ -z "$ANTHROPIC_API_KEY" ]]; then
-        echo '{"limit_5h": "—", "limit_7d": "—", "reset_5h": "—", "reset_7d": "—"}'
-        return 0
-      fi
-
-      mkdir -p "$cache_dir"
-      local response
-      response=$(curl -s -H "api-key: $ANTHROPIC_API_KEY" \
-        "https://api.anthropic.com/v1/usage" 2>/dev/null || echo '{}')
-
-      # Parse response and cache it
-      echo "$response" > "$cache_file" 2>/dev/null || true
-      echo "$response"
-    }
-
-    # Format rate limit with color based on usage percentage
-    format_limit() {
-      local current=$1
-      local limit=$2
-      local label=$3
-      local reset=$4
-
-      # Validate numeric inputs; default to 0 if non-numeric
-      if ! [[ "$current" =~ ^[0-9]+$ ]]; then current=0; fi
-      if ! [[ "$limit" =~ ^[0-9]+$ ]]; then limit=0; fi
-
-      # Calculate percentage (0-100) only if inputs are valid numbers
-      local percent=0
-      if [[ $current -gt 0 && $limit -gt 0 ]]; then
-        percent=$(echo "scale=0; (100 * $current) / $limit" | ${pkgs.bc}/bin/bc 2>/dev/null || echo 0)
-      fi
-
-      # Select color based on threshold
-      local color="$COLOR_GREEN"
-      [[ $percent -ge 50 ]] && color="$COLOR_YELLOW"
-      [[ $percent -ge 75 ]] && color="$COLOR_ORANGE"
-      [[ $percent -ge 90 ]] && color="$COLOR_RED"
-
-      # Format: label percent%
-      printf "%b%s %d%%''${COLOR_RESET}" "$color" "$label" "$percent"
-    }
-
-    # --- Main Script ---
-
-    # Parse Claude Code environment
-    parse_statusline_data
-
-    # Get git context
-    cwd=$(get_working_dir)
-    branch=$(get_git_info)
-
-    # Get rate limit data (cached)
-    rate_data=$(get_rate_limit_data)
-
-    # Extract rate limit values (graceful defaults if parsing fails)
-    limit_5h=$(echo "$rate_data" | ${pkgs.jq}/bin/jq -r '.limit_5h // "—"' 2>/dev/null || echo "—")
-    used_5h=$(echo "$rate_data" | ${pkgs.jq}/bin/jq -r '.used_5h // 0' 2>/dev/null || echo 0)
-    reset_5h=$(echo "$rate_data" | ${pkgs.jq}/bin/jq -r '.reset_5h // "—"' 2>/dev/null || echo "—")
-
-    limit_7d=$(echo "$rate_data" | ${pkgs.jq}/bin/jq -r '.limit_7d // "—"' 2>/dev/null || echo "—")
-    used_7d=$(echo "$rate_data" | ${pkgs.jq}/bin/jq -r '.used_7d // 0' 2>/dev/null || echo 0)
-    reset_7d=$(echo "$rate_data" | ${pkgs.jq}/bin/jq -r '.reset_7d // "—"' 2>/dev/null || echo "—")
-
-    # --- OUTPUT ---
-    # Line 1: Context (what am I working on)
-    printf "%s ''${DIM}|''${COLOR_RESET} %s@%s ''${DIM}|''${COLOR_RESET} %s tokens\n" \
-      "$MODEL" "$cwd" "$branch" "$TOKENS"
-
-    # Line 2: Limits (what are my constraints)
-    printf "%s ''${DIM}|''${COLOR_RESET} " "$EFFORT"
-    format_limit "$used_5h" "$limit_5h" "5h" "$reset_5h"
-    printf " ''${DIM}|''${COLOR_RESET} "
-    format_limit "$used_7d" "$limit_7d" "7d" "$reset_7d"
-    printf "\n"
-  '';
+  # Fetch the real statusline.sh from daniel3303's repository
+  statuslineScript = pkgs.fetchurl {
+    url = "https://raw.githubusercontent.com/daniel3303/ClaudeCodeStatusLine/refs/heads/main/statusline.sh";
+    hash = "sha256-5B8b0pU0BWffhRCmQAeCktitfR8zxSD25VqiC0jn9iU=";
+  };
 
 in
 {
@@ -179,13 +33,10 @@ in
       enable = true;
       script = ''
         #!/usr/bin/env bash
-        # ClaudeCodeStatusLine (daniel3303) - 2-line format
-        exec ${statuslineScript} "$@"
+        # ClaudeCodeStatusLine by daniel3303
+        # https://github.com/daniel3303/ClaudeCodeStatusLine
+        exec ${pkgs.bash}/bin/bash ${statuslineScript} "$@"
       '';
     };
-
-    # Ensure only one statusline module sets the status line configuration
-    # Both daniel3303 and powerline set programs.claude.statusLine, but mkIf ensures
-    # only the enabled one applies (later in merge order wins in NixOS)
   };
 }
