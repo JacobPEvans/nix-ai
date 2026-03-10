@@ -50,12 +50,12 @@ while IFS= read -r -d '' entry; do
   [[ -n "$target" ]] || continue
 
   # Hash the store path string (not file contents - that's what matters for staleness)
-  hash=$(printf '%s' "$target" | shasum -a 256 | cut -d' ' -f1)
+  hash=$(printf '%s' "$target" | /usr/bin/shasum -a 256 | cut -d' ' -f1)
   new_hashes["$name"]="$hash"
 
   if [[ "${old_hashes[$name]:-}" != "$hash" ]]; then
     if [[ -d "$CACHE_DIR/$name" ]]; then
-      rm -rf "$CACHE_DIR/$name"
+      rm -rf "${CACHE_DIR:?}/$name"
       log_info "Purged stale cache: $name"
       log_info "  Store path changed to: $target"
     fi
