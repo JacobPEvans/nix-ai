@@ -73,11 +73,6 @@ if [ "$size" -gt 0 ]; then
 else
     pct_used=0
 fi
-pct_remain=$(( 100 - pct_used ))
-
-used_comma=$(format_commas $current)
-remain_comma=$(format_commas $(( size - current )))
-
 # Check reasoning effort
 settings_path="$HOME/.claude/settings.json"
 effort_level="medium"
@@ -168,9 +163,11 @@ get_oauth_token() {
 }
 
 # ===== LINE 2 & 3: Usage limits with progress bars (cached) =====
-cache_file="/tmp/claude/statusline-usage-cache.json"
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/claude"
+cache_file="$cache_dir/statusline-usage-cache.json"
 cache_max_age=60  # seconds between API calls
-mkdir -p /tmp/claude
+mkdir -p "$cache_dir"
+chmod 700 "$cache_dir"
 
 needs_refresh=true
 usage_data=""
@@ -203,7 +200,7 @@ if $needs_refresh; then
         # Only cache valid usage responses (not error/rate-limit JSON)
         if [ -n "$response" ] && echo "$response" | jq -e '.five_hour' >/dev/null 2>&1; then
             usage_data="$response"
-            echo "$response" > "$cache_file"
+            (umask 077; echo "$response" > "$cache_file")
         fi
     fi
 fi
