@@ -13,7 +13,7 @@
 #   - Effort level (low/med/high reasoning) indicator
 #   - Color-coded warnings: green <50% → yellow → orange → red ≥90%
 #   - 60-second caching of API responses at /tmp/claude/statusline-usage-cache.json
-#   - No external dependencies (pure bash)
+#   - Runtime dependencies: jq, bc, curl, git (wired through Nix)
 #
 {
   config,
@@ -77,7 +77,7 @@ let
     get_rate_limit_data() {
       local cache_dir="/tmp/claude"
       local cache_file="$cache_dir/statusline-usage-cache.json"
-      local cache_age=$(($(date +%s) - $(stat -f%m "$cache_file" 2>/dev/null || echo 0)))
+      local cache_age=$(($(date +%s) - $(stat -c %Y "$cache_file" 2>/dev/null || stat -f%m "$cache_file" 2>/dev/null || echo 0)))
 
       # Use cache if valid (< 60 seconds old)
       if [[ -f "$cache_file" && $cache_age -lt 60 ]]; then
@@ -109,7 +109,7 @@ let
       local reset=$4
 
       # Calculate percentage (0-100)
-      local percent=$([[ "$current" -gt 0 && "$limit" -gt 0 ]] && echo "scale=0; (100 * $current) / $limit" | bc || echo 0)
+      local percent=$([[ "$current" -gt 0 && "$limit" -gt 0 ]] && echo "scale=0; (100 * $current) / $limit" | ${pkgs.bc}/bin/bc || echo 0)
 
       # Select color based on threshold
       local color="$COLOR_GREEN"
@@ -127,20 +127,20 @@ let
     parse_statusline_data
 
     # Get git context
-    local cwd=$(get_working_dir)
-    local branch=$(get_git_info)
+    cwd=$(get_working_dir)
+    branch=$(get_git_info)
 
     # Get rate limit data (cached)
-    local rate_data=$(get_rate_limit_data)
+    rate_data=$(get_rate_limit_data)
 
     # Extract rate limit values (graceful defaults if parsing fails)
-    local limit_5h=$(echo "$rate_data" | jq -r '.limit_5h // "—"' 2>/dev/null || echo "—")
-    local used_5h=$(echo "$rate_data" | jq -r '.used_5h // 0' 2>/dev/null || echo 0)
-    local reset_5h=$(echo "$rate_data" | jq -r '.reset_5h // "—"' 2>/dev/null || echo "—")
+    limit_5h=$(echo "$rate_data" | ${pkgs.jq}/bin/jq -r '.limit_5h // "—"' 2>/dev/null || echo "—")
+    used_5h=$(echo "$rate_data" | ${pkgs.jq}/bin/jq -r '.used_5h // 0' 2>/dev/null || echo 0)
+    reset_5h=$(echo "$rate_data" | ${pkgs.jq}/bin/jq -r '.reset_5h // "—"' 2>/dev/null || echo "—")
 
-    local limit_7d=$(echo "$rate_data" | jq -r '.limit_7d // "—"' 2>/dev/null || echo "—")
-    local used_7d=$(echo "$rate_data" | jq -r '.used_7d // 0' 2>/dev/null || echo "—")
-    local reset_7d=$(echo "$rate_data" | jq -r '.reset_7d // "—"' 2>/dev/null || echo "—")
+    limit_7d=$(echo "$rate_data" | ${pkgs.jq}/bin/jq -r '.limit_7d // "—"' 2>/dev/null || echo "—")
+    used_7d=$(echo "$rate_data" | ${pkgs.jq}/bin/jq -r '.used_7d // 0' 2>/dev/null || echo 0)
+    reset_7d=$(echo "$rate_data" | ${pkgs.jq}/bin/jq -r '.reset_7d // "—"' 2>/dev/null || echo "—")
 
     # --- OUTPUT ---
     # Line 1: Context (what am I working on)
