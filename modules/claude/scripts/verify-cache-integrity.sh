@@ -18,6 +18,20 @@ MARKETPLACES_DIR="$HOME_DIR/.claude/plugins/marketplaces"
 CACHE_DIR="$HOME_DIR/.claude/plugins/cache"
 HASH_FILE="$CACHE_DIR/.nix-store-hashes"
 
+# Resolve the SHA-256 hasher once at startup.
+# Prefer shasum from PATH (present on macOS and installable cross-platform),
+# fall back to the macOS system copy, then sha256sum (Linux coreutils).
+# sha256sum does not accept -a 256, so wrap the call to normalise the interface.
+if _cmd=$(command -v shasum 2>/dev/null) || { [ -x /usr/bin/shasum ] && _cmd=/usr/bin/shasum; }; then
+  sha256_string() { "$_cmd" -a 256; }
+elif _cmd=$(command -v sha256sum 2>/dev/null); then
+  sha256_string() { "$_cmd"; }
+else
+  echo "error: no shasum or sha256sum found" >&2
+  exit 1
+fi
+unset _cmd
+
 # Only run if both dirs exist
 [[ -d "$MARKETPLACES_DIR" ]] || exit 0
 [[ -d "$CACHE_DIR" ]] || exit 0
@@ -50,7 +64,7 @@ while IFS= read -r -d '' entry; do
   [[ -n "$target" ]] || continue
 
   # Hash the store path string (not file contents - that's what matters for staleness)
-  hash=$(printf '%s' "$target" | /usr/bin/shasum -a 256 | cut -d' ' -f1)
+  hash=$(printf '%s' "$target" | sha256_string | cut -d' ' -f1)
   new_hashes["$name"]="$hash"
 
   if [[ "${old_hashes[$name]:-}" != "$hash" ]]; then
