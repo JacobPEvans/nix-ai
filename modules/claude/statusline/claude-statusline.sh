@@ -91,7 +91,7 @@ out+="${blue}${model_name}${reset}"
 cwd=$(echo "$input" | jq -r '.cwd // empty')
 if [ -n "$cwd" ]; then
     # Show last 2 path components (e.g., nix-ai/main) instead of just basename
-    display_dir=$(echo "$cwd" | rev | cut -d'/' -f1-2 | rev)
+    display_dir="$(basename "$(dirname "$cwd")")/$(basename "$cwd")"
     git_branch=$(git -C "${cwd}" rev-parse --abbrev-ref HEAD 2>/dev/null)
     out+=" ${dim}|${reset} "
     out+="${cyan}${display_dir}${reset}"
