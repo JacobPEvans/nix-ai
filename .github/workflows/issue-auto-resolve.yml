@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   dispatch:
-    if: github.event_name == 'issues'
+    if: github.event_name == 'issues' && github.event.label.name == 'ai:ready'
     runs-on: ubuntu-latest
     permissions:
       actions: write
@@ -31,15 +31,7 @@ jobs:
           WORKFLOW_NAME: ${{ github.workflow }}
           REPO: ${{ github.repository }}
           ISSUE_NUM: ${{ github.event.issue.number }}
-          EVENT_ACTION: ${{ github.event.action }}
-          LABEL_NAME: ${{ github.event.label.name }}
         run: |
-          # Filter labeled events to only ai:ready
-          if [[ "$EVENT_ACTION" == "labeled" && "$LABEL_NAME" != "ai:ready" ]]; then
-            echo "Label '$LABEL_NAME' is not ai:ready — skipping"
-            exit 0
-          fi
-
           # Daily dispatch limit (cost control safety valve)
           TODAY=$(date -u +%Y-%m-%d)
           COUNT=$(gh run list \
@@ -54,9 +46,7 @@ jobs:
           fi
 
           # Remove ai:ready label so it can be re-applied to re-trigger
-          if [[ "$EVENT_ACTION" == "labeled" && "$LABEL_NAME" == "ai:ready" ]]; then
-            gh issue edit "$ISSUE_NUM" --repo "$REPO" --remove-label "ai:ready" || true
-          fi
+          gh issue edit "$ISSUE_NUM" --repo "$REPO" --remove-label "ai:ready" || true
 
           gh workflow run "$WORKFLOW_NAME" \
             --repo "$REPO" \
