@@ -26,6 +26,16 @@ let
   # Local fork of daniel3303's script with cwd patch applied
   statuslineScript = ./claude-statusline.sh;
 
+  # Runtime dependencies required by claude-statusline.sh
+  runtimePath = lib.makeBinPath [
+    pkgs.bash
+    pkgs.jq
+    pkgs.git
+    pkgs.curl
+    pkgs.gawk
+    pkgs.coreutils
+  ];
+
 in
 {
   config = lib.mkIf cfg.enable {
@@ -35,6 +45,7 @@ in
         #!/usr/bin/env bash
         # Based on ClaudeCodeStatusLine by daniel3303
         # https://github.com/daniel3303/ClaudeCodeStatusLine
+        export PATH="${runtimePath}:$PATH"
         exec ${pkgs.bash}/bin/bash ${statuslineScript} "$@"
       '';
     };
