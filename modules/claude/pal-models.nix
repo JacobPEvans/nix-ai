@@ -12,11 +12,16 @@
 #   model like "glm-5:cloud" must be registered with alias "glm-5". When the
 #   user asks for "glm-5", PAL finds the alias → resolves to "glm-5:cloud" →
 #   sends that to Ollama. This is handled automatically by pal-models.jq.
+#
+# Version pinning:
+#   The PAL server args use a pinned git commit hash (from flake.lock) instead
+#   of the Nix store path. The Nix store path approach fails because setuptools_scm
+#   tries to write egg-info to the read-only Nix store during uvx build.
+#   To update: run `nix flake update pal-mcp-server` and update the rev in args.
 {
   config,
   lib,
   pkgs,
-  pal-mcp-server,
   ...
 }:
 
@@ -27,11 +32,17 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
-    # Pin PAL to the flake-locked Nix store path instead of live git URL.
+    # Pin PAL to the flake-locked git commit via git URL.
+    # NOTE: Using the Nix store path directly (${pal-mcp-server}) does NOT work —
+    # setuptools_scm tries to write pal_mcp_server.egg-info to the source directory
+    # during uvx build, which fails because the Nix store is read-only.
+    # The git URL approach lets uvx clone to a writable temp dir, and the commit
+    # hash provides the same pinning guarantee as the Nix store path.
+    # The rev comes from flake.lock (nodes.pal-mcp-server.locked.rev).
     programs.claude.mcpServers.pal.args = lib.mkForce [
       "uvx"
       "--from"
-      "${pal-mcp-server}"
+      "git+https://github.com/BeehiveInnovations/pal-mcp-server.git@7afc7c1cc96e23992c8f105f960132c657883bb1"
       "pal-mcp-server"
     ];
 
