@@ -93,7 +93,7 @@ jobs:
             Automated update of Nix flake dependencies.
           title: "chore(deps): update flake inputs"
           body: |
-            Automated Nix flake dependency update.
+            Automated update via nix flake update and nix-update.
 
             See the flake.lock diff below for specific version bumps.
 
