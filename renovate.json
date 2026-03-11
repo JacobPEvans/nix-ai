@@ -3,5 +3,26 @@
   "extends": [
     "config:recommended",
     "local>JacobPEvans/.github:renovate-presets"
+  ],
+  "customManagers": [
+    {
+      "description": "bunx wrapper npm packages pinned in Nix modules",
+      "customType": "regex",
+      "fileMatch": ["modules/ai-tools\\.nix"],
+      "matchStrings": [
+        "bunx\\s+--bun\\s+(?<depName>(?:@[^@/]+\\/)?[^@\\s]+)@(?<currentValue>[\\d]+(?:\\.[\\d]+)*)"
+      ],
+      "datasourceTemplate": "npm"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Bunx wrapper npm packages - weekly updates",
+      "matchDatasources": ["npm"],
+      "matchFileNames": ["modules/ai-tools.nix"],
+      "groupName": "npm-wrappers",
+      "schedule": ["after 7am on Monday"],
+      "minimumReleaseAge": "3 days"
+    }
   ]
 }

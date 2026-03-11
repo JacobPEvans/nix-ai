@@ -75,6 +75,10 @@ jobs:
           # shellcheck disable=SC2086
           nix flake update $FLAKE_INPUTS
 
+      - name: Update custom packages
+        if: github.event_name != 'repository_dispatch'
+        run: nix run nixpkgs#nix-update -- --flake gh-aw
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v8
         with:

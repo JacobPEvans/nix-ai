@@ -17,11 +17,13 @@
 #   The PAL server args use a pinned git commit hash (from flake.lock) instead
 #   of the Nix store path. The Nix store path approach fails because setuptools_scm
 #   tries to write egg-info to the read-only Nix store during uvx build.
-#   To update: run `nix flake update pal-mcp-server` and update the rev in args.
+#   The rev is derived automatically from the pal-mcp-server flake input —
+#   running `nix flake update pal-mcp-server` is all that is needed to bump it.
 {
   config,
   lib,
   pkgs,
+  pal-mcp-server,
   ...
 }:
 
@@ -42,7 +44,7 @@ in
     programs.claude.mcpServers.pal.args = lib.mkForce [
       "uvx"
       "--from"
-      "git+https://github.com/BeehiveInnovations/pal-mcp-server.git@7afc7c1cc96e23992c8f105f960132c657883bb1"
+      "git+https://github.com/BeehiveInnovations/pal-mcp-server.git@${pal-mcp-server.rev}"
       "pal-mcp-server"
     ];
 
