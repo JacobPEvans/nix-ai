@@ -4,14 +4,11 @@ on:
   push:
     branches: [main]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
-
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
 
 jobs:
   release-please:
+    permissions:
+      contents: write
+      pull-requests: write
     uses: JacobPEvans/.github/.github/workflows/_release-please.yml@main
