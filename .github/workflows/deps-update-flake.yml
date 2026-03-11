@@ -27,6 +27,7 @@ jobs:
   update:
     name: Update flake inputs
     runs-on: ubuntu-latest
+    environment: automation
     permissions:
       contents: write
       pull-requests: write

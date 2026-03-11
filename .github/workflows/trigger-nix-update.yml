@@ -8,6 +8,7 @@ on:
 jobs:
   trigger-nix:
     runs-on: ubuntu-latest
+    environment: automation
     permissions:
       contents: read  # Minimal permissions
 
