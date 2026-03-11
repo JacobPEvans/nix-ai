@@ -311,10 +311,10 @@ in
       # Session management
       cleanupPeriodDays = mkOption {
         type = types.int;
-        default = 14;
+        default = 30;
         description = ''
           Sessions inactive longer than this period are deleted.
-          Default upstream is 30, we use 14 to reduce storage.
+          Upstream Claude default is 30 days.
         '';
       };
 

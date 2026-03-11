@@ -135,7 +135,9 @@ in
     # Extended thinking enabled with token budget controlled via env vars
     alwaysThinkingEnabled = true;
 
-    # Session cleanup - 30 days is the upstream default
+    # Session cleanup: explicitly set to 30 days (upstream Claude default).
+    # Keeping this explicit to document the intentional choice and prevent
+    # accidental drift if the module option default ever changes.
     cleanupPeriodDays = 30;
 
     # Environment variables for model config and token optimization
