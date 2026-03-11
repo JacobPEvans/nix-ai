@@ -2,7 +2,7 @@
 # Based on ClaudeCodeStatusLine by daniel3303
 # https://github.com/daniel3303/ClaudeCodeStatusLine
 # Modified: Show last 2 path components for cwd instead of basename
-# Single line: Model | tokens | %used | %remain | think | 5h bar @reset | 7d bar @reset | extra
+# Single line: Model | cwd@branch (diff) | used/total (pct-used) | effort | 5h usage % @reset | 7d usage % @reset | extra
 
 set -f  # disable globbing
 
