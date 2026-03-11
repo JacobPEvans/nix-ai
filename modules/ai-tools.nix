@@ -147,16 +147,23 @@
       fi
       LOG_FILE="''${XDG_STATE_HOME:-$HOME/.local/state}/doppler-mcp.log"
       mkdir -p "$(dirname "$LOG_FILE")"
+      touch "$LOG_FILE" && chmod 600 "$LOG_FILE"
+      # Preflight: verify Doppler auth before launching the MCP server.
+      # Only this check's stderr is logged; the wrapped command's stderr
+      # flows to the caller unchanged (important for MCP JSON-RPC communication).
       set +e
-      ${pkgs.doppler}/bin/doppler run -p ai-ci-automation -c prd -- "$@" 2>>"$LOG_FILE"
-      _exit=$?
+      ${pkgs.doppler}/bin/doppler run -p ai-ci-automation -c prd -- true 1>/dev/null 2>>"$LOG_FILE"
+      _preflight=$?
       set -e
-      if [ "$_exit" -ne 0 ]; then
-        echo "$(date -u +%FT%TZ) doppler-mcp failed. Exit: $_exit" >> "$LOG_FILE"
+      if [ "$_preflight" -ne 0 ]; then
+        echo "$(date -u +%FT%TZ) doppler-mcp preflight failed. Exit: $_preflight" >> "$LOG_FILE"
         ${pkgs.doppler}/bin/doppler --version >> "$LOG_FILE" 2>&1 || true
         ${pkgs.doppler}/bin/doppler me >> "$LOG_FILE" 2>&1 || true
-        exit "$_exit"
+        exit "$_preflight"
       fi
+      # Preflight passed — exec the real command, restoring proper signal forwarding
+      # and leaving stderr unredirected for the MCP server.
+      exec ${pkgs.doppler}/bin/doppler run -p ai-ci-automation -c prd -- "$@"
     '')
 
     # ==========================================================================
@@ -199,15 +206,29 @@
 
       echo ""
       echo "3. PAL secrets (ai-ci-automation/prd):"
-      ${pkgs.doppler}/bin/doppler secrets -p ai-ci-automation -c prd 2>&1 | \
-        grep -E "^(GEMINI_API_KEY|OPENROUTER_API_KEY|OLLAMA_HOST)" | \
-        ${pkgs.gnused}/bin/sed 's/=.*/=<redacted>/' || \
-        echo "   WARNING: Could not read PAL secrets"
+      required_secrets=(GEMINI_API_KEY OPENROUTER_API_KEY OLLAMA_HOST)
+      missing_any=0
+      for secret in "''${required_secrets[@]}"; do
+        if ${pkgs.doppler}/bin/doppler secrets get "$secret" \
+             --project ai-ci-automation \
+             --config prd \
+             --plain >/dev/null 2>&1; then
+          echo "   OK: $secret available"
+        else
+          echo "   ERROR: $secret missing or unreadable"
+          missing_any=1
+        fi
+      done
+      if [ "$missing_any" -ne 0 ]; then
+        echo "   One or more required PAL secrets are missing or inaccessible."
+        exit 1
+      fi
 
       echo ""
       echo "4. Last doppler-mcp log entries (if any):"
+      # Note: log file has chmod 600 - contents are diagnostic only, no secret values
       if [ -f "$LOG_FILE" ]; then
-        tail -20 "$LOG_FILE"
+        ${pkgs.coreutils}/bin/tail -20 "$LOG_FILE"
       else
         echo "   No log file found at $LOG_FILE (no failures recorded)"
       fi
