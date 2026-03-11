@@ -135,6 +135,9 @@
     # Fetches secrets from the ai-ci-automation project at subprocess launch time.
     # Used by mcp/default.nix withDoppler helper — secrets never stored in any file.
     # Usage: doppler-mcp <command> [args...]
+    #
+    # Logs failures to $XDG_STATE_HOME/doppler-mcp.log for diagnosing MCP startup
+    # failures (Doppler auth errors, missing secrets, etc.).
     (writeShellScriptBin "doppler-mcp" ''
       set -euo pipefail
       if [ "$#" -lt 1 ]; then
@@ -142,6 +145,24 @@
         echo "Wraps a command with: doppler run -p ai-ci-automation -c prd -- <command> [args...]" >&2
         exit 1
       fi
+      LOG_FILE="''${XDG_STATE_HOME:-$HOME/.local/state}/doppler-mcp.log"
+      mkdir -p "$(dirname "$LOG_FILE")"
+      touch "$LOG_FILE" && chmod 600 "$LOG_FILE"
+      # Preflight: verify Doppler auth before launching the MCP server.
+      # Only this check's stderr is logged; the wrapped command's stderr
+      # flows to the caller unchanged (important for MCP JSON-RPC communication).
+      set +e
+      ${pkgs.doppler}/bin/doppler run -p ai-ci-automation -c prd -- true 1>/dev/null 2>>"$LOG_FILE"
+      _preflight=$?
+      set -e
+      if [ "$_preflight" -ne 0 ]; then
+        echo "$(date -u +%FT%TZ) doppler-mcp preflight failed. Exit: $_preflight" >> "$LOG_FILE"
+        ${pkgs.doppler}/bin/doppler --version >> "$LOG_FILE" 2>&1 || true
+        ${pkgs.doppler}/bin/doppler me >> "$LOG_FILE" 2>&1 || true
+        exit "$_preflight"
+      fi
+      # Preflight passed — exec the real command, restoring proper signal forwarding
+      # and leaving stderr unredirected for the MCP server.
       exec ${pkgs.doppler}/bin/doppler run -p ai-ci-automation -c prd -- "$@"
     '')
 
@@ -158,6 +179,62 @@
         | ${pkgs.jq}/bin/jq --from-file ${./mcp/scripts/pal-models.jq} \
         > "$HOME/.config/pal-mcp/custom_models.json"
       echo "PAL custom models updated. Restart Claude Code to pick up changes."
+    '')
+
+    # ==========================================================================
+    # Check PAL MCP Health
+    # ==========================================================================
+    # Verifies that doppler-mcp can authenticate and access PAL secrets.
+    # Run after a darwin-rebuild switch to confirm the PAL MCP server will start.
+    # Also useful for diagnosing why PAL is absent from Claude Code sessions.
+    (writeShellScriptBin "check-pal-mcp" ''
+      set -euo pipefail
+      LOG_FILE="''${XDG_STATE_HOME:-$HOME/.local/state}/doppler-mcp.log"
+
+      echo "=== PAL MCP Health Check ==="
+
+      echo ""
+      echo "1. Doppler version:"
+      ${pkgs.doppler}/bin/doppler --version
+
+      echo ""
+      echo "2. Doppler auth status:"
+      ${pkgs.doppler}/bin/doppler me 2>&1 || {
+        echo "   ERROR: Not authenticated. Run: doppler login"
+        exit 1
+      }
+
+      echo ""
+      echo "3. PAL secrets (ai-ci-automation/prd):"
+      required_secrets=(GEMINI_API_KEY OPENROUTER_API_KEY OLLAMA_HOST)
+      missing_any=0
+      for secret in "''${required_secrets[@]}"; do
+        if ${pkgs.doppler}/bin/doppler secrets get "$secret" \
+             --project ai-ci-automation \
+             --config prd \
+             --plain >/dev/null 2>&1; then
+          echo "   OK: $secret available"
+        else
+          echo "   ERROR: $secret missing or unreadable"
+          missing_any=1
+        fi
+      done
+      if [ "$missing_any" -ne 0 ]; then
+        echo "   One or more required PAL secrets are missing or inaccessible."
+        exit 1
+      fi
+
+      echo ""
+      echo "4. Last doppler-mcp log entries (if any):"
+      # Note: log file has chmod 600 - contents are diagnostic only, no secret values
+      if [ -f "$LOG_FILE" ]; then
+        ${pkgs.coreutils}/bin/tail -20 "$LOG_FILE"
+      else
+        echo "   No log file found at $LOG_FILE (no failures recorded)"
+      fi
+
+      echo ""
+      echo "=== Health check complete ==="
     '')
 
     # ==========================================================================
