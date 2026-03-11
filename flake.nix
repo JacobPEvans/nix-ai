@@ -231,6 +231,17 @@
         }
       );
 
+      # Expose custom packages for nix-update automation
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          gh-aw = pkgs.callPackage ./modules/gh-extensions/gh-aw.nix { };
+        }
+      );
+
       # Formatter
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
     };

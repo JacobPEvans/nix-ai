@@ -75,6 +75,11 @@ jobs:
           # shellcheck disable=SC2086
           nix flake update $FLAKE_INPUTS
 
+      - name: Update custom packages
+        if: github.event_name != 'repository_dispatch'
+        continue-on-error: true
+        run: nix run nixpkgs#nix-update -- --flake gh-aw
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v8
         with:
@@ -88,7 +93,7 @@ jobs:
             Automated update of Nix flake dependencies.
           title: "chore(deps): update flake inputs"
           body: |
-            Automated Nix flake dependency update.
+            Automated update via nix flake update and nix-update.
 
             See the flake.lock diff below for specific version bumps.
 
