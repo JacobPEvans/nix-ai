@@ -117,6 +117,7 @@ in
   huggingface = {
     command = "uvx";
     args = [ "huggingface-mcp-server" ];
+    disabled = true; # Requires: HF_TOKEN env var (from macOS Keychain via nix-darwin shell init)
   };
 
   # ================================================================
