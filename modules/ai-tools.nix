@@ -51,6 +51,10 @@
 #   chatgpt: chatgpt-cli@3.3.0
 #   claude-flow: claude-flow@2.0.0
 #
+# UVX WRAPPER PACKAGES (Python packages not in nixpkgs/homebrew):
+#   hf: huggingface-hub CLI (model downloads, used with HuggingFace MCP)
+#   vllm-mlx: Apple Silicon MLX inference server (OpenAI/Anthropic compatible)
+#
 # PIPX PACKAGES (Python, installed separately):
 #   aider: aider-chat (AI pair programming)
 #
@@ -235,6 +239,30 @@
 
       echo ""
       echo "=== Health check complete ==="
+    '')
+
+    # ==========================================================================
+    # HuggingFace Hub CLI
+    # ==========================================================================
+    # Download and manage models (especially MLX-quantized models).
+    # Used alongside the HuggingFace MCP server: search via MCP, download via hf CLI.
+    # Source: https://github.com/huggingface/huggingface_hub
+    # PyPI: huggingface-hub (provides `hf` entry point)
+    # Requires: HF_TOKEN env var (from macOS Keychain via nix-darwin shell init)
+    (writeShellScriptBin "hf" ''
+      exec ${uv}/bin/uvx --from huggingface-hub hf "$@"
+    '')
+
+    # ==========================================================================
+    # vllm-mlx - Apple Silicon MLX Inference Server
+    # ==========================================================================
+    # Serves local MLX models as OpenAI/Anthropic-compatible API endpoints.
+    # PAL can route to local models via OLLAMA_HOST or direct API URL.
+    # Source: https://github.com/waybarrios/vllm-mlx
+    # PyPI: vllm-mlx
+    # Usage: vllm-mlx serve mlx-community/Qwen3-4B-4bit
+    (writeShellScriptBin "vllm-mlx" ''
+      exec ${uv}/bin/uvx --from vllm-mlx vllm-mlx "$@"
     '')
 
     # ==========================================================================
