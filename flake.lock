@@ -67,11 +67,11 @@
     "cc-dev-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1772770589,
-        "narHash": "sha256-KnbH3ueJmDl0BYsdsKVkLBPb0crhPfqBhPG04VOL3Ic=",
+        "lastModified": 1773351518,
+        "narHash": "sha256-hzixwj+qcYuT4hDMYAuupWhaz7FvFFsqt1cC/2n43ck=",
         "owner": "Lucklyric",
         "repo": "cc-dev-tools",
-        "rev": "9f38695d96a367c71d22624c22568d41dfdec681",
+        "rev": "097a9e1f2a4f79cd3301664034fd1915da31ff0d",
         "type": "github"
       },
       "original": {
@@ -115,11 +115,11 @@
     "claude-code-plugins-plus": {
       "flake": false,
       "locked": {
-        "lastModified": 1773296362,
-        "narHash": "sha256-P+WSwPQuPjm2SJxFmtomjmXwNzYVLGASyW19BCVSEyI=",
+        "lastModified": 1773328303,
+        "narHash": "sha256-yJHhLlg+qX1ZeMxUuSA7Pf4qrf/Z0UiUX+OjN3STaGY=",
         "owner": "jeremylongshore",
         "repo": "claude-code-plugins-plus",
-        "rev": "a12f2d90f0129d19bc8b0651455a0427fa163e9c",
+        "rev": "3739f136913b67da94486a5e91194a06a118ce83",
         "type": "github"
       },
       "original": {
@@ -247,11 +247,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1773126146,
-        "narHash": "sha256-Kob9356sCwqTPjNDmcsS2IymE1EFEhll/+RKXcMrZz4=",
+        "lastModified": 1773282714,
+        "narHash": "sha256-at2PNNVNoTfXBe3bA6pgff+CKOwdBWUZCUBIfXGrXsU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "0b21e2b6732e32d757d0c0a6dbb4fa8968edee9e",
+        "rev": "a8556879c286b4a40a717a416ae61818c26d1ac8",
         "type": "github"
       },
       "original": {
