@@ -13,18 +13,13 @@
     in
     {
       devShells.${system}.default = pkgs.mkShell {
-        buildInputs =
-          with pkgs;
-          [
-            python314
-            uv
-          ]
-          ++ (with pkgs.darwin.apple_sdk.frameworks; [
-            Metal
-            Accelerate
-            CoreGraphics
-            CoreVideo
-          ]);
+        buildInputs = with pkgs; [
+          python314
+          uv
+        ];
+        # Note: Apple Metal/Accelerate frameworks are NOT listed here.
+        # mlx ships pre-built Apple Silicon wheels via PyPI; macOS provides
+        # frameworks at /System/Library/Frameworks/ at runtime without Nix.
 
         HF_HOME = "/Volumes/HuggingFace";
 
