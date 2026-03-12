@@ -47,6 +47,6 @@
   # - Data stored at ~/.open-webui/ (not managed by Nix)
   # - LaunchAgent starts on login (auto-restart if crashes)
   # - Logs: ~/Library/Logs/OpenWebUI/open-webui.log
-  # - Installed via `uv tool install open-webui --python 3.12` in home.activation
+  # - Installed via `uv tool install open-webui --python 3.14` in home.activation
   # - Binary at ~/.local/bin/open-webui (uv tool bin directory)
 }
