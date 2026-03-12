@@ -20,10 +20,10 @@ fetch = official "fetch";
 # nixpkgs binary (resolved via PATH)
 github = { command = "github-mcp-server"; };
 
-# npm package via bunx
-context7 = {
-  command = "bunx";
-  args = [ "@context7/mcp-server" ];
+# Python package via uvx
+huggingface = {
+  command = "uvx";
+  args = [ "huggingface-mcp-server" ];
 };
 ```
 
@@ -73,6 +73,28 @@ Use your secrets manager (Doppler, Keychain, 1Password, etc.) to inject env vars
 Required env vars are documented in comments above each server definition.
 The config does NOT store any secrets — it only references commands and URLs.
 
+### macOS Keychain injection (PAT, HF_TOKEN, etc.)
+
+For tokens that are not in Doppler, the established pattern in nix-darwin injects them
+from the macOS Keychain via `_get_keychain_secret` in the shell init:
+
+```nix
+# In nix-darwin hosts/macbook-m4/home.nix:
+export HF_TOKEN=${HF_TOKEN:-"$(_get_keychain_secret 'HF_TOKEN' 'ai-cli-coder')"}
+```
+
+The account name (`ai-cli-coder`) and keychain db (`automation.keychain-db`) are defined
+in `lib/user-config.nix` in nix-darwin. Adapt these values if your setup uses different names.
+
+The shell exports the env var, and Claude Code (and its MCP servers) inherit it at startup.
+Secrets are never written to `~/.claude.json` or any Nix-managed file.
+
+**One-time setup:** Add secrets to macOS Keychain:
+
+```bash
+security add-generic-password -U -s HF_TOKEN -a "ai-cli-coder" -w "your-token-here" automation.keychain-db
+```
+
 ### Doppler injection via `doppler-mcp`
 
 For servers whose secrets live in Doppler (project `ai-ci-automation`, config `prd`),
@@ -101,6 +123,16 @@ They are never written to `~/.claude.json` or any other file Claude Code can rea
 
 **Non-secret config belongs in `env`, not Doppler.** Values like feature flags, timeouts,
 and log levels are not sensitive and belong in the Nix-managed `env` attribute.
+
+### Plugin-managed servers (context7)
+
+Some servers are provided by Claude Code plugins and manage their own MCP server lifecycle.
+Do **not** define these in `mcp/default.nix` — doing so creates a duplicate that causes
+conflicts on startup.
+
+| Plugin | Server |
+|--------|--------|
+| `context7@claude-plugins-official` | context7 |
 
 ## PAL MCP Tools
 
@@ -186,12 +218,50 @@ Scores are estimated from model file size. Adjust if needed by editing
 | 40–70 GB | 14 |
 | 70+ GB | 17 |
 
+## HuggingFace MCP
+
+The `huggingface` server provides tools for searching and exploring HuggingFace Hub.
+
+**Requires:** `HF_TOKEN` env var injected from macOS Keychain (see Secrets Management above).
+
+**One-time Keychain setup:**
+
+```bash
+security add-generic-password -U -s HF_TOKEN -a "ai-cli-coder" -w "your-hf-token-here" automation.keychain-db
+```
+
+**Available tools:** search models, datasets, spaces, and papers; get model/dataset info; compare models.
+
+## MLX Inference (Local Apple Silicon)
+
+Two CLI tools work together for local MLX model workflows:
+
+| Tool | Purpose |
+|------|---------|
+| `hf` | Download and manage models from HuggingFace Hub |
+| `vllm-mlx` | Serve MLX models as OpenAI/Anthropic-compatible API |
+
+**Typical workflow:**
+
+```bash
+# 1. Search for a model via HuggingFace MCP in Claude Code
+# 2. Download it
+hf download mlx-community/Qwen3-4B-4bit
+
+# 3. Serve it locally (OpenAI-compatible endpoint at :8000)
+vllm-mlx serve mlx-community/Qwen3-4B-4bit
+```
+
+Both tools are `uvx` wrappers defined in `ai-tools.nix` — no separate installation needed.
+
 ## Adding New Servers
 
 1. Choose the transport:
    - Local stdio process → inline attribute set with `command` (and optionally `args`)
    - Local stdio with Doppler secrets → set `command = "doppler-mcp"`, shift original command to `args[0]`
+   - Local stdio env var from Keychain → set env var in nix-darwin shell init, server inherits it
    - Remote SSE/HTTP endpoint → inline attribute set with `type` and `url`
+   - Plugin-managed → do NOT add here; let the plugin manage it
 
 2. New servers are enabled by default. Add `// { disabled = true; }` to start disabled.
 

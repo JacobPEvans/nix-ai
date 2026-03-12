@@ -30,10 +30,16 @@ in
   sequentialthinking = official "sequentialthinking";
   time = official "time";
   docker = official "docker";
-  exa = official "exa";
-  firecrawl = official "firecrawl";
-  cloudflare = official "cloudflare";
-  aws = official "aws-kb-retrieval";
+  exa = official "exa" // {
+    disabled = true;
+  }; # Requires: EXA_API_KEY
+  firecrawl = official "firecrawl" // {
+    disabled = true;
+  }; # Requires: FIRECRAWL_API_KEY
+  cloudflare = official "cloudflare" // {
+    disabled = true;
+  }; # Requires: CLOUDFLARE_API_TOKEN
+  aws = official "aws-kb-retrieval"; # Requires: AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
 
   # ================================================================
   # Native nixpkgs packages (binary name, resolved via PATH)
@@ -55,11 +61,8 @@ in
   # Third-party npm packages (via bunx)
   # ================================================================
 
-  # Context7 - Library documentation lookup
-  context7 = {
-    command = "bunx";
-    args = [ "@context7/mcp-server" ];
-  };
+  # Context7 - provided by context7@claude-plugins-official plugin (see plugins/external.nix).
+  # Do NOT define here — the plugin manages its own MCP server lifecycle.
 
   # ================================================================
   # PAL MCP - Multi-model orchestration
@@ -91,16 +94,31 @@ in
     env = {
       # Enable ALL PAL tools (default disables: analyze,refactor,testgen,secaudit,docgen,tracer)
       DISABLED_TOOLS = "";
-      # Default to latest available Gemini model.
-      # PAL has no model allowlist — DEFAULT_MODEL is the only restriction lever.
-      # gemini-3-pro-preview deprecated March 9 2026; update to gemini-3.1-pro-preview
-      # once BeehiveInnovations adds PAL support for it.
-      DEFAULT_MODEL = "gemini-3-pro-preview";
+      # Valid options: 'auto', 'pro', 'flash', 'o3', 'o3-mini', 'o4-mini', 'gpt-5', 'grok',
+      # 'opus-4.1', 'sonnet-4.1', or any DIAL/custom model name.
+      # 'pro' = latest Gemini Pro (requires GEMINI_API_KEY).
+      # 'auto' = PAL picks best available model based on configured API keys.
+      DEFAULT_MODEL = "pro";
       # Conversation limits
       CONVERSATION_TIMEOUT_HOURS = "6";
       MAX_CONVERSATION_TURNS = "50";
       LOG_LEVEL = "INFO";
     };
+  };
+
+  # ================================================================
+  # HuggingFace MCP - Model/dataset/paper search and documentation
+  # ================================================================
+  # Community stdio package: https://github.com/shreyaskarnik/huggingface-mcp-server
+  # Tools: search models/datasets/spaces/papers, get info, compare models
+  # Requires: HF_TOKEN env var (from macOS Keychain via nix-darwin shell init)
+  huggingface = {
+    command = "uvx";
+    args = [
+      "--from"
+      "huggingface-mcp-server==0.1.0"
+      "huggingface-mcp-server"
+    ];
   };
 
   # ================================================================
