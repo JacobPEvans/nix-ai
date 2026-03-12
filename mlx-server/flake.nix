@@ -21,16 +21,23 @@
         # mlx ships pre-built Apple Silicon wheels via PyPI; macOS provides
         # frameworks at /System/Library/Frameworks/ at runtime without Nix.
 
-        HF_HOME = "/Volumes/HuggingFace";
-
         shellHook = ''
+          # Set HF_HOME: use external volume if mounted, otherwise fall back
+          if [ -d "/Volumes/HuggingFace" ] && [ -w "/Volumes/HuggingFace" ]; then
+            export HF_HOME="/Volumes/HuggingFace"
+          else
+            export HF_HOME="''${HOME}/.cache/huggingface"
+            mkdir -p "''${HF_HOME}"
+          fi
+
           if [ ! -d ".venv" ]; then
             echo "-> Creating MLX venv with Python 3.14..."
-            uv venv .venv --python 3.14
+            uv venv .venv --python ${pkgs.python314}/bin/python3.14
             source .venv/bin/activate
             uv sync
           else
             source .venv/bin/activate
+            uv sync
           fi
           echo "MLX environment ready ($(python3 --version))"
         '';
