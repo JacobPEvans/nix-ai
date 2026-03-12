@@ -39,9 +39,7 @@ in
   cloudflare = official "cloudflare" // {
     disabled = true;
   }; # Requires: CLOUDFLARE_API_TOKEN
-  aws = official "aws-kb-retrieval" // {
-    disabled = true;
-  }; # Requires: AWS credentials
+  aws = official "aws-kb-retrieval"; # Requires: AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
 
   # ================================================================
   # Native nixpkgs packages (binary name, resolved via PATH)
@@ -121,7 +119,6 @@ in
       "huggingface-mcp-server==0.1.0"
       "huggingface-mcp-server"
     ];
-    disabled = true; # Requires: HF_TOKEN env var (from macOS Keychain via nix-darwin shell init)
   };
 
   # ================================================================
