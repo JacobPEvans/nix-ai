@@ -96,8 +96,11 @@ in
     env = {
       # Enable ALL PAL tools (default disables: analyze,refactor,testgen,secaudit,docgen,tracer)
       DISABLED_TOOLS = "";
-      # Use generic "gemini" model name — PAL resolves to the latest available Gemini model.
-      DEFAULT_MODEL = "gemini";
+      # Valid options: 'auto', 'pro', 'flash', 'o3', 'o3-mini', 'o4-mini', 'gpt-5', 'grok',
+      # 'opus-4.1', 'sonnet-4.1', or any DIAL/custom model name.
+      # 'pro' = latest Gemini Pro (requires GEMINI_API_KEY).
+      # 'auto' = PAL picks best available model based on configured API keys.
+      DEFAULT_MODEL = "pro";
       # Conversation limits
       CONVERSATION_TIMEOUT_HOURS = "6";
       MAX_CONVERSATION_TURNS = "50";
