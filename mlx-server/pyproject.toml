@@ -1,0 +1,10 @@
+[project]
+name = "mlx-server"
+version = "0.1.0"
+description = "Apple MLX local inference server environment"
+requires-python = ">=3.14"
+dependencies = [
+  "mlx>=0.24.0",
+  "mlx-lm>=0.21.0",
+  "huggingface-hub>=0.27.0",
+]

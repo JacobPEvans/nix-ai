@@ -19,7 +19,7 @@ let
   logDir = "${homeDir}/.claude/logs";
 
   # Python environment for auto-claude scripts
-  pythonEnv = pkgs.python3.withPackages (ps: [
+  pythonEnv = pkgs.python314.withPackages (ps: [
     (ps.slack-sdk.overridePythonAttrs (_: {
       doCheck = false; # Disable tests - they fail in CI with connection/signal errors
     }))
@@ -209,7 +209,7 @@ in
             # Explicitly set PYTHONPATH for launchd's clean environment
             # Nix python wrappers may not resolve properly without this
             # Include scripts directory for auto_claude_db, auto_claude_utils, etc.
-            PYTHONPATH = "${pythonEnv}/${pkgs.python3.sitePackages}:${homeDir}/.claude/scripts";
+            PYTHONPATH = "${pythonEnv}/${pkgs.python314.sitePackages}:${homeDir}/.claude/scripts";
             # GitHub CLI config directory for headless authentication
             # gh will use the token from ~/.config/gh/hosts.yml
             GH_CONFIG_DIR = "${homeDir}/.config/gh";

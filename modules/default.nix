@@ -114,8 +114,8 @@ in
         # open-webui: installed via uv (nixpkgs broken on darwin — see modules/open-webui.nix)
         installOpenWebui = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q "^open-webui"; then
-            echo "-> Installing open-webui via uv (Python 3.12)..."
-            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install open-webui --python 3.12
+            echo "-> Installing open-webui via uv (Python 3.14)..."
+            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install open-webui --python 3.14
           fi
         '';
       };

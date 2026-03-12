@@ -17,7 +17,7 @@ let
   logDir = "${homeDir}/.claude/logs";
 
   # Python with required packages
-  pythonWithDeps = pkgs.python3.withPackages (ps: [
+  pythonWithDeps = pkgs.python314.withPackages (ps: [
     (ps.slack-sdk.overridePythonAttrs (_: {
       doCheck = false;
     }))

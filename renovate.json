@@ -23,6 +23,14 @@
       "groupName": "npm-wrappers",
       "schedule": ["after 7am on Monday"],
       "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "MLX Python packages - weekly updates (upstream changes daily, short soak time)",
+      "matchManagers": ["uv"],
+      "matchFileNames": ["mlx-server/uv.lock"],
+      "groupName": "mlx-packages",
+      "schedule": ["after 7am on Monday"],
+      "minimumReleaseAge": "2 days"
     }
   ]
 }
