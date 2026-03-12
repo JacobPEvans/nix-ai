@@ -52,8 +52,8 @@
 #   claude-flow: claude-flow@2.0.0
 #
 # UVX WRAPPER PACKAGES (Python packages not in nixpkgs/homebrew):
-#   hf: huggingface-hub CLI (model downloads, used with HuggingFace MCP)
-#   vllm-mlx: Apple Silicon MLX inference server (OpenAI/Anthropic compatible)
+#   hf: huggingface-hub==1.6.0 CLI (model downloads, used with HuggingFace MCP)
+#   vllm-mlx: vllm-mlx==0.2.6 Apple Silicon MLX inference server (OpenAI/Anthropic compatible)
 #
 # PIPX PACKAGES (Python, installed separately):
 #   aider: aider-chat (AI pair programming)
@@ -250,7 +250,7 @@
     # PyPI: huggingface-hub (provides `hf` entry point)
     # Requires: HF_TOKEN env var (from macOS Keychain via nix-darwin shell init)
     (writeShellScriptBin "hf" ''
-      exec ${uv}/bin/uvx --from huggingface-hub hf "$@"
+      exec ${uv}/bin/uvx --from "huggingface-hub==1.6.0" hf "$@"
     '')
 
     # ==========================================================================
@@ -262,7 +262,7 @@
     # PyPI: vllm-mlx
     # Usage: vllm-mlx serve mlx-community/Qwen3-4B-4bit
     (writeShellScriptBin "vllm-mlx" ''
-      exec ${uv}/bin/uvx --from vllm-mlx vllm-mlx "$@"
+      exec ${uv}/bin/uvx --from "vllm-mlx==0.2.6" vllm-mlx "$@"
     '')
 
     # ==========================================================================
