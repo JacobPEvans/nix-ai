@@ -1,7 +1,11 @@
-# AI Development Tools
+# Proprietary AI Model Tools
 #
-# Linters, formatters, and utilities specifically for AI coding workflows.
-# These tools are NOT general-purpose development tools.
+# CLI wrappers and utilities for closed-source model products:
+# Claude Code ecosystem, GitHub Copilot, OpenAI ChatGPT, etc.
+# Also includes shared infrastructure tools (MCP servers, Doppler wrapper).
+#
+# Open-source AI tools (HuggingFace, MLX, Ollama, smolagents, LangGraph)
+# live in oss-ai-tools.nix — kept separate per the no-shared-files rule.
 #
 # ============================================================================
 # PACKAGE HIERARCHY (STRICT - NO EXCEPTIONS)
@@ -11,14 +15,14 @@
 #
 # 1. **nixpkgs** (ALWAYS FIRST, NO EXCEPTIONS)
 #    - Check: nix search nixpkgs <package>
-#    - Use if package exists and is reasonably up-to-date
+#    - Use if package exists, builds, and is reasonably up-to-date
 #    - Benefits: Binary cache, security updates, integration
 #    - Example: github-mcp-server, terraform-mcp-server
 #
 # 2. **homebrew** (ONLY if not in nixpkgs)
 #    - Fallback for packages missing from nixpkgs
 #    - Check: brew search <package>
-#    - Add to modules/darwin/homebrew.nix with clear justification
+#    - Add to nix-darwin modules/darwin/homebrew.nix with clear justification
 #    - Document WHY homebrew is needed (not in nixpkgs, severely outdated, etc.)
 #
 # 3. **bunx wrapper** (for npm packages not in nixpkgs or homebrew)
@@ -40,7 +44,7 @@
 # NIXPKGS PACKAGES (sourced via unstable overlay in modules/darwin/common.nix):
 #   github-mcp-server, terraform-mcp-server
 #
-# HOMEBREW PACKAGES (from modules/darwin/homebrew.nix):
+# HOMEBREW PACKAGES (from nix-darwin modules/darwin/homebrew.nix):
 #   codex: OpenAI Codex CLI (moved from nixpkgs to match claude/gemini pattern)
 #   block-goose-cli: Block's AI agent (nixpkgs outdated at time of addition)
 #   gemini-cli: Google Gemini CLI (moved from nixpkgs due to severe version lag)
@@ -49,11 +53,7 @@
 #   cclint: @felixgeelhaar/cclint@0.12.1
 #   gh-copilot: @githubnext/github-copilot-cli@latest (unversioned - upstream)
 #   chatgpt: chatgpt-cli@3.3.0
-#   claude-flow: claude-flow@2.0.0
-#
-# UVX WRAPPER PACKAGES (Python packages not in nixpkgs/homebrew):
-#   hf: huggingface-hub==1.6.0 CLI (model downloads, used with HuggingFace MCP)
-#   vllm-mlx: vllm-mlx==0.2.6 Apple Silicon MLX inference server (OpenAI/Anthropic compatible)
+#   claude-flow: claude-flow@2.7.47
 #
 # PIPX PACKAGES (Python, installed separately):
 #   aider: aider-chat (AI pair programming)
