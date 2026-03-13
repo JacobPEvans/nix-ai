@@ -242,6 +242,22 @@
     '')
 
     # ==========================================================================
+    # Splunk MCP Connect Wrapper
+    # ==========================================================================
+    # Wraps the Splunk MCP Server App connection via mcp-remote stdio proxy.
+    # Reads SPLUNK_MCP_ENDPOINT and SPLUNK_MCP_TOKEN from env (injected by
+    # doppler-mcp from Doppler ai-ci-automation/prd project).
+    # Usage: splunk-mcp-connect (no args — called by Claude Code MCP server config)
+    (writeShellScriptBin "splunk-mcp-connect" ''
+      set -euo pipefail
+      : "''${SPLUNK_MCP_ENDPOINT:?SPLUNK_MCP_ENDPOINT not set in Doppler}"
+      : "''${SPLUNK_MCP_TOKEN:?SPLUNK_MCP_TOKEN not set in Doppler}"
+      exec ${pkgs.nodejs}/bin/npx -y mcp-remote \
+        "$SPLUNK_MCP_ENDPOINT" \
+        --header "Authorization: Bearer $SPLUNK_MCP_TOKEN"
+    '')
+
+    # ==========================================================================
     # HuggingFace Hub CLI
     # ==========================================================================
     # Download and manage models (especially MLX-quantized models).
