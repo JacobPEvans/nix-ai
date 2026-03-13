@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/JacobPEvans/nix-ai/compare/v1.1.0...v1.2.0) (2026-03-13)
+
+
+### Features
+
+* add splunk-mcp-connect wrapper script ([#151](https://github.com/JacobPEvans/nix-ai/issues/151)) ([294abd1](https://github.com/JacobPEvans/nix-ai/commit/294abd13b211390518bd68a76166fbef1f78141f))
+
 ## [1.1.0](https://github.com/JacobPEvans/nix-ai/compare/v1.0.0...v1.1.0) (2026-03-13)
 
 
