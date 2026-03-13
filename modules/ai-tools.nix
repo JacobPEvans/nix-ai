@@ -247,12 +247,18 @@
     # Wraps the Splunk MCP Server App connection via mcp-remote stdio proxy.
     # Reads SPLUNK_MCP_ENDPOINT and SPLUNK_MCP_TOKEN from env (injected by
     # doppler-mcp from Doppler ai-ci-automation/prd project).
+    # MCP server entry: nix-darwin hosts/macbook-m4/home.nix (infrastructure, not AI-specific)
     # Usage: splunk-mcp-connect (no args — called by Claude Code MCP server config)
     (writeShellScriptBin "splunk-mcp-connect" ''
       set -euo pipefail
       : "''${SPLUNK_MCP_ENDPOINT:?SPLUNK_MCP_ENDPOINT not set in Doppler}"
       : "''${SPLUNK_MCP_TOKEN:?SPLUNK_MCP_TOKEN not set in Doppler}"
-      exec ${pkgs.nodejs}/bin/npx -y mcp-remote \
+      # SECURITY NOTE: Bearer token is visible in process list via --header arg.
+      # This is a known mcp-remote limitation — no stdin/env-based header injection
+      # exists yet. Mitigated by: (1) macOS single-user system, (2) token is
+      # Splunk-scoped with limited capabilities, (3) rotatable via Doppler.
+      export NODE_TLS_REJECT_UNAUTHORIZED=0  # Self-signed cert on Splunk; scoped to mcp-remote only
+      exec ${bun}/bin/bunx --bun mcp-remote@0.1.38 \
         "$SPLUNK_MCP_ENDPOINT" \
         --header "Authorization: Bearer $SPLUNK_MCP_TOKEN"
     '')
