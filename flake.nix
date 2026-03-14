@@ -254,8 +254,8 @@
         }
       );
 
-      # Named devenv shells — reference via: use flake ~/git/nix-ai/main#<name>
-      # To add a new shell: add a new key below with its own devenv module.
+      # Named devenv shells — reference via: nix develop ~/git/nix-ai/main#<name>
+      # To add a new shell: add a new key to the attrset below.
       devShells = forAllSystems (
         system:
         let
@@ -267,7 +267,6 @@
             inherit inputs pkgs;
             modules = [
               {
-                # Required for pure evaluation (nix flake check)
                 devenv.root = toString ./.;
                 languages.python = {
                   enable = true;
@@ -284,6 +283,36 @@
                     opentelemetry-instrumentation
                   '';
                 };
+              }
+            ];
+          };
+        }
+        # mlx-server is Apple Silicon only — MLX ships aarch64 wheels only
+        // nixpkgs.lib.optionalAttrs (system == "aarch64-darwin") {
+          mlx-server = devenv.lib.mkShell {
+            inherit inputs pkgs;
+            modules = [
+              {
+                # Reads pyproject.toml / uv.lock from ./mlx-server/
+                devenv.root = toString ./mlx-server;
+                languages.python = {
+                  enable = true;
+                  version = "3.14";
+                  uv = {
+                    enable = true;
+                    sync.enable = true;
+                  };
+                };
+                enterShell = ''
+                  # Set HF_HOME: use external volume if mounted, otherwise fall back
+                  if [ -d "/Volumes/HuggingFace" ] && [ -w "/Volumes/HuggingFace" ]; then
+                    export HF_HOME="/Volumes/HuggingFace"
+                  else
+                    export HF_HOME="''${XDG_CACHE_HOME:-''${HOME}/.cache}/huggingface"
+                    mkdir -p "''${HF_HOME}"
+                  fi
+                  echo "MLX environment ready ($(python3 --version))"
+                '';
               }
             ];
           };
