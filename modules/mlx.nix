@@ -21,9 +21,9 @@
 let
   cfg = config.programs.mlx;
 
-  # Reuse the existing vllm-mlx wrapper from ai-tools.nix (installed via home.packages)
-  # rather than creating a duplicate. The LaunchAgent and CLI tools reference the
-  # wrapper by name since it's already on PATH after darwin-rebuild switch.
+  # Central vllm-mlx wrapper definition. This is the single source of truth —
+  # the LaunchAgent ProgramArguments needs a Nix store path, not a PATH lookup,
+  # so the derivation lives here. CLI tools (mlx-switch) also reference it directly.
   vllmMlxBin = "${lib.getExe (
     pkgs.writeShellScriptBin "vllm-mlx" ''
       exec ${pkgs.uv}/bin/uvx --from "vllm-mlx==0.2.6" vllm-mlx "$@"
@@ -145,7 +145,7 @@ in
           '{model: $model, messages: [{role: "user", content: $prompt}], stream: $stream}')
 
         if [[ "$stream" == "true" ]]; then
-          ${pkgs.curl}/bin/curl -sN "$api_url/chat/completions" \
+          ${pkgs.curl}/bin/curl -sfN "$api_url/chat/completions" \
             -H "Content-Type: application/json" \
             -d "$payload" \
           | while IFS= read -r line; do
