@@ -66,10 +66,9 @@ in
   # Agent teams display mode (direct settings.json property)
   teammateMode = "auto";
 
-  # Model: commented out to use account-tier default (Opus 4.6 with 1M context)
-  # opusplan uses Opus for planning, Sonnet for execution, but lacks [1m] variant
+  # Model: use account-tier default. The 'opusplan' model is no longer
+  # specified as it lacks a 1M context variant.
   # See: https://code.claude.com/docs/en/model-config
-  # model = "opusplan";
 
   # Release channel: "stable" delays ~1 week to avoid regressions
   autoUpdatesChannel = "stable";
