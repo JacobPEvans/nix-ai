@@ -3,7 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    devenv.url = "github:cachix/devenv";
+    devenv = {
+      url = "github:cachix/devenv";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   nixConfig = {
@@ -27,6 +30,8 @@
         inherit inputs pkgs;
         modules = [
           {
+            # Required for pure evaluation (nix flake check)
+            devenv.root = toString ./.;
             languages.python = {
               enable = true;
               version = "3.14";
