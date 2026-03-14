@@ -1,31 +1,21 @@
-# Automated flake.lock updates with verified commits
+# Custom package updates (source hash bumps via nix-update)
 #
-# Uses JacobPEvans-github-actions App for:
-# - Signed & verified commits via GitHub's REST API
-# - Enabling auto-merge for approved updates
+# Flake input updates (flake.lock) are handled by Renovate's nix manager,
+# which creates individual PRs per input with auto-merge for trusted owners.
+# See renovate.json and renovate-presets.json in JacobPEvans/.github.
 #
-# Triggers:
-# - Daily at noon UTC (schedule)
-# - Instant sync when upstream repos push (repository_dispatch)
-# - Manual (workflow_dispatch)
-#
-# Update Strategy:
-# - repository_dispatch (upstream-repo-updated): Updates specified flake input (fast sync)
-# - Other triggers: Updates all inputs
-# - Claude Code Philosophy: Always update when available. Accept updates; revert only if issues found.
-name: Update flake.lock
+# This workflow only handles nix-update for packages with pinned source hashes
+# that Renovate cannot manage natively.
+name: Update custom packages
 
 on:
   schedule:
-    - cron: "0 12 * * *"
-  repository_dispatch:
-    types:
-      - upstream-repo-updated
+    - cron: "0 12 * * 1"
   workflow_dispatch:
 
 jobs:
   update:
-    name: Update flake inputs
+    name: Update custom packages
     runs-on: ubuntu-latest
     environment: automation
     permissions:
@@ -44,40 +34,10 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token }}
 
-      - name: Determine inputs to update
-        id: inputs
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          FLAKE_INPUT_NAME: ${{ github.event.client_payload.flake_input_name }}
-        run: |
-          if [[ "$EVENT_NAME" == "repository_dispatch" ]]; then
-            if [[ -z "$FLAKE_INPUT_NAME" ]]; then
-              echo "::error::flake_input_name not provided in client_payload"
-              exit 1
-            fi
-            if [[ ! "$FLAKE_INPUT_NAME" =~ ^[a-zA-Z0-9._-]+$ ]]; then
-              echo "::error::Invalid flake_input_name '$FLAKE_INPUT_NAME'"
-              exit 1
-            fi
-            echo "inputs=$FLAKE_INPUT_NAME" >> "$GITHUB_OUTPUT"
-            echo "::notice::Fast sync: updating $FLAKE_INPUT_NAME"
-          else
-            echo "inputs=" >> "$GITHUB_OUTPUT"
-            echo "::notice::Scheduled/manual: updating all inputs"
-          fi
-
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
 
-      - name: Update flake inputs
-        env:
-          FLAKE_INPUTS: ${{ steps.inputs.outputs.inputs }}
-        run: |
-          # shellcheck disable=SC2086
-          nix flake update $FLAKE_INPUTS
-
-      - name: Update custom packages
-        if: github.event_name != 'repository_dispatch'
+      - name: Update gh-aw
         run: nix run nixpkgs#nix-update -- --flake gh-aw
 
       - name: Create Pull Request
@@ -85,24 +45,10 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token }}
           sign-commits: true
-          branch: update_flake_lock_action
+          branch: chore/update-custom-packages
           delete-branch: true
-          commit-message: |
-            chore(deps): update flake inputs
-
-            Automated update of Nix flake dependencies.
-          title: "chore(deps): update flake inputs"
+          commit-message: "chore(deps): update custom packages"
+          title: "chore(deps): update custom packages"
           body: |
-            Automated update via nix flake update and nix-update.
-
-            See the flake.lock diff below for specific version bumps.
-
-            ## Review Notes
-            - Always accept AI tool updates; revert only if issues found
-            - After merge, nix-darwin flake.lock auto-updates via trigger workflow
-
-            ---
-            *Created by JacobPEvans-github-actions*
+            Automated update via nix-update.
           labels: dependencies
-          assignees: JacobPEvans
-          reviewers: JacobPEvans
