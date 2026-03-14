@@ -31,9 +31,10 @@ let
   outputFile = "${outputDir}/custom_models.json";
 in
 {
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf (cfg.enable && cfg.mcpServers ? pal && !(cfg.mcpServers.pal.disabled or false)) {
     # Install pal-mcp-server as a Nix package so `doppler-mcp pal-mcp-server`
     # resolves via PATH. The package is built from the pinned flake input.
+    # Guarded: only install when the pal MCP server is present and not disabled.
     home.packages = [
       (pkgs.callPackage ../mcp/pal-package.nix { inherit pal-mcp-server; })
     ];
