@@ -92,7 +92,7 @@ in
   imports = [
     ./claude
     ./maestro
-    ./mlx.nix
+    ./mlx
     ./ollama.nix
     ./open-webui.nix
   ];
