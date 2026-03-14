@@ -48,6 +48,7 @@ jobs:
     outputs:
       nix: ${{ steps.filter.outputs.nix }}
       markdown: ${{ steps.filter.outputs.markdown }}
+      is-deps-only: ${{ steps.detect-deps.outputs.is-deps-only }}
     steps:
       - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v4
@@ -59,9 +60,25 @@ jobs:
               - 'flake.lock'
               - 'lib/**'
               - 'modules/**'
+              - 'scripts/**'
             markdown:
               - '**.md'
               - '.markdownlint*'
+
+      - name: Detect Dependency-Only Commits
+        id: detect-deps
+        env:
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          COMMIT_MSG: ${{ github.event.pull_request.title }}
+        run: |
+          # Skip nix-validate only if:
+          # 1. Author is jacobpevans-github-actions (Renovate bot, with or without [bot] suffix)
+          # 2. Commit message starts with "chore(deps)"
+          if [[ "$AUTHOR" == "jacobpevans-github-actions"* && "$COMMIT_MSG" == chore\(deps\)* ]]; then
+            echo "is-deps-only=true" >> $GITHUB_OUTPUT
+          else
+            echo "is-deps-only=false" >> $GITHUB_OUTPUT
+          fi
 
   # ==========================================================================
   # CONDITIONAL CHECKS (call reusable workflows)
@@ -85,11 +102,6 @@ jobs:
     needs: changes
     if: needs.changes.outputs.nix == 'true' || needs.changes.outputs.markdown == 'true'
     uses: JacobPEvans/.github/.github/workflows/_file-size.yml@main
-    with:
-      # flake.lock exceeds the 1000-line default due to devenv transitive inputs.
-      # Lock files are auto-generated and legitimately large; raising the threshold
-      # rather than the 500KB size limit keeps the intent of the check intact.
-      max-line-count: 1500
 
   # ==========================================================================
   # MERGE GATE - The ONLY required check in branch protection
@@ -103,5 +115,5 @@ jobs:
       - name: Check all results
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: nix-validate, markdown-lint, file-size
+          allowed-skips: ${{ (needs.changes.outputs.is-deps-only == 'true' && 'nix-validate, markdown-lint, file-size') || 'nix-validate, markdown-lint, file-size' }}
           jobs: ${{ toJSON(needs) }}
