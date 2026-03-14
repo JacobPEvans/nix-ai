@@ -12,9 +12,12 @@
 # Usage: pkgs.callPackage ./pal-package.nix { inherit pal-mcp-server; }
 { python3Packages, pal-mcp-server }:
 
+let
+  version = "9.8.2";
+in
 python3Packages.buildPythonApplication {
   pname = "pal-mcp-server";
-  version = "9.8.2";
+  inherit version;
   src = pal-mcp-server;
   pyproject = true;
 
@@ -35,8 +38,11 @@ python3Packages.buildPythonApplication {
   # Prevents setuptools_scm from running git to detect version.
   # Without this, it would try to write pal_mcp_server.egg-info to the source
   # directory, which fails because the Nix store is read-only.
-  env.SETUPTOOLS_SCM_PRETEND_VERSION = "9.8.2";
+  env.SETUPTOOLS_SCM_PRETEND_VERSION = version;
 
   # Tests require live API keys (Gemini, OpenRouter, Ollama) — skip in Nix build.
   doCheck = false;
+
+  # Verify the package imports correctly at build time (no network/API keys needed).
+  pythonImportsCheck = [ "pal_mcp_server" ];
 }
