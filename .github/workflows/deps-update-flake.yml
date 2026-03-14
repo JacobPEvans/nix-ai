@@ -13,6 +13,12 @@
 # - repository_dispatch (upstream-repo-updated): Updates specified flake input (fast sync)
 # - Other triggers: Updates all inputs
 # - Claude Code Philosophy: Always update when available. Accept updates; revert only if issues found.
+#
+# Auto-Merge Policy:
+# - PRs where ONLY flake.lock changed AND all bumped inputs are from trusted owners
+#   get auto-merged after CI passes (gh pr merge --auto --squash)
+# - Trusted owners list aligned with renovate-presets.json in JacobPEvans/.github
+# - If ANY non-flake.lock files changed or ANY untrusted owner present, manual review required
 name: Update flake.lock
 
 on:
@@ -80,7 +86,103 @@ jobs:
         if: github.event_name != 'repository_dispatch'
         run: nix run nixpkgs#nix-update -- --flake gh-aw
 
+      - name: Analyze flake.lock changes
+        id: analyze
+        run: |
+          # Trusted owners — aligned with renovate-presets.json in JacobPEvans/.github
+          # Self-owned repos merge immediately; Nix ecosystem and partner orgs after CI passes
+          TRUSTED_OWNERS="JacobPEvans NixOS nix-community cachix anthropics numtide hercules-ci DeterminateSystems edolstra oxalica srid wakatime"
+
+          if ! git diff --quiet flake.lock 2>/dev/null; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+
+            # Parse old and new flake.lock to find changed direct inputs
+            ANALYSIS=$(jq -n \
+              --slurpfile old <(git show HEAD:flake.lock) \
+              --slurpfile new <(cat flake.lock) \
+              '
+              ($old[0].nodes) as $on |
+              ($new[0].nodes) as $nn |
+              ($nn.root.inputs | to_entries) as $ri |
+              [
+                $ri[] |
+                .key as $input | .value as $node |
+                ($on[$node].locked // {}) as $ol |
+                ($nn[$node].locked // {}) as $nl |
+                select($ol.rev != $nl.rev) |
+                {
+                  input: $input,
+                  owner: ($nl.owner // "unknown"),
+                  repo: ($nl.repo // "unknown"),
+                  ref: ($nn[$node].original.ref // "main"),
+                  old_rev: (($ol.rev // "")[0:8]),
+                  new_rev: (($nl.rev // "")[0:8]),
+                  date: (if $nl.lastModified then ($nl.lastModified | todate | split("T")[0]) else "unknown" end)
+                }
+              ] |
+              {
+                changes: .,
+                owners: [.[].owner] | unique,
+                table: (
+                  if length == 0 then "No direct input changes detected."
+                  else
+                    "| Input | Repository | Ref | Change |\n|-------|-----------|-----|--------|\n" +
+                    (map("| `\(.input)` | \(.owner)/\(.repo) | \(.ref) | `\(.old_rev)` \u2192 `\(.new_rev)` (\(.date)) |") | join("\n"))
+                  end
+                )
+              }
+              ')
+
+            TABLE=$(echo "$ANALYSIS" | jq -r '.table')
+            OWNERS=$(echo "$ANALYSIS" | jq -r '.owners[]')
+
+            # Check if all changed owners are trusted
+            ALL_TRUSTED=true
+            UNTRUSTED_LIST=""
+            for owner in $OWNERS; do
+              if ! echo "$TRUSTED_OWNERS" | tr ' ' '\n' | grep -qx "$owner"; then
+                ALL_TRUSTED=false
+                UNTRUSTED_LIST="${UNTRUSTED_LIST:+$UNTRUSTED_LIST, }$owner"
+              fi
+            done
+
+            # Non-flake.lock changes (e.g. nix-update source bumps) block auto-merge
+            OTHER_CHANGES=$(git diff --name-only | grep -v '^flake\.lock$' || true)
+            if [[ -n "$OTHER_CHANGES" ]]; then
+              ALL_TRUSTED=false
+              echo "::notice::Non-flake.lock files also changed: $OTHER_CHANGES"
+            fi
+
+            echo "all_trusted=$ALL_TRUSTED" >> "$GITHUB_OUTPUT"
+
+            # Build PR body
+            {
+              echo "body<<EOFBODY"
+              echo "## Flake Input Updates"
+              echo ""
+              echo "$TABLE"
+              echo ""
+              if [[ "$ALL_TRUSTED" == "true" ]]; then
+                echo "> All changes from trusted sources — auto-merge enabled after CI passes"
+              else
+                echo "> Contains updates from untrusted sources${UNTRUSTED_LIST:+ ($UNTRUSTED_LIST)} — manual review required"
+              fi
+              echo ""
+              echo "## Review Notes"
+              echo "- Always accept AI tool updates; revert only if issues found"
+              echo "- After merge, nix-darwin flake.lock auto-updates via trigger workflow"
+              echo ""
+              echo "---"
+              echo "*Created by JacobPEvans-github-actions*"
+              echo "EOFBODY"
+            } >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create Pull Request
+        id: create-pr
+        if: steps.analyze.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ steps.app-token.outputs.token }}
@@ -92,17 +194,16 @@ jobs:
 
             Automated update of Nix flake dependencies.
           title: "chore(deps): update flake inputs"
-          body: |
-            Automated update via nix flake update and nix-update.
-
-            See the flake.lock diff below for specific version bumps.
-
-            ## Review Notes
-            - Always accept AI tool updates; revert only if issues found
-            - After merge, nix-darwin flake.lock auto-updates via trigger workflow
-
-            ---
-            *Created by JacobPEvans-github-actions*
+          body: ${{ steps.analyze.outputs.body }}
           labels: dependencies
           assignees: JacobPEvans
           reviewers: JacobPEvans
+
+      - name: Enable auto-merge for trusted updates
+        if: steps.analyze.outputs.all_trusted == 'true' && steps.create-pr.outputs.pull-request-number
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR_NUMBER: ${{ steps.create-pr.outputs.pull-request-number }}
+        run: |
+          echo "::notice::All changes from trusted sources, enabling auto-merge for PR #$PR_NUMBER"
+          gh pr merge "$PR_NUMBER" --auto --squash
