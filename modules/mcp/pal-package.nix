@@ -41,8 +41,7 @@ python3Packages.buildPythonApplication {
   env.SETUPTOOLS_SCM_PRETEND_VERSION = version;
 
   # Tests require live API keys (Gemini, OpenRouter, Ollama) — skip in Nix build.
+  # Note: pythonImportsCheck is not applicable — package uses a flat layout
+  # (server.py, config.py) with no importable Python package directory.
   doCheck = false;
-
-  # Verify the package imports correctly at build time (no network/API keys needed).
-  pythonImportsCheck = [ "pal_mcp_server" ];
 }
