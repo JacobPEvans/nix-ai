@@ -4,6 +4,9 @@
     "config:recommended",
     "local>JacobPEvans/.github:renovate-presets"
   ],
+  "nix": {
+    "enabled": true
+  },
   "customManagers": [
     {
       "description": "bunx wrapper npm packages pinned in Nix modules",
