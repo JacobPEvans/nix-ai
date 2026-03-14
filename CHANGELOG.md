@@ -1,7 +1,13 @@
 # Changelog
 
-## [1.4.0](https://github.com/JacobPEvans/nix-ai/compare/v1.3.0...v1.4.0) (2026-03-14)
+## [1.5.0](https://github.com/JacobPEvans/nix-ai/compare/v1.4.0...v1.5.0) (2026-03-14)
 
+
+### Features
+
+* add devenv with ai-dev shell, convert mlx-server to devenv ([#158](https://github.com/JacobPEvans/nix-ai/issues/158)) ([0d1deb1](https://github.com/JacobPEvans/nix-ai/commit/0d1deb113464adb622186e08c4b95d3882db4c8f))
+
+## [1.4.0](https://github.com/JacobPEvans/nix-ai/compare/v1.3.0...v1.4.0) (2026-03-14)
 
 ### Bug Fixes
 
@@ -9,20 +15,17 @@
 
 ## [1.3.0](https://github.com/JacobPEvans/nix-ai/compare/v1.2.0...v1.3.0) (2026-03-14)
 
-
 ### Features
 
 * enable 1M context window models in model picker ([#155](https://github.com/JacobPEvans/nix-ai/issues/155)) ([73ae890](https://github.com/JacobPEvans/nix-ai/commit/73ae890e1b872af01dedd7dcab38b24740dbb914))
 
 ## [1.2.0](https://github.com/JacobPEvans/nix-ai/compare/v1.1.0...v1.2.0) (2026-03-13)
 
-
 ### Features
 
 * add splunk-mcp-connect wrapper script ([#151](https://github.com/JacobPEvans/nix-ai/issues/151)) ([294abd1](https://github.com/JacobPEvans/nix-ai/commit/294abd13b211390518bd68a76166fbef1f78141f))
 
 ## [1.1.0](https://github.com/JacobPEvans/nix-ai/compare/v1.0.0...v1.1.0) (2026-03-13)
-
 
 ### Features
 
@@ -42,7 +45,6 @@
 * switch to ClaudeCodeStatusLine (daniel3303) 2-line statusline ([#126](https://github.com/JacobPEvans/nix-ai/issues/126)) ([805b240](https://github.com/JacobPEvans/nix-ai/commit/805b240bf23815421f123b38d6f6d6093769b051)), closes [#103](https://github.com/JacobPEvans/nix-ai/issues/103)
 * upgrade to Python 3.14 and add MLX inference server ([#142](https://github.com/JacobPEvans/nix-ai/issues/142)) ([60695d9](https://github.com/JacobPEvans/nix-ai/commit/60695d9dd1fc759541f806170099b3f42886c950))
 * WakaTime Doppler injection, PAL flake pinning, GitHub MCP disabled ([#122](https://github.com/JacobPEvans/nix-ai/issues/122)) ([448417c](https://github.com/JacobPEvans/nix-ai/commit/448417cbbd6458b103a92fe1d0a7945a44a06928))
-
 
 ### Bug Fixes
 
