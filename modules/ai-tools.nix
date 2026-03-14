@@ -53,7 +53,7 @@
 #
 # UVX WRAPPER PACKAGES (Python packages not in nixpkgs/homebrew):
 #   hf: huggingface-hub==1.6.0 CLI (model downloads, used with HuggingFace MCP)
-#   vllm-mlx: vllm-mlx==0.2.6 Apple Silicon MLX inference server (OpenAI/Anthropic compatible)
+#   vllm-mlx: defined in modules/mlx.nix (owns the wrapper + LaunchAgent)
 #
 # PIPX PACKAGES (Python, installed separately):
 #   aider: aider-chat (AI pair programming)
@@ -273,18 +273,6 @@
     # Requires: HF_TOKEN env var (from macOS Keychain via nix-darwin shell init)
     (writeShellScriptBin "hf" ''
       exec ${uv}/bin/uvx --from "huggingface-hub==1.6.0" hf "$@"
-    '')
-
-    # ==========================================================================
-    # vllm-mlx - Apple Silicon MLX Inference Server
-    # ==========================================================================
-    # Serves local MLX models as OpenAI/Anthropic-compatible API endpoints.
-    # PAL can route to local models via OLLAMA_HOST or direct API URL.
-    # Source: https://github.com/waybarrios/vllm-mlx
-    # PyPI: vllm-mlx
-    # Usage: vllm-mlx serve mlx-community/Qwen3-4B-4bit
-    (writeShellScriptBin "vllm-mlx" ''
-      exec ${uv}/bin/uvx --from "vllm-mlx==0.2.6" vllm-mlx "$@"
     '')
 
     # ==========================================================================
