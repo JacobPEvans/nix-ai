@@ -158,11 +158,11 @@
     "cc-dev-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1773351518,
-        "narHash": "sha256-hzixwj+qcYuT4hDMYAuupWhaz7FvFFsqt1cC/2n43ck=",
+        "lastModified": 1773368188,
+        "narHash": "sha256-HcICAqqI3kP0PWQhWvkaM2DOegINXamgox5u+LH2wYA=",
         "owner": "Lucklyric",
         "repo": "cc-dev-tools",
-        "rev": "097a9e1f2a4f79cd3301664034fd1915da31ff0d",
+        "rev": "f6414993a4c5047ab3c6f88866789d03f50bef7c",
         "type": "github"
       },
       "original": {
@@ -190,11 +190,11 @@
     "claude-code-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1773299556,
-        "narHash": "sha256-zA8XbkO+citd27qQmPRZuIaDRCnrNuLgkpjR46aEvQk=",
+        "lastModified": 1773451385,
+        "narHash": "sha256-1igZnEDoblQDOBPGeTF0C9bqCCmdhZeG1wMFmZNIq6I=",
         "owner": "anthropics",
         "repo": "claude-code",
-        "rev": "2dc1e697836e94f3e9b7b8f19e6fb4a3622e3cca",
+        "rev": "420a1884671fe09addc881f9a62624dae952d21c",
         "type": "github"
       },
       "original": {
@@ -206,11 +206,11 @@
     "claude-code-plugins-plus": {
       "flake": false,
       "locked": {
-        "lastModified": 1773328303,
-        "narHash": "sha256-yJHhLlg+qX1ZeMxUuSA7Pf4qrf/Z0UiUX+OjN3STaGY=",
+        "lastModified": 1773421857,
+        "narHash": "sha256-8ILufwizZ7mrFLloZjavmEqvocqYyFozhnkbfgcoiwg=",
         "owner": "jeremylongshore",
         "repo": "claude-code-plugins-plus",
-        "rev": "3739f136913b67da94486a5e91194a06a118ce83",
+        "rev": "00609f3ea51aa17333549004032cbf0b6fe757db",
         "type": "github"
       },
       "original": {
@@ -254,11 +254,11 @@
     "claude-plugins-official": {
       "flake": false,
       "locked": {
-        "lastModified": 1773272274,
-        "narHash": "sha256-cItpjzwNVJ3Ic3yFN6t3AqRjdOmeXwOTcYS+Ov6Zf8k=",
+        "lastModified": 1773438661,
+        "narHash": "sha256-ETeWt0onsC/TDVaZLHqm2Qptqds+Cs1PMZ85GgWlBcg=",
         "owner": "anthropics",
         "repo": "claude-plugins-official",
-        "rev": "b36fd4b753018b0b340803579399992a32e43502",
+        "rev": "d5c15b861cd23e3102215c26020368ad5134dc47",
         "type": "github"
       },
       "original": {
@@ -270,11 +270,11 @@
     "claude-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1772572632,
-        "narHash": "sha256-HhrX4UvuX9Ucq3qhMvsLC3/NtfcA5MPaA/mXuJvB0yc=",
+        "lastModified": 1773441473,
+        "narHash": "sha256-BwLNVWW+lwECEKueOkP6POIs67/ALqqL9R5Ygw6ysQA=",
         "owner": "secondsky",
         "repo": "claude-skills",
-        "rev": "dffbcfa0edc66df0f24e8dff43f8f952ce464f01",
+        "rev": "bb9164bd9c91403dc3f3c121cdec712919b181bb",
         "type": "github"
       },
       "original": {
@@ -356,11 +356,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1773449929,
-        "narHash": "sha256-z6nOxEunptr/x1ktCFabjlKWE5QjxpRtcsdfcYrlwPA=",
+        "lastModified": 1773487113,
+        "narHash": "sha256-JOelki93tHJLXd+jwyzxoTcCLQdG934Nq88WUoNN3+w=",
         "owner": "cachix",
         "repo": "devenv",
-        "rev": "d100515e03946b62b1bf87fa96d5b0d63a2ac581",
+        "rev": "f54b5add9b4c4cfb2d293748e8a6034b640f48b8",
         "type": "github"
       },
       "original": {
@@ -947,11 +947,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1773282714,
-        "narHash": "sha256-at2PNNVNoTfXBe3bA6pgff+CKOwdBWUZCUBIfXGrXsU=",
+        "lastModified": 1773360959,
+        "narHash": "sha256-nxIWzANKAF/3plYP4rvmS9KCwe/dgGF/2b3dd+P4Tv8=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "a8556879c286b4a40a717a416ae61818c26d1ac8",
+        "rev": "27618deb4750c9c5d85c6769a7b2574d99b025db",
         "type": "github"
       },
       "original": {
