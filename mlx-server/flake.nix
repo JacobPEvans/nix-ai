@@ -3,44 +3,51 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    devenv.url = "github:cachix/devenv";
+  };
+
+  nixConfig = {
+    extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";
+    extra-substituters = "https://devenv.cachix.org";
   };
 
   outputs =
-    { self, nixpkgs }:
+    {
+      self,
+      nixpkgs,
+      devenv,
+      ...
+    }@inputs:
     let
       system = "aarch64-darwin";
       pkgs = import nixpkgs { inherit system; };
     in
     {
-      devShells.${system}.default = pkgs.mkShell {
-        buildInputs = with pkgs; [
-          python314
-          uv
+      devShells.${system}.default = devenv.lib.mkShell {
+        inherit inputs pkgs;
+        modules = [
+          {
+            languages.python = {
+              enable = true;
+              version = "3.14";
+              uv = {
+                enable = true;
+                sync.enable = true;
+              };
+            };
+
+            enterShell = ''
+              # Set HF_HOME: use external volume if mounted, otherwise fall back
+              if [ -d "/Volumes/HuggingFace" ] && [ -w "/Volumes/HuggingFace" ]; then
+                export HF_HOME="/Volumes/HuggingFace"
+              else
+                export HF_HOME="''${HOME}/.cache/huggingface"
+                mkdir -p "''${HF_HOME}"
+              fi
+              echo "MLX environment ready ($(python3 --version))"
+            '';
+          }
         ];
-        # Note: Apple Metal/Accelerate frameworks are NOT listed here.
-        # mlx ships pre-built Apple Silicon wheels via PyPI; macOS provides
-        # frameworks at /System/Library/Frameworks/ at runtime without Nix.
-
-        shellHook = ''
-          # Set HF_HOME: use external volume if mounted, otherwise fall back
-          if [ -d "/Volumes/HuggingFace" ] && [ -w "/Volumes/HuggingFace" ]; then
-            export HF_HOME="/Volumes/HuggingFace"
-          else
-            export HF_HOME="''${HOME}/.cache/huggingface"
-            mkdir -p "''${HF_HOME}"
-          fi
-
-          if [ ! -d ".venv" ]; then
-            echo "-> Creating MLX venv with Python 3.14..."
-            uv venv .venv --python ${pkgs.python314}/bin/python3.14
-            source .venv/bin/activate
-            uv sync
-          else
-            source .venv/bin/activate
-            uv sync
-          fi
-          echo "MLX environment ready ($(python3 --version))"
-        '';
       };
     };
 }

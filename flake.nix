@@ -1,11 +1,21 @@
 {
   description = "AI CLI ecosystem for Claude, Gemini, Copilot (Nix flake)";
 
+  nixConfig = {
+    extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";
+    extra-substituters = "https://devenv.cachix.org";
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.11-darwin";
 
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    devenv = {
+      url = "github:cachix/devenv";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -96,6 +106,7 @@
       self,
       nixpkgs,
       home-manager,
+      devenv,
       claude-code-plugins,
       claude-cookbooks,
       ai-assistant-instructions,
@@ -115,7 +126,7 @@
       wakatime,
       pal-mcp-server,
       ...
-    }:
+    }@inputs:
     let
       supportedSystems = [
         "aarch64-darwin"
@@ -240,6 +251,42 @@
         {
           gh-aw = pkgs.callPackage ./modules/gh-extensions/gh-aw.nix { };
           pal-mcp-server = pkgs.callPackage ./modules/mcp/pal-package.nix { inherit pal-mcp-server; };
+        }
+      );
+
+      # Named devenv shells — reference via: use flake ~/git/nix-ai/main#<name>
+      # To add a new shell: add a new key below with its own devenv module.
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          # AI Python development: LangChain, LangGraph, OpenTelemetry
+          ai-dev = devenv.lib.mkShell {
+            inherit inputs pkgs;
+            modules = [
+              {
+                # Required for pure evaluation (nix flake check)
+                devenv.root = toString ./.;
+                languages.python = {
+                  enable = true;
+                  version = "3.14";
+                  venv.enable = true;
+                  venv.requirements = ''
+                    langchain
+                    langchain-core
+                    langchain-openai
+                    langgraph
+                    opentelemetry-api
+                    opentelemetry-sdk
+                    opentelemetry-exporter-otlp
+                    opentelemetry-instrumentation
+                  '';
+                };
+              }
+            ];
+          };
         }
       );
 
