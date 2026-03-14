@@ -41,7 +41,7 @@
               if [ -d "/Volumes/HuggingFace" ] && [ -w "/Volumes/HuggingFace" ]; then
                 export HF_HOME="/Volumes/HuggingFace"
               else
-                export HF_HOME="''${HOME}/.cache/huggingface"
+                export HF_HOME="''${XDG_CACHE_HOME:-''${HOME}/.cache}/huggingface"
                 mkdir -p "''${HF_HOME}"
               fi
               echo "MLX environment ready ($(python3 --version))"
