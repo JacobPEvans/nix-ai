@@ -13,12 +13,10 @@
 #   user asks for "glm-5", PAL finds the alias → resolves to "glm-5:cloud" →
 #   sends that to Ollama. This is handled automatically by pal-models.jq.
 #
-# Version pinning:
-#   The PAL server args use a pinned git commit hash (from flake.lock) instead
-#   of the Nix store path. The Nix store path approach fails because setuptools_scm
-#   tries to write egg-info to the read-only Nix store during uvx build.
-#   The rev is derived automatically from the pal-mcp-server flake input —
-#   running `nix flake update pal-mcp-server` is all that is needed to bump it.
+# PAL is built as a Nix derivation (modules/mcp/pal-package.nix) and installed
+# via home.packages. This eliminates the uvx git-clone approach that previously
+# failed with Permission denied when setuptools_scm tried to write to the
+# read-only Nix store.
 {
   config,
   lib,
@@ -34,18 +32,10 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
-    # Pin PAL to the flake-locked git commit via git URL.
-    # NOTE: Using the Nix store path directly (${pal-mcp-server}) does NOT work —
-    # setuptools_scm tries to write pal_mcp_server.egg-info to the source directory
-    # during uvx build, which fails because the Nix store is read-only.
-    # The git URL approach lets uvx clone to a writable temp dir, and the commit
-    # hash provides the same pinning guarantee as the Nix store path.
-    # The rev comes from flake.lock (nodes.pal-mcp-server.locked.rev).
-    programs.claude.mcpServers.pal.args = lib.mkForce [
-      "uvx"
-      "--from"
-      "git+https://github.com/BeehiveInnovations/pal-mcp-server.git@${pal-mcp-server.rev}"
-      "pal-mcp-server"
+    # Install pal-mcp-server as a Nix package so `doppler-mcp pal-mcp-server`
+    # resolves via PATH. The package is built from the pinned flake input.
+    home.packages = [
+      (pkgs.callPackage ../mcp/pal-package.nix { inherit pal-mcp-server; })
     ];
 
     # Inject CUSTOM_MODELS_CONFIG_PATH into PAL server env.
