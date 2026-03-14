@@ -1,11 +1,6 @@
 {
   description = "AI CLI ecosystem for Claude, Gemini, Copilot (Nix flake)";
 
-  nixConfig = {
-    extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";
-    extra-substituters = "https://devenv.cachix.org";
-  };
-
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.11-darwin";
 
@@ -16,6 +11,11 @@
 
     devenv = {
       url = "github:cachix/devenv";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nixpkgs-python = {
+      url = "github:cachix/nixpkgs-python";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
