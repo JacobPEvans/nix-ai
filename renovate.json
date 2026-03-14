@@ -13,6 +13,15 @@
         "bunx\\s+--bun\\s+(?<depName>(?:@[^@/]+\\/)?[^@\\s]+)@(?<currentValue>[\\d][^\\s]*)"
       ],
       "datasourceTemplate": "npm"
+    },
+    {
+      "description": "uvx wrapper PyPI packages pinned in Nix modules",
+      "customType": "regex",
+      "fileMatch": ["modules/ai-tools\\.nix", "modules/mlx\\.nix"],
+      "matchStrings": [
+        "uvx\\s+--from\\s+\"(?<depName>[a-zA-Z0-9_-]+)==(?<currentValue>[\\d][^\\s\"]*)\""
+      ],
+      "datasourceTemplate": "pypi"
     }
   ],
   "packageRules": [
@@ -21,6 +30,14 @@
       "matchDatasources": ["npm"],
       "matchFileNames": ["modules/ai-tools.nix"],
       "groupName": "npm-wrappers",
+      "schedule": ["after 7am on Monday"],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "uvx wrapper PyPI packages - weekly updates",
+      "matchDatasources": ["pypi"],
+      "matchFileNames": ["modules/ai-tools.nix", "modules/mlx.nix"],
+      "groupName": "pypi-wrappers",
       "schedule": ["after 7am on Monday"],
       "minimumReleaseAge": "3 days"
     },
