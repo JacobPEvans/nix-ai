@@ -66,9 +66,10 @@ in
   # Agent teams display mode (direct settings.json property)
   teammateMode = "auto";
 
-  # Model: opusplan uses Opus for planning, Sonnet for execution
+  # Model: commented out to use account-tier default (Opus 4.6 with 1M context)
+  # opusplan uses Opus for planning, Sonnet for execution, but lacks [1m] variant
   # See: https://code.claude.com/docs/en/model-config
-  model = "opusplan";
+  # model = "opusplan";
 
   # Release channel: "stable" delays ~1 week to avoid regressions
   autoUpdatesChannel = "stable";
@@ -144,7 +145,7 @@ in
     # See: https://code.claude.com/docs/en/settings
     # See: https://code.claude.com/docs/en/model-config
     env = {
-      # Model selection: opusplan is set above (Opus for planning, Sonnet for execution).
+      # Model: uses account-tier default (no override set above).
       # Auto-claude background jobs use their own CLAUDE_MODEL env var (haiku).
       # ANTHROPIC_MODEL = "sonnet"; # Uncomment to override default model via env var
       # CLAUDE_CODE_SUBAGENT_MODEL = "claude-haiku-4-5-20251001"; # Cost control for subagents
