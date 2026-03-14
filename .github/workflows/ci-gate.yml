@@ -85,6 +85,11 @@ jobs:
     needs: changes
     if: needs.changes.outputs.nix == 'true' || needs.changes.outputs.markdown == 'true'
     uses: JacobPEvans/.github/.github/workflows/_file-size.yml@main
+    with:
+      # flake.lock exceeds the 1000-line default due to devenv transitive inputs.
+      # Lock files are auto-generated and legitimately large; raising the threshold
+      # rather than the 500KB size limit keeps the intent of the check intact.
+      max-line-count: 1500
 
   # ==========================================================================
   # MERGE GATE - The ONLY required check in branch protection
