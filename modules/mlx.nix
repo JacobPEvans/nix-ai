@@ -189,20 +189,23 @@ in
         host="${cfg.host}"
         label="${launchAgentLabel}"
 
+        plist="$HOME/Library/LaunchAgents/$label.plist"
+        domain_target="gui/$(id -u)"
+
         restore_default() {
           echo ""
           echo "Restoring default model..."
           # Kill any vllm-mlx still holding the port
           ${pkgs.lsof}/bin/lsof -ti :"$port" 2>/dev/null | xargs kill 2>/dev/null || true
           sleep 1
-          launchctl start "$label" 2>/dev/null || true
+          launchctl bootstrap "$domain_target" "$plist" 2>/dev/null || true
           echo "Default model restored via LaunchAgent."
         }
 
         trap restore_default EXIT
 
         echo "Stopping default LaunchAgent..."
-        launchctl stop "$label" 2>/dev/null || true
+        launchctl bootout "$domain_target/$label" 2>/dev/null || true
 
         # Wait for port to be free
         for i in $(seq 1 30); do
@@ -236,6 +239,11 @@ in
 
         port="${toString cfg.port}"
         label="${launchAgentLabel}"
+        plist="$HOME/Library/LaunchAgents/$label.plist"
+        domain_target="gui/$(id -u)"
+
+        echo "Unloading LaunchAgent..."
+        launchctl bootout "$domain_target/$label" 2>/dev/null || true
 
         echo "Killing any vllm-mlx process on port $port..."
         ${pkgs.lsof}/bin/lsof -ti :"$port" 2>/dev/null | xargs kill 2>/dev/null || true
@@ -247,8 +255,8 @@ in
           sleep 1
         fi
 
-        echo "Restarting default LaunchAgent ($label)..."
-        launchctl start "$label" 2>/dev/null || true
+        echo "Reloading default LaunchAgent ($label)..."
+        launchctl bootstrap "$domain_target" "$plist" 2>/dev/null || true
 
         echo "Default model restored: ${cfg.defaultModel}"
       '')
@@ -315,9 +323,8 @@ in
       # Usage: cat file.md | mlx-chat "summarize this"
       # Usage: mlx-chat --json "Extract entities from: Hello World"
       (pkgs.writeShellScriptBin "mlx-chat" ''
-        exec ${pkgs.uv}/bin/uvx \
-          --from openai \
-          --with openai \
+        exec ${pkgs.uv}/bin/uv run \
+          --with "openai==1.82.0" \
           python3 ${./mlx-chat.py} "$@"
       '')
     ];
