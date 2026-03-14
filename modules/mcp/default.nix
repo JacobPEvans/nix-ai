@@ -80,17 +80,12 @@ in
   #
   # Non-secret config is set in env below (belongs in Nix, not Doppler).
 
-  # Source pinned via flake input; args overridden in claude/pal-models.nix.
+  # Built as a Nix derivation (modules/mcp/pal-package.nix), installed to PATH.
   # Wrapped with doppler-mcp to inject Doppler secrets at subprocess launch time.
   # Secrets are never written to ~/.claude.json or any file Claude Code can read.
   pal = {
     command = "doppler-mcp";
-    args = [
-      "uvx"
-      "--from"
-      "git+https://github.com/BeehiveInnovations/pal-mcp-server.git"
-      "pal-mcp-server"
-    ];
+    args = [ "pal-mcp-server" ];
     env = {
       # Enable ALL PAL tools (default disables: analyze,refactor,testgen,secaudit,docgen,tracer)
       DISABLED_TOOLS = "";

@@ -239,6 +239,7 @@
         in
         {
           gh-aw = pkgs.callPackage ./modules/gh-extensions/gh-aw.nix { };
+          pal-mcp-server = pkgs.callPackage ./modules/mcp/pal-package.nix { inherit pal-mcp-server; };
         }
       );
 
