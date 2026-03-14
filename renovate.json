@@ -15,11 +15,12 @@
       "datasourceTemplate": "npm"
     },
     {
-      "description": "uvx wrapper PyPI packages pinned in Nix modules",
+      "description": "uv/uvx wrapper PyPI packages pinned in Nix modules",
       "customType": "regex",
       "fileMatch": ["modules/ai-tools\\.nix", "modules/mlx\\.nix"],
       "matchStrings": [
         "uvx\\s+--from\\s+\"(?<depName>[a-zA-Z0-9_-]+)==(?<currentValue>[\\d][^\\s\"]*)\""
+        , "uv\\s+run\\s+--with\\s+\"(?<depName>[a-zA-Z0-9_-]+)==(?<currentValue>[\\d][^\\s\"]*)\""
       ],
       "datasourceTemplate": "pypi"
     }
@@ -34,7 +35,7 @@
       "minimumReleaseAge": "3 days"
     },
     {
-      "description": "uvx wrapper PyPI packages - weekly updates",
+      "description": "uv/uvx wrapper PyPI packages - weekly updates",
       "matchDatasources": ["pypi"],
       "matchFileNames": ["modules/ai-tools.nix", "modules/mlx.nix"],
       "groupName": "pypi-wrappers",
