@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/JacobPEvans/nix-ai/compare/v1.2.0...v1.3.0) (2026-03-14)
+
+
+### Features
+
+* enable 1M context window models in model picker ([#155](https://github.com/JacobPEvans/nix-ai/issues/155)) ([73ae890](https://github.com/JacobPEvans/nix-ai/commit/73ae890e1b872af01dedd7dcab38b24740dbb914))
+
 ## [1.2.0](https://github.com/JacobPEvans/nix-ai/compare/v1.1.0...v1.2.0) (2026-03-13)
 
 
