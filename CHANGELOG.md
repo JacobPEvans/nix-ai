@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/JacobPEvans/nix-ai/compare/v1.4.0...v1.5.0) (2026-03-14)
+
+
+### Features
+
+* add devenv with ai-dev shell, convert mlx-server to devenv ([#158](https://github.com/JacobPEvans/nix-ai/issues/158)) ([0d1deb1](https://github.com/JacobPEvans/nix-ai/commit/0d1deb113464adb622186e08c4b95d3882db4c8f))
+
 ## [1.4.0](https://github.com/JacobPEvans/nix-ai/compare/v1.3.0...v1.4.0) (2026-03-14)
 
 ### Bug Fixes
