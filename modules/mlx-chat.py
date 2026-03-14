@@ -15,7 +15,39 @@ import argparse
 import os
 import sys
 
+import openai
 from openai import OpenAI
+
+
+def stream_response(client, model, messages):
+    """Send a streaming chat request and print tokens as they arrive.
+
+    Returns the complete response text so the caller can append it to the
+    conversation history.
+    """
+    try:
+        response = client.chat.completions.create(
+            model=model, messages=messages, stream=True
+        )
+    except openai.APIConnectionError:
+        print(
+            "\nError: cannot reach MLX server. Is it running?",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    except openai.APIError as exc:
+        print(f"\nAPI error: {exc}", file=sys.stderr)
+        sys.exit(1)
+
+    print("MLX: ", end="", flush=True)
+    full_response = []
+    for chunk in response:
+        token = chunk.choices[0].delta.content
+        if token:
+            print(token, end="", flush=True)
+            full_response.append(token)
+    print("\n")
+    return "".join(full_response)
 
 
 def main():
@@ -38,7 +70,13 @@ def main():
     args = parser.parse_args()
 
     api_url = os.environ.get("MLX_API_URL", "http://127.0.0.1:11435/v1")
-    model = args.model or os.environ.get("MLX_DEFAULT_MODEL", "default")
+    model = args.model or os.environ.get("MLX_DEFAULT_MODEL", "")
+    if not model:
+        print(
+            "Error: no model specified. Set MLX_DEFAULT_MODEL or pass --model.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     client = OpenAI(base_url=api_url, api_key="not-needed")
 
@@ -70,7 +108,19 @@ def main():
             print("Error: No prompt provided via stdin or arguments.", file=sys.stderr)
             sys.exit(1)
         messages.append({"role": "user", "content": initial_prompt})
-        response = client.chat.completions.create(model=model, messages=messages)
+        try:
+            response = client.chat.completions.create(
+                model=model, messages=messages
+            )
+        except openai.APIConnectionError:
+            print(
+                "Error: cannot reach MLX server. Is it running?",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        except openai.APIError as exc:
+            print(f"API error: {exc}", file=sys.stderr)
+            sys.exit(1)
         print(response.choices[0].message.content)
         return
 
@@ -81,18 +131,8 @@ def main():
     if initial_prompt:
         messages.append({"role": "user", "content": initial_prompt})
         print(f"You: {initial_prompt}")
-        response = client.chat.completions.create(
-            model=model, messages=messages, stream=True
-        )
-        print("MLX: ", end="", flush=True)
-        full_response = []
-        for chunk in response:
-            token = chunk.choices[0].delta.content
-            if token:
-                print(token, end="", flush=True)
-                full_response.append(token)
-        print("\n")
-        messages.append({"role": "assistant", "content": "".join(full_response)})
+        reply = stream_response(client, model, messages)
+        messages.append({"role": "assistant", "content": reply})
 
     while True:
         try:
@@ -106,18 +146,8 @@ def main():
             break
 
         messages.append({"role": "user", "content": user_input})
-        response = client.chat.completions.create(
-            model=model, messages=messages, stream=True
-        )
-        print("MLX: ", end="", flush=True)
-        full_response = []
-        for chunk in response:
-            token = chunk.choices[0].delta.content
-            if token:
-                print(token, end="", flush=True)
-                full_response.append(token)
-        print("\n")
-        messages.append({"role": "assistant", "content": "".join(full_response)})
+        reply = stream_response(client, model, messages)
+        messages.append({"role": "assistant", "content": reply})
 
 
 if __name__ == "__main__":
