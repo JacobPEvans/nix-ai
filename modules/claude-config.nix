@@ -162,10 +162,6 @@ in
       # See: https://code.claude.com/docs/en/agent-teams
       CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
 
-      # Disable 1M token context window models from model picker
-      # No native settings.json key exists; env var removes only 1M variants
-      CLAUDE_CODE_DISABLE_1M_CONTEXT = "1";
-
       # Adaptive thinking for Opus 4.6/Sonnet 4.6 (explicitly enabled)
       CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING = "0";
 
