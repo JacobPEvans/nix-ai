@@ -13,7 +13,7 @@ MAESTRO_APP="@maestroApp@"
 
 # Verify Maestro is installed
 if [ ! -x "$MAESTRO_APP" ]; then
-  echo "Error: Maestro not found at $MAESTRO_APP" >&2
+  echo "Error: Maestro not found at '$MAESTRO_APP'" >&2
   echo "Please install Maestro from: https://www.maestro.app" >&2
   exit 1
 fi
