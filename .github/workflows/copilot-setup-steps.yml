@@ -1,12 +1,10 @@
 name: Copilot Setup Steps
 
-on:
-  workflow_call:
+on: push
+
+permissions:
+  contents: read
 
 jobs:
   copilot-setup-steps:
-    name: Copilot Setup Steps
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: DeterminateSystems/determinate-nix-action@v3
+    uses: JacobPEvans/.github/.github/workflows/_copilot-setup-steps.yml@main
