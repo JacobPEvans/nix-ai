@@ -259,73 +259,76 @@
       #
       # devenv.root uses builtins.getEnv "PWD" so devenv writes .devenv/ state
       # to the real filesystem instead of the read-only Nix store copy.
-      # Requires --impure (set in each .envrc). Falls back to store path for
-      # pure evaluation (nix flake check).
-      devShells = forAllSystems (
-        system:
+      # Requires --impure (pass via .envrc or `nix develop --impure`).
+      # Falls back to store path for pure evaluation (nix flake check).
+      devShells =
         let
-          pkgs = nixpkgs.legacyPackages.${system};
-          # Runtime PWD (empty string under pure eval → falls back to store path)
+          # Runtime PWD — not system-specific; empty under pure eval → falls back to store path
           pwd = builtins.getEnv "PWD";
         in
-        {
-          # AI Python development: LangChain, LangGraph, OpenTelemetry
-          ai-dev = devenv.lib.mkShell {
-            inherit inputs pkgs;
-            modules = [
-              {
-                devenv.root = if pwd != "" then pwd else toString ./.;
-                languages.python = {
-                  enable = true;
-                  version = "3.14";
-                  venv.enable = true;
-                  venv.requirements = ''
-                    langchain
-                    langchain-core
-                    langchain-openai
-                    langgraph
-                    opentelemetry-api
-                    opentelemetry-sdk
-                    opentelemetry-exporter-otlp
-                    opentelemetry-instrumentation
-                  '';
-                };
-              }
-            ];
-          };
-        }
-        # mlx-server is Apple Silicon only — MLX ships aarch64 wheels only
-        // nixpkgs.lib.optionalAttrs (system == "aarch64-darwin") {
-          mlx-server = devenv.lib.mkShell {
-            inherit inputs pkgs;
-            modules = [
-              {
-                # Reads pyproject.toml / uv.lock from ./mlx-server/
-                # PWD is already mlx-server/ when nix-direnv evaluates the .envrc
-                devenv.root = if pwd != "" then pwd else toString ./mlx-server;
-                languages.python = {
-                  enable = true;
-                  version = "3.14";
-                  uv = {
+        forAllSystems (
+          system:
+          let
+            pkgs = nixpkgs.legacyPackages.${system};
+          in
+          {
+            # AI Python development: LangChain, LangGraph, OpenTelemetry
+            ai-dev = devenv.lib.mkShell {
+              inherit inputs pkgs;
+              modules = [
+                {
+                  devenv.root = if pwd != "" then pwd else toString ./.;
+                  languages.python = {
                     enable = true;
-                    sync.enable = true;
+                    version = "3.14";
+                    venv.enable = true;
+                    venv.requirements = ''
+                      langchain
+                      langchain-core
+                      langchain-openai
+                      langgraph
+                      opentelemetry-api
+                      opentelemetry-sdk
+                      opentelemetry-exporter-otlp
+                      opentelemetry-instrumentation
+                    '';
                   };
-                };
-                enterShell = ''
-                  # Set HF_HOME: use external volume if mounted, otherwise fall back
-                  if [ -d "/Volumes/HuggingFace" ] && [ -w "/Volumes/HuggingFace" ]; then
-                    export HF_HOME="/Volumes/HuggingFace"
-                  else
-                    export HF_HOME="''${XDG_CACHE_HOME:-''${HOME}/.cache}/huggingface"
-                    mkdir -p "''${HF_HOME}"
-                  fi
-                  echo "MLX environment ready ($(python3 --version))"
-                '';
-              }
-            ];
-          };
-        }
-      );
+                }
+              ];
+            };
+          }
+          # mlx-server is Apple Silicon only — MLX ships aarch64 wheels only
+          // nixpkgs.lib.optionalAttrs (system == "aarch64-darwin") {
+            mlx-server = devenv.lib.mkShell {
+              inherit inputs pkgs;
+              modules = [
+                {
+                  # Reads pyproject.toml / uv.lock from ./mlx-server/
+                  # PWD is already mlx-server/ when nix-direnv evaluates the .envrc
+                  devenv.root = if pwd != "" then pwd else toString ./mlx-server;
+                  languages.python = {
+                    enable = true;
+                    version = "3.14";
+                    uv = {
+                      enable = true;
+                      sync.enable = true;
+                    };
+                  };
+                  enterShell = ''
+                    # Set HF_HOME: use external volume if mounted, otherwise fall back
+                    if [ -d "/Volumes/HuggingFace" ] && [ -w "/Volumes/HuggingFace" ]; then
+                      export HF_HOME="/Volumes/HuggingFace"
+                    else
+                      export HF_HOME="''${XDG_CACHE_HOME:-''${HOME}/.cache}/huggingface"
+                      mkdir -p "''${HF_HOME}"
+                    fi
+                    echo "MLX environment ready ($(python3 --version))"
+                  '';
+                }
+              ];
+            };
+          }
+        );
 
       # Formatter
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
