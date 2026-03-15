@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.8.0](https://github.com/JacobPEvans/nix-ai/compare/v1.7.0...v1.8.0) (2026-03-15)
+
+
+### Bug Fixes
+
+* **ci:** migrate copilot-setup-steps to determinate-nix-action@v3 ([#175](https://github.com/JacobPEvans/nix-ai/issues/175)) ([47eef4b](https://github.com/JacobPEvans/nix-ai/commit/47eef4b714e6b31e2fdf002d678e824ee247bc72))
+* golden standard — bugs, cross-platform, dead code, style ([#174](https://github.com/JacobPEvans/nix-ai/issues/174)) ([4954bd1](https://github.com/JacobPEvans/nix-ai/commit/4954bd1e6a7c6e388dbb26c85736f3cecf8e1ee7))
+* migrate Bash permission format from colon to space separator ([#177](https://github.com/JacobPEvans/nix-ai/issues/177)) ([62658c1](https://github.com/JacobPEvans/nix-ai/commit/62658c1ade1cf96e5b735dd0c47c942a3a3dc423))
+
 ## [1.7.0](https://github.com/JacobPEvans/nix-ai/compare/v1.6.0...v1.7.0) (2026-03-15)
 
 
