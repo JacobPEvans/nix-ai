@@ -28,5 +28,5 @@ jobs:
       repo_context: "Nix home-manager modules for AI CLI tools (Claude, Gemini, Copilot, MCP servers)"
       ci_structure: "ci-gate.yml (dorny/paths-filter + nix-check + markdown-lint + alls-green gate)"
       workflow_name: "CI Gate"
-      extra_tools: "Bash(nix:*)"
+      extra_tools: "Bash(nix *)"
     secrets: inherit

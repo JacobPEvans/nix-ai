@@ -69,5 +69,5 @@ jobs:
     secrets: inherit
     with:
       repo_context: "Nix AI tools configuration using home-manager modules"
-      extra_tools: "Bash(nix:*)"
+      extra_tools: "Bash(nix *)"
       issue_number: ${{ inputs.issue_number }}

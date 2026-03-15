@@ -4,7 +4,7 @@
 # Each tool has different permission syntax requirements.
 #
 # FORMATS:
-# - Claude Code: Bash(cmd:*) for shell, Read(**) for file tools
+# - Claude Code: Bash(cmd *) for shell, Read(**) for file tools
 # - Gemini CLI: ShellTool(cmd) for shell, ReadFileTool for file tools
 # - Copilot CLI: shell(cmd) patterns for runtime flags
 # - Crush: shell_allowlist for permissions config
@@ -61,15 +61,17 @@ in
   # ============================================================================
   # CLAUDE CODE FORMATTER
   # ============================================================================
-  # Format: Bash(cmd:*) for shell commands
-  # The :* suffix is Claude-specific wildcard syntax: it matches "cmd:" followed by any arguments
+  # Format: Bash(cmd *) for shell commands
+  # The "<cmd> *" suffix (space then asterisk) is Claude-specific wildcard syntax:
+  # it matches "cmd" followed by any arguments.
+  # The space enforces word boundaries (e.g., "nix *" matches "nix search" but not "nix-env")
 
-  claude = {
+  claude = rec {
     # Format a single shell command for Claude
-    formatShellCommand = cmd: "Bash(${cmd}:*)";
+    formatShellCommand = cmd: "Bash(${cmd} *)";
 
     # Format a list of shell commands
-    formatShellCommands = cmds: map (cmd: "Bash(${cmd}:*)") cmds;
+    formatShellCommands = cmds: map formatShellCommand cmds;
 
     # Format all allowed commands from permissions (shell + tool-specific + MCP)
     # Note: Tool-specific permissions are placed before shell permissions.
@@ -78,7 +80,7 @@ in
       permissions:
       let
         allCommands = flattenCommands permissions.allow;
-        shellPermissions = map (cmd: "Bash(${cmd}:*)") allCommands;
+        shellPermissions = map formatShellCommand allCommands;
         mcpPermissions = permissions.mcpAllow or [ ];
       in
       (getClaudeToolPermissions permissions) ++ mcpPermissions ++ shellPermissions;
@@ -90,7 +92,7 @@ in
       permissions:
       let
         allCommands = flattenCommands permissions.deny;
-        shellDenied = map (cmd: "Bash(${cmd}:*)") allCommands;
+        shellDenied = map formatShellCommand allCommands;
         mcpPermissions = permissions.mcpDeny or [ ];
       in
       (getClaudeDenyPermissions permissions) ++ mcpPermissions ++ shellDenied;
@@ -101,7 +103,7 @@ in
       permissions:
       let
         allCommands = flattenCommands permissions.ask;
-        shellPermissions = map (cmd: "Bash(${cmd}:*)") allCommands;
+        shellPermissions = map formatShellCommand allCommands;
         mcpPermissions = permissions.mcpAsk or [ ];
       in
       mcpPermissions ++ shellPermissions;
