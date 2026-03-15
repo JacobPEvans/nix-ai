@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.6.0](https://github.com/JacobPEvans/nix-ai/compare/v1.5.0...v1.6.0) (2026-03-15)
+
+
+### Features
+
+* add MLX inference server home-manager module ([#161](https://github.com/JacobPEvans/nix-ai/issues/161)) ([eb4e91f](https://github.com/JacobPEvans/nix-ai/commit/eb4e91ffa3a3a6113e59f57b4b4e5a9529943dc7))
+* **devenv:** add nixpkgs-python input and remove flake-level nixConfig ([#170](https://github.com/JacobPEvans/nix-ai/issues/170)) ([b80ceca](https://github.com/JacobPEvans/nix-ai/commit/b80ceca8a6a486877567a339bce8ab30fe57614b))
+* migrate flake.lock updates to Renovate nix manager ([#169](https://github.com/JacobPEvans/nix-ai/issues/169)) ([5dbaf23](https://github.com/JacobPEvans/nix-ai/commit/5dbaf23e8bab84847e7ec64a0edf41b9178755ee))
+
+
+### Bug Fixes
+
+* **ci:** exclude CHANGELOG.md from markdownlint ([#171](https://github.com/JacobPEvans/nix-ai/issues/171)) ([f974ead](https://github.com/JacobPEvans/nix-ai/commit/f974eada87f0c10a29fe6897b5543ebb289b86fd))
+* **ci:** upgrade ci-gate.yml to Merge Gatekeeper pattern ([#162](https://github.com/JacobPEvans/nix-ai/issues/162)) ([10a5a47](https://github.com/JacobPEvans/nix-ai/commit/10a5a478b9e57fc870df527838ba686a2315576b))
+
 ## [1.5.0](https://github.com/JacobPEvans/nix-ai/compare/v1.4.0...v1.5.0) (2026-03-14)
 
 
