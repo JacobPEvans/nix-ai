@@ -10,6 +10,7 @@ jobs:
   release-please:
     permissions:
       contents: read
+      pull-requests: write
     uses: JacobPEvans/.github/.github/workflows/_release-please.yml@main
     secrets:
       GH_ACTION_JACOBPEVANS_APP_ID: ${{ secrets.GH_ACTION_JACOBPEVANS_APP_ID }}
