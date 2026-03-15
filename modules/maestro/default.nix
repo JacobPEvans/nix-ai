@@ -58,8 +58,7 @@ in
       {
         ".local/bin/maestro-cli" = {
           executable = true;
-          source = pkgs.substituteAll {
-            src = ./scripts/maestro-cli.sh;
+          source = pkgs.replaceVars ./scripts/maestro-cli.sh {
             maestroApp = cfg.appPath;
           };
         };
