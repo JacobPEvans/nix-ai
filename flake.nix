@@ -265,6 +265,10 @@
         let
           # Runtime PWD — not system-specific; empty under pure eval → falls back to store path
           pwd = builtins.getEnv "PWD";
+          # Guard: only use PWD when it looks like the flake root (has flake.nix)
+          pwdIsFlakeRoot = pwd != "" && builtins.pathExists (pwd + "/flake.nix");
+          # Guard: only use PWD for mlx-server when it contains pyproject.toml
+          pwdIsMlxRoot = pwd != "" && builtins.pathExists (pwd + "/pyproject.toml");
         in
         forAllSystems (
           system:
@@ -277,7 +281,7 @@
               inherit inputs pkgs;
               modules = [
                 {
-                  devenv.root = if pwd != "" then pwd else toString ./.;
+                  devenv.root = if pwdIsFlakeRoot then pwd else toString ./.;
                   languages.python = {
                     enable = true;
                     version = "3.14";
@@ -304,8 +308,9 @@
               modules = [
                 {
                   # Reads pyproject.toml / uv.lock from ./mlx-server/
-                  # PWD is already mlx-server/ when nix-direnv evaluates the .envrc
-                  devenv.root = if pwd != "" then pwd else toString ./mlx-server;
+                  # PWD is mlx-server/ when nix-direnv evaluates the .envrc there;
+                  # guard against arbitrary caller directories with pyproject.toml check.
+                  devenv.root = if pwdIsMlxRoot then pwd else toString ./mlx-server;
                   languages.python = {
                     enable = true;
                     version = "3.14";
