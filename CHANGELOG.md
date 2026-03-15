@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/JacobPEvans/nix-ai/compare/v1.8.0...v1.9.0) (2026-03-15)
+
+
+### Bug Fixes
+
+* **ci:** add pull-requests:write for release-please auto-approve ([007d630](https://github.com/JacobPEvans/nix-ai/commit/007d630d28ee4b59e2ce11d7926f3f0a0aac2e58))
+
 ## [1.8.0](https://github.com/JacobPEvans/nix-ai/compare/v1.7.0...v1.8.0) (2026-03-15)
 
 
