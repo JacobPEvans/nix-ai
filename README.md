@@ -80,7 +80,7 @@ Key enable toggles exposed by the default module:
 | ------ | ---- | ------- | ----------- |
 | `programs.claude.enable` | bool | — | Enable Claude Code configuration |
 | `programs.claude.apiKeyHelper.enable` | bool | false | Headless API key authentication via Bitwarden |
-| `programs.claudeStatusline.enable` | bool | true | Claude Code powerline statusline |
+| `programs.claudeStatusline.enable` | bool | false | Claude Code powerline statusline |
 | `programs.claude.settings.sandbox.enabled` | bool | false | Filesystem/network sandbox isolation |
 | `programs.claude.settings.alwaysThinkingEnabled` | bool | true | Extended thinking mode |
 | `programs.claude.remoteControlAtStartup` | bool or null | null | Remote Control auto-start |

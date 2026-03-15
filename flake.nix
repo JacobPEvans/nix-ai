@@ -14,11 +14,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixpkgs-python = {
-      url = "github:cachix/nixpkgs-python";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # Official Anthropic repositories
     claude-code-plugins = {
       url = "github:anthropics/claude-code";
