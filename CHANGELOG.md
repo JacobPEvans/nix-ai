@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/JacobPEvans/nix-ai/compare/v1.6.0...v1.7.0) (2026-03-15)
+
+
+### Bug Fixes
+
+* **devenv:** use impure eval for runtime DEVENV_ROOT resolution ([#172](https://github.com/JacobPEvans/nix-ai/issues/172)) ([d0247dc](https://github.com/JacobPEvans/nix-ai/commit/d0247dc20ea3a62511e9ea7cbf2c847f2f3778b7))
+
 ## [1.6.0](https://github.com/JacobPEvans/nix-ai/compare/v1.5.0...v1.6.0) (2026-03-15)
 
 
