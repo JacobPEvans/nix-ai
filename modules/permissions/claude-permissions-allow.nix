@@ -3,7 +3,7 @@
 # Uses unified permission definitions from ai-cli/common/permissions.nix
 # with Claude-specific formatting via formatters.nix.
 #
-# FORMAT: Bash(cmd:*) for shell commands, plus tool-specific patterns
+# FORMAT: Bash(cmd *) for shell commands, plus tool-specific patterns
 #
 # SINGLE SOURCE OF TRUTH:
 # Command definitions are in ai-cli/common/permissions.nix
@@ -38,6 +38,6 @@ let
 in
 {
   # Export allowed permissions list
-  # Combines shell commands (Bash(cmd:*)) with tool-specific permissions
+  # Combines shell commands (Bash(cmd *)) with tool-specific permissions
   allow = formatters.claude.formatAllowed permissions;
 }

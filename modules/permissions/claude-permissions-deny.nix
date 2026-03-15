@@ -3,7 +3,7 @@
 # Uses unified permission definitions from ai-cli/common/permissions.nix
 # with Claude-specific formatting via formatters.nix.
 #
-# FORMAT: Bash(cmd:*) for blocked shell commands, plus Read() patterns for sensitive files
+# FORMAT: Bash(cmd *) for blocked shell commands, plus Read() patterns for sensitive files
 #
 # SINGLE SOURCE OF TRUTH:
 # Command definitions are in ai-cli/common/permissions.nix
@@ -44,6 +44,6 @@ let
 in
 {
   # Export denied permissions list
-  # Combines shell denies (Bash(cmd:*)) with sensitive file read blocks
+  # Combines shell denies (Bash(cmd *)) with sensitive file read blocks
   deny = formatters.claude.formatDenied permissions;
 }

@@ -10,7 +10,7 @@
 # - toolSpecific: Non-shell tool identifiers
 #
 # TOOL FORMATS (applied by formatters.nix):
-# - Claude: Bash(cmd:*), Read(**), etc.
+# - Claude: Bash(cmd *), Read(**), etc.
 # - Gemini: ShellTool(cmd), ReadFileTool, etc.
 # - Copilot: shell(cmd) patterns (runtime flags)
 # - Crush: shell_allowlist patterns
