@@ -6,18 +6,13 @@
   aiModule,
 }:
 {
-  formatting =
-    pkgs.runCommand "check-formatting"
-      {
-        nativeBuildInputs = [ pkgs.nixfmt-rfc-style ];
-      }
-      ''
-        cp -r ${src} $TMPDIR/src
-        chmod -R u+w $TMPDIR/src
-        cd $TMPDIR/src
-        ${pkgs.lib.getExe pkgs.treefmt} --fail-on-change --no-cache --formatters nixfmt .
-        touch $out
-      '';
+  formatting = pkgs.runCommand "check-formatting" { } ''
+    cp -r ${src} $TMPDIR/src
+    chmod -R u+w $TMPDIR/src
+    cd $TMPDIR/src
+    ${pkgs.lib.getExe pkgs.nixfmt-tree} --fail-on-change --no-cache --tree-root $TMPDIR/src .
+    touch $out
+  '';
 
   statix = pkgs.runCommand "check-statix" { } ''
     cd ${src}

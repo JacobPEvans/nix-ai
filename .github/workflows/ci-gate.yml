@@ -115,5 +115,5 @@ jobs:
       - name: Check all results
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: ${{ (needs.changes.outputs.is-deps-only == 'true' && 'nix-validate, markdown-lint, file-size') || 'nix-validate, markdown-lint, file-size' }}
+          allowed-skips: ${{ needs.changes.outputs.is-deps-only == 'true' && 'nix-validate, markdown-lint, file-size' || '' }}
           jobs: ${{ toJSON(needs) }}

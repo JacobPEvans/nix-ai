@@ -4,80 +4,78 @@
 # Cross-platform: no Darwin-specific code here.
 { lib, ... }:
 
-with lib;
-
 let
   # Reusable submodule types
-  marketplaceModule = types.submodule {
+  marketplaceModule = lib.types.submodule {
     options = {
-      source = mkOption {
-        type = types.submodule {
+      source = lib.mkOption {
+        type = lib.types.submodule {
           options = {
-            type = mkOption {
-              type = types.enum [
+            type = lib.mkOption {
+              type = lib.types.enum [
                 "git"
                 "github"
                 "local"
               ];
               default = "git";
             };
-            url = mkOption { type = types.str; };
+            url = lib.mkOption { type = lib.types.str; };
           };
         };
       };
-      flakeInput = mkOption {
-        type = types.nullOr types.path;
+      flakeInput = lib.mkOption {
+        type = lib.types.nullOr lib.types.path;
         default = null;
         description = "Flake input for Nix-managed (immutable) plugins";
       };
     };
   };
 
-  componentModule = types.submodule {
+  componentModule = lib.types.submodule {
     options = {
-      name = mkOption { type = types.str; };
-      source = mkOption { type = types.path; };
+      name = lib.mkOption { type = lib.types.str; };
+      source = lib.mkOption { type = lib.types.path; };
     };
   };
 
-  mcpServerModule = types.submodule {
+  mcpServerModule = lib.types.submodule {
     options = {
-      type = mkOption {
-        type = types.enum [
+      type = lib.mkOption {
+        type = lib.types.enum [
           "stdio"
           "sse"
           "http"
         ];
         default = "stdio";
       };
-      command = mkOption {
-        type = types.nullOr types.str;
+      command = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
         default = null;
       };
-      args = mkOption {
-        type = types.listOf types.str;
+      args = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
         default = [ ];
       };
-      env = mkOption {
-        type = types.attrsOf types.str;
+      env = lib.mkOption {
+        type = lib.types.attrsOf lib.types.str;
         default = { };
       };
-      url = mkOption {
-        type = types.nullOr types.str;
+      url = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
         default = null;
       };
-      headers = mkOption {
-        type = types.attrsOf types.str;
+      headers = lib.mkOption {
+        type = lib.types.attrsOf lib.types.str;
         default = { };
       };
-      disabled = mkOption {
-        type = types.bool;
+      disabled = lib.mkOption {
+        type = lib.types.bool;
         default = false;
       };
     };
   };
 
-  hookType = types.nullOr (types.either types.path types.lines);
+  hookType = lib.types.nullOr (lib.types.either lib.types.path lib.types.lines);
 
 in
 {
@@ -86,60 +84,60 @@ in
 
     # Plugins
     plugins = {
-      marketplaces = mkOption {
-        type = types.attrsOf marketplaceModule;
+      marketplaces = lib.mkOption {
+        type = lib.types.attrsOf marketplaceModule;
         default = { };
       };
-      enabled = mkOption {
-        type = types.attrsOf types.bool;
+      enabled = lib.mkOption {
+        type = lib.types.attrsOf lib.types.bool;
         default = { };
       };
-      allowRuntimeInstall = mkOption {
-        type = types.bool;
+      allowRuntimeInstall = lib.mkOption {
+        type = lib.types.bool;
         default = true;
       };
     };
 
     # Commands
     commands = {
-      fromFlakeInputs = mkOption {
-        type = types.listOf componentModule;
+      fromFlakeInputs = lib.mkOption {
+        type = lib.types.listOf componentModule;
         default = [ ];
       };
-      local = mkOption {
-        type = types.attrsOf types.path;
+      local = lib.mkOption {
+        type = lib.types.attrsOf lib.types.path;
         default = { };
       };
-      fromLiveRepo = mkOption {
-        type = types.nullOr types.path;
+      fromLiveRepo = lib.mkOption {
+        type = lib.types.nullOr lib.types.path;
         default = null;
       };
-      liveRepoCommands = mkOption {
-        type = types.listOf types.str;
+      liveRepoCommands = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
         default = [ ];
       };
     };
 
     # Agents
     agents = {
-      fromFlakeInputs = mkOption {
-        type = types.listOf componentModule;
+      fromFlakeInputs = lib.mkOption {
+        type = lib.types.listOf componentModule;
         default = [ ];
       };
-      local = mkOption {
-        type = types.attrsOf types.path;
+      local = lib.mkOption {
+        type = lib.types.attrsOf lib.types.path;
         default = { };
       };
     };
 
     # Skills
     skills = {
-      fromFlakeInputs = mkOption {
-        type = types.listOf componentModule;
+      fromFlakeInputs = lib.mkOption {
+        type = lib.types.listOf componentModule;
         default = [ ];
       };
-      local = mkOption {
-        type = types.attrsOf types.path;
+      local = lib.mkOption {
+        type = lib.types.attrsOf lib.types.path;
         default = { };
       };
     };
@@ -147,39 +145,39 @@ in
     # Hooks - fully implemented in modules/claude/settings.nix
     # Generates executable scripts in ~/.claude/hooks/ via home.file.
     hooks = {
-      preToolUse = mkOption {
+      preToolUse = lib.mkOption {
         type = hookType;
         default = null;
       };
-      postToolUse = mkOption {
+      postToolUse = lib.mkOption {
         type = hookType;
         default = null;
       };
-      userPromptSubmit = mkOption {
+      userPromptSubmit = lib.mkOption {
         type = hookType;
         default = null;
       };
-      stop = mkOption {
+      stop = lib.mkOption {
         type = hookType;
         default = null;
       };
-      subagentStop = mkOption {
+      subagentStop = lib.mkOption {
         type = hookType;
         default = null;
       };
-      sessionStart = mkOption {
+      sessionStart = lib.mkOption {
         type = hookType;
         default = null;
       };
-      sessionEnd = mkOption {
+      sessionEnd = lib.mkOption {
         type = hookType;
         default = null;
       };
     };
 
     # MCP Servers
-    mcpServers = mkOption {
-      type = types.attrsOf mcpServerModule;
+    mcpServers = lib.mkOption {
+      type = lib.types.attrsOf mcpServerModule;
       default = { };
     };
 
@@ -189,8 +187,8 @@ in
     apiKeyHelper = {
       enable = lib.mkEnableOption "API key helper for headless Claude authentication";
 
-      scriptPath = mkOption {
-        type = types.str;
+      scriptPath = lib.mkOption {
+        type = lib.types.str;
         default = ".local/bin/claude-api-key-helper";
         description = "Path (relative to home) where the API key helper script is installed";
       };
@@ -198,8 +196,8 @@ in
 
     # Agent teams: coordinate multiple Claude Code instances
     # See: https://code.claude.com/docs/en/agent-teams
-    teammateMode = mkOption {
-      type = types.enum [
+    teammateMode = lib.mkOption {
+      type = lib.types.enum [
         "auto"
         "in-process"
         "tmux"
@@ -214,8 +212,8 @@ in
     };
 
     # Auto-update channel for Claude Code binary
-    autoUpdatesChannel = mkOption {
-      type = types.enum [
+    autoUpdatesChannel = lib.mkOption {
+      type = lib.types.enum [
         "stable"
         "latest"
       ];
@@ -228,8 +226,8 @@ in
     };
 
     # Show turn duration in UI
-    showTurnDuration = mkOption {
-      type = types.bool;
+    showTurnDuration = lib.mkOption {
+      type = lib.types.bool;
       default = false;
       description = "Show how long each turn takes in the Claude Code UI";
     };
@@ -237,8 +235,8 @@ in
     # Remote Control auto-start (Feb 2026 feature)
     # Stored in ~/.claude.json (global config) via home.activation.
     # See: https://code.claude.com/docs/en/remote-control
-    remoteControlAtStartup = mkOption {
-      type = types.nullOr types.bool;
+    remoteControlAtStartup = lib.mkOption {
+      type = lib.types.nullOr lib.types.bool;
       default = null;
       description = ''
         Enable Remote Control for all sessions automatically.
@@ -248,8 +246,8 @@ in
 
     # Trusted project directories for CLAUDE.md external import approval.
     # Stored in ~/.claude.json under projects.<path> at activation time.
-    trustedProjectDirs = mkOption {
-      type = types.listOf types.str;
+    trustedProjectDirs = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
       default = [ ];
       description = ''
         Base directories containing git repos (worktree layout).
@@ -260,8 +258,8 @@ in
       example = [ "~/git" ];
     };
 
-    model = mkOption {
-      type = types.nullOr types.str;
+    model = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
       default = null;
       description = ''
         Override the default model. Accepts aliases ("opus", "sonnet",
@@ -270,9 +268,9 @@ in
       '';
     };
 
-    effortLevel = mkOption {
-      type = types.nullOr (
-        types.enum [
+    effortLevel = lib.mkOption {
+      type = lib.types.nullOr (
+        lib.types.enum [
           "low"
           "medium"
           "high"
@@ -289,8 +287,8 @@ in
       '';
     };
 
-    attribution = mkOption {
-      type = types.attrsOf types.str;
+    attribution = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
       default = { };
       description = "Commit attribution trailer. Set commit = \"(claude)\" for minimal attribution.";
     };
@@ -298,8 +296,8 @@ in
     # Settings
     settings = {
       # Extended thinking mode
-      alwaysThinkingEnabled = mkOption {
-        type = types.bool;
+      alwaysThinkingEnabled = lib.mkOption {
+        type = lib.types.bool;
         default = true;
         description = ''
           Enable Claude's extended thinking capability by default.
@@ -309,8 +307,8 @@ in
       };
 
       # Session management
-      cleanupPeriodDays = mkOption {
-        type = types.int;
+      cleanupPeriodDays = lib.mkOption {
+        type = lib.types.int;
         default = 30;
         description = ''
           Sessions inactive longer than this period are deleted.
@@ -320,25 +318,25 @@ in
 
       # Permissions
       permissions = {
-        allow = mkOption {
-          type = types.listOf types.str;
+        allow = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
           default = [ ];
           description = "Commands and operations to auto-approve without prompting";
         };
-        deny = mkOption {
-          type = types.listOf types.str;
+        deny = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
           default = [ ];
           description = "Commands and operations to permanently block";
         };
-        ask = mkOption {
-          type = types.listOf types.str;
+        ask = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
           default = [ ];
           description = "Commands and operations requiring user confirmation";
         };
       };
 
-      additionalDirectories = mkOption {
-        type = types.listOf types.str;
+      additionalDirectories = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
         default = [ ];
         description = "Directories accessible to Claude Code without prompts";
         example = [
@@ -350,8 +348,8 @@ in
 
       # Environment variables for Claude Code
       # See: https://code.claude.com/docs/en/settings
-      env = mkOption {
-        type = types.attrsOf types.str;
+      env = lib.mkOption {
+        type = lib.types.attrsOf lib.types.str;
         default = { };
         description = ''
           Environment variables passed to Claude Code.
@@ -363,8 +361,8 @@ in
         };
       };
 
-      schemaUrl = mkOption {
-        type = types.str;
+      schemaUrl = lib.mkOption {
+        type = lib.types.str;
         default = "https://json.schemastore.org/claude-code-settings.json";
         description = "JSON schema URL for settings validation";
       };
@@ -372,24 +370,24 @@ in
       # Sandbox configuration (Dec 2025 feature)
       # Provides filesystem/network isolation for untrusted codebases
       sandbox = {
-        enabled = mkOption {
-          type = types.bool;
+        enabled = lib.mkOption {
+          type = lib.types.bool;
           default = false;
           description = ''
             Enable sandbox mode for filesystem/network isolation.
             Useful when working in untrusted codebases.
           '';
         };
-        autoAllowBashIfSandboxed = mkOption {
-          type = types.bool;
+        autoAllowBashIfSandboxed = lib.mkOption {
+          type = lib.types.bool;
           default = true;
           description = ''
             Automatically allow bash commands when sandboxed.
             Safe because sandbox prevents destructive operations.
           '';
         };
-        excludedCommands = mkOption {
-          type = types.listOf types.str;
+        excludedCommands = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
           default = [ ];
           description = "Commands to exclude from sandbox restrictions";
           example = [
@@ -403,24 +401,24 @@ in
 
     # Status Line (supports claude-code-statusline)
     statusLine = {
-      enable = mkOption {
-        type = types.bool;
+      enable = lib.mkOption {
+        type = lib.types.bool;
         default = false;
       };
-      script = mkOption {
-        type = types.nullOr types.lines;
+      script = lib.mkOption {
+        type = lib.types.nullOr lib.types.lines;
         default = null;
       };
     };
 
     # Feature Flags
     features = {
-      pluginSchemaVersion = mkOption {
-        type = types.int;
+      pluginSchemaVersion = lib.mkOption {
+        type = lib.types.int;
         default = 1;
       };
-      experimental = mkOption {
-        type = types.attrsOf types.bool;
+      experimental = lib.mkOption {
+        type = lib.types.attrsOf lib.types.bool;
         default = { };
       };
     };
