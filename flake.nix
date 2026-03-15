@@ -256,10 +256,17 @@
 
       # Named devenv shells — reference via: nix develop ~/git/nix-ai/main#<name>
       # To add a new shell: add a new key to the attrset below.
+      #
+      # devenv.root uses builtins.getEnv "PWD" so devenv writes .devenv/ state
+      # to the real filesystem instead of the read-only Nix store copy.
+      # Requires --impure (set in each .envrc). Falls back to store path for
+      # pure evaluation (nix flake check).
       devShells = forAllSystems (
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
+          # Runtime PWD (empty string under pure eval → falls back to store path)
+          pwd = builtins.getEnv "PWD";
         in
         {
           # AI Python development: LangChain, LangGraph, OpenTelemetry
@@ -267,7 +274,7 @@
             inherit inputs pkgs;
             modules = [
               {
-                devenv.root = toString ./.;
+                devenv.root = if pwd != "" then pwd else toString ./.;
                 languages.python = {
                   enable = true;
                   version = "3.14";
@@ -294,7 +301,8 @@
             modules = [
               {
                 # Reads pyproject.toml / uv.lock from ./mlx-server/
-                devenv.root = toString ./mlx-server;
+                # PWD is already mlx-server/ when nix-direnv evaluates the .envrc
+                devenv.root = if pwd != "" then pwd else toString ./mlx-server;
                 languages.python = {
                   enable = true;
                   version = "3.14";
