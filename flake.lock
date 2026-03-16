@@ -769,11 +769,11 @@
     "jacobpevans-cc-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1773423037,
-        "narHash": "sha256-/NBhGS4rGCKtjWgorBlUcLdVSYmrYC0M31C5D6PokQU=",
+        "lastModified": 1773690690,
+        "narHash": "sha256-vui9BTWm5EavMfHmz2d4NcStUMzMFP94DwRBlpMfXm0=",
         "owner": "JacobPEvans",
         "repo": "claude-code-plugins",
-        "rev": "35dec4a7f7d83265041f260cc88163d0fa32ff39",
+        "rev": "018aebd770cc595d278a901eab4229a815a59ec1",
         "type": "github"
       },
       "original": {
