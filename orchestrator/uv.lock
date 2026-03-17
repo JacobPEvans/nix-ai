@@ -913,6 +913,32 @@ wheels = [
 ]
 
 [[package]]
+name = "llama-index-vector-stores-faiss"
+version = "0.6.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "llama-index-core" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7c/32/89a04e38fa9595b7116c61955d9a67085f0a5480738e9c14063e374724c2/llama_index_vector_stores_faiss-0.6.0.tar.gz", hash = "sha256:00bfeb6cb7571e0e856566cb4f10c89b415b6108f151d9ad48ee9c31da563f5e", size = 6045, upload-time = "2026-03-12T20:46:31.454Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5b/85/465b4f199075ae7773c181b2f98cf689f3107a8de031e7a9d4cd5e906446/llama_index_vector_stores_faiss-0.6.0-py3-none-any.whl", hash = "sha256:d4600c60ef5411d9e35ba573b4f416a5e13ea04c6f942c8e6f49f03f2feb4f3b", size = 7739, upload-time = "2026-03-12T20:46:30.736Z" },
+]
+
+[[package]]
+name = "llama-index-vector-stores-qdrant"
+version = "0.10.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "grpcio" },
+    { name = "llama-index-core" },
+    { name = "qdrant-client" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/cf/ff/f1ce3444c65cf3aff1edd4810e2736f9d81512cd5e2565cd7d341e17fbba/llama_index_vector_stores_qdrant-0.10.0.tar.gz", hash = "sha256:173855ff82fffedda5b24c2561f8a6dcd9da24318143188de85470f6667a84ea", size = 14699, upload-time = "2026-03-12T20:47:56.99Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d4/8d/6486b04a867e6ce5fdd3b838146a9e951a42668ea8fd7fcee9d0e6c41c9f/llama_index_vector_stores_qdrant-0.10.0-py3-none-any.whl", hash = "sha256:a883c9bd3d301b434fdf1645a5118b18db0b429d4011ba275ce23a69297606c6", size = 14967, upload-time = "2026-03-12T20:47:57.921Z" },
+]
+
+[[package]]
 name = "llama-index-workflows"
 version = "2.16.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1288,6 +1314,8 @@ dependencies = [
     { name = "langgraph" },
     { name = "llama-index" },
     { name = "llama-index-core" },
+    { name = "llama-index-embeddings-openai" },
+    { name = "llama-index-vector-stores-faiss" },
     { name = "numpy" },
     { name = "openai" },
     { name = "pydantic" },
@@ -1302,6 +1330,7 @@ dev = [
     { name = "ruff" },
 ]
 qdrant = [
+    { name = "llama-index-vector-stores-qdrant" },
     { name = "qdrant-client" },
 ]
 
@@ -1311,6 +1340,9 @@ requires-dist = [
     { name = "langgraph", specifier = ">=0.4.0" },
     { name = "llama-index", specifier = ">=0.12.0" },
     { name = "llama-index-core", specifier = ">=0.12.0" },
+    { name = "llama-index-embeddings-openai", specifier = ">=0.3.0" },
+    { name = "llama-index-vector-stores-faiss", specifier = ">=0.3.0" },
+    { name = "llama-index-vector-stores-qdrant", marker = "extra == 'qdrant'", specifier = ">=0.4.0" },
     { name = "numpy", specifier = ">=2.2.0" },
     { name = "openai", specifier = ">=1.82.0" },
     { name = "pydantic", specifier = ">=2.11.0" },

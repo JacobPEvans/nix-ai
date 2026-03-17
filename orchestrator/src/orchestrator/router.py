@@ -20,6 +20,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+from orchestrator.common import l2_normalize
+
 if TYPE_CHECKING:
     from openai import OpenAI
 
@@ -155,15 +157,5 @@ class SkillRouter:
 
 
 def _cosine_similarity(a: np.ndarray, b: np.ndarray) -> np.ndarray:
-    """Compute cosine similarity between two sets of vectors.
-
-    Args:
-        a: Shape (m, d) — query vectors
-        b: Shape (n, d) — candidate vectors
-
-    Returns:
-        Shape (m, n) similarity matrix
-    """
-    a_norm = a / (np.linalg.norm(a, axis=1, keepdims=True) + 1e-10)
-    b_norm = b / (np.linalg.norm(b, axis=1, keepdims=True) + 1e-10)
-    return a_norm @ b_norm.T
+    """Cosine similarity between (m, d) and (n, d) → (m, n) matrix."""
+    return l2_normalize(a) @ l2_normalize(b).T

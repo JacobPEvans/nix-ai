@@ -11,8 +11,9 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-import yaml
 from pydantic import BaseModel, ConfigDict, Field
+
+from orchestrator.common import load_yaml_file
 
 
 class ModelSize(str, Enum):
@@ -165,8 +166,7 @@ class SkillDefinition(BaseModel):
 
 def load_skill(path: Path) -> SkillDefinition:
     """Load a single skill definition from a YAML file."""
-    with path.open() as f:
-        data = yaml.safe_load(f)
+    data = load_yaml_file(path)
     return SkillDefinition.model_validate(data)
 
 

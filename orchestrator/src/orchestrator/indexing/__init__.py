@@ -1,19 +1,13 @@
-"""Indexing subpackage — embedding pipeline and vector backends."""
+"""Indexing subpackage — embedding pipeline backed by llama-index."""
 
 from __future__ import annotations
 
-from .embedder import (
+from .pipeline import (
     EmbeddingConfig,
     EmbeddingPipeline,
-    FAISSBackend,
-    QdrantBackend,
-    VectorBackend,
 )
 
 __all__ = [
     "EmbeddingConfig",
     "EmbeddingPipeline",
-    "FAISSBackend",
-    "QdrantBackend",
-    "VectorBackend",
 ]
