@@ -6,7 +6,9 @@ executable LangGraph StateGraphs.
 
 Node types:
   - llm_call: Invoke an OpenAI-compatible LLM endpoint
-  - tool_exec: Execute a configured shell command/tool
+  - tool_exec: Execute a configured shell command/tool.
+    **Warning**: This can execute arbitrary code and should only be used
+    with trusted workflow definitions.
   - human_input: Pause execution and record pending human review
   - conditional: Route to different nodes based on state values
 
@@ -141,8 +143,7 @@ def _make_llm_call_node(node_def: NodeDefinition):  # noqa: ANN202
 
         # Build message list: system prompt + any existing messages
         messages: list[dict[str, str]] = [{"role": "system", "content": system_prompt}]
-        for msg in state.get("messages", []):
-            messages.append(msg)
+        messages.extend(state.get("messages", []))
 
         logger.debug("llm_call node '%s' → %s/%s", node_def.name, endpoint, model)
         response = client.chat.completions.create(

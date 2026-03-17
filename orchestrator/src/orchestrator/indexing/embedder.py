@@ -289,13 +289,13 @@ class QdrantBackend:
             msg = "ids, embeddings and metadata must have the same length"
             raise ValueError(msg)
 
-        # Qdrant uses integer point ids internally; we store the string id
-        # in the payload so we can return it from search.
+        # Qdrant supports string point IDs natively — use doc_id directly
+        # to avoid hash collisions from integer conversion.
         points = [
             PointStruct(
-                id=abs(hash(doc_id)) % (2**63),
+                id=doc_id,
                 vector=emb,
-                payload={"_doc_id": doc_id, **meta},
+                payload=meta,
             )
             for doc_id, emb, meta in zip(ids, embeddings, metadata)
         ]
@@ -315,18 +315,17 @@ class QdrantBackend:
         results: list[tuple[str, float, dict[str, Any]]] = []
         for hit in hits:
             payload = dict(hit.payload or {})
-            doc_id = payload.pop("_doc_id", str(hit.id))
+            doc_id = str(hit.id)
             results.append((doc_id, float(hit.score), payload))
         return results
 
     def delete(self, ids: list[str]) -> None:
         from qdrant_client.models import PointIdsList
 
-        # Convert string ids back to the same integer hash used in add().
-        int_ids = [abs(hash(doc_id)) % (2**63) for doc_id in ids]
+        # Qdrant point IDs are strings, so pass them directly.
         self._client.delete(
             collection_name=self.COLLECTION,
-            points_selector=PointIdsList(points=int_ids),
+            points_selector=PointIdsList(points=ids),
         )
         logger.debug("QdrantBackend: deleted %d points", len(ids))
 

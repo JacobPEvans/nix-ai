@@ -16,7 +16,6 @@ The reader:
 from __future__ import annotations
 
 import logging
-import os
 import re
 from pathlib import Path
 from typing import Any
@@ -110,7 +109,6 @@ def _parse_file(path: Path) -> dict[str, Any]:
         return {}
 
     frontmatter, body = _parse_frontmatter(raw)
-    full_text = raw  # Use full raw text for extraction (includes frontmatter tags)
 
     # Merge frontmatter tags with inline tags; deduplicate while preserving order
     fm_tags: list[str] = frontmatter.get("tags", [])
@@ -126,7 +124,8 @@ def _parse_file(path: Path) -> dict[str, Any]:
 
     # Wikilinks are extracted from the body only (frontmatter rarely has them)
     wikilinks = _extract_wikilinks(body)
-    embeds = _extract_embeds(full_text)
+    # Embeds use full raw text since ![[embed]] can appear in frontmatter
+    embeds = _extract_embeds(raw)
     callouts = _extract_callouts(body)
 
     # Title: prefer frontmatter title, fall back to filename stem
@@ -229,9 +228,4 @@ class ObsidianReader:
                     logger.warning("Skipping non-existent or non-markdown path: %s", p)
             return resolved
 
-        md_files: list[Path] = []
-        for dirpath, _dirnames, filenames in os.walk(self.vault_path):
-            for fname in sorted(filenames):
-                if fname.endswith(".md"):
-                    md_files.append(Path(dirpath) / fname)
-        return sorted(md_files)
+        return sorted(self.vault_path.rglob("*.md"))
