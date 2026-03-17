@@ -178,12 +178,39 @@ def _make_tool_exec_node(node_def: NodeDefinition):  # noqa: ANN202
     def _node(state: WorkflowState) -> WorkflowState:
         cmd = [command, *args]
         logger.debug("tool_exec node '%s' → %s", node_def.name, cmd)
-        result = subprocess.run(  # noqa: S603
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-        )
+        try:
+            result = subprocess.run(  # noqa: S603
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
+        except FileNotFoundError:
+            error_msg = f"tool_exec '{node_def.name}': command not found: {command}"
+            logger.error(error_msg)
+            return {
+                **state,
+                "current_node": node_def.name,
+                "output": error_msg,
+                "metadata": {
+                    **state.get("metadata", {}),
+                    f"{node_def.name}_returncode": 127,
+                    f"{node_def.name}_error": "command_not_found",
+                },
+            }
+        except subprocess.TimeoutExpired:
+            error_msg = f"tool_exec '{node_def.name}': timed out after {timeout}s"
+            logger.error(error_msg)
+            return {
+                **state,
+                "current_node": node_def.name,
+                "output": error_msg,
+                "metadata": {
+                    **state.get("metadata", {}),
+                    f"{node_def.name}_returncode": -1,
+                    f"{node_def.name}_error": "timeout",
+                },
+            }
         output = result.stdout.strip() if result.returncode == 0 else result.stderr.strip()
         return {
             **state,
@@ -331,9 +358,21 @@ class WorkflowEngine:
 
         graph = StateGraph(WorkflowState)
 
-        # Index edges by source for routing
+        # Validate all edge references before building the graph
         edges_by_source: dict[str, list[EdgeDefinition]] = {}
         for edge in workflow.edges:
+            if edge.source not in node_names:
+                msg = (
+                    f"Edge references unknown source node '{edge.source}'. "
+                    f"Known nodes: {sorted(node_names)}"
+                )
+                raise ValueError(msg)
+            if edge.target not in node_names:
+                msg = (
+                    f"Edge references unknown target node '{edge.target}'. "
+                    f"Known nodes: {sorted(node_names)}"
+                )
+                raise ValueError(msg)
             edges_by_source.setdefault(edge.source, []).append(edge)
 
         # Add nodes
@@ -395,10 +434,9 @@ class WorkflowEngine:
                 graph.add_conditional_edges(node_def.name, router_fn, path_map)
 
             elif outgoing:
-                # Simple deterministic edges
+                # Simple deterministic edges (targets already validated above)
                 for edge in outgoing:
-                    target = edge.target if edge.target in node_names else END
-                    graph.add_edge(node_def.name, target)
+                    graph.add_edge(node_def.name, edge.target)
             else:
                 # Terminal node — connect to END
                 graph.add_edge(node_def.name, END)

@@ -44,9 +44,13 @@ def _parse_frontmatter(text: str) -> tuple[dict[str, Any], str]:
 
     raw_yaml = match.group(1)
     try:
-        data = yaml.safe_load(raw_yaml) or {}
+        data = yaml.safe_load(raw_yaml)
     except yaml.YAMLError:
         logger.warning("Failed to parse frontmatter YAML — skipping frontmatter")
+        data = None
+
+    # Coerce non-dict results (None, lists, scalars) to empty dict
+    if not isinstance(data, dict):
         data = {}
 
     body = text[match.end():]
@@ -75,8 +79,10 @@ def _extract_wikilinks(text: str) -> list[str]:
 def _extract_tags(text: str) -> list[str]:
     """Extract all #tags and #nested/tags from text.
 
-    Tags inside code spans (backtick-delimited) are excluded by the regex
-    negative lookbehind on backtick and word characters.
+    The regex uses a negative lookbehind for backtick and word characters,
+    so tags immediately preceded by a backtick or word char are skipped.
+    This catches most cases but does not fully parse fenced/inline code
+    spans — a tag preceded by a space inside backticks may still match.
     """
     return _TAG_RE.findall(text)
 
@@ -111,9 +117,15 @@ def _parse_file(path: Path) -> dict[str, Any]:
     frontmatter, body = _parse_frontmatter(raw)
 
     # Merge frontmatter tags with inline tags; deduplicate while preserving order
-    fm_tags: list[str] = frontmatter.get("tags", [])
-    if isinstance(fm_tags, str):
-        fm_tags = [fm_tags]
+    fm_tags_raw = frontmatter.get("tags")
+    if fm_tags_raw is None:
+        fm_tags: list[str] = []
+    elif isinstance(fm_tags_raw, str):
+        fm_tags = [fm_tags_raw]
+    elif isinstance(fm_tags_raw, list):
+        fm_tags = [str(t) for t in fm_tags_raw if t is not None]
+    else:
+        fm_tags = []
     inline_tags = _extract_tags(body)
     seen: set[str] = set()
     tags: list[str] = []

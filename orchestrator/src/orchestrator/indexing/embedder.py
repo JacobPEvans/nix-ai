@@ -52,7 +52,9 @@ class VectorBackend(Protocol):
     """Protocol for pluggable vector storage backends.
 
     All methods operate on lists so callers can batch freely.
-    Similarity scores are in [0, 1] (higher = more similar).
+    Similarity scores use cosine similarity in [-1, 1] (higher = more
+    similar). In practice, text embeddings rarely produce negative
+    scores.
     """
 
     def add(
@@ -479,7 +481,8 @@ class EmbeddingPipeline:
             return
 
         # Filter out documents whose content is unchanged.
-        new_docs = []
+        new_docs: list[dict[str, Any]] = []
+        pending_hashes: dict[str, str] = {}
         for doc in documents:
             doc_id = doc["id"]
             text = doc["text"]
@@ -487,14 +490,19 @@ class EmbeddingPipeline:
             if self._hashes.get(doc_id) == text_hash:
                 logger.debug("Skipping unchanged document '%s'", doc_id)
                 continue
-            self._hashes[doc_id] = text_hash
+            pending_hashes[doc_id] = text_hash
             new_docs.append(doc)
 
         if not new_docs:
             logger.debug("EmbeddingPipeline.index: all documents unchanged, nothing to embed")
             return
 
-        # Process in batches.
+        # Delete existing vectors for changed documents (upsert semantics)
+        existing_ids = [doc["id"] for doc in new_docs if doc["id"] in self._hashes]
+        if existing_ids:
+            self._backend.delete(existing_ids)
+
+        # Process in batches — update hashes only after successful write.
         for batch in self._batched(new_docs):
             texts = [doc["text"] for doc in batch]
             ids = [doc["id"] for doc in batch]
@@ -502,6 +510,9 @@ class EmbeddingPipeline:
 
             embeddings = self._embed(texts)
             self._backend.add(ids, embeddings, metadata)
+            # Commit hashes only after backend write succeeds.
+            for doc_id in ids:
+                self._hashes[doc_id] = pending_hashes[doc_id]
             logger.debug("EmbeddingPipeline: indexed batch of %d documents", len(batch))
 
         logger.info("EmbeddingPipeline: indexed %d documents", len(new_docs))
