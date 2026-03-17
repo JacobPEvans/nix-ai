@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ModelSize(str, Enum):
@@ -104,6 +104,8 @@ class SkillDefinition(BaseModel):
     - What resources it needs
     """
 
+    model_config = ConfigDict(extra="forbid")
+
     name: str = Field(description="Unique skill identifier (kebab-case)")
     description: str = Field(description="Human-readable description of what the skill does")
     version: str = Field(default="1.0.0", description="Semantic version of the skill definition")
@@ -119,7 +121,7 @@ class SkillDefinition(BaseModel):
 
     system_prompt: str = Field(
         default="",
-        description="System prompt text (or path to a .md file)",
+        description="System prompt text (inline). Use system_prompt_file for file-based prompts",
     )
     system_prompt_file: str | None = Field(
         default=None,

@@ -265,7 +265,11 @@
           # Guard: only use PWD for mlx-server when it contains pyproject.toml
           pwdIsMlxRoot = pwd != "" && builtins.pathExists (pwd + "/pyproject.toml");
           # Guard: only use PWD for orchestrator when its pyproject.toml has the orchestrator project name
-          pwdIsOrchestratorRoot = pwd != "" && builtins.pathExists (pwd + "/pyproject.toml");
+          pwdIsOrchestratorRoot =
+            pwd != ""
+            && builtins.pathExists (pwd + "/pyproject.toml")
+            &&
+              builtins.match ".*name = \"orchestrator\".*" (builtins.readFile (pwd + "/pyproject.toml")) != null;
         in
         forAllSystems (
           system:

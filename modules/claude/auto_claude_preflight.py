@@ -341,7 +341,7 @@ def _get_repo_stats(target_dir: str) -> dict:
 
 
 def check_issue_totals(total_count: int, ai_count: int, force_run: bool = False) -> dict:
-    """Check hard limits: 150 total issues max, 25 ai-created max.
+    """Check hard limits: 100 total issues max, 25 ai-created max.
 
     Returns enforcement mode:
     - NORMAL: All limits OK, proceed normally
@@ -367,13 +367,13 @@ def check_issue_totals(total_count: int, ai_count: int, force_run: bool = False)
         }
 
     # Determine enforcement mode
-    if total_count >= 150:
+    if total_count >= 100:
         return {
             "ok": False,  # HARD STOP
             "total_issues": total_count,
             "ai_created": ai_count,
             "enforcement_mode": "PAUSED",
-            "message": f"HARD LIMIT: Total issues ({total_count}/150) exceeded. Run paused.",
+            "message": f"HARD LIMIT: Total issues ({total_count}/100) exceeded. Run paused.",
         }
     elif ai_count >= 25:
         return {
@@ -505,7 +505,7 @@ def main():
             results["status"] = "skip"
             results["reason"] = results["control"]["reason"]
         elif not results["totals"]["ok"]:
-            # HARD LIMIT: Total issues >= 150, skip entire run
+            # HARD LIMIT: Total issues >= 100, skip entire run
             results["status"] = "skip"
             results["reason"] = results["totals"]["message"]
         elif not results["git"]["ok"]:

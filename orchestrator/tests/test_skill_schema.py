@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 import pytest
 import yaml
+from pydantic import ValidationError
 
 from orchestrator.skill_schema import (
     ModelRequirement,
@@ -87,11 +88,11 @@ class TestSkillDefinition:
         assert resources.max_duration_seconds == 300
 
     def test_temperature_validation(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             ModelRequirement(temperature=3.0)
 
     def test_max_tokens_validation(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             ModelRequirement(max_tokens=0)
 
 
@@ -133,7 +134,7 @@ class TestLoadSkill:
     def test_load_invalid_yaml(self, tmp_path: Path):
         bad_file = tmp_path / "bad.yaml"
         bad_file.write_text("name: 123\n")
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             load_skill(bad_file)
 
 

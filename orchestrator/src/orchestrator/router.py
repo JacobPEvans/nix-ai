@@ -21,6 +21,8 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
+    from openai import OpenAI
+
     from .skill_schema import SkillDefinition
 
 logger = logging.getLogger(__name__)
@@ -44,13 +46,15 @@ class SkillRouter:
     and match incoming prompts via cosine similarity.
     """
 
+    # Port 11434 = Ollama embeddings endpoint; port 11435 = MLX LLM endpoint
+    # (intentional difference: embeddings run on Ollama, LLM inference on MLX)
     embedding_endpoint: str = "http://127.0.0.1:11434/v1"
     embedding_model: str = "nomic-embed-text-v1.5"
     threshold: float = 0.3
     _skills: dict[str, SkillDefinition] = field(default_factory=dict)
     _embeddings: np.ndarray | None = field(default=None, repr=False)
     _skill_names: list[str] = field(default_factory=list)
-    _client: object = field(default=None, repr=False)
+    _client: OpenAI | None = field(default=None, repr=False)
 
     def _get_client(self):
         """Lazy-initialize the OpenAI client."""
@@ -78,11 +82,11 @@ class SkillRouter:
         Each skill is represented by its description plus any example prompts,
         concatenated into a single embedding text for richer matching.
         """
-        self._skills = skills
+        self._skills = dict(skills)
         self._skill_names = []
         texts = []
 
-        for name, skill in skills.items():
+        for name, skill in sorted(skills.items()):
             self._skill_names.append(name)
             # Combine description and examples for richer embedding
             parts = [skill.description]
@@ -105,6 +109,8 @@ class SkillRouter:
         """
         if self._embeddings is None or len(self._skill_names) == 0:
             return []
+
+        top_k = max(1, min(top_k, len(self._skill_names)))
 
         prompt_embedding = self._embed([prompt])
         scores = _cosine_similarity(prompt_embedding, self._embeddings)[0]
@@ -158,6 +164,6 @@ def _cosine_similarity(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     Returns:
         Shape (m, n) similarity matrix
     """
-    a_norm = a / np.linalg.norm(a, axis=1, keepdims=True)
-    b_norm = b / np.linalg.norm(b, axis=1, keepdims=True)
+    a_norm = a / (np.linalg.norm(a, axis=1, keepdims=True) + 1e-10)
+    b_norm = b / (np.linalg.norm(b, axis=1, keepdims=True) + 1e-10)
     return a_norm @ b_norm.T

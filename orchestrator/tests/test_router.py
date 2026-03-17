@@ -37,7 +37,7 @@ def sample_skills() -> dict[str, SkillDefinition]:
     }
 
 
-class TestCosinesimilarity:
+class TestCosineSimilarity:
     def test_identical_vectors(self):
         a = np.array([[1.0, 0.0, 0.0]])
         b = np.array([[1.0, 0.0, 0.0]])
@@ -67,6 +67,14 @@ class TestCosinesimilarity:
         assert result.shape == (1, 3)
         assert np.argmax(result[0]) == 0
 
+    def test_zero_norm_vector(self):
+        """Verify epsilon prevents division by zero for zero-norm vectors."""
+        a = np.array([[0.0, 0.0, 0.0]])
+        b = np.array([[1.0, 0.0, 0.0]])
+        result = _cosine_similarity(a, b)
+        assert not np.isnan(result[0, 0])
+        assert np.isclose(result[0, 0], 0.0)
+
 
 class TestSkillRouter:
     def test_register_skills_embeds_descriptions(self, sample_skills):
@@ -83,9 +91,10 @@ class TestSkillRouter:
     def test_route_returns_best_match(self, sample_skills):
         router = SkillRouter(threshold=0.3)
         # Create embeddings where code-review is closest to query
+        # Skills are sorted alphabetically: code-explain, code-review, vault-search
         skill_embeddings = np.array([
-            [0.9, 0.1, 0.0],  # code-review
             [0.1, 0.9, 0.0],  # code-explain
+            [0.9, 0.1, 0.0],  # code-review
             [0.0, 0.1, 0.9],  # vault-search
         ])
         query_embedding = np.array([[0.85, 0.15, 0.0]])  # similar to code-review
