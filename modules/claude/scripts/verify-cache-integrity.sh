@@ -67,7 +67,7 @@ while IFS= read -r -d '' entry; do
       log_info "  Store path changed to: $target"
     fi
   fi
-done < <(find "$MARKETPLACES_DIR" -mindepth 1 -maxdepth 1 -type l -print0 2>/dev/null)
+done < <(find "$MARKETPLACES_DIR" -mindepth 1 -maxdepth 1 -type l -print0)
 
 # Write updated hashes atomically to avoid leaving a partially written file
 mkdir -p "$CACHE_DIR"
