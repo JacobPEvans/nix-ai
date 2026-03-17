@@ -32,7 +32,7 @@ def _make_mock_modules() -> dict[str, MagicMock]:
 
     # SimpleDocumentStore
     mock_docstore_mod = MagicMock()
-    mock_docstore_mod.SimpleDocumentStore = MagicMock
+    mock_docstore_mod.SimpleDocumentStore = MagicMock()
 
     # OpenAIEmbedding
     mock_embed_mod = MagicMock()
