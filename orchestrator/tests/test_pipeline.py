@@ -32,7 +32,7 @@ def _make_mock_modules() -> dict[str, MagicMock]:
 
     # SimpleDocumentStore
     mock_docstore_mod = MagicMock()
-    mock_docstore_mod.SimpleDocumentStore = MagicMock
+    mock_docstore_mod.SimpleDocumentStore = MagicMock()
 
     # OpenAIEmbedding
     mock_embed_mod = MagicMock()
@@ -357,7 +357,9 @@ class TestEmbeddingPipelineSaveLoad:
 
         # Mock SimpleDocumentStore.from_persist_dir
         mock_docstore_mod = mock_li["llama_index.core.storage.docstore"]
-        mock_docstore_mod.SimpleDocumentStore.from_persist_dir.return_value = MagicMock()
+        mock_docstore_mod.SimpleDocumentStore.from_persist_dir.return_value = (
+            MagicMock()
+        )
 
         pipeline.load()
 
@@ -415,7 +417,9 @@ class TestEmbeddingPipelineSaveLoad:
         mock_faiss_mod = mock_li["llama_index.vector_stores.faiss"]
         mock_faiss_mod.FaissVectorStore.from_persist_dir.return_value = MagicMock()
         mock_docstore_mod = mock_li["llama_index.core.storage.docstore"]
-        mock_docstore_mod.SimpleDocumentStore.from_persist_dir.return_value = MagicMock()
+        mock_docstore_mod.SimpleDocumentStore.from_persist_dir.return_value = (
+            MagicMock()
+        )
 
         # load() must not raise NotImplementedError for "Faiss"
         pipeline.load()

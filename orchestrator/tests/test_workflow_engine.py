@@ -249,7 +249,9 @@ class TestBuildGraph:
         graph = engine.build_graph(wf)
         assert callable(getattr(graph, "invoke", None))
 
-    def test_build_graph_conditional_invalid_target(self, conditional_workflow_dict: dict):
+    def test_build_graph_conditional_invalid_target(
+        self, conditional_workflow_dict: dict
+    ):
         # Corrupt one of the conditional targets
         for node in conditional_workflow_dict["nodes"]:
             if node["name"] == "check":
@@ -301,7 +303,9 @@ class TestExecute:
 
         engine = WorkflowEngine()
         wf = engine.load_workflow_from_dict(simple_workflow_dict)
-        result = engine.execute(wf, {"messages": [{"role": "user", "content": "hello"}]})
+        result = engine.execute(
+            wf, {"messages": [{"role": "user", "content": "hello"}]}
+        )
 
         assert isinstance(result, dict)
         # After tool_exec node, output should be the command stdout
@@ -332,7 +336,10 @@ class TestExecute:
         # has_issue=True → should route to flag node
         result = engine.execute(
             wf,
-            {"messages": [{"role": "user", "content": "review this"}], "metadata": {"has_issue": True}},
+            {
+                "messages": [{"role": "user", "content": "review this"}],
+                "metadata": {"has_issue": True},
+            },
         )
         assert result.get("output") == "flagged"
 
@@ -359,7 +366,10 @@ class TestExecute:
         # has_issue=False → should route to approve node
         result = engine.execute(
             wf,
-            {"messages": [{"role": "user", "content": "review this"}], "metadata": {"has_issue": False}},
+            {
+                "messages": [{"role": "user", "content": "review this"}],
+                "metadata": {"has_issue": False},
+            },
         )
         assert result.get("output") == "approved"
 

@@ -108,21 +108,30 @@ def _make_tool_exec_node(
         logger.debug("tool_exec node '%s' → %s", node_def.name, cmd)
         try:
             result = subprocess.run(  # noqa: S603
-                cmd, capture_output=True, text=True, timeout=timeout,
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
             )
         except FileNotFoundError:
             return _error_state(
-                state, node_def.name,
+                state,
+                node_def.name,
                 f"tool_exec '{node_def.name}': command not found: {command}",
-                127, "command_not_found",
+                127,
+                "command_not_found",
             )
         except subprocess.TimeoutExpired:
             return _error_state(
-                state, node_def.name,
+                state,
+                node_def.name,
                 f"tool_exec '{node_def.name}': timed out after {timeout}s",
-                -1, "timeout",
+                -1,
+                "timeout",
             )
-        output = result.stdout.strip() if result.returncode == 0 else result.stderr.strip()
+        output = (
+            result.stdout.strip() if result.returncode == 0 else result.stderr.strip()
+        )
         return {
             **state,
             "current_node": node_def.name,
@@ -141,7 +150,9 @@ def _make_human_input_node(
     node_def: NodeDefinition,
 ) -> Callable[[WorkflowState], WorkflowState]:
     """Return a node that records a pending human-input request."""
-    prompt = node_def.config.get("prompt", "Human review required. Please provide input.")
+    prompt = node_def.config.get(
+        "prompt", "Human review required. Please provide input."
+    )
 
     def _node(state: WorkflowState) -> WorkflowState:
         logger.info("human_input node '%s': %s", node_def.name, prompt)

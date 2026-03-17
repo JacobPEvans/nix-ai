@@ -131,7 +131,11 @@ class ObsidianReader:
             }
             documents.append(Document(text=body, metadata=metadata, id_=str(path)))
 
-        logger.info("ObsidianReader: loaded %d documents from %s", len(documents), self.vault_path)
+        logger.info(
+            "ObsidianReader: loaded %d documents from %s",
+            len(documents),
+            self.vault_path,
+        )
         return documents
 
     def _resolve_paths(self, file_list: list[str | Path] | None) -> list[Path]:

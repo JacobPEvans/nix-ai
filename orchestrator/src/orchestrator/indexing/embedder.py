@@ -166,7 +166,9 @@ class FAISSBackend:
         self._index.add(arr)  # type: ignore[arg-type]
         self._ids.extend(ids)
         self._metadata.extend(metadata)
-        logger.debug("FAISSBackend: added %d vectors (total %d)", len(ids), len(self._ids))
+        logger.debug(
+            "FAISSBackend: added %d vectors (total %d)", len(ids), len(self._ids)
+        )
 
     def search(
         self,
@@ -196,7 +198,9 @@ class FAISSBackend:
         the index from scratch excluding the deleted ids.
         """
         to_delete = set(ids)
-        keep_positions = [i for i, doc_id in enumerate(self._ids) if doc_id not in to_delete]
+        keep_positions = [
+            i for i, doc_id in enumerate(self._ids) if doc_id not in to_delete
+        ]
 
         if not keep_positions:
             self._index = faiss.IndexFlatIP(self.dimension)
@@ -213,7 +217,9 @@ class FAISSBackend:
         self._index.add(kept_vectors)  # type: ignore[arg-type]
         self._ids = [self._ids[i] for i in keep_positions]
         self._metadata = [self._metadata[i] for i in keep_positions]
-        logger.debug("FAISSBackend: deleted %d vectors (remaining %d)", len(ids), len(self._ids))
+        logger.debug(
+            "FAISSBackend: deleted %d vectors (remaining %d)", len(ids), len(self._ids)
+        )
 
     def save(self, path: str | Path) -> None:
         """Write FAISS index and JSON sidecar to *path* (used as prefix)."""
@@ -322,8 +328,7 @@ class QdrantBackend:
             limit=top_k,
         )
         return [
-            (str(hit.id), float(hit.score), dict(hit.payload or {}))
-            for hit in hits
+            (str(hit.id), float(hit.score), dict(hit.payload or {})) for hit in hits
         ]
 
     def delete(self, ids: list[str]) -> None:
@@ -498,7 +503,9 @@ class EmbeddingPipeline:
             new_docs.append(doc)
 
         if not new_docs:
-            logger.debug("EmbeddingPipeline.index: all documents unchanged, nothing to embed")
+            logger.debug(
+                "EmbeddingPipeline.index: all documents unchanged, nothing to embed"
+            )
             return
 
         # Delete existing vectors for changed documents (upsert semantics)

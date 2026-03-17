@@ -163,7 +163,11 @@ class TestMergeTags:
 def doc_cls_patch():
     """Patch llama_index.core.schema.Document with a dict-returning mock."""
     mock_doc = MagicMock()
-    mock_doc.side_effect = lambda text, metadata, id_: {"text": text, "metadata": metadata, "id_": id_}
+    mock_doc.side_effect = lambda text, metadata, id_: {
+        "text": text,
+        "metadata": metadata,
+        "id_": id_,
+    }
     mock_schema = MagicMock(Document=mock_doc)
     mock_core = MagicMock()
     mock_core.schema = mock_schema
@@ -182,32 +186,50 @@ def doc_cls_patch():
 
 class TestObsidianReaderLoadData:
     def test_vault_directory_walking(self, tmp_path: Path, doc_cls_patch: Any):
-        vault = _make_vault(tmp_path, {
-            "note1.md": "# Note 1\nContent one.",
-            "note2.md": "# Note 2\nContent two.",
-        })
+        vault = _make_vault(
+            tmp_path,
+            {
+                "note1.md": "# Note 1\nContent one.",
+                "note2.md": "# Note 2\nContent two.",
+            },
+        )
         reader = ObsidianReader(vault)
         docs = reader.load_data()
         assert len(docs) == 2
 
     def test_metadata_completeness(self, tmp_path: Path, doc_cls_patch: Any):
-        vault = _make_vault(tmp_path, {
-            "complete.md": (
-                "---\ntitle: Full Note\ntags: [alpha]\n---\n"
-                "Body with [[Link]] and #beta and ![[img.png]] and\n> [!note]\n> text"
-            ),
-        })
+        vault = _make_vault(
+            tmp_path,
+            {
+                "complete.md": (
+                    "---\ntitle: Full Note\ntags: [alpha]\n---\n"
+                    "Body with [[Link]] and #beta and ![[img.png]] and\n> [!note]\n> text"
+                ),
+            },
+        )
         reader = ObsidianReader(vault)
         docs = reader.load_data()
         assert len(docs) == 1
         meta = docs[0]["metadata"]
-        for field in ("title", "tags", "wikilinks", "embeds", "callouts", "frontmatter", "path", "mtime"):
+        for field in (
+            "title",
+            "tags",
+            "wikilinks",
+            "embeds",
+            "callouts",
+            "frontmatter",
+            "path",
+            "mtime",
+        ):
             assert field in meta, f"Missing metadata field: {field}"
 
     def test_frontmatter_in_metadata(self, tmp_path: Path, doc_cls_patch: Any):
-        vault = _make_vault(tmp_path, {
-            "fm.md": "---\ntitle: FM Note\nauthor: Alice\n---\nContent.",
-        })
+        vault = _make_vault(
+            tmp_path,
+            {
+                "fm.md": "---\ntitle: FM Note\nauthor: Alice\n---\nContent.",
+            },
+        )
         reader = ObsidianReader(vault)
         docs = reader.load_data()
         fm = docs[0]["metadata"]["frontmatter"]
@@ -215,10 +237,13 @@ class TestObsidianReaderLoadData:
         assert fm["author"] == "Alice"
 
     def test_incremental_mode_file_list(self, tmp_path: Path, doc_cls_patch: Any):
-        vault = _make_vault(tmp_path, {
-            "included.md": "I should be included.",
-            "excluded.md": "I should be excluded.",
-        })
+        vault = _make_vault(
+            tmp_path,
+            {
+                "included.md": "I should be included.",
+                "excluded.md": "I should be excluded.",
+            },
+        )
         reader = ObsidianReader(vault)
         docs = reader.load_data(file_list=[vault / "included.md"])
         assert len(docs) == 1
@@ -232,9 +257,12 @@ class TestObsidianReaderLoadData:
         assert docs[0]["text"] == ""
 
     def test_file_with_no_special_syntax(self, tmp_path: Path, doc_cls_patch: Any):
-        vault = _make_vault(tmp_path, {
-            "plain.md": "This is just plain text with nothing special in it.",
-        })
+        vault = _make_vault(
+            tmp_path,
+            {
+                "plain.md": "This is just plain text with nothing special in it.",
+            },
+        )
         reader = ObsidianReader(vault)
         docs = reader.load_data()
         assert len(docs) == 1
@@ -245,25 +273,35 @@ class TestObsidianReaderLoadData:
         assert meta["callouts"] == []
 
     def test_title_fallback_to_filename(self, tmp_path: Path, doc_cls_patch: Any):
-        vault = _make_vault(tmp_path, {"my-great-note.md": "Content without frontmatter."})
+        vault = _make_vault(
+            tmp_path, {"my-great-note.md": "Content without frontmatter."}
+        )
         reader = ObsidianReader(vault)
         docs = reader.load_data()
         assert docs[0]["metadata"]["title"] == "my-great-note"
 
     def test_wikilinks_in_metadata(self, tmp_path: Path, doc_cls_patch: Any):
-        vault = _make_vault(tmp_path, {
-            "linked.md": "See [[PageA]] and [[PageB|Alias B]] for details.",
-        })
+        vault = _make_vault(
+            tmp_path,
+            {
+                "linked.md": "See [[PageA]] and [[PageB|Alias B]] for details.",
+            },
+        )
         reader = ObsidianReader(vault)
         docs = reader.load_data()
         wl = docs[0]["metadata"]["wikilinks"]
         assert "PageA" in wl
         assert "PageB" in wl
 
-    def test_tags_merged_from_frontmatter_and_body(self, tmp_path: Path, doc_cls_patch: Any):
-        vault = _make_vault(tmp_path, {
-            "tagged.md": "---\ntags: [project]\n---\nThis is #project and #status/active.",
-        })
+    def test_tags_merged_from_frontmatter_and_body(
+        self, tmp_path: Path, doc_cls_patch: Any
+    ):
+        vault = _make_vault(
+            tmp_path,
+            {
+                "tagged.md": "---\ntags: [project]\n---\nThis is #project and #status/active.",
+            },
+        )
         reader = ObsidianReader(vault)
         docs = reader.load_data()
         tags = docs[0]["metadata"]["tags"]
@@ -272,9 +310,12 @@ class TestObsidianReaderLoadData:
         assert tags.count("project") == 1
 
     def test_incremental_mode_relative_paths(self, tmp_path: Path, doc_cls_patch: Any):
-        vault = _make_vault(tmp_path, {
-            "relative.md": "Content of the relative file.",
-        })
+        vault = _make_vault(
+            tmp_path,
+            {
+                "relative.md": "Content of the relative file.",
+            },
+        )
         reader = ObsidianReader(vault)
         docs = reader.load_data(file_list=["relative.md"])
         assert len(docs) == 1

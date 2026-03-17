@@ -58,11 +58,13 @@ class TestCosineSimilarity:
 
     def test_multiple_candidates(self):
         query = np.array([[1.0, 0.0, 0.0]])
-        candidates = np.array([
-            [1.0, 0.0, 0.0],  # identical
-            [0.0, 1.0, 0.0],  # orthogonal
-            [0.7, 0.7, 0.0],  # partial match
-        ])
+        candidates = np.array(
+            [
+                [1.0, 0.0, 0.0],  # identical
+                [0.0, 1.0, 0.0],  # orthogonal
+                [0.7, 0.7, 0.0],  # partial match
+            ]
+        )
         result = _cosine_similarity(query, candidates)
         assert result.shape == (1, 3)
         assert np.argmax(result[0]) == 0
@@ -92,11 +94,13 @@ class TestSkillRouter:
         router = SkillRouter(threshold=0.3)
         # Create embeddings where code-review is closest to query
         # Skills are sorted alphabetically: code-explain, code-review, vault-search
-        skill_embeddings = np.array([
-            [0.1, 0.9, 0.0],  # code-explain
-            [0.9, 0.1, 0.0],  # code-review
-            [0.0, 0.1, 0.9],  # vault-search
-        ])
+        skill_embeddings = np.array(
+            [
+                [0.1, 0.9, 0.0],  # code-explain
+                [0.9, 0.1, 0.0],  # code-review
+                [0.0, 0.1, 0.9],  # vault-search
+            ]
+        )
         query_embedding = np.array([[0.85, 0.15, 0.0]])  # similar to code-review
 
         with patch.object(router, "_embed") as mock_embed:
@@ -113,11 +117,13 @@ class TestSkillRouter:
 
     def test_route_best_returns_none_below_threshold(self, sample_skills):
         router = SkillRouter(threshold=0.99)
-        skill_embeddings = np.array([
-            [1.0, 0.0, 0.0],
-            [0.0, 1.0, 0.0],
-            [0.0, 0.0, 1.0],
-        ])
+        skill_embeddings = np.array(
+            [
+                [1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0],
+                [0.0, 0.0, 1.0],
+            ]
+        )
         # Orthogonal to all skills
         query_embedding = np.array([[0.33, 0.33, 0.34]])
 

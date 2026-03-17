@@ -50,7 +50,11 @@ def _make_config(**kwargs) -> EmbeddingConfig:
 
 def _make_docs(n: int, prefix: str = "doc") -> list[dict]:
     return [
-        {"id": f"{prefix}{i}", "text": f"content for {prefix} {i}", "metadata": {"idx": i}}
+        {
+            "id": f"{prefix}{i}",
+            "text": f"content for {prefix} {i}",
+            "metadata": {"idx": i},
+        }
         for i in range(n)
     ]
 
@@ -285,8 +289,8 @@ class TestEmbeddingPipelineHashing:
             return _fake_embed(texts)
 
         with patch.object(pipeline, "_embed", side_effect=recording_embed):
-            pipeline.index(docs)      # first index: should embed
-            pipeline.index(docs)      # second index, same content: should skip
+            pipeline.index(docs)  # first index: should embed
+            pipeline.index(docs)  # second index, same content: should skip
 
         assert len(embed_calls) == 1  # only first call should fire
 

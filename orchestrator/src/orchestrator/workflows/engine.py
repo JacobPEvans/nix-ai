@@ -62,7 +62,9 @@ except ImportError:  # pragma: no cover
 class WorkflowEngine:
     """Translates WorkflowDefinition objects into executable LangGraph graphs."""
 
-    def __init__(self, *, checkpointing: bool = False, db_path: str = ":memory:") -> None:
+    def __init__(
+        self, *, checkpointing: bool = False, db_path: str = ":memory:"
+    ) -> None:
         self.checkpointing = checkpointing
         self.db_path = db_path
         self._checkpointer = None
@@ -74,7 +76,9 @@ class WorkflowEngine:
                 self._checkpointer = SqliteSaver.from_conn_string(db_path)
                 logger.info("Checkpointing enabled at %s", db_path)
             except ImportError:
-                logger.warning("langgraph[sqlite] not installed — checkpointing disabled")
+                logger.warning(
+                    "langgraph[sqlite] not installed — checkpointing disabled"
+                )
 
     def load_workflow(self, path: str | Path) -> WorkflowDefinition:
         """Parse a YAML file into a WorkflowDefinition."""
@@ -182,7 +186,9 @@ class WorkflowEngine:
             path_map[false_target] = false_target
         graph.add_conditional_edges(node_def.name, router_fn, path_map)
 
-    def execute(self, workflow: WorkflowDefinition, input_state: dict[str, Any]) -> dict[str, Any]:
+    def execute(
+        self, workflow: WorkflowDefinition, input_state: dict[str, Any]
+    ) -> dict[str, Any]:
         """Build and run a workflow graph with the given initial state."""
         compiled = self.build_graph(workflow)
 

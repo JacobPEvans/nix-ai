@@ -108,8 +108,12 @@ class SkillDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     name: str = Field(description="Unique skill identifier (kebab-case)")
-    description: str = Field(description="Human-readable description of what the skill does")
-    version: str = Field(default="1.0.0", description="Semantic version of the skill definition")
+    description: str = Field(
+        description="Human-readable description of what the skill does"
+    )
+    version: str = Field(
+        default="1.0.0", description="Semantic version of the skill definition"
+    )
     tags: list[str] = Field(
         default_factory=list,
         description="Tags for categorization and routing",
