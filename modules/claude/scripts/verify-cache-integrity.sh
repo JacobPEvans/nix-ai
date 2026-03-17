@@ -18,19 +18,21 @@ MARKETPLACES_DIR="$HOME_DIR/.claude/plugins/marketplaces"
 CACHE_DIR="$HOME_DIR/.claude/plugins/cache"
 HASH_FILE="$CACHE_DIR/.nix-store-hashes"
 
-# Resolve the SHA-256 hasher once at startup.
+# Resolve the SHA-256 hasher once at startup into _SHA_CMD.
 # Prefer shasum from PATH (present on macOS and installable cross-platform),
 # fall back to the macOS system copy, then sha256sum (Linux coreutils).
 # sha256sum does not accept -a 256, so wrap the call to normalise the interface.
-if _cmd=$(command -v shasum 2>/dev/null) || { [ -x /usr/bin/shasum ] && _cmd=/usr/bin/shasum; }; then
-  sha256_string() { "$_cmd" -a 256; }
-elif _cmd=$(command -v sha256sum 2>/dev/null); then
-  sha256_string() { "$_cmd"; }
+# NOTE: _SHA_CMD must persist — sha256_string references it at call time, not
+# definition time. Using a temporary that gets unset causes "unbound variable"
+# under set -u, silently breaking cache integrity on every darwin-rebuild switch.
+if _SHA_CMD=$(command -v shasum 2>/dev/null) || { [ -x /usr/bin/shasum ] && _SHA_CMD=/usr/bin/shasum; }; then
+  sha256_string() { "$_SHA_CMD" -a 256; }
+elif _SHA_CMD=$(command -v sha256sum 2>/dev/null); then
+  sha256_string() { "$_SHA_CMD"; }
 else
   echo "error: no shasum or sha256sum found" >&2
   exit 1
 fi
-unset _cmd
 
 # Only run if both dirs exist
 [[ -d "$MARKETPLACES_DIR" ]] || exit 0
@@ -45,23 +47,14 @@ if [[ -f "$HASH_FILE" ]]; then
 fi
 
 # Build new hashes, purge stale caches
-# Marketplaces are real directories containing per-file symlinks to /nix/store/
-# (after transition from whole-directory symlinks via recursive=true in plugins.nix)
+# Marketplaces are directory symlinks to /nix/store/ (plugins.nix without recursive)
 declare -A new_hashes
-# Use find with process substitution to avoid a for loop, per repo guidelines
 while IFS= read -r -d '' entry; do
   name=$(basename "$entry")
 
-  # Find the first Nix store symlink inside this marketplace directory
-  target=""
-  while IFS= read -r -d '' link; do
-    t=$(readlink "$link")
-    if [[ "$t" == /nix/store/* ]]; then
-      target="$t"
-      break
-    fi
-  done < <(find "$entry" -maxdepth 3 -type l -print0 2>/dev/null)
-  [[ -n "$target" ]] || continue
+  # Directory symlink: target is the nix store path itself
+  target=$(readlink "$entry")
+  [[ "$target" == /nix/store/* ]] || continue
 
   # Hash the store path string (not file contents - that's what matters for staleness)
   hash=$(printf '%s' "$target" | sha256_string | cut -d' ' -f1)
@@ -74,7 +67,7 @@ while IFS= read -r -d '' entry; do
       log_info "  Store path changed to: $target"
     fi
   fi
-done < <(find "$MARKETPLACES_DIR" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null)
+done < <(find "$MARKETPLACES_DIR" -mindepth 1 -maxdepth 1 -type l -print0)
 
 # Write updated hashes atomically to avoid leaving a partially written file
 mkdir -p "$CACHE_DIR"

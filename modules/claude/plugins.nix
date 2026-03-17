@@ -1,12 +1,17 @@
 # Claude Code Plugin Management
 #
-# Symlinks Nix-managed plugin directories from flake inputs.
-# Runtime plugins are unaffected - they live in separate directories.
+# Symlinks Nix-managed plugin directories from flake inputs as single directory
+# symlinks (home-manager's default: recursive = false). Claude Code only READS
+# from ~/.claude/plugins/marketplaces/ — it writes exclusively to
+# ~/.claude/plugins/cache/. Since marketplaces are read-only, immutable nix
+# store symlinks are the correct approach.
 #
-# Uses `recursive = true` to create per-file symlinks inside each marketplace
-# directory, rather than symlinking the entire directory. This allows Claude
-# Code's extra files (.git/, caches) to coexist without conflict, and avoids
-# "cannot overwrite directory with symlink" errors on darwin-rebuild switch.
+# IMPORTANT: Do NOT add `recursive = true` or `force = true`:
+# - recursive = true creates per-file symlinks, allowing .backup pollution
+# - force = true causes home-manager to rename existing files to .backup,
+#   which pollute Claude Code's plugin cache when it re-indexes
+# Phase 1 of orphan-cleanup.nix handles the one-time migration from
+# recursive (real dirs) to directory symlinks.
 { config, lib, ... }:
 
 let
@@ -24,8 +29,6 @@ let
     name: marketplace:
     lib.nameValuePair ".claude/plugins/marketplaces/${getMarketplaceName name}" {
       source = marketplace.flakeInput;
-      recursive = true;
-      force = true;
     }
   ) nixManagedMarketplaces;
 
