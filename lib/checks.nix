@@ -71,7 +71,7 @@ in
 
   # Evaluate the real home-manager module with real inputs to catch import errors
   module-eval = pkgs.runCommand "check-module-eval" { } ''
-    echo ${hmConfig.activationPackage.drvPath} > $out
+    echo "${builtins.unsafeDiscardStringContext hmConfig.activationPackage.drvPath}" > $out
   '';
 
   # ============================================================================
