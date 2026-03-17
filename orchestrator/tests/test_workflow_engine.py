@@ -277,7 +277,7 @@ def _make_fake_completion(content: str) -> MagicMock:
 
 
 class TestExecute:
-    @patch("orchestrator.workflows.engine.subprocess.run")
+    @patch("orchestrator.workflows.nodes.subprocess.run")
     @patch("openai.OpenAI")
     def test_execute_two_node_workflow(
         self,
@@ -307,7 +307,7 @@ class TestExecute:
         # After tool_exec node, output should be the command stdout
         assert result.get("output") == "done"
 
-    @patch("orchestrator.workflows.engine.subprocess.run")
+    @patch("orchestrator.workflows.nodes.subprocess.run")
     @patch("openai.OpenAI")
     def test_execute_conditional_routing_true_branch(
         self,
@@ -336,7 +336,7 @@ class TestExecute:
         )
         assert result.get("output") == "flagged"
 
-    @patch("orchestrator.workflows.engine.subprocess.run")
+    @patch("orchestrator.workflows.nodes.subprocess.run")
     @patch("openai.OpenAI")
     def test_execute_conditional_routing_false_branch(
         self,
