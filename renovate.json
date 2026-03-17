@@ -52,6 +52,14 @@
       "groupName": "mlx-packages",
       "schedule": ["after 7am on Monday"],
       "minimumReleaseAge": "2 days"
+    },
+    {
+      "description": "Orchestrator Python packages - weekly updates",
+      "matchManagers": ["uv"],
+      "matchFileNames": ["orchestrator/uv.lock"],
+      "groupName": "orchestrator-packages",
+      "schedule": ["after 7am on Monday"],
+      "minimumReleaseAge": "3 days"
     }
   ]
 }

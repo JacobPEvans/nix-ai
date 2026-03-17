@@ -264,6 +264,8 @@
           pwdIsFlakeRoot = pwd != "" && builtins.pathExists (pwd + "/flake.nix");
           # Guard: only use PWD for mlx-server when it contains pyproject.toml
           pwdIsMlxRoot = pwd != "" && builtins.pathExists (pwd + "/pyproject.toml");
+          # Guard: only use PWD for orchestrator when its pyproject.toml has the orchestrator project name
+          pwdIsOrchestratorRoot = pwd != "" && builtins.pathExists (pwd + "/pyproject.toml");
         in
         forAllSystems (
           system:
@@ -292,6 +294,28 @@
                       opentelemetry-instrumentation
                     '';
                   };
+                }
+              ];
+            };
+          }
+          // {
+            # Skill orchestration: LangGraph, LlamaIndex, embeddings
+            orchestrator = devenv.lib.mkShell {
+              inherit inputs pkgs;
+              modules = [
+                {
+                  devenv.root = if pwdIsOrchestratorRoot then pwd else toString ./orchestrator;
+                  languages.python = {
+                    enable = true;
+                    version = "3.14";
+                    uv = {
+                      enable = true;
+                      sync.enable = true;
+                    };
+                  };
+                  enterShell = ''
+                    echo "Orchestrator environment ready ($(python3 --version))"
+                  '';
                 }
               ];
             };

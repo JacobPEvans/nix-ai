@@ -1,0 +1,39 @@
+name: code-review
+description: Review code for quality, security, and best practices
+version: "1.0.0"
+tags:
+  - code
+  - review
+  - quality
+  - security
+
+model:
+  endpoint: http://127.0.0.1:11435/v1
+  model: mlx-community/Qwen2.5-Coder-32B-Instruct-4bit
+  size: medium
+  temperature: 0.3
+  max_tokens: 8192
+  json_mode: false
+
+system_prompt: |
+  You are an expert code reviewer. Analyze the provided code for:
+  1. Security vulnerabilities (OWASP Top 10)
+  2. Performance issues
+  3. Code style and readability
+  4. Error handling gaps
+  5. Test coverage suggestions
+
+  Be specific and actionable. Reference line numbers when possible.
+
+output_format: markdown
+
+resources:
+  max_memory_gb: 20.0
+  max_duration_seconds: 120
+  max_input_tokens: 32768
+
+examples:
+  - "Review this Python function for bugs"
+  - "Check this code for security issues"
+  - "What's wrong with this implementation?"
+  - "Audit this code for quality"

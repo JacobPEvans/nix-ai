@@ -1,0 +1,67 @@
+name: structured-extract
+description: Extract structured data from unstructured text into JSON format
+version: "1.0.0"
+tags:
+  - extraction
+  - json
+  - structured
+  - parsing
+
+model:
+  endpoint: http://127.0.0.1:11434/v1
+  model: hermes3:8b
+  size: small
+  temperature: 0.1
+  max_tokens: 2048
+  json_mode: true
+
+system_prompt: |
+  You are a data extraction specialist. Extract structured information
+  from the provided text and return it as valid JSON matching the
+  requested schema.
+
+  Rules:
+  - Return ONLY valid JSON
+  - Use null for missing fields, never fabricate data
+  - Normalize dates to ISO 8601 format
+  - Normalize names to Title Case
+
+output_format: json
+
+output_schema:
+  type: object
+  properties:
+    entities:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+          type:
+            type: string
+            enum: [person, organization, project, technology]
+          attributes:
+            type: object
+    relationships:
+      type: array
+      items:
+        type: object
+        properties:
+          source:
+            type: string
+          target:
+            type: string
+          type:
+            type: string
+
+resources:
+  max_memory_gb: 5.0
+  max_duration_seconds: 30
+  max_input_tokens: 4096
+
+examples:
+  - "Extract entities from this meeting note"
+  - "Parse the people and companies mentioned here"
+  - "Get structured data from this email"
+  - "Extract action items from this transcript"
