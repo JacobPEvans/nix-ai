@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.10.0](https://github.com/JacobPEvans/nix-ai/compare/v1.9.0...v1.10.0) (2026-03-17)
+
+
+### Features
+
+* add orchestrator devShell with skill schema and semantic router ([de9826d](https://github.com/JacobPEvans/nix-ai/commit/de9826d463f7a950613c6470dbd21e85f9c26754))
+
+
+### Bug Fixes
+
+* address PR [#188](https://github.com/JacobPEvans/nix-ai/issues/188) review feedback ([a7f4782](https://github.com/JacobPEvans/nix-ai/commit/a7f4782b5e93eb4bc28ff49bf64caf051a90a88d))
+* **deps:** update jacobpevans-cc-plugins for /ship command ([#184](https://github.com/JacobPEvans/nix-ai/issues/184)) ([f4983a9](https://github.com/JacobPEvans/nix-ai/commit/f4983a9102065acb942fda376d49f3142ae4b034))
+* **devenv:** use python package attr instead of version string ([#187](https://github.com/JacobPEvans/nix-ai/issues/187)) ([daca68a](https://github.com/JacobPEvans/nix-ai/commit/daca68afbf7dc2055853f3fc1c9b19d9b467068b))
+* raise issue hard limit from 50 to 150 per repo ([25ccf92](https://github.com/JacobPEvans/nix-ai/commit/25ccf9294a4fc51118acf9de3cb0214e34c5e77f))
+
 ## [1.9.0](https://github.com/JacobPEvans/nix-ai/compare/v1.8.0...v1.9.0) (2026-03-15)
 
 
