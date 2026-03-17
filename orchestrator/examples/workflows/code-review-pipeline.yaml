@@ -1,0 +1,43 @@
+name: code-review-pipeline
+description: Automated code review workflow with LLM analysis
+nodes:
+  - name: analyze_diff
+    type: llm_call
+    config:
+      model: "qwen3-coder:30b"
+      endpoint: "http://localhost:11435/v1"
+      system_prompt: "You are a code reviewer. Analyze the diff and identify issues."
+    description: "Analyze code diff for issues"
+  - name: categorize_issues
+    type: llm_call
+    config:
+      model: "qwen3-coder:30b"
+      endpoint: "http://localhost:11435/v1"
+      system_prompt: "Categorize the identified issues by severity: critical, warning, info."
+    description: "Categorize issues by severity"
+  - name: check_critical
+    type: conditional
+    config:
+      condition_key: "has_critical"
+      true_target: "request_human_review"
+      false_target: "generate_report"
+    description: "Route based on critical issues"
+  - name: request_human_review
+    type: human_input
+    config:
+      prompt: "Critical issues found. Please review and approve."
+    description: "Request human review for critical issues"
+  - name: generate_report
+    type: tool_exec
+    config:
+      command: "echo"
+      args: ["Review complete"]
+    description: "Generate final review report"
+edges:
+  - source: analyze_diff
+    target: categorize_issues
+  - source: categorize_issues
+    target: check_critical
+  - source: request_human_review
+    target: generate_report
+entry_point: analyze_diff
