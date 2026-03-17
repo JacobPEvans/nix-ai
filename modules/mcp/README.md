@@ -175,8 +175,8 @@ installed Ollama models without manual configuration.
 
 1. `claude/pal-models.nix` adds a `palCustomModels` activation script and injects
    `CUSTOM_MODELS_CONFIG_PATH=~/.config/pal-mcp/custom_models.json` into the PAL server env.
-2. The activation script sources `mcp/scripts/pal-models.jq`, which processes
-   `ollama list` output and writes a JSON registry entry for each model.
+2. The activation script uses `mcp/scripts/pal-models.jq` (via `jq --from-file`) to
+   transform the Ollama `/api/tags` JSON into a registry entry for each model.
 3. PAL reads the registry at startup. All Ollama models appear under **Custom/Local API**.
 
 If Ollama is not running at rebuild time the existing file is kept unchanged (no error).
