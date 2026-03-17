@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/JacobPEvans/nix-ai/compare/v1.10.0...v1.11.0) (2026-03-17)
+
+
+### Bug Fixes
+
+* **plugins:** replace per-file symlinks with directory symlinks ([#186](https://github.com/JacobPEvans/nix-ai/issues/186)) ([cff42d5](https://github.com/JacobPEvans/nix-ai/commit/cff42d58f776b58e75faf8f3a9e45dfa0810b966))
+
 ## [1.10.0](https://github.com/JacobPEvans/nix-ai/compare/v1.9.0...v1.10.0) (2026-03-17)
 
 
