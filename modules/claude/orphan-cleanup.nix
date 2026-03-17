@@ -3,8 +3,8 @@
 # Three-phase cleanup for Nix-managed directories:
 #
 # Phase 1 (BEFORE linkGeneration):
-# - Removes directory symlinks pointing to the nix store that conflict with
-#   individual file symlinks in the new generation.
+# - Removes directory symlinks and real directories that conflict with
+#   directory symlinks in the new generation.
 # - Also removes stale root-level symlinks whose nix store targets no longer exist.
 #
 # Phase 2 (AFTER linkGeneration):
@@ -36,7 +36,9 @@ in
 {
   config = lib.mkIf cfg.enable {
     home.activation = {
-      # Phase 1: Remove conflicting directory symlinks BEFORE linkGeneration.
+      # Phase 1: Remove conflicting entries BEFORE linkGeneration.
+      # Handles directory symlinks AND real directories (migration from recursive=true)
+      # so home-manager can create fresh directory symlinks.
       cleanupConflictingDirectorySymlinks = lib.hm.dag.entryBefore [ "linkGeneration" ] ''
         . ${./scripts/cleanup-conflicting-symlinks.sh} \
           ${lib.escapeShellArgs (componentDirs ++ marketplaceDirs)}
