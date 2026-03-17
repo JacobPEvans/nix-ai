@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.0](https://github.com/JacobPEvans/nix-ai/compare/v1.12.0...v1.13.0) (2026-03-17)
+
+
+### Features
+
+* orchestrator phase 2-3 — loaders, embeddings, workflows ([#208](https://github.com/JacobPEvans/nix-ai/issues/208)) ([585ed75](https://github.com/JacobPEvans/nix-ai/commit/585ed75059233d6a9dff6552efbd8de4b5c83c6e))
+
 ## [1.12.0](https://github.com/JacobPEvans/nix-ai/compare/v1.11.0...v1.12.0) (2026-03-17)
 
 
