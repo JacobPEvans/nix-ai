@@ -25,6 +25,7 @@ qdrant = [
 dev = [
   "pytest>=8.0",
   "pytest-asyncio>=0.26.0",
+  "pytest-cov>=6.0",
   "ruff>=0.11.0",
 ]
 
@@ -37,3 +38,14 @@ packages = ["src/orchestrator"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "--cov=orchestrator --cov-report=term-missing --cov-fail-under=80"
+
+[tool.coverage.run]
+source = ["orchestrator"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "if TYPE_CHECKING:",
+  "if __name__",
+]
