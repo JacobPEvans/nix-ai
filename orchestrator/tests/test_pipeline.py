@@ -83,7 +83,11 @@ def _make_config(**kwargs: Any) -> EmbeddingConfig:
 
 def _make_docs(n: int, prefix: str = "doc") -> list[dict[str, Any]]:
     return [
-        {"id": f"{prefix}{i}", "text": f"content for {prefix} {i}", "metadata": {"idx": i}}
+        {
+            "id": f"{prefix}{i}",
+            "text": f"content for {prefix} {i}",
+            "metadata": {"idx": i},
+        }
         for i in range(n)
     ]
 
@@ -184,7 +188,14 @@ class TestEmbeddingPipelineIndex:
 
         pipeline._pipeline.run.assert_called_once()
         call_args = pipeline._pipeline.run.call_args
-        assert len(call_args.kwargs.get("documents", call_args.args[0] if call_args.args else [])) == 3
+        assert (
+            len(
+                call_args.kwargs.get(
+                    "documents", call_args.args[0] if call_args.args else []
+                )
+            )
+            == 3
+        )
 
     def test_empty_document_list_is_noop(self, mock_li: dict):
         from orchestrator.indexing.pipeline import EmbeddingPipeline
@@ -230,8 +241,16 @@ class TestEmbeddingPipelineSearch:
         results = pipeline.search("test query", top_k=2)
 
         assert len(results) == 2
-        assert results[0] == {"id": "doc0", "score": 0.95, "metadata": {"source": "a.md"}}
-        assert results[1] == {"id": "doc1", "score": 0.80, "metadata": {"source": "b.md"}}
+        assert results[0] == {
+            "id": "doc0",
+            "score": 0.95,
+            "metadata": {"source": "a.md"},
+        }
+        assert results[1] == {
+            "id": "doc1",
+            "score": 0.80,
+            "metadata": {"source": "b.md"},
+        }
 
     def test_search_handles_empty_results(self, mock_li: dict):
         from orchestrator.indexing.pipeline import EmbeddingPipeline
@@ -284,10 +303,14 @@ class TestEmbeddingPipelineSaveLoad:
         config = _make_config(index_path=tmp_path / "test_index")
         pipeline = EmbeddingPipeline(config)
         pipeline._vector_store = MagicMock()
+        mock_docstore = MagicMock()
+        pipeline._pipeline = MagicMock()
+        pipeline._pipeline.docstore = mock_docstore
 
         pipeline.save()
 
         pipeline._vector_store.persist.assert_called_once()
+        mock_docstore.persist.assert_called_once()
 
     def test_save_with_custom_path(self, mock_li: dict, tmp_path: Path):
         from orchestrator.indexing.pipeline import EmbeddingPipeline
@@ -295,6 +318,8 @@ class TestEmbeddingPipelineSaveLoad:
         config = _make_config()
         pipeline = EmbeddingPipeline(config)
         pipeline._vector_store = MagicMock()
+        pipeline._pipeline = MagicMock()
+        pipeline._pipeline.docstore = MagicMock()
 
         custom_path = tmp_path / "custom_index"
         pipeline.save(custom_path)
@@ -302,22 +327,44 @@ class TestEmbeddingPipelineSaveLoad:
         call_args = pipeline._vector_store.persist.call_args
         assert str(custom_path) in str(call_args)
 
-    def test_load_replaces_vector_store(self, mock_li: dict, tmp_path: Path):
+    def test_save_skips_docstore_persist_when_none(self, mock_li: dict, tmp_path: Path):
+        from orchestrator.indexing.pipeline import EmbeddingPipeline
+
+        config = _make_config(index_path=tmp_path / "test_index")
+        pipeline = EmbeddingPipeline(config)
+        pipeline._vector_store = MagicMock()
+        pipeline._pipeline = MagicMock()
+        pipeline._pipeline.docstore = None
+
+        # Should not raise even when docstore is None
+        pipeline.save()
+        pipeline._vector_store.persist.assert_called_once()
+
+    def test_load_replaces_vector_store_and_rebuilds_pipeline(
+        self, mock_li: dict, tmp_path: Path
+    ):
         from orchestrator.indexing.pipeline import EmbeddingPipeline
 
         config = _make_config(index_path=tmp_path / "test_index")
         pipeline = EmbeddingPipeline(config)
         old_store = pipeline._vector_store
+        old_pipeline = pipeline._pipeline
 
         # Mock FaissVectorStore.from_persist_dir
         mock_faiss_mod = mock_li["llama_index.vector_stores.faiss"]
         mock_new_store = MagicMock()
         mock_faiss_mod.FaissVectorStore.from_persist_dir.return_value = mock_new_store
 
+        # Mock SimpleDocumentStore.from_persist_dir
+        mock_docstore_mod = mock_li["llama_index.core.storage.docstore"]
+        mock_docstore_mod.SimpleDocumentStore.from_persist_dir.return_value = MagicMock()
+
         pipeline.load()
 
         assert pipeline._vector_store is mock_new_store
         assert pipeline._vector_store is not old_store
+        # Pipeline must be rebuilt so index() writes to the loaded store
+        assert pipeline._pipeline is not old_pipeline
 
     def test_save_raises_for_qdrant_backend(self, mock_li: dict):
         import orchestrator.indexing.pipeline as pipeline_mod
@@ -346,3 +393,29 @@ class TestEmbeddingPipelineSaveLoad:
 
         with pytest.raises(NotImplementedError, match="qdrant"):
             pipeline.load()
+
+    def test_save_load_case_insensitive_backend(self, mock_li: dict, tmp_path: Path):
+        """Backend check must be case-insensitive to match _make_vector_store behavior."""
+        from orchestrator.indexing.pipeline import EmbeddingPipeline
+
+        config = _make_config(index_path=tmp_path / "case_index")
+        pipeline = EmbeddingPipeline(config)
+        pipeline._vector_store = MagicMock()
+        pipeline._pipeline = MagicMock()
+        pipeline._pipeline.docstore = MagicMock()
+        # Mutate to title-case to verify .lower() normalization
+        pipeline.config = _make_config(
+            backend="Faiss", index_path=tmp_path / "case_index"
+        )
+
+        # save() must not raise NotImplementedError for "Faiss"
+        pipeline.save()
+        pipeline._vector_store.persist.assert_called_once()
+
+        mock_faiss_mod = mock_li["llama_index.vector_stores.faiss"]
+        mock_faiss_mod.FaissVectorStore.from_persist_dir.return_value = MagicMock()
+        mock_docstore_mod = mock_li["llama_index.core.storage.docstore"]
+        mock_docstore_mod.SimpleDocumentStore.from_persist_dir.return_value = MagicMock()
+
+        # load() must not raise NotImplementedError for "Faiss"
+        pipeline.load()

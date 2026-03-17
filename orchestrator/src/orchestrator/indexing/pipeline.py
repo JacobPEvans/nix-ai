@@ -135,20 +135,31 @@ class EmbeddingPipeline:
 
     def save(self, path: str | Path | None = None) -> None:
         """Persist the index to disk. Only supported for the 'faiss' backend."""
-        if self.config.backend != "faiss":
+        if self.config.backend.lower() != "faiss":
             msg = f"save/load is not supported for the '{self.config.backend}' backend"
             raise NotImplementedError(msg)
         target = str(Path(path) if path is not None else self.config.index_path)
         self._vector_store.persist(persist_path=target)
+        if self._pipeline.docstore is not None:
+            self._pipeline.docstore.persist(persist_path=target)
         logger.info("EmbeddingPipeline: saved index to %s", target)
 
     def load(self, path: str | Path | None = None) -> None:
         """Load a previously saved index from disk. Only supported for the 'faiss' backend."""
-        if self.config.backend != "faiss":
+        if self.config.backend.lower() != "faiss":
             msg = f"save/load is not supported for the '{self.config.backend}' backend"
             raise NotImplementedError(msg)
+        from llama_index.core.ingestion import DocstoreStrategy, IngestionPipeline
+        from llama_index.core.storage.docstore import SimpleDocumentStore
         from llama_index.vector_stores.faiss import FaissVectorStore
 
         target = str(Path(path) if path is not None else self.config.index_path)
         self._vector_store = FaissVectorStore.from_persist_dir(target)
+        docstore = SimpleDocumentStore.from_persist_dir(target)
+        self._pipeline = IngestionPipeline(
+            transformations=[self._embed_model],
+            vector_store=self._vector_store,
+            docstore=docstore,
+            docstore_strategy=DocstoreStrategy.UPSERTS,
+        )
         logger.info("EmbeddingPipeline: loaded index from %s", target)
