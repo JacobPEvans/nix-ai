@@ -144,6 +144,18 @@ class TestMakeToolExecNode:
         assert result["metadata"]["echo_returncode"] == 0
 
     @patch("orchestrator.workflows.nodes.subprocess.run")
+    def test_failure_returns_stderr(self, mock_run: MagicMock) -> None:
+        mock_run.return_value = MagicMock(returncode=1, stdout="out", stderr="err")
+        node_def = NodeDefinition(
+            name="fail", type=NodeType.TOOL_EXEC,
+            config={"command": "false"},
+        )
+        fn = _make_tool_exec_node(node_def)
+        result = fn({})
+        assert result["output"] == "err"
+        assert result["metadata"]["fail_returncode"] == 1
+
+    @patch("orchestrator.workflows.nodes.subprocess.run")
     def test_file_not_found_returns_127(self, mock_run: MagicMock) -> None:
         mock_run.side_effect = FileNotFoundError()
         node_def = NodeDefinition(
