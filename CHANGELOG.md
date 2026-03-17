@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.13.0](https://github.com/JacobPEvans/nix-ai/compare/v1.12.0...v1.13.0) (2026-03-17)
+
+
+### Features
+
+* orchestrator phase 2-3 — loaders, embeddings, workflows ([#208](https://github.com/JacobPEvans/nix-ai/issues/208)) ([585ed75](https://github.com/JacobPEvans/nix-ai/commit/585ed75059233d6a9dff6552efbd8de4b5c83c6e))
+
+## [1.12.0](https://github.com/JacobPEvans/nix-ai/compare/v1.11.0...v1.12.0) (2026-03-17)
+
+
+### Bug Fixes
+
+* **docs:** correct PAL model script references in MCP README ([#211](https://github.com/JacobPEvans/nix-ai/issues/211)) ([c880929](https://github.com/JacobPEvans/nix-ai/commit/c880929eff3b5cffca4cb6d32e8c9250e4c591ca))
+
 ## [1.11.0](https://github.com/JacobPEvans/nix-ai/compare/v1.10.0...v1.11.0) (2026-03-17)
 
 
