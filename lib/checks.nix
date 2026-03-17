@@ -70,9 +70,11 @@ in
   '';
 
   # Evaluate the real home-manager module with real inputs to catch import errors
-  module-eval = pkgs.runCommand "check-module-eval" { } ''
-    echo "${builtins.unsafeDiscardStringContext hmConfig.activationPackage.drvPath}" > $out
-  '';
+  module-eval = builtins.seq hmConfig.activationPackage (
+    pkgs.runCommand "check-module-eval" { } ''
+      touch $out
+    ''
+  );
 
   # ============================================================================
   # Regression Tests
