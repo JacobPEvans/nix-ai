@@ -279,7 +279,7 @@
                   devenv.root = if pwdIsFlakeRoot then pwd else toString ./.;
                   languages.python = {
                     enable = true;
-                    version = "3.14";
+                    package = pkgs.python314;
                     venv.enable = true;
                     venv.requirements = ''
                       langchain
@@ -308,7 +308,7 @@
                   devenv.root = if pwdIsMlxRoot then pwd else toString ./mlx-server;
                   languages.python = {
                     enable = true;
-                    version = "3.14";
+                    package = pkgs.python314;
                     uv = {
                       enable = true;
                       sync.enable = true;
