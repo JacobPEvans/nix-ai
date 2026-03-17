@@ -76,11 +76,10 @@ class EmbeddingPipeline:
             model_name=config.model,
         )
         self._vector_store = self._make_vector_store(config, FaissVectorStore)
-        self._docstore = SimpleDocumentStore()
         self._pipeline = IngestionPipeline(
             transformations=[self._embed_model],
             vector_store=self._vector_store,
-            docstore=self._docstore,
+            docstore=SimpleDocumentStore(),
             docstore_strategy=DocstoreStrategy.UPSERTS,
         )
 
@@ -122,9 +121,11 @@ class EmbeddingPipeline:
         result = self._vector_store.query(
             VectorStoreQuery(query_embedding=query_emb, similarity_top_k=top_k)
         )
+        nodes = result.nodes or []
+        similarities = result.similarities or []
         return [
-            {"id": nid, "score": float(s), "metadata": {}}
-            for nid, s in zip(result.ids or [], result.similarities or [])
+            {"id": node.id_, "score": float(score), "metadata": node.metadata}
+            for node, score in zip(nodes, similarities)
         ]
 
     def delete(self, ids: list[str]) -> None:
@@ -133,14 +134,19 @@ class EmbeddingPipeline:
             self._vector_store.delete(doc_id)
 
     def save(self, path: str | Path | None = None) -> None:
-        """Persist the index to disk."""
+        """Persist the index to disk. Only supported for the 'faiss' backend."""
+        if self.config.backend != "faiss":
+            msg = f"save/load is not supported for the '{self.config.backend}' backend"
+            raise NotImplementedError(msg)
         target = str(Path(path) if path is not None else self.config.index_path)
-        Path(target).parent.mkdir(parents=True, exist_ok=True)
         self._vector_store.persist(persist_path=target)
         logger.info("EmbeddingPipeline: saved index to %s", target)
 
     def load(self, path: str | Path | None = None) -> None:
-        """Load a previously saved index from disk."""
+        """Load a previously saved index from disk. Only supported for the 'faiss' backend."""
+        if self.config.backend != "faiss":
+            msg = f"save/load is not supported for the '{self.config.backend}' backend"
+            raise NotImplementedError(msg)
         from llama_index.vector_stores.faiss import FaissVectorStore
 
         target = str(Path(path) if path is not None else self.config.index_path)

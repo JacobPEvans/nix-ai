@@ -214,8 +214,15 @@ class TestEmbeddingPipelineSearch:
         pipeline._embed_model = MagicMock()
         pipeline._embed_model.get_query_embedding.return_value = [0.1] * DIM
 
+        node0 = MagicMock()
+        node0.id_ = "doc0"
+        node0.metadata = {"source": "a.md"}
+        node1 = MagicMock()
+        node1.id_ = "doc1"
+        node1.metadata = {"source": "b.md"}
+
         mock_result = MagicMock()
-        mock_result.ids = ["doc0", "doc1"]
+        mock_result.nodes = [node0, node1]
         mock_result.similarities = [0.95, 0.80]
         pipeline._vector_store = MagicMock()
         pipeline._vector_store.query.return_value = mock_result
@@ -223,8 +230,8 @@ class TestEmbeddingPipelineSearch:
         results = pipeline.search("test query", top_k=2)
 
         assert len(results) == 2
-        assert results[0] == {"id": "doc0", "score": 0.95, "metadata": {}}
-        assert results[1] == {"id": "doc1", "score": 0.80, "metadata": {}}
+        assert results[0] == {"id": "doc0", "score": 0.95, "metadata": {"source": "a.md"}}
+        assert results[1] == {"id": "doc1", "score": 0.80, "metadata": {"source": "b.md"}}
 
     def test_search_handles_empty_results(self, mock_li: dict):
         from orchestrator.indexing.pipeline import EmbeddingPipeline
@@ -236,7 +243,7 @@ class TestEmbeddingPipelineSearch:
         pipeline._embed_model.get_query_embedding.return_value = [0.1] * DIM
 
         mock_result = MagicMock()
-        mock_result.ids = None
+        mock_result.nodes = None
         mock_result.similarities = None
         pipeline._vector_store = MagicMock()
         pipeline._vector_store.query.return_value = mock_result
@@ -311,3 +318,31 @@ class TestEmbeddingPipelineSaveLoad:
 
         assert pipeline._vector_store is mock_new_store
         assert pipeline._vector_store is not old_store
+
+    def test_save_raises_for_qdrant_backend(self, mock_li: dict):
+        import orchestrator.indexing.pipeline as pipeline_mod
+
+        original = pipeline_mod._QDRANT_AVAILABLE
+        try:
+            pipeline_mod._QDRANT_AVAILABLE = True
+            from orchestrator.indexing.pipeline import EmbeddingPipeline
+
+            config = _make_config(backend="faiss")  # start faiss, then mutate
+            pipeline = EmbeddingPipeline(config)
+            # Simulate a pipeline that was configured with qdrant
+            pipeline.config = _make_config(backend="qdrant")
+
+            with pytest.raises(NotImplementedError, match="qdrant"):
+                pipeline.save()
+        finally:
+            pipeline_mod._QDRANT_AVAILABLE = original
+
+    def test_load_raises_for_qdrant_backend(self, mock_li: dict):
+        from orchestrator.indexing.pipeline import EmbeddingPipeline
+
+        config = _make_config(backend="faiss")
+        pipeline = EmbeddingPipeline(config)
+        pipeline.config = _make_config(backend="qdrant")
+
+        with pytest.raises(NotImplementedError, match="qdrant"):
+            pipeline.load()
