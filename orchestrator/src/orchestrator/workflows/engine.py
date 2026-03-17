@@ -128,6 +128,11 @@ class WorkflowEngine:
 
             if node_def.type == NodeType.CONDITIONAL:
                 self._wire_conditional(graph, node_def, node_names)
+            elif node_def.type == NodeType.HUMAN_INPUT:
+                # human_input nodes are always terminal: they set pending_human_input=True
+                # and halt the graph so the caller can resume after obtaining human input.
+                # Any outgoing edges in the YAML are intentionally ignored here.
+                graph.add_edge(node_def.name, END)
             elif outgoing:
                 for edge in outgoing:
                     graph.add_edge(node_def.name, edge.target)

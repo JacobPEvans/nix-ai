@@ -278,7 +278,7 @@ def _make_fake_completion(content: str) -> MagicMock:
 
 class TestExecute:
     @patch("orchestrator.workflows.nodes.subprocess.run")
-    @patch("openai.OpenAI")
+    @patch("orchestrator.workflows.nodes.OpenAI")
     def test_execute_two_node_workflow(
         self,
         mock_openai_cls: MagicMock,
@@ -308,7 +308,7 @@ class TestExecute:
         assert result.get("output") == "done"
 
     @patch("orchestrator.workflows.nodes.subprocess.run")
-    @patch("openai.OpenAI")
+    @patch("orchestrator.workflows.nodes.OpenAI")
     def test_execute_conditional_routing_true_branch(
         self,
         mock_openai_cls: MagicMock,
@@ -337,7 +337,7 @@ class TestExecute:
         assert result.get("output") == "flagged"
 
     @patch("orchestrator.workflows.nodes.subprocess.run")
-    @patch("openai.OpenAI")
+    @patch("orchestrator.workflows.nodes.OpenAI")
     def test_execute_conditional_routing_false_branch(
         self,
         mock_openai_cls: MagicMock,
@@ -382,6 +382,53 @@ class TestExecute:
         result = engine.execute(wf, {"messages": []})
         assert result.get("pending_human_input") is True
         assert "Please review" in result.get("human_input_prompt", "")
+
+    @patch("orchestrator.workflows.nodes.subprocess.run")
+    def test_human_input_node_is_terminal_even_with_outgoing_edge(
+        self,
+        mock_subprocess: MagicMock,
+    ):
+        """human_input nodes must route to END regardless of outgoing edges in the YAML.
+
+        This guards against the regression where the engine would wire an explicit
+        outgoing edge from a human_input node, causing the graph to continue
+        immediately instead of halting for human review.
+        """
+        proc = MagicMock()
+        proc.returncode = 0
+        proc.stdout = "should-not-appear"
+        proc.stderr = ""
+        mock_subprocess.return_value = proc
+
+        workflow_dict = {
+            "name": "human-terminal-wf",
+            "description": "Verify human_input always routes to END",
+            "nodes": [
+                {
+                    "name": "pause",
+                    "type": "human_input",
+                    "config": {"prompt": "Critical issues. Please approve."},
+                },
+                {
+                    "name": "next_step",
+                    "type": "tool_exec",
+                    "config": {"command": "echo", "args": ["should-not-appear"]},
+                },
+            ],
+            # Even though an outgoing edge is declared, the engine must ignore it
+            # for human_input nodes and wire to END instead.
+            "edges": [{"source": "pause", "target": "next_step"}],
+            "entry_point": "pause",
+        }
+        engine = WorkflowEngine()
+        wf = engine.load_workflow_from_dict(workflow_dict)
+        result = engine.execute(wf, {"messages": []})
+
+        # Graph must have halted at the human_input node
+        assert result.get("pending_human_input") is True
+        assert result.get("current_node") == "pause"
+        # next_step must NOT have executed
+        assert result.get("output") != "should-not-appear"
 
 
 # ---------------------------------------------------------------------------

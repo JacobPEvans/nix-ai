@@ -38,6 +38,8 @@ edges:
     target: categorize_issues
   - source: categorize_issues
     target: check_critical
-  - source: request_human_review
-    target: generate_report
+  # Note: request_human_review has no outgoing edge. human_input nodes are always
+  # terminal — the engine routes them to END so the caller receives a state with
+  # pending_human_input=True. Resume the workflow (supplying human feedback) to
+  # continue to generate_report.
 entry_point: analyze_diff

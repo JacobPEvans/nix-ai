@@ -18,6 +18,8 @@ import logging
 import subprocess
 from typing import Any, Callable
 
+from openai import OpenAI
+
 from orchestrator.workflows.models import NodeDefinition, NodeType, WorkflowState
 
 logger = logging.getLogger(__name__)
@@ -39,7 +41,9 @@ def _error_state(
     }
 
 
-def _make_passthrough_node(node_def: NodeDefinition):  # noqa: ANN202
+def _make_passthrough_node(
+    node_def: NodeDefinition,
+) -> Callable[[WorkflowState], WorkflowState]:
     """Return a no-op node function used as a routing placeholder."""
 
     def _node(state: WorkflowState) -> WorkflowState:
@@ -49,7 +53,9 @@ def _make_passthrough_node(node_def: NodeDefinition):  # noqa: ANN202
     return _node
 
 
-def _make_llm_call_node(node_def: NodeDefinition):  # noqa: ANN202
+def _make_llm_call_node(
+    node_def: NodeDefinition,
+) -> Callable[[WorkflowState], WorkflowState]:
     """Return a node function that calls an OpenAI-compatible LLM endpoint."""
     cfg = node_def.config
     endpoint = cfg.get("endpoint", "http://127.0.0.1:11435/v1")
@@ -59,8 +65,6 @@ def _make_llm_call_node(node_def: NodeDefinition):  # noqa: ANN202
     max_tokens = int(cfg.get("max_tokens", 4096))
 
     # Create client once at factory time instead of per-invocation
-    from openai import OpenAI
-
     client = OpenAI(base_url=endpoint, api_key="not-needed")
 
     def _node(state: WorkflowState) -> WorkflowState:
@@ -90,7 +94,9 @@ def _make_llm_call_node(node_def: NodeDefinition):  # noqa: ANN202
     return _node
 
 
-def _make_tool_exec_node(node_def: NodeDefinition):  # noqa: ANN202
+def _make_tool_exec_node(
+    node_def: NodeDefinition,
+) -> Callable[[WorkflowState], WorkflowState]:
     """Return a node function that executes a configured shell command."""
     cfg = node_def.config
     command = cfg.get("command", "echo")
@@ -131,7 +137,9 @@ def _make_tool_exec_node(node_def: NodeDefinition):  # noqa: ANN202
     return _node
 
 
-def _make_human_input_node(node_def: NodeDefinition):  # noqa: ANN202
+def _make_human_input_node(
+    node_def: NodeDefinition,
+) -> Callable[[WorkflowState], WorkflowState]:
     """Return a node that records a pending human-input request."""
     prompt = node_def.config.get("prompt", "Human review required. Please provide input.")
 
