@@ -101,6 +101,17 @@ class VectorBackend(Protocol):
         ...
 
 
+def _validate_add_args(
+    ids: list[str],
+    embeddings: list[list[float]],
+    metadata: list[dict[str, Any]],
+) -> None:
+    """Validate that add() arguments have consistent lengths."""
+    if len(ids) != len(embeddings) or len(ids) != len(metadata):
+        msg = "ids, embeddings and metadata must have the same length"
+        raise ValueError(msg)
+
+
 # ---------------------------------------------------------------------------
 # FAISS backend
 # ---------------------------------------------------------------------------
@@ -138,9 +149,7 @@ class FAISSBackend:
     ) -> None:
         if not ids:
             return
-        if len(ids) != len(embeddings) or len(ids) != len(metadata):
-            msg = "ids, embeddings and metadata must have the same length"
-            raise ValueError(msg)
+        _validate_add_args(ids, embeddings, metadata)
 
         arr = np.array(embeddings, dtype=np.float32)
         if arr.shape[1] != self.dimension:
@@ -287,9 +296,7 @@ class QdrantBackend:
     ) -> None:
         if not ids:
             return
-        if len(ids) != len(embeddings) or len(ids) != len(metadata):
-            msg = "ids, embeddings and metadata must have the same length"
-            raise ValueError(msg)
+        _validate_add_args(ids, embeddings, metadata)
 
         # Qdrant supports string point IDs natively — use doc_id directly
         # to avoid hash collisions from integer conversion.
@@ -314,17 +321,14 @@ class QdrantBackend:
             query_vector=query_embedding,
             limit=top_k,
         )
-        results: list[tuple[str, float, dict[str, Any]]] = []
-        for hit in hits:
-            payload = dict(hit.payload or {})
-            doc_id = str(hit.id)
-            results.append((doc_id, float(hit.score), payload))
-        return results
+        return [
+            (str(hit.id), float(hit.score), dict(hit.payload or {}))
+            for hit in hits
+        ]
 
     def delete(self, ids: list[str]) -> None:
         from qdrant_client.models import PointIdsList
 
-        # Qdrant point IDs are strings, so pass them directly.
         self._client.delete(
             collection_name=self.COLLECTION,
             points_selector=PointIdsList(points=ids),

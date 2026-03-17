@@ -94,12 +94,11 @@ def _extract_callouts(text: str) -> list[str]:
 
 def _extract_embeds(text: str) -> list[str]:
     """Extract ![[embed]] targets (images and note embeds)."""
-    results: list[str] = []
-    for match in _EMBED_RE.finditer(text):
-        target = match.group(1).split("|")[0].strip()
-        if target:
-            results.append(target)
-    return results
+    return [
+        target
+        for match in _EMBED_RE.finditer(text)
+        if (target := match.group(1).split("|")[0].strip())
+    ]
 
 
 def _parse_file(path: Path) -> dict[str, Any]:
@@ -118,21 +117,14 @@ def _parse_file(path: Path) -> dict[str, Any]:
 
     # Merge frontmatter tags with inline tags; deduplicate while preserving order
     fm_tags_raw = frontmatter.get("tags")
-    if fm_tags_raw is None:
-        fm_tags: list[str] = []
-    elif isinstance(fm_tags_raw, str):
-        fm_tags = [fm_tags_raw]
+    if isinstance(fm_tags_raw, str):
+        fm_tags: list[str] = [fm_tags_raw]
     elif isinstance(fm_tags_raw, list):
         fm_tags = [str(t) for t in fm_tags_raw if t is not None]
     else:
         fm_tags = []
     inline_tags = _extract_tags(body)
-    seen: set[str] = set()
-    tags: list[str] = []
-    for tag in [*fm_tags, *inline_tags]:
-        if tag not in seen:
-            seen.add(tag)
-            tags.append(tag)
+    tags = list(dict.fromkeys([*fm_tags, *inline_tags]))
 
     # Wikilinks are extracted from the body only (frontmatter rarely has them)
     wikilinks = _extract_wikilinks(body)
@@ -193,12 +185,12 @@ class ObsidianReader:
         """
         try:
             from llama_index.core.schema import Document
-        except ImportError:
+        except ImportError as exc:
             msg = (
                 "llama-index-core is required for ObsidianReader. "
                 "Install it with: pip install llama-index-core"
             )
-            raise ImportError(msg)  # noqa: TRY200
+            raise ImportError(msg) from exc
 
         paths = self._resolve_paths(file_list)
         documents: list[Any] = []

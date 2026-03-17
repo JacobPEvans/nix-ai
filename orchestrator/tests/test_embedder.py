@@ -44,8 +44,7 @@ def _fake_embed(texts: list[str], dim: int = DIM) -> list[list[float]]:
 
 
 def _make_config(**kwargs) -> EmbeddingConfig:
-    defaults = dict(dimension=DIM, batch_size=4, backend="faiss")
-    defaults.update(kwargs)
+    defaults = {"dimension": DIM, "batch_size": 4, "backend": "faiss"} | kwargs
     return EmbeddingConfig(**defaults)
 
 
@@ -262,16 +261,10 @@ class TestEmbeddingPipelineBatching:
         pipeline = EmbeddingPipeline(config)
         docs = _make_docs(4)
 
-        call_count: list[int] = []
-
-        def capturing_embed(texts: list[str]) -> list[list[float]]:
-            call_count.append(1)
-            return _fake_embed(texts)
-
-        with patch.object(pipeline, "_embed", side_effect=capturing_embed):
+        with patch.object(pipeline, "_embed", side_effect=_fake_embed) as mock_embed:
             pipeline.index(docs)
 
-        assert len(call_count) == 1
+        assert mock_embed.call_count == 1
 
 
 # ---------------------------------------------------------------------------

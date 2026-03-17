@@ -175,6 +175,14 @@ def _make_tool_exec_node(node_def: NodeDefinition):  # noqa: ANN202
     args = [str(a) for a in cfg.get("args", [])]
     timeout = int(cfg.get("timeout", 30))
 
+    def _make_result(
+        state: WorkflowState, output: str, returncode: int, error: str | None = None,
+    ) -> WorkflowState:
+        meta = {**state.get("metadata", {}), f"{node_def.name}_returncode": returncode}
+        if error:
+            meta[f"{node_def.name}_error"] = error
+        return {**state, "current_node": node_def.name, "output": output, "metadata": meta}
+
     def _node(state: WorkflowState) -> WorkflowState:
         cmd = [command, *args]
         logger.debug("tool_exec node '%s' → %s", node_def.name, cmd)
@@ -186,41 +194,16 @@ def _make_tool_exec_node(node_def: NodeDefinition):  # noqa: ANN202
                 timeout=timeout,
             )
         except FileNotFoundError:
-            error_msg = f"tool_exec '{node_def.name}': command not found: {command}"
-            logger.error(error_msg)
-            return {
-                **state,
-                "current_node": node_def.name,
-                "output": error_msg,
-                "metadata": {
-                    **state.get("metadata", {}),
-                    f"{node_def.name}_returncode": 127,
-                    f"{node_def.name}_error": "command_not_found",
-                },
-            }
+            msg = f"tool_exec '{node_def.name}': command not found: {command}"
+            logger.error(msg)
+            return _make_result(state, msg, returncode=127, error="command_not_found")
         except subprocess.TimeoutExpired:
-            error_msg = f"tool_exec '{node_def.name}': timed out after {timeout}s"
-            logger.error(error_msg)
-            return {
-                **state,
-                "current_node": node_def.name,
-                "output": error_msg,
-                "metadata": {
-                    **state.get("metadata", {}),
-                    f"{node_def.name}_returncode": -1,
-                    f"{node_def.name}_error": "timeout",
-                },
-            }
+            msg = f"tool_exec '{node_def.name}': timed out after {timeout}s"
+            logger.error(msg)
+            return _make_result(state, msg, returncode=-1, error="timeout")
+
         output = result.stdout.strip() if result.returncode == 0 else result.stderr.strip()
-        return {
-            **state,
-            "current_node": node_def.name,
-            "output": output,
-            "metadata": {
-                **state.get("metadata", {}),
-                f"{node_def.name}_returncode": result.returncode,
-            },
-        }
+        return _make_result(state, output, returncode=result.returncode)
 
     _node.__name__ = node_def.name
     return _node
@@ -246,6 +229,34 @@ def _make_human_input_node(node_def: NodeDefinition):  # noqa: ANN202
 
     _node.__name__ = node_def.name
     return _node
+
+
+def _make_passthrough_node(node_def: NodeDefinition):  # noqa: ANN202
+    """Return a no-op node function used as a routing placeholder."""
+
+    def _node(state: WorkflowState) -> WorkflowState:
+        return {**state, "current_node": node_def.name}
+
+    _node.__name__ = node_def.name
+    return _node
+
+
+def _make_conditional_router(
+    condition_key: str, true_target: str, false_target: str,
+):  # noqa: ANN202
+    """Return a routing function for conditional nodes.
+
+    Checks ``metadata[condition_key]`` (falling back to top-level state)
+    and returns the appropriate target node name.
+    """
+
+    def _router(state: WorkflowState) -> str:
+        meta = state.get("metadata", {})
+        if meta.get(condition_key) or state.get(condition_key):  # type: ignore[call-overload]
+            return true_target or END
+        return false_target or END
+
+    return _router
 
 
 # ---------------------------------------------------------------------------
@@ -361,50 +372,38 @@ class WorkflowEngine:
         # Validate all edge references before building the graph
         edges_by_source: dict[str, list[EdgeDefinition]] = {}
         for edge in workflow.edges:
-            if edge.source not in node_names:
-                msg = (
-                    f"Edge references unknown source node '{edge.source}'. "
-                    f"Known nodes: {sorted(node_names)}"
-                )
-                raise ValueError(msg)
-            if edge.target not in node_names:
-                msg = (
-                    f"Edge references unknown target node '{edge.target}'. "
-                    f"Known nodes: {sorted(node_names)}"
-                )
-                raise ValueError(msg)
+            for role, name in (("source", edge.source), ("target", edge.target)):
+                if name not in node_names:
+                    msg = (
+                        f"Edge references unknown {role} node '{name}'. "
+                        f"Known nodes: {sorted(node_names)}"
+                    )
+                    raise ValueError(msg)
             edges_by_source.setdefault(edge.source, []).append(edge)
 
         # Add nodes
+        node_factories = {
+            NodeType.LLM_CALL: _make_llm_call_node,
+            NodeType.TOOL_EXEC: _make_tool_exec_node,
+            NodeType.HUMAN_INPUT: _make_human_input_node,
+            NodeType.CONDITIONAL: _make_passthrough_node,
+        }
         for node_def in workflow.nodes:
-            if node_def.type == NodeType.LLM_CALL:
-                fn = _make_llm_call_node(node_def)
-            elif node_def.type == NodeType.TOOL_EXEC:
-                fn = _make_tool_exec_node(node_def)
-            elif node_def.type == NodeType.HUMAN_INPUT:
-                fn = _make_human_input_node(node_def)
-            elif node_def.type == NodeType.CONDITIONAL:
-                # Conditional nodes are routing-only; they don't do computation.
-                # The actual routing happens via conditional_edge below.
-                fn = _make_passthrough_node(node_def)
-            else:
+            factory = node_factories.get(node_def.type)
+            if factory is None:
                 msg = f"Unknown node type: {node_def.type}"
                 raise ValueError(msg)
-
-            graph.add_node(node_def.name, fn)
+            graph.add_node(node_def.name, factory(node_def))
 
         # Wire edges
         for node_def in workflow.nodes:
             outgoing = edges_by_source.get(node_def.name, [])
 
             if node_def.type == NodeType.CONDITIONAL:
-                # Build a routing function from the node's config
                 cfg = node_def.config
-                condition_key = cfg.get("condition_key", "")
                 true_target = cfg.get("true_target", "")
                 false_target = cfg.get("false_target", "")
 
-                # Validate targets exist
                 for target_name in (true_target, false_target):
                     if target_name and target_name not in node_names:
                         msg = (
@@ -413,24 +412,10 @@ class WorkflowEngine:
                         )
                         raise ValueError(msg)
 
-                def _make_router(key: str, t_target: str, f_target: str):  # noqa: ANN202
-                    def _router(state: WorkflowState) -> str:
-                        meta = state.get("metadata", {})
-                        if meta.get(key) or state.get(key):  # type: ignore[call-overload]
-                            return t_target or END
-                        return f_target or END
-
-                    return _router
-
-                router_fn = _make_router(condition_key, true_target, false_target)
-
-                # Build path_map for add_conditional_edges
-                path_map: dict[str, str] = {}
-                if true_target:
-                    path_map[true_target] = true_target
-                if false_target:
-                    path_map[false_target] = false_target
-
+                router_fn = _make_conditional_router(
+                    cfg.get("condition_key", ""), true_target, false_target,
+                )
+                path_map = {t: t for t in (true_target, false_target) if t}
                 graph.add_conditional_edges(node_def.name, router_fn, path_map)
 
             elif outgoing:
@@ -448,10 +433,6 @@ class WorkflowEngine:
             compile_kwargs["checkpointer"] = self._checkpointer
 
         return graph.compile(**compile_kwargs)
-
-    # ------------------------------------------------------------------
-    # Execution
-    # ------------------------------------------------------------------
 
     def execute(
         self,
@@ -485,18 +466,3 @@ class WorkflowEngine:
 
         result = compiled.invoke(initial, **invoke_kwargs)
         return dict(result)
-
-
-# ---------------------------------------------------------------------------
-# Internal helpers
-# ---------------------------------------------------------------------------
-
-
-def _make_passthrough_node(node_def: NodeDefinition):  # noqa: ANN202
-    """Return a no-op node function used as a routing placeholder."""
-
-    def _node(state: WorkflowState) -> WorkflowState:
-        return {**state, "current_node": node_def.name}
-
-    _node.__name__ = node_def.name
-    return _node
