@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.0](https://github.com/JacobPEvans/nix-ai/compare/v1.13.0...v1.14.0) (2026-03-18)
+
+
+### Bug Fixes
+
+* **tests:** use MagicMock instance for SimpleDocumentStore in pipeline tests ([#215](https://github.com/JacobPEvans/nix-ai/issues/215)) ([e788030](https://github.com/JacobPEvans/nix-ai/commit/e788030048a5af2c2ee361250a345cb107da90ad))
+
 ## [1.13.0](https://github.com/JacobPEvans/nix-ai/compare/v1.12.0...v1.13.0) (2026-03-17)
 
 
