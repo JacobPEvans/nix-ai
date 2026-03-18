@@ -311,7 +311,7 @@
                   devenv.root = if pwdIsOrchestratorRoot then pwd else toString ./orchestrator;
                   languages.python = {
                     enable = true;
-                    version = "3.14";
+                    package = pkgs.python314;
                     uv = {
                       enable = true;
                       sync.enable = true;
