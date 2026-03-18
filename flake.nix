@@ -40,6 +40,10 @@
       url = "github:BillChirico/bills-claude-skills";
       flake = false;
     };
+    bitwarden-marketplace = {
+      url = "github:bitwarden/ai-plugins";
+      flake = false;
+    };
     cc-dev-tools = {
       url = "github:Lucklyric/cc-dev-tools";
       flake = false;
@@ -88,10 +92,6 @@
       url = "github:wakatime/claude-code-wakatime";
       flake = false;
     };
-    bitwarden-marketplace = {
-      url = "github:bitwarden/ai-plugins";
-      flake = false;
-    };
 
     # PAL MCP server - pinned for supply-chain safety; auto-bumped by deps-update-flake.yml
     pal-mcp-server = {
@@ -111,6 +111,7 @@
       ai-assistant-instructions,
       anthropic-agent-skills,
       bills-claude-skills,
+      bitwarden-marketplace,
       cc-dev-tools,
       cc-marketplace,
       claude-code-plugins-plus,
@@ -123,7 +124,6 @@
       axton-obsidian-visual-skills,
       superpowers-marketplace,
       wakatime,
-      bitwarden-marketplace,
       pal-mcp-server,
       ...
     }@inputs:
@@ -138,6 +138,7 @@
         inherit
           anthropic-agent-skills
           bills-claude-skills
+          bitwarden-marketplace
           cc-dev-tools
           cc-marketplace
           claude-code-plugins-plus
@@ -150,7 +151,6 @@
           axton-obsidian-visual-skills
           superpowers-marketplace
           wakatime
-          bitwarden-marketplace
           ;
       };
     in
