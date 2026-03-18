@@ -9,11 +9,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    devenv = {
-      url = "github:cachix/devenv";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # Official Anthropic repositories
     claude-code-plugins = {
       url = "github:anthropics/claude-code";
@@ -105,7 +100,6 @@
       self,
       nixpkgs,
       home-manager,
-      devenv,
       claude-code-plugins,
       claude-cookbooks,
       ai-assistant-instructions,
@@ -126,7 +120,7 @@
       wakatime,
       pal-mcp-server,
       ...
-    }@inputs:
+    }:
     let
       supportedSystems = [
         "aarch64-darwin"
@@ -254,115 +248,6 @@
           pal-mcp-server = pkgs.callPackage ./modules/mcp/pal-package.nix { inherit pal-mcp-server; };
         }
       );
-
-      # Named devenv shells — reference via: nix develop ~/git/nix-ai/main#<name>
-      # To add a new shell: add a new key to the attrset below.
-      #
-      # devenv.root uses builtins.getEnv "PWD" so devenv writes .devenv/ state
-      # to the real filesystem instead of the read-only Nix store copy.
-      # Requires --impure (pass via .envrc or `nix develop --impure`).
-      # Falls back to store path for pure evaluation (nix flake check).
-      devShells =
-        let
-          # Runtime PWD — not system-specific; empty under pure eval → falls back to store path
-          pwd = builtins.getEnv "PWD";
-          # Guard: only use PWD when it looks like the flake root (has flake.nix)
-          pwdIsFlakeRoot = pwd != "" && builtins.pathExists (pwd + "/flake.nix");
-          # Guard: only use PWD for mlx-server when it contains pyproject.toml
-          pwdIsMlxRoot = pwd != "" && builtins.pathExists (pwd + "/pyproject.toml");
-          # Guard: only use PWD for orchestrator when its pyproject.toml has the orchestrator project name
-          pwdIsOrchestratorRoot =
-            pwd != ""
-            && builtins.pathExists (pwd + "/pyproject.toml")
-            &&
-              builtins.match ".*name = \"orchestrator\".*" (builtins.readFile (pwd + "/pyproject.toml")) != null;
-        in
-        forAllSystems (
-          system:
-          let
-            pkgs = nixpkgs.legacyPackages.${system};
-          in
-          {
-            # AI Python development: LangChain, LangGraph, OpenTelemetry
-            ai-dev = devenv.lib.mkShell {
-              inherit inputs pkgs;
-              modules = [
-                {
-                  devenv.root = if pwdIsFlakeRoot then pwd else toString ./.;
-                  languages.python = {
-                    enable = true;
-                    package = pkgs.python314;
-                    venv.enable = true;
-                    venv.requirements = ''
-                      langchain
-                      langchain-core
-                      langchain-openai
-                      langgraph
-                      opentelemetry-api
-                      opentelemetry-sdk
-                      opentelemetry-exporter-otlp
-                      opentelemetry-instrumentation
-                    '';
-                  };
-                }
-              ];
-            };
-          }
-          // {
-            # Skill orchestration: LangGraph, LlamaIndex, embeddings
-            orchestrator = devenv.lib.mkShell {
-              inherit inputs pkgs;
-              modules = [
-                {
-                  devenv.root = if pwdIsOrchestratorRoot then pwd else toString ./orchestrator;
-                  languages.python = {
-                    enable = true;
-                    package = pkgs.python314;
-                    uv = {
-                      enable = true;
-                      sync.enable = true;
-                    };
-                  };
-                  enterShell = ''
-                    echo "Orchestrator environment ready ($(python3 --version))"
-                  '';
-                }
-              ];
-            };
-          }
-          # mlx-server is Apple Silicon only — MLX ships aarch64 wheels only
-          // nixpkgs.lib.optionalAttrs (system == "aarch64-darwin") {
-            mlx-server = devenv.lib.mkShell {
-              inherit inputs pkgs;
-              modules = [
-                {
-                  # Reads pyproject.toml / uv.lock from ./mlx-server/
-                  # PWD is mlx-server/ when nix-direnv evaluates the .envrc there;
-                  # guard against arbitrary caller directories with pyproject.toml check.
-                  devenv.root = if pwdIsMlxRoot then pwd else toString ./mlx-server;
-                  languages.python = {
-                    enable = true;
-                    package = pkgs.python314;
-                    uv = {
-                      enable = true;
-                      sync.enable = true;
-                    };
-                  };
-                  enterShell = ''
-                    # Set HF_HOME: use external volume if mounted, otherwise fall back
-                    if [ -d "/Volumes/HuggingFace" ] && [ -w "/Volumes/HuggingFace" ]; then
-                      export HF_HOME="/Volumes/HuggingFace"
-                    else
-                      export HF_HOME="''${XDG_CACHE_HOME:-''${HOME}/.cache}/huggingface"
-                      mkdir -p "''${HF_HOME}"
-                    fi
-                    echo "MLX environment ready ($(python3 --version))"
-                  '';
-                }
-              ];
-            };
-          }
-        );
 
       # Formatter
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
