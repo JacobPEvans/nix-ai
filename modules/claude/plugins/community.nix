@@ -3,6 +3,7 @@
 # Plugins from community-maintained marketplaces:
 # - cc-marketplace: Official source for claudecodecommands.directory plugins
 # - superpowers-marketplace: Enhanced Claude capabilities (obra/Jesse Vincent)
+# - bitwarden-marketplace: Enterprise-grade session analysis and config validation
 
 _:
 
@@ -27,6 +28,15 @@ _:
     # Obsidian Visual Skills - Diagrams (axtonliu/axton-obsidian-visual-skills)
     # Marketplace declares single plugin "obsidian-visual-skills" bundling 3 skills
     "obsidian-visual-skills@axton-obsidian-visual-skills" = true;
+
+    # Bitwarden Marketplace - Enterprise-grade session analysis and config validation
+    # claude-retrospective: 3 skills (retrospecting, extracting-session-data, analyzing-git-sessions)
+    # claude-config-validator: 1 skill (reviewing-claude-config) — security + quality validation
+    "claude-retrospective@bitwarden-marketplace" = true;
+    "claude-config-validator@bitwarden-marketplace" = true;
+    # NOT enabled - Bitwarden-specific: bitwarden-code-review, bitwarden-software-engineer,
+    # bitwarden-security-engineer, bitwarden-product-analyst, bitwarden-init,
+    # atlassian-reader, bitwarden-atlassian-tools
 
     # REMOVED - redundant or unused:
     # double-check - unnecessary

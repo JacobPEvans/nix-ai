@@ -31,7 +31,7 @@
       flake = false;
     };
 
-    # Marketplace Inputs (14 total)
+    # Marketplace Inputs
     anthropic-agent-skills = {
       url = "github:anthropics/skills";
       flake = false;
@@ -88,6 +88,10 @@
       url = "github:wakatime/claude-code-wakatime";
       flake = false;
     };
+    bitwarden-marketplace = {
+      url = "github:bitwarden/ai-plugins";
+      flake = false;
+    };
 
     # PAL MCP server - pinned for supply-chain safety; auto-bumped by deps-update-flake.yml
     pal-mcp-server = {
@@ -119,6 +123,7 @@
       axton-obsidian-visual-skills,
       superpowers-marketplace,
       wakatime,
+      bitwarden-marketplace,
       pal-mcp-server,
       ...
     }@inputs:
@@ -145,6 +150,7 @@
           axton-obsidian-visual-skills
           superpowers-marketplace
           wakatime
+          bitwarden-marketplace
           ;
       };
     in
