@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.15.0](https://github.com/JacobPEvans/nix-ai/compare/v1.14.0...v1.15.0) (2026-03-18)
+
+
+### Features
+
+* **plugins:** add Bitwarden ai-plugins marketplace ([#217](https://github.com/JacobPEvans/nix-ai/issues/217)) ([f1ddbc1](https://github.com/JacobPEvans/nix-ai/commit/f1ddbc1e639d14fda48546663d21a9eac2f9c5a5))
+
+
+### Bug Fixes
+
+* **devshell:** use python package attr instead of version in orchestrator shell ([#218](https://github.com/JacobPEvans/nix-ai/issues/218)) ([ae9fe44](https://github.com/JacobPEvans/nix-ai/commit/ae9fe44ff157c664b6f79eb9d3d4b2126d2ef1aa))
+
 ## [1.14.0](https://github.com/JacobPEvans/nix-ai/compare/v1.13.0...v1.14.0) (2026-03-18)
 
 
