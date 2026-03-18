@@ -64,6 +64,22 @@
         "type": "github"
       }
     },
+    "bitwarden-marketplace": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1773816539,
+        "narHash": "sha256-h3i956SBwJJZxBMwEhI8iERe1QYzQkIQQUu9ZcyUpV0=",
+        "owner": "bitwarden",
+        "repo": "ai-plugins",
+        "rev": "477fdb700c2fccbc9f6239285628f77c0a3361f5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "bitwarden",
+        "repo": "ai-plugins",
+        "type": "github"
+      }
+    },
     "cachix": {
       "inputs": {
         "devenv": [
@@ -1057,6 +1073,7 @@
         "anthropic-agent-skills": "anthropic-agent-skills",
         "axton-obsidian-visual-skills": "axton-obsidian-visual-skills",
         "bills-claude-skills": "bills-claude-skills",
+        "bitwarden-marketplace": "bitwarden-marketplace",
         "cc-dev-tools": "cc-dev-tools",
         "cc-marketplace": "cc-marketplace",
         "claude-code-plugins": "claude-code-plugins",

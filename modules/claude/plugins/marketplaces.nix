@@ -191,6 +191,15 @@ let
         url = "axtonliu/axton-obsidian-visual-skills";
       };
     };
+
+    # --- Enterprise / Well-Known ---
+    # Bitwarden AI plugins: session retrospective, config validation, code review
+    "bitwarden-marketplace" = {
+      source = {
+        type = "github";
+        url = "bitwarden/ai-plugins";
+      };
+    };
   };
 
   # Validate all marketplaces at evaluation time

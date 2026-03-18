@@ -31,13 +31,17 @@
       flake = false;
     };
 
-    # Marketplace Inputs (14 total)
+    # Marketplace Inputs
     anthropic-agent-skills = {
       url = "github:anthropics/skills";
       flake = false;
     };
     bills-claude-skills = {
       url = "github:BillChirico/bills-claude-skills";
+      flake = false;
+    };
+    bitwarden-marketplace = {
+      url = "github:bitwarden/ai-plugins";
       flake = false;
     };
     cc-dev-tools = {
@@ -107,6 +111,7 @@
       ai-assistant-instructions,
       anthropic-agent-skills,
       bills-claude-skills,
+      bitwarden-marketplace,
       cc-dev-tools,
       cc-marketplace,
       claude-code-plugins-plus,
@@ -133,6 +138,7 @@
         inherit
           anthropic-agent-skills
           bills-claude-skills
+          bitwarden-marketplace
           cc-dev-tools
           cc-marketplace
           claude-code-plugins-plus
