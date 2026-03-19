@@ -45,15 +45,27 @@ in
     home.activation.updateClaudePlugins =
       lib.hm.dag.entryAfter [ "linkGeneration" "verifyCacheIntegrity" ]
         ''
+          # Resolve claude binary — activation runs as root via sudo so
+          # homebrew/nix-profile paths aren't in PATH by default.
+          CLAUDE=""
+          for p in \
+            "$(command -v claude 2>/dev/null)" \
+            /opt/homebrew/bin/claude \
+            /usr/local/bin/claude \
+            "$HOME/.nix-profile/bin/claude" \
+            /etc/profiles/per-user/*/bin/claude; do
+            [ -n "$p" ] && [ -x "$p" ] && CLAUDE="$p" && break
+          done
+
           if [ -n "$DRY_RUN_CMD" ]; then
             echo "claude-plugins: dry-run — skipping plugin cache sync" >&2
-          elif command -v claude >/dev/null 2>&1; then
-            echo "claude-plugins: syncing jacobpevans-cc-plugins cache..." >&2
-            claude plugins marketplace update jacobpevans-cc-plugins \
+          elif [ -n "$CLAUDE" ]; then
+            echo "claude-plugins: syncing jacobpevans-cc-plugins cache (using $CLAUDE)..." >&2
+            "$CLAUDE" plugins marketplace update jacobpevans-cc-plugins \
               || echo "claude-plugins: marketplace update failed (non-fatal)" >&2
-            claude plugins list | grep '@jacobpevans-cc-plugins' | sed 's/.*❯ //' \
+            "$CLAUDE" plugins list | grep '@jacobpevans-cc-plugins' | sed 's/.*❯ //' \
               | while IFS= read -r plugin; do
-                  claude plugins update "$plugin" \
+                  "$CLAUDE" plugins update "$plugin" \
                     || echo "claude-plugins: failed to update $plugin (non-fatal)" >&2
                 done
           else
