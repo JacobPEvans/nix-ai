@@ -22,8 +22,21 @@
 let
   cfg = config.programs.claude;
   mlxCfg = config.programs.mlx;
+  ollamaCfg = config.programs.ollama;
   outputDir = "${config.home.homeDirectory}/.config/pal-mcp";
   outputFile = "${outputDir}/custom_models.json";
+
+  # Shared environment for the sync script (used by both CLI tool and activation)
+  syncEnv = ''
+    export CURL="${pkgs.curl}/bin/curl"
+    export JQ="${pkgs.jq}/bin/jq"
+    export MLX_JQ_FILE="${../mcp/scripts/pal-models-mlx.jq}"
+    export OLLAMA_JQ_FILE="${../mcp/scripts/pal-models.jq}"
+    export MLX_URL="http://127.0.0.1:${toString mlxCfg.port}/v1/models"
+    export OLLAMA_URL="http://localhost:${toString ollamaCfg.port}/api/tags"
+    export OUTPUT_DIR="${outputDir}"
+    export OUTPUT_FILE="${outputFile}"
+  '';
 in
 {
   config = lib.mkIf cfg.enable {
@@ -36,23 +49,8 @@ in
       # Queries MLX /v1/models (primary) and Ollama /api/tags (fallback).
       (pkgs.writeShellScriptBin "sync-mlx-models" ''
         set -euo pipefail
-        mkdir -p "${outputDir}"
-
-        # Query MLX vllm-mlx for loaded models (OpenAI format)
-        mlx_json=$(${pkgs.curl}/bin/curl -sf http://127.0.0.1:${toString mlxCfg.port}/v1/models \
-          | ${pkgs.jq}/bin/jq --from-file ${../mcp/scripts/pal-models-mlx.jq} 2>/dev/null \
-          || echo '{"models": []}')
-
-        # Query Ollama for any additional local models (if reachable)
-        ollama_json=$(${pkgs.curl}/bin/curl -sf http://localhost:11434/api/tags \
-          | ${pkgs.jq}/bin/jq --from-file ${../mcp/scripts/pal-models.jq} 2>/dev/null \
-          || echo '{"models": []}')
-
-        # Merge MLX + Ollama models
-        echo "$mlx_json" \
-          | ${pkgs.jq}/bin/jq --argjson ollama "$(echo "$ollama_json" | ${pkgs.jq}/bin/jq '.models')" \
-            '.models += $ollama' \
-          > "${outputFile}"
+        ${syncEnv}
+        . ${../mcp/scripts/sync-pal-models.sh}
         echo "PAL custom models updated. Restart Claude Code to pick up changes."
       '')
     ];
@@ -64,23 +62,8 @@ in
     # Generate custom_models.json by merging dynamic MLX + Ollama models.
     # If either server is unreachable, its section contributes an empty list.
     home.activation.palCustomModels = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      mkdir -p "${outputDir}"
-
-      # Query MLX vllm-mlx for loaded models (OpenAI format)
-      mlx_json=$(${pkgs.curl}/bin/curl -sf http://127.0.0.1:${toString mlxCfg.port}/v1/models \
-        | ${pkgs.jq}/bin/jq --from-file ${../mcp/scripts/pal-models-mlx.jq} 2>/dev/null \
-        || echo '{"models": []}')
-
-      # Query Ollama for any additional local models (if reachable)
-      ollama_json=$(${pkgs.curl}/bin/curl -sf http://localhost:11434/api/tags \
-        | ${pkgs.jq}/bin/jq --from-file ${../mcp/scripts/pal-models.jq} 2>/dev/null \
-        || echo '{"models": []}')
-
-      # Merge MLX + Ollama models
-      echo "$mlx_json" \
-        | ${pkgs.jq}/bin/jq --argjson ollama "$(echo "$ollama_json" | ${pkgs.jq}/bin/jq '.models')" \
-          '.models += $ollama' \
-        > "${outputFile}"
+      ${syncEnv}
+      . ${../mcp/scripts/sync-pal-models.sh}
     '';
   };
 }

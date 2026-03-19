@@ -25,6 +25,12 @@ in
       default = "/Volumes/Ollama";
       description = "Path to the dedicated APFS volume where Ollama models are stored";
     };
+
+    port = lib.mkOption {
+      type = lib.types.port;
+      default = 11434;
+      description = "Port for the Ollama API server";
+    };
   };
 
   config = lib.mkMerge [
