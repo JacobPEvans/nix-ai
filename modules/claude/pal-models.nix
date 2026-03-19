@@ -52,6 +52,24 @@ in
     # resolves via PATH. The package is built from the pinned flake input.
     home.packages = [
       (pkgs.callPackage ../mcp/pal-package.nix { inherit pal-mcp-server; })
+
+      # Refresh custom_models.json between darwin-rebuild switches.
+      # Run after `ollama pull <model>` to register new models in PAL.
+      (pkgs.writeShellScriptBin "sync-ollama-models" ''
+        set -euo pipefail
+        mkdir -p "${outputDir}"
+
+        # Try Ollama first; fall back to empty model list
+        ollama_json=$(${pkgs.curl}/bin/curl -sf http://localhost:11434/api/tags \
+          | ${pkgs.jq}/bin/jq --from-file ${../mcp/scripts/pal-models.jq} 2>/dev/null \
+          || echo '{"models": []}')
+
+        # Append static MLX model entry
+        echo "$ollama_json" \
+          | ${pkgs.jq}/bin/jq --argjson mlx '${mlxModelJson}' '.models += [$mlx]' \
+          > "${outputFile}"
+        echo "PAL custom models updated. Restart Claude Code to pick up changes."
+      '')
     ];
 
     # Inject CUSTOM_MODELS_CONFIG_PATH into PAL server env.
