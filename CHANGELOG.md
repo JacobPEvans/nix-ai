@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.4](https://github.com/JacobPEvans/nix-ai/compare/v1.16.3...v1.16.4) (2026-03-19)
+
+
+### Bug Fixes
+
+* resolve claude binary path during sudo activation ([#238](https://github.com/JacobPEvans/nix-ai/issues/238)) ([a0d6d1a](https://github.com/JacobPEvans/nix-ai/commit/a0d6d1a9e77a77982593c228aa18119a97d0006a))
+
 ## [1.16.3](https://github.com/JacobPEvans/nix-ai/compare/v1.16.2...v1.16.3) (2026-03-19)
 
 
