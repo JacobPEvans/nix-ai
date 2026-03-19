@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.16.0](https://github.com/JacobPEvans/nix-ai/compare/v1.15.0...v1.16.0) (2026-03-19)
+
+
+### Features
+
+* enable MLX inference server (vllm-mlx on port 11435) ([#229](https://github.com/JacobPEvans/nix-ai/issues/229)) ([b7b2a1b](https://github.com/JacobPEvans/nix-ai/commit/b7b2a1b7a977873d4557a6f7e9c8bfece61a213c))
+
+
+### Bug Fixes
+
+* add release-please config for manifest mode ([5c1d9eb](https://github.com/JacobPEvans/nix-ai/commit/5c1d9ebbab3ec1ef87813e837a188945b74f0e48))
+* move sync-ollama-models to pal-models.nix for MLX model append ([#226](https://github.com/JacobPEvans/nix-ai/issues/226)) ([d66fca5](https://github.com/JacobPEvans/nix-ai/commit/d66fca59ee907056e53a23f12ca7853ddfb9b902))
+* PAL MCP model routing — fix JSON nesting, MLX-first default, add MLX models ([#225](https://github.com/JacobPEvans/nix-ai/issues/225)) ([15b297a](https://github.com/JacobPEvans/nix-ai/commit/15b297adc5208e54e67056f4382fa3396b525d77))
+* **plugins:** update stale plugin count comment in development.nix ([#222](https://github.com/JacobPEvans/nix-ai/issues/222)) ([5ffd43d](https://github.com/JacobPEvans/nix-ai/commit/5ffd43db73206590cda7797aa37a642dc94521c9))
+* sync release-please permissions and VERSION ([df6938a](https://github.com/JacobPEvans/nix-ai/commit/df6938a57a3944d5d24bdfdddcfaf2ba5f6d0278))
+
 ## [1.15.0](https://github.com/JacobPEvans/nix-ai/compare/v1.14.0...v1.15.0) (2026-03-18)
 
 
