@@ -42,17 +42,18 @@ in
     # Only targets jacobpevans-cc-plugins — other marketplaces manage their own
     # update cadence. Fails open: if claude CLI is missing or updates fail, log
     # a warning and continue.
-    home.activation.updateClaudePlugins = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    home.activation.updateClaudePlugins = lib.hm.dag.entryAfter [ "linkGeneration" "verifyCacheIntegrity" ] ''
       if [ -n "$DRY_RUN_CMD" ]; then
         echo "claude-plugins: dry-run — skipping plugin cache sync" >&2
       elif command -v claude >/dev/null 2>&1; then
         echo "claude-plugins: syncing jacobpevans-cc-plugins cache..." >&2
-        claude plugins marketplace update jacobpevans-cc-plugins 2>/dev/null \
+        claude plugins marketplace update jacobpevans-cc-plugins \
           || echo "claude-plugins: marketplace update failed (non-fatal)" >&2
-        for plugin in $(claude plugins list 2>/dev/null | grep '@jacobpevans-cc-plugins' | sed 's/.*❯ //'); do
-          claude plugins update "$plugin" 2>/dev/null \
-            || echo "claude-plugins: failed to update $plugin (non-fatal)" >&2
-        done
+        claude plugins list | grep '@jacobpevans-cc-plugins' | sed 's/.*❯ //' \
+          | while IFS= read -r plugin; do
+              claude plugins update "$plugin" \
+                || echo "claude-plugins: failed to update $plugin (non-fatal)" >&2
+            done
       else
         echo "claude-plugins: claude CLI not found — skipping plugin cache sync" >&2
       fi
