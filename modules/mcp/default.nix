@@ -76,7 +76,7 @@ in
   # API keys injected via Doppler (doppler-mcp wrapper, at least one required):
   #   - GEMINI_API_KEY (Google Gemini)
   #   - OPENROUTER_API_KEY (OpenRouter - unified model access)
-  #   - OLLAMA_HOST (local Ollama server URL)
+  #   - OLLAMA_HOST (local Ollama server URL — being deprecated in favor of MLX)
   #
   # Non-secret config is set in env below (belongs in Nix, not Doppler).
 

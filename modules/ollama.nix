@@ -25,6 +25,12 @@ in
       default = "/Volumes/Ollama";
       description = "Path to the dedicated APFS volume where Ollama models are stored";
     };
+
+    port = lib.mkOption {
+      type = lib.types.port;
+      default = 11434;
+      description = "Port for the Ollama API server";
+    };
   };
 
   config = lib.mkMerge [
@@ -56,7 +62,12 @@ in
         # Default: 5m
         # Format: duration (e.g., "30s", "5m", "1h", "24h", "-1" for infinite)
         # "-1" keeps models always loaded (faster subsequent requests, more memory)
-        OLLAMA_KEEP_ALIVE = "1h";
+        OLLAMA_KEEP_ALIVE = "10m";
+
+        # Maximum memory Ollama may allocate for loaded models
+        # Default: unlimited (will consume all available unified memory)
+        # Cap prevents OOM crashes when MLX is also running (~60-70GB)
+        OLLAMA_MAX_MEMORY = "20G";
 
         # Maximum number of parallel model requests
         # Default: 1 (sequential processing)
@@ -164,7 +175,8 @@ in
           EnvironmentVariables = {
             OLLAMA_MODELS = "${cfg.modelsVolume}/models";
             OLLAMA_CONTEXT_LENGTH = "8192";
-            OLLAMA_KEEP_ALIVE = "1h";
+            OLLAMA_KEEP_ALIVE = "10m";
+            OLLAMA_MAX_MEMORY = "20G";
           };
           RunAtLoad = true;
           KeepAlive = true;

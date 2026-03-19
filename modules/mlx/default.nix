@@ -11,10 +11,10 @@
 # MLX is ~2x faster than Ollama for token generation on M4 Max with ~50% less memory.
 #
 # Features:
-#   - Always-on LaunchAgent running a default ~15GB model
+#   - Always-on LaunchAgent running a default MoE model (~70GB, 10B active)
 #   - Foreground model switching (auto-restores default on exit)
 #   - CLI tools for quick prompts (mlx) and interactive chat (mlx-chat)
-#   - OpenAI-compatible API at http://127.0.0.1:11435/v1
+#   - OpenAI-compatible API at http://127.0.0.1:11436/v1
 #
 # Models stored on dedicated APFS volume: /Volumes/HuggingFace
 #
@@ -40,7 +40,7 @@ in
 
     defaultModel = lib.mkOption {
       type = lib.types.str;
-      default = "mlx-community/gpt-oss-120b-4bit";
+      default = "mlx-community/Qwen3.5-122B-A10B-4bit";
       description = "Default HuggingFace model to serve via vllm-mlx";
     };
 

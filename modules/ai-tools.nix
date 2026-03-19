@@ -170,8 +170,8 @@
       exec ${pkgs.doppler}/bin/doppler run -p ai-ci-automation -c prd -- "$@"
     '')
 
-    # sync-ollama-models moved to modules/claude/pal-models.nix
-    # (needs MLX config access to append static MLX model entry)
+    # sync-mlx-models moved to modules/claude/pal-models.nix
+    # (needs MLX config access for dynamic model discovery)
 
     # ==========================================================================
     # Check PAL MCP Health
@@ -198,7 +198,7 @@
 
       echo ""
       echo "3. PAL secrets (ai-ci-automation/prd):"
-      required_secrets=(GEMINI_API_KEY OPENROUTER_API_KEY OLLAMA_HOST)
+      required_secrets=(GEMINI_API_KEY OPENROUTER_API_KEY)
       missing_any=0
       for secret in "''${required_secrets[@]}"; do
         if ${pkgs.doppler}/bin/doppler secrets get "$secret" \
