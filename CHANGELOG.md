@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.2](https://github.com/JacobPEvans/nix-ai/compare/v1.16.1...v1.16.2) (2026-03-19)
+
+
+### Bug Fixes
+
+* clarify MLX port description as default choice ([#232](https://github.com/JacobPEvans/nix-ai/issues/232)) ([d9125dc](https://github.com/JacobPEvans/nix-ai/commit/d9125dcba9630944fc2258b52aded1e8bf7e5e38))
+
 ## [1.16.1](https://github.com/JacobPEvans/nix-ai/compare/v1.16.0...v1.16.1) (2026-03-19)
 
 
