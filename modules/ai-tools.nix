@@ -170,20 +170,8 @@
       exec ${pkgs.doppler}/bin/doppler run -p ai-ci-automation -c prd -- "$@"
     '')
 
-    # ==========================================================================
-    # Sync PAL Ollama Models
-    # ==========================================================================
-    # Refreshes ~/.config/pal-mcp/custom_models.json from `ollama list`.
-    # Run after `ollama pull <model>` to make new models available in PAL
-    # without a full darwin-rebuild switch.
-    (writeShellScriptBin "sync-ollama-models" ''
-      set -euo pipefail
-      mkdir -p "$HOME/.config/pal-mcp"
-      ${pkgs.curl}/bin/curl -sf http://localhost:11434/api/tags \
-        | ${pkgs.jq}/bin/jq --from-file ${./mcp/scripts/pal-models.jq} \
-        > "$HOME/.config/pal-mcp/custom_models.json"
-      echo "PAL custom models updated. Restart Claude Code to pick up changes."
-    '')
+    # sync-ollama-models moved to modules/claude/pal-models.nix
+    # (needs MLX config access to append static MLX model entry)
 
     # ==========================================================================
     # Check PAL MCP Health
