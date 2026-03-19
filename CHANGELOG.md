@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.3](https://github.com/JacobPEvans/nix-ai/compare/v1.16.2...v1.16.3) (2026-03-19)
+
+
+### Bug Fixes
+
+* auto-sync Claude Code plugin cache after nix rebuild ([#235](https://github.com/JacobPEvans/nix-ai/issues/235)) ([edba1ad](https://github.com/JacobPEvans/nix-ai/commit/edba1adb0d2ade246e7c7ce51a60762d8fb770ae))
+* cap Ollama memory at 20G, switch MLX default to Qwen3.5-122B MoE ([#234](https://github.com/JacobPEvans/nix-ai/issues/234)) ([9d82a86](https://github.com/JacobPEvans/nix-ai/commit/9d82a86d8a17b88eeb670e490a6401ff7f92e73f))
+
 ## [1.16.2](https://github.com/JacobPEvans/nix-ai/compare/v1.16.1...v1.16.2) (2026-03-19)
 
 
