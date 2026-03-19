@@ -54,7 +54,7 @@ in
             /usr/local/bin/claude \
             "$HOME/.nix-profile/bin/claude" \
             /etc/profiles/per-user/*/bin/claude; do
-            [ -n "$p" ] && [ -x "$p" ] && CLAUDE="$p" && break
+            [ -n "$p" ] && [ -f "$p" ] && [ -x "$p" ] && CLAUDE="$p" && break
           done
 
           if [ -n "$DRY_RUN_CMD" ]; then
