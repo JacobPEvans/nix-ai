@@ -32,7 +32,7 @@ let
     export JQ="${pkgs.jq}/bin/jq"
     export MLX_JQ_FILE="${../mcp/scripts/pal-models-mlx.jq}"
     export OLLAMA_JQ_FILE="${../mcp/scripts/pal-models.jq}"
-    export MLX_URL="http://127.0.0.1:${toString mlxCfg.port}/v1/models"
+    export MLX_URL="http://${mlxCfg.host}:${toString mlxCfg.port}/v1/models"
     export OLLAMA_URL="http://localhost:${toString ollamaCfg.port}/api/tags"
     export OUTPUT_DIR="${outputDir}"
     export OUTPUT_FILE="${outputFile}"

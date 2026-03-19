@@ -11,7 +11,7 @@
 # MLX is ~2x faster than Ollama for token generation on M4 Max with ~50% less memory.
 #
 # Features:
-#   - Always-on LaunchAgent running a default ~15GB model
+#   - Always-on LaunchAgent running a default MoE model (~70GB, 10B active)
 #   - Foreground model switching (auto-restores default on exit)
 #   - CLI tools for quick prompts (mlx) and interactive chat (mlx-chat)
 #   - OpenAI-compatible API at http://127.0.0.1:11436/v1

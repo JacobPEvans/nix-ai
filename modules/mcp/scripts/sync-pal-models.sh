@@ -26,7 +26,12 @@ ollama_json=$("$CURL" -sf --connect-timeout 3 --max-time 5 "$OLLAMA_URL" \
   || echo '{"models": []}')
 
 # Merge MLX + Ollama models
-echo "$mlx_json" \
+merged=$(echo "$mlx_json" \
   | "$JQ" --argjson ollama "$(echo "$ollama_json" | "$JQ" '.models')" \
-    '.models += $ollama' \
-  > "$OUTPUT_FILE"
+    '.models += $ollama')
+
+# Only overwrite if at least one backend returned models (preserve previous file otherwise)
+model_count=$(echo "$merged" | "$JQ" '.models | length')
+if [ "$model_count" -gt 0 ] || [ ! -f "$OUTPUT_FILE" ]; then
+  echo "$merged" > "$OUTPUT_FILE"
+fi
