@@ -14,7 +14,7 @@
     .data[]
     | .id as $id
     | ($id | split("/") | last) as $short
-    | ($short | ascii_downcase | gsub("-(?:4bit|8bit|3bit)$"; "")) as $clean
+    | ($short | ascii_downcase | gsub("-[0-9]+bit$"; "")) as $clean
     | {
         model_name: $id,
         aliases: [$short, $clean],
