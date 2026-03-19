@@ -2,6 +2,7 @@
 #
 # Transforms Ollama /api/tags JSON → PAL MCP custom_models.json format.
 # Usage: curl -sf http://localhost:11434/api/tags | jq --from-file pal-models.jq
+# Note: Ollama models are supplementary — MLX is the primary backend (see pal-models-mlx.jq)
 #
 # Behaviour:
 #   - Skips models with "/" in name (OpenRouter/proxy entries)
