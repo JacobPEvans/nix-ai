@@ -12,49 +12,47 @@
 #   - Deduplication: first model to claim an alias wins; later models lose that alias
 
 {
-  custom_api: {
-    models: (
-      [
-        .models[]
-        | select(.name | contains("/") | not)
-        | .name as $name
-        | ($name | split(":")[0]) as $base
-        | ($name | split(":")[1] // "latest") as $tag
-        | (if $tag == "latest" then $base else $name end) as $model_name
-        | (.size / 1073741824) as $gb
-        | (if $gb == 0 then 14
-           elif $gb < 5 then 5
-           elif $gb < 20 then 8
-           elif $gb < 40 then 11
-           elif $gb < 70 then 14
-           else 17 end) as $score
+  models: (
+    [
+      .models[]
+      | select(.name | contains("/") | not)
+      | .name as $name
+      | ($name | split(":")[0]) as $base
+      | ($name | split(":")[1] // "latest") as $tag
+      | (if $tag == "latest" then $base else $name end) as $model_name
+      | (.size / 1073741824) as $gb
+      | (if $gb == 0 then 14
+         elif $gb < 5 then 5
+         elif $gb < 20 then 8
+         elif $gb < 40 then 11
+         elif $gb < 70 then 14
+         else 17 end) as $score
+      | {
+          model_name: $model_name,
+          aliases: (
+            if $tag == "latest" then [$base]
+            else [$base, "\($base)-\($tag)"]
+            end
+          ),
+          intelligence_score: $score,
+          speed_score: 5,
+          json_mode: false,
+          function_calling: false,
+          images: false
+        }
+    ]
+    | reduce .[] as $m (
+        {seen: [], out: []};
+        .seen as $seen
+        | .out as $out
+        | $m
+        | .aliases |= map(select(. as $a | $seen | index($a) | not))
+        | . as $cleaned
         | {
-            model_name: $model_name,
-            aliases: (
-              if $tag == "latest" then [$base]
-              else [$base, "\($base)-\($tag)"]
-              end
-            ),
-            intelligence_score: $score,
-            speed_score: 5,
-            json_mode: false,
-            function_calling: false,
-            images: false
+            seen: ($seen + $cleaned.aliases),
+            out: ($out + [$cleaned])
           }
-      ]
-      | reduce .[] as $m (
-          {seen: [], out: []};
-          .seen as $seen
-          | .out as $out
-          | $m
-          | .aliases |= map(select(. as $a | $seen | index($a) | not))
-          | . as $cleaned
-          | {
-              seen: ($seen + $cleaned.aliases),
-              out: ($out + [$cleaned])
-            }
-        )
-      | .out
-    )
-  }
+      )
+    | .out
+  )
 }

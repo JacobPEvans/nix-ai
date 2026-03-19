@@ -94,6 +94,8 @@ in
       # 'pro' = latest Gemini Pro (requires GEMINI_API_KEY).
       # 'auto' = PAL picks best available model based on configured API keys.
       DEFAULT_MODEL = "pro";
+      # Custom API endpoint — MLX inference server (vllm-mlx on port 11435)
+      CUSTOM_API_URL = "http://127.0.0.1:11435/v1";
       # Conversation limits
       CONVERSATION_TIMEOUT_HOURS = "6";
       MAX_CONVERSATION_TURNS = "50";

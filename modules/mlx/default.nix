@@ -40,8 +40,8 @@ in
 
     defaultModel = lib.mkOption {
       type = lib.types.str;
-      default = "mlx-community/Qwen3.5-27B-4bit";
-      description = "Default HuggingFace model to serve (~15GB for Qwen3.5-27B-4bit)";
+      default = "mlx-community/gpt-oss-120b-4bit";
+      description = "Default HuggingFace model to serve via vllm-mlx";
     };
 
     port = lib.mkOption {
