@@ -113,7 +113,7 @@ in
     # Revisit: if vllm-mlx adds paged KV cache with true continuous batching,
     # or if switching to a smaller model where bandwidth is not the bottleneck.
     # decodeConcurrency = lib.mkOption {
-    #   type = lib.types.int;
+    #   type = lib.types.ints.positive;
     #   default = 32;
     #   description = "Max concurrent decode requests. No benefit for 122B MoE on M4 Max (bandwidth-bound).";
     # };
@@ -123,7 +123,7 @@ in
     # does not help when one request already saturates memory bandwidth.
     # Revisit: same conditions as decodeConcurrency.
     # promptConcurrency = lib.mkOption {
-    #   type = lib.types.int;
+    #   type = lib.types.ints.positive;
     #   default = 8;
     #   description = "Max concurrent prefill requests. No benefit for 122B MoE (bandwidth-bound).";
     # };
@@ -157,7 +157,7 @@ in
     # acceptance overhead but can improve throughput if draft quality is high.
     # Revisit: tune after enabling draftModel — start at 3, try 5 if acceptance > 80%.
     # numDraftTokens = lib.mkOption {
-    #   type = lib.types.int;
+    #   type = lib.types.ints.positive;
     #   default = 3;
     #   description = "Tokens drafted per speculative step. Only used with draftModel.";
     # };
@@ -178,7 +178,7 @@ in
     # Setting this would only affect raw curl calls without max_tokens.
     # Revisit: no need unless adding a consumer that omits max_tokens.
     # maxTokens = lib.mkOption {
-    #   type = lib.types.int;
+    #   type = lib.types.ints.positive;
     #   default = 512;
     #   description = "Default max tokens when client omits max_tokens. All current consumers set it explicitly.";
     # };
