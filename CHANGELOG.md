@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.17.2](https://github.com/JacobPEvans/nix-ai/compare/v1.17.1...v1.17.2) (2026-03-20)
+
+
+### Bug Fixes
+
+* add MLX perf tuning flags and remove Ollama from stack ([#243](https://github.com/JacobPEvans/nix-ai/issues/243)) ([f375d87](https://github.com/JacobPEvans/nix-ai/commit/f375d8758903d7e1909514237ec36349c5d158bb))
+* add MLX performance tuning flags for vllm-mlx LaunchAgent ([f375d87](https://github.com/JacobPEvans/nix-ai/commit/f375d8758903d7e1909514237ec36349c5d158bb))
+
 ## [1.17.1](https://github.com/JacobPEvans/nix-ai/compare/v1.17.0...v1.17.1) (2026-03-20)
 
 
