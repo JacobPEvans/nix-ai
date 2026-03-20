@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.5](https://github.com/JacobPEvans/nix-ai/compare/v1.17.4...v1.17.5) (2026-03-20)
+
+
+### Bug Fixes
+
+* **mlx:** update LaunchAgent flags for vllm-mlx 0.2.6 CLI, split checks.nix ([#250](https://github.com/JacobPEvans/nix-ai/issues/250)) ([b9c7165](https://github.com/JacobPEvans/nix-ai/commit/b9c716564687a92dae39f4ea03ff650da6895ecb))
+
 ## [1.17.4](https://github.com/JacobPEvans/nix-ai/compare/v1.17.3...v1.17.4) (2026-03-20)
 
 
