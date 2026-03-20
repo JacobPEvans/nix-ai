@@ -5,11 +5,10 @@
   ...
 }:
 #
-# MLX Inference Server Module
+# MLX Inference Server Module (vllm-mlx 0.2.6)
 #
-# Manages an MLX inference server as a macOS LaunchAgent for Apple Silicon.
-# Supports two backends: vllm-mlx (faster for MoE) and mlx-lm (Apple's reference server).
-# Only one backend runs at a time via the `backend` option.
+# Manages the vllm-mlx inference server as a macOS LaunchAgent for Apple Silicon.
+# MLX is ~2x faster than llama.cpp for token generation on M4 Max with ~50% less memory.
 #
 # Features:
 #   - Always-on LaunchAgent running a default MoE model (~70GB, 10B active)
@@ -19,17 +18,16 @@
 #
 # Models stored on dedicated APFS volume: /Volumes/HuggingFace
 #
+# Parameter reference: vllm-mlx 0.2.6 `serve --help` output (captured from local binary).
+#
 let
   cfg = config.programs.mlx;
 
-  # vllm-mlx wrapper — pinned version, Nix store path for LaunchAgent.
+  # Central vllm-mlx wrapper — single source of truth for the pinned version.
+  # The LaunchAgent needs a Nix store path (not a PATH lookup), so the
+  # derivation lives here. Also added to home.packages for CLI access.
   vllmMlxPkg = pkgs.writeShellScriptBin "vllm-mlx" ''
     exec ${pkgs.uv}/bin/uvx --from "vllm-mlx==0.2.6" vllm-mlx "$@"
-  '';
-
-  # mlx-lm wrapper — pinned version, Nix store path for LaunchAgent.
-  mlxLmPkg = pkgs.writeShellScriptBin "mlx-lm-server" ''
-    exec ${pkgs.uv}/bin/uvx --from "mlx-lm==0.31.1" mlx_lm.server "$@"
   '';
 
   apiUrl = "http://${cfg.host}:${toString cfg.port}/v1";
@@ -40,33 +38,24 @@ in
   # Configuration Options
   # ============================================================================
   options.programs.mlx = {
-    enable = lib.mkEnableOption "MLX inference server";
-
-    backend = lib.mkOption {
-      type = lib.types.enum [
-        "vllm-mlx"
-        "mlx-lm"
-      ];
-      default = "vllm-mlx";
-      description = "Inference backend. vllm-mlx = faster for MoE, mlx-lm = Apple's reference server.";
-    };
+    enable = lib.mkEnableOption "MLX inference server via vllm-mlx";
 
     defaultModel = lib.mkOption {
       type = lib.types.str;
       default = "mlx-community/Qwen3.5-122B-A10B-4bit";
-      description = "Default HuggingFace model to serve";
+      description = "Default HuggingFace model to serve via vllm-mlx";
     };
 
     port = lib.mkOption {
       type = lib.types.port;
       default = 11434;
-      description = "Port for the API server (avoids conflict with other services on port 8080)";
+      description = "Port for the vllm-mlx API server (avoids conflict with 8080 used by Open WebUI)";
     };
 
     host = lib.mkOption {
       type = lib.types.str;
       default = "127.0.0.1";
-      description = "Host address for the API server";
+      description = "Host address for the vllm-mlx API server";
     };
 
     huggingFaceHome = lib.mkOption {
@@ -75,93 +64,292 @@ in
       description = "Path to HuggingFace model cache (dedicated APFS volume)";
     };
 
-    # ---- vllm-mlx 0.2.6 SETTINGS ----
+    # ---- vllm-mlx 0.2.6 PERFORMANCE TUNING ----
     # Benchmarked 2026-03-19 on M4 Max 128GB with Qwen3.5-122B-A10B-4bit.
     # Baseline: 55-74 tok/s generation, no parallel request benefit (bandwidth-bound).
-    vllmMlxSettings = {
+    #
+    # vllm-mlx 0.2.6 replaced the old token-count KV cache (--max-kv-size) with a
+    # memory-aware cache that auto-sizes based on available RAM and evicts via LRU.
+    # The default allocates ~20% of RAM (~25.6GB on 128GB), which combined with
+    # ~70GB model weights leaves comfortable headroom for macOS + apps.
 
-      # chunkedPrefillTokens — Max prefill tokens per scheduler step (--chunked-prefill-tokens).
-      # Prevents starvation of active decode requests during long prefills by chunking
-      # the prefill into smaller steps. 0 = disabled (process entire prefill at once).
-      # Current: 8192 (balanced speed vs memory for M4 Max 128GB)
-      # Revisit: try 16384 after confirming headroom, or 0 to disable chunking
-      chunkedPrefillTokens = lib.mkOption {
-        type = lib.types.ints.unsigned;
-        default = 8192;
-        description = "Max prefill tokens per scheduler step (--chunked-prefill-tokens). 0 = disabled.";
-      };
-
-      # cacheMemoryMb — Hard cap on KV cache memory (--cache-memory-mb).
-      # Prevents kernel panic: IOGPUMemory completeMemory() prepare count underflow
-      # on long agentic sessions (58k+ tokens). Critical for 122B models using ~70GB
-      # RAM for weights alone — unbounded KV growth crashes the system.
-      # Ref: https://github.com/ml-explore/mlx-lm/issues/883
-      # vllm-mlx default: auto-detect ~20% of RAM (~25GB on 128GB). We keep the default
-      # since 25GB is reasonable headroom above the ~70GB model weight footprint.
-      # Revisit: set explicitly if OOM occurs, or increase on M4 Ultra 256GB.
-      cacheMemoryMb = lib.mkOption {
-        type = lib.types.nullOr lib.types.ints.positive;
-        default = null;
-        description = "Hard cap on KV cache memory in MB (--cache-memory-mb). Null = auto-detect ~20% of RAM.";
-      };
-
-      # prefixCacheSize — Number of distinct KV prefix caches held in LRU (--prefix-cache-size).
-      # Enables prefix reuse: requests sharing the same system prompt skip re-prefill
-      # entirely, yielding up to 5.8x TTFT speedup. Only used in legacy (non-memory-aware)
-      # cache mode. vllm-mlx 0.2.6 defaults to memory-aware cache which auto-manages entries.
-      # Current: null (use vllm-mlx default of 100 with memory-aware cache)
-      # Revisit: set explicitly with --no-memory-aware-cache for deterministic behavior
-      prefixCacheSize = lib.mkOption {
-        type = lib.types.nullOr lib.types.ints.positive;
-        default = null;
-        description = "Max entries in prefix cache (--prefix-cache-size). Null = use server default (100, legacy mode only).";
-      };
+    # cacheMemoryMb — Override the memory-aware cache size (--cache-memory-mb).
+    # Default: null = auto-detect (~20% RAM = ~25.6GB on 128GB systems).
+    # Prevents kernel panic: IOGPUMemory completeMemory() prepare count underflow
+    # on long agentic sessions (58k+ tokens). The memory-aware LRU eviction handles
+    # this automatically, but an explicit cap can be set if needed.
+    # Ref: https://github.com/ml-explore/mlx-lm/issues/883
+    # Revisit: increase on M4 Ultra 256GB, or decrease if running a larger model.
+    cacheMemoryMb = lib.mkOption {
+      type = lib.types.nullOr lib.types.ints.positive;
+      default = null;
+      description = "Cache memory limit in MB. Null = auto-detect (~20% RAM). Overrides memory-aware cache sizing.";
     };
 
-    # ---- mlx-lm 0.31.1 SETTINGS ----
-    mlxLmSettings = {
-
-      # prefillStepSize — Chunk size for prompt prefill processing (--prefill-step-size).
-      # mlx-lm default: 2048. Increasing to 8192 yields ~1.5x TTFT improvement on long prompts.
-      # Revisit: try 16384 after confirming memory headroom
-      prefillStepSize = lib.mkOption {
-        type = lib.types.ints.positive;
-        default = 8192;
-        description = "Prefill chunk size in tokens (--prefill-step-size). Larger = faster TTFT on long prompts.";
-      };
-
-      # promptCacheSize — Number of distinct KV prefix caches held in LRU (--prompt-cache-size).
-      # mlx-lm default: not set. Enables prefix reuse for repeated system prompts.
-      promptCacheSize = lib.mkOption {
-        type = lib.types.nullOr lib.types.ints.positive;
-        default = null;
-        description = "Max entries in prompt cache (--prompt-cache-size). Null = server default.";
-      };
-
-      # promptCacheBytes — Max total bytes for all cached KV prefixes (--prompt-cache-bytes).
-      # Example: "16G". Not set because count-based promptCacheSize is safer.
-      promptCacheBytes = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        default = null;
-        description = "Max total bytes for prompt caches (e.g. '16G'). Null = unlimited.";
-      };
-
-      # decodeConcurrency — Max requests decoded in parallel (--decode-concurrency).
-      # mlx-lm default: 32. Benchmarked 2026-03-19: no benefit for 122B MoE (bandwidth-bound).
-      decodeConcurrency = lib.mkOption {
-        type = lib.types.nullOr lib.types.ints.positive;
-        default = null;
-        description = "Max concurrent decode requests (--decode-concurrency). Null = server default.";
-      };
-
-      # promptConcurrency — Max prompts processed in parallel during prefill (--prompt-concurrency).
-      # mlx-lm default: 8. No benefit for 122B MoE (bandwidth-bound).
-      promptConcurrency = lib.mkOption {
-        type = lib.types.nullOr lib.types.ints.positive;
-        default = null;
-        description = "Max concurrent prefill requests (--prompt-concurrency). Null = server default.";
-      };
+    # prefillBatchSize — Batch size for prompt prefill processing (--prefill-batch-size).
+    # Default: null = server picks optimal value based on available memory.
+    # Previously --prefill-step-size; renamed in v0.2.6.
+    # Larger values can improve TTFT on long prompts but increase memory pressure.
+    # Revisit: benchmark specific values if TTFT is a concern.
+    prefillBatchSize = lib.mkOption {
+      type = lib.types.nullOr lib.types.ints.positive;
+      default = null;
+      description = "Prefill batch size (tokens). Null = server default. Larger = faster TTFT, more memory.";
     };
+
+    # ---- INACTIVE PERFORMANCE OPTIONS (vllm-mlx 0.2.6) ----
+    # Complete parameter reference from `vllm-mlx serve --help`.
+    # Each option explains what it does, the server default, why it's disabled
+    # for our setup (M4 Max 128GB, Qwen3.5-122B, single-user, agentic workloads),
+    # and when to revisit.
+
+    # ---- ACTIVE TUNING (uncomment to override server defaults) ----
+
+    # cacheMemoryPercent — Fraction of available RAM for cache (--cache-memory-percent).
+    # Server default: 0.20. Alternative to cacheMemoryMb for proportional sizing.
+    # Disabled: auto-detect (20%) is appropriate for 128GB with a 70GB model.
+    # Revisit: if switching models or needing finer memory control.
+    # cacheMemoryPercent = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.float;
+    #   default = null;
+    #   description = "Fraction of RAM for cache (0.0-1.0). Alternative to cacheMemoryMb.";
+    # };
+
+    # chunkedPrefillTokens — Max prefill tokens per scheduler step (--chunked-prefill-tokens).
+    # Server default: 0 (disabled). Prevents prefill starvation in multi-request scenarios.
+    # Disabled: single-user setup, no contention during prefill.
+    # Revisit: if enabling continuousBatching for multi-user.
+    # chunkedPrefillTokens = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.ints.unsigned;
+    #   default = null;
+    #   description = "Max prefill tokens per scheduler step. 0 = disabled. Prevents prefill starvation.";
+    # };
+
+    # maxNumSeqs — Max concurrent sequences (--max-num-seqs).
+    # Server default: unset (no limit). Caps parallel request handling.
+    # Disabled: single-user LaunchAgent, one request at a time.
+    # Revisit: if serving multiple concurrent consumers.
+    # maxNumSeqs = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.ints.positive;
+    #   default = null;
+    #   description = "Max concurrent sequences. Null = no limit.";
+    # };
+
+    # completionBatchSize — Completion batch size (--completion-batch-size).
+    # Server default: unset. Controls decode batching.
+    # Disabled: single-user, no batching benefit.
+    # Revisit: if adding concurrent consumers.
+    # completionBatchSize = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.ints.positive;
+    #   default = null;
+    #   description = "Completion batch size. Null = server default.";
+    # };
+
+    # streamInterval — Tokens to batch before streaming (--stream-interval).
+    # Server default: unset. 1 = smooth streaming, higher = more throughput.
+    # Disabled: server default is fine for agentic workloads.
+    # Revisit: if latency-sensitive streaming is needed (set to 1).
+    # streamInterval = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.ints.positive;
+    #   default = null;
+    #   description = "Tokens batched before streaming. 1 = smooth, higher = throughput.";
+    # };
+
+    # maxTokens — Default max generation length (--max-tokens).
+    # Server default: 32768. Only affects requests that omit max_tokens.
+    # Disabled: all consumers (PAL, mlx-chat, local AI tools) set max_tokens explicitly.
+    # Revisit: no need unless adding a consumer that omits max_tokens.
+    # maxTokens = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.ints.positive;
+    #   default = null;
+    #   description = "Default max tokens when client omits max_tokens. Server default: 32768.";
+    # };
+
+    # defaultTemperature — Override default temperature (--default-temperature).
+    # Server default: model-dependent. Overrides for all requests without explicit temperature.
+    # Disabled: consumers set temperature explicitly.
+    # Revisit: only if a consumer relies on server defaults.
+    # defaultTemperature = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.float;
+    #   default = null;
+    #   description = "Override default temperature for requests that don't set it.";
+    # };
+
+    # defaultTopP — Override default top_p (--default-top-p).
+    # Server default: model-dependent.
+    # Disabled: consumers set top_p explicitly.
+    # Revisit: same as defaultTemperature.
+    # defaultTopP = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.float;
+    #   default = null;
+    #   description = "Override default top_p for requests that don't set it.";
+    # };
+
+    # timeout — Request timeout in seconds (--timeout).
+    # Server default: 300. Per-request timeout.
+    # Disabled: 300s is generous for agentic workloads.
+    # Revisit: increase if running very long generation requests.
+    # timeout = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.ints.positive;
+    #   default = null;
+    #   description = "Request timeout in seconds. Server default: 300.";
+    # };
+
+    # ---- MULTI-USER (not applicable for single-user LaunchAgent) ----
+
+    # continuousBatching — Enable continuous batching (--continuous-batching).
+    # Server default: disabled. Improves multi-user throughput but adds overhead
+    # for single-user workloads (slower per-request).
+    # Disabled: single-user LaunchAgent, no multi-user benefit.
+    # Revisit: if serving multiple concurrent consumers.
+    # continuousBatching = lib.mkOption {
+    #   type = lib.types.bool;
+    #   default = false;
+    #   description = "Enable continuous batching. Better multi-user, slower single-user.";
+    # };
+
+    # ---- EXPERIMENTAL ----
+
+    # pagedCache — Use paged KV cache (--use-paged-cache).
+    # Server default: disabled. Experimental paged cache implementation.
+    # Disabled: experimental, memory-aware cache is production-ready.
+    # Revisit: when paged cache graduates from experimental.
+    # pagedCache = lib.mkOption {
+    #   type = lib.types.bool;
+    #   default = false;
+    #   description = "Use experimental paged KV cache.";
+    # };
+
+    # pagedCacheBlockSize — Tokens per cache block (--paged-cache-block-size).
+    # Server default: 64. Only used with pagedCache.
+    # Disabled: pagedCache is experimental.
+    # Revisit: when enabling pagedCache.
+    # pagedCacheBlockSize = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.ints.positive;
+    #   default = null;
+    #   description = "Tokens per paged cache block. Server default: 64. Only with pagedCache.";
+    # };
+
+    # maxCacheBlocks — Maximum cache blocks (--max-cache-blocks).
+    # Server default: 1000. Only used with pagedCache.
+    # Disabled: pagedCache is experimental.
+    # Revisit: when enabling pagedCache.
+    # maxCacheBlocks = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.ints.positive;
+    #   default = null;
+    #   description = "Maximum paged cache blocks. Server default: 1000. Only with pagedCache.";
+    # };
+
+    # ---- TOOL INTEGRATION ----
+
+    # reasoningParser — Reasoning content extraction (--reasoning-parser).
+    # Options: qwen3, deepseek_r1, harmony.
+    # Disabled: not needed for current API consumers.
+    # Revisit: if using reasoning-aware consumers (e.g., qwen3 for our model).
+    # reasoningParser = lib.mkOption {
+    #   type = lib.types.nullOr (lib.types.enum [ "qwen3" "deepseek_r1" "harmony" ]);
+    #   default = null;
+    #   description = "Reasoning content extraction parser. Options: qwen3, deepseek_r1, harmony.";
+    # };
+
+    # enableAutoToolChoice — Auto tool choice for supported models (--enable-auto-tool-choice).
+    # Server default: disabled.
+    # Disabled: tool calling managed by consumers, not the server.
+    # Revisit: if using native tool calling via the API.
+    # enableAutoToolChoice = lib.mkOption {
+    #   type = lib.types.bool;
+    #   default = false;
+    #   description = "Enable automatic tool choice for supported models.";
+    # };
+
+    # toolCallParser — Tool call parser (--tool-call-parser).
+    # Options: auto, mistral, qwen, qwen3_coder, llama, hermes, deepseek, kimi,
+    #          granite, nemotron, xlam, functionary, glm47.
+    # Disabled: tool calling managed by consumers.
+    # Revisit: if enabling enableAutoToolChoice.
+    # toolCallParser = lib.mkOption {
+    #   type = lib.types.nullOr (lib.types.enum [
+    #     "auto" "mistral" "qwen" "qwen3_coder" "llama" "hermes"
+    #     "deepseek" "kimi" "granite" "nemotron" "xlam" "functionary" "glm47"
+    #   ]);
+    #   default = null;
+    #   description = "Tool call parser. Only used with enableAutoToolChoice.";
+    # };
+
+    # mcpConfig — MCP configuration file (--mcp-config).
+    # Path to JSON/YAML MCP config for server-side tool integration.
+    # Disabled: MCP managed by consumers (Claude Code, PAL), not the inference server.
+    # Revisit: if the inference server needs direct MCP tool access.
+    # mcpConfig = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.path;
+    #   default = null;
+    #   description = "Path to MCP configuration file (JSON/YAML) for server-side tools.";
+    # };
+
+    # ---- EMBEDDINGS ----
+
+    # embeddingModel — Pre-load embedding model at startup (--embedding-model).
+    # Disabled: embeddings handled by separate services.
+    # Revisit: if consolidating embedding generation into vllm-mlx.
+    # embeddingModel = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.str;
+    #   default = null;
+    #   description = "HuggingFace ID of embedding model to pre-load at startup.";
+    # };
+
+    # ---- SECURITY ----
+
+    # apiKey — API authentication key (--api-key).
+    # Disabled: server binds to 127.0.0.1, no external access.
+    # Revisit: if exposing the server on a network interface.
+    # apiKey = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.str;
+    #   default = null;
+    #   description = "API authentication key. Not needed when binding to localhost.";
+    # };
+
+    # rateLimit — Requests per minute per client (--rate-limit).
+    # Server default: 0 (disabled). Per-client rate limiting.
+    # Disabled: single-user, localhost-only, no abuse vector.
+    # Revisit: if exposing the server externally.
+    # rateLimit = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.ints.unsigned;
+    #   default = null;
+    #   description = "Requests per minute per client. 0 = disabled. Server default: 0.";
+    # };
+
+    # ---- LEGACY (not recommended) ----
+
+    # prefixCacheSize — Max entries in prefix cache (--prefix-cache-size).
+    # Server default: 100. LEGACY MODE ONLY — requires --no-memory-aware-cache.
+    # Memory-aware mode (default) is strictly better: auto-sizes based on RAM.
+    # Disabled: memory-aware mode handles this automatically.
+    # Revisit: only if debugging memory-aware cache issues.
+    # prefixCacheSize = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.ints.positive;
+    #   default = null;
+    #   description = "Legacy prefix cache entry count. Requires noMemoryAwareCache. Server default: 100.";
+    # };
+
+    # noMemoryAwareCache — Disable memory-aware cache (--no-memory-aware-cache).
+    # Server default: memory-aware enabled. Falls back to legacy entry-count mode.
+    # Disabled: memory-aware mode is strictly better.
+    # Revisit: only if debugging memory-aware cache issues.
+    # noMemoryAwareCache = lib.mkOption {
+    #   type = lib.types.bool;
+    #   default = false;
+    #   description = "Disable memory-aware cache, use legacy entry-count mode. Not recommended.";
+    # };
+
+    # disablePrefixCache — Disable prefix caching entirely (--disable-prefix-cache).
+    # Server default: prefix caching enabled. Disabling removes all prefix reuse.
+    # Disabled: prefix caching provides significant TTFT speedup for repeated prompts.
+    # Revisit: only if debugging prefix cache issues.
+    # disablePrefixCache = lib.mkOption {
+    #   type = lib.types.bool;
+    #   default = false;
+    #   description = "Disable prefix caching entirely. Not recommended.";
+    # };
   };
 
   # ============================================================================
@@ -177,16 +365,14 @@ in
       MLX_PORT = toString cfg.port;
       MLX_HOST = cfg.host;
       MLX_HF_HOME = cfg.huggingFaceHome;
-      MLX_BACKEND = cfg.backend;
     };
 
     # ==========================================================================
     # CLI Tools
     # ==========================================================================
     home.packages = [
-      # Both backend wrappers on PATH for manual CLI use
+      # vllm-mlx wrapper (on PATH for scripts, store path for LaunchAgent)
       vllmMlxPkg
-      mlxLmPkg
 
       # mlx — one-shot prompt (curl + jq, no Python)
       (pkgs.writeShellApplication {
@@ -242,55 +428,23 @@ in
       enable = true;
       config = {
         Label = launchAgentLabel;
-        ProgramArguments =
-          if cfg.backend == "vllm-mlx" then
-            [
-              (lib.getExe vllmMlxPkg)
-              "serve"
-              cfg.defaultModel
-              "--port"
-              (toString cfg.port)
-              "--host"
-              cfg.host
-              "--chunked-prefill-tokens"
-              (toString cfg.vllmMlxSettings.chunkedPrefillTokens)
-            ]
-            ++ lib.optionals (cfg.vllmMlxSettings.cacheMemoryMb != null) [
-              "--cache-memory-mb"
-              (toString cfg.vllmMlxSettings.cacheMemoryMb)
-            ]
-            ++ lib.optionals (cfg.vllmMlxSettings.prefixCacheSize != null) [
-              "--prefix-cache-size"
-              (toString cfg.vllmMlxSettings.prefixCacheSize)
-            ]
-          else
-            [
-              (lib.getExe mlxLmPkg)
-              "--model"
-              cfg.defaultModel
-              "--port"
-              (toString cfg.port)
-              "--host"
-              cfg.host
-              "--prefill-step-size"
-              (toString cfg.mlxLmSettings.prefillStepSize)
-            ]
-            ++ lib.optionals (cfg.mlxLmSettings.promptCacheSize != null) [
-              "--prompt-cache-size"
-              (toString cfg.mlxLmSettings.promptCacheSize)
-            ]
-            ++ lib.optionals (cfg.mlxLmSettings.promptCacheBytes != null) [
-              "--prompt-cache-bytes"
-              cfg.mlxLmSettings.promptCacheBytes
-            ]
-            ++ lib.optionals (cfg.mlxLmSettings.decodeConcurrency != null) [
-              "--decode-concurrency"
-              (toString cfg.mlxLmSettings.decodeConcurrency)
-            ]
-            ++ lib.optionals (cfg.mlxLmSettings.promptConcurrency != null) [
-              "--prompt-concurrency"
-              (toString cfg.mlxLmSettings.promptConcurrency)
-            ];
+        ProgramArguments = [
+          (lib.getExe vllmMlxPkg)
+          "serve"
+          cfg.defaultModel
+          "--port"
+          (toString cfg.port)
+          "--host"
+          cfg.host
+        ]
+        ++ lib.optionals (cfg.cacheMemoryMb != null) [
+          "--cache-memory-mb"
+          (toString cfg.cacheMemoryMb)
+        ]
+        ++ lib.optionals (cfg.prefillBatchSize != null) [
+          "--prefill-batch-size"
+          (toString cfg.prefillBatchSize)
+        ];
         RunAtLoad = true;
         KeepAlive = true;
         EnvironmentVariables = {
