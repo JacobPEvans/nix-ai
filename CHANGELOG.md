@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.3](https://github.com/JacobPEvans/nix-ai/compare/v1.17.2...v1.17.3) (2026-03-20)
+
+
+### Bug Fixes
+
+* cross-repo cleanup after unstable overlay removal ([#249](https://github.com/JacobPEvans/nix-ai/issues/249)) ([9093bd9](https://github.com/JacobPEvans/nix-ai/commit/9093bd9424a70ea870c226a6d7855eb38238e2c9))
+
 ## [1.17.2](https://github.com/JacobPEvans/nix-ai/compare/v1.17.1...v1.17.2) (2026-03-20)
 
 
