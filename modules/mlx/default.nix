@@ -61,6 +61,127 @@ in
       default = "/Volumes/HuggingFace";
       description = "Path to HuggingFace model cache (dedicated APFS volume)";
     };
+
+    # ---- MLX PERFORMANCE TUNING ----
+    # Benchmarked 2026-03-19 on M4 Max 128GB with Qwen3.5-122B-A10B-4bit.
+    # Baseline: 55-74 tok/s generation, no parallel request benefit (bandwidth-bound).
+
+    # maxKvSize — Caps rotating KV cache per session (tokens).
+    # Prevents kernel panic: IOGPUMemory completeMemory() prepare count underflow
+    # on long agentic sessions (58k+ tokens). Critical for 122B models using ~70GB
+    # RAM for weights alone — unbounded KV growth crashes the system.
+    # Ref: https://github.com/ml-explore/mlx-lm/issues/883
+    # Current: 8192 (safe for 128GB with ~50GB headroom)
+    # Revisit: increase to 16384-32768 on M4 Ultra 256GB
+    maxKvSize = lib.mkOption {
+      type = lib.types.ints.positive;
+      default = 8192;
+      description = "Max KV cache size per session (tokens). Prevents OOM kernel panics on long contexts.";
+    };
+
+    # prefillStepSize — Chunk size for prompt prefill processing (tokens).
+    # Increasing from default 2048 → 8192 yields ~1.5x TTFT improvement on long prompts.
+    # Higher values (16384) are possible but stress memory on 128GB systems.
+    # Current: 8192 (balanced speed vs memory for M4 Max 128GB)
+    # Revisit: try 16384 after confirming headroom with max-kv-size 8192
+    prefillStepSize = lib.mkOption {
+      type = lib.types.ints.positive;
+      default = 8192;
+      description = "Prefill chunk size (tokens). Larger = faster TTFT on long prompts, more memory.";
+    };
+
+    # promptCacheSize — Number of distinct KV prefix caches held in LRU.
+    # Enables prefix reuse: requests sharing the same system prompt skip re-prefill
+    # entirely, yielding up to 5.8x TTFT speedup. Low count because 122B model
+    # leaves limited RAM headroom for cached prefixes.
+    # Current: 5 (PAL + mlx-chat + local AI consumers = 3 distinct system prompts, plus 2 spare)
+    # Revisit: increase if adding more consumers or switching to a smaller model
+    promptCacheSize = lib.mkOption {
+      type = lib.types.ints.positive;
+      default = 5;
+      description = "Number of distinct prefix KV caches in LRU. Enables fast TTFT for repeated system prompts.";
+    };
+
+    # ---- INACTIVE PERFORMANCE OPTIONS ----
+    # Documented here for tracking efficiency over time. Each explains why
+    # it's disabled and when to revisit.
+
+    # decodeConcurrency — Max requests decoded in parallel (--decode-concurrency).
+    # Server default: 32. Benchmarked 2026-03-19: two simultaneous 512-token
+    # requests yielded 0.95x speedup (worse than serial). GPU memory bandwidth
+    # is fully saturated by a single decode stream on 122B MoE.
+    # Revisit: if vllm-mlx adds paged KV cache with true continuous batching,
+    # or if switching to a smaller model where bandwidth is not the bottleneck.
+    # decodeConcurrency = lib.mkOption {
+    #   type = lib.types.ints.positive;
+    #   default = 32;
+    #   description = "Max concurrent decode requests. No benefit for 122B MoE on M4 Max (bandwidth-bound).";
+    # };
+
+    # promptConcurrency — Max prompts processed in parallel during prefill (--prompt-concurrency).
+    # Server default: 8. Same benchmark result as decodeConcurrency — parallel prefill
+    # does not help when one request already saturates memory bandwidth.
+    # Revisit: same conditions as decodeConcurrency.
+    # promptConcurrency = lib.mkOption {
+    #   type = lib.types.ints.positive;
+    #   default = 8;
+    #   description = "Max concurrent prefill requests. No benefit for 122B MoE (bandwidth-bound).";
+    # };
+
+    # promptCacheBytes — Max total bytes for all cached KV prefixes (--prompt-cache-bytes).
+    # Example: "16G". Not set because count-based promptCacheSize is safer — byte-based
+    # requires knowing exact RAM headroom after model loading, which varies by model.
+    # Revisit: enable if running many distinct long system prompts that exceed the
+    # count limit, or if you want tighter memory control on a constrained system.
+    # promptCacheBytes = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.str;
+    #   default = null;
+    #   description = "Max total bytes for prefix caches (e.g. '16G'). Null = unlimited (count-limited instead).";
+    # };
+
+    # draftModel — Smaller model for speculative decoding (--draft-model).
+    # Speculative decoding has the draft model generate N candidate tokens cheaply,
+    # then the main model verifies them in a single forward pass. Can yield 1.5-2x
+    # speedup on factual/coding tasks if the draft model has high acceptance rate.
+    # Not enabled because it requires pulling, storing, and managing a second model.
+    # Candidate: mlx-community/Qwen3-7B-4bit as draft for the 122B target.
+    # Revisit: when ready to invest in a second model for throughput gains.
+    # draftModel = lib.mkOption {
+    #   type = lib.types.nullOr lib.types.str;
+    #   default = null;
+    #   description = "HuggingFace ID of draft model for speculative decoding. Null = disabled.";
+    # };
+
+    # numDraftTokens — Tokens to draft per speculative step (--num-draft-tokens).
+    # Server default: 3. Only relevant when draftModel is set. Higher values increase
+    # acceptance overhead but can improve throughput if draft quality is high.
+    # Revisit: tune after enabling draftModel — start at 3, try 5 if acceptance > 80%.
+    # numDraftTokens = lib.mkOption {
+    #   type = lib.types.ints.positive;
+    #   default = 3;
+    #   description = "Tokens drafted per speculative step. Only used with draftModel.";
+    # };
+
+    # pipeline — Use pipelining instead of tensor parallelism (--pipeline).
+    # Only relevant for multi-GPU setups (M4 Ultra with split dies). The M4 Max
+    # has a single GPU die, so tensor parallelism and pipelining are equivalent.
+    # Revisit: if upgrading to M4 Ultra or a multi-die system.
+    # pipeline = lib.mkOption {
+    #   type = lib.types.bool;
+    #   default = false;
+    #   description = "Use pipelining instead of tensor parallelism. Only for multi-GPU (M4 Ultra).";
+    # };
+
+    # maxTokens — Default max generation length when client doesn't specify (--max-tokens).
+    # Server default: 512. Not overridden because all consumers (PAL, mlx-chat,
+    # local AI tools) always pass max_tokens explicitly in their API requests.
+    # Setting this would only affect raw curl calls without max_tokens.
+    # Revisit: no need unless adding a consumer that omits max_tokens.
+    # maxTokens = lib.mkOption {
+    #   type = lib.types.ints.positive;
+    #   default = 512;
+    #   description = "Default max tokens when client omits max_tokens. All current consumers set it explicitly.";
+    # };
   };
 
   # ============================================================================
@@ -147,6 +268,12 @@ in
           (toString cfg.port)
           "--host"
           cfg.host
+          "--max-kv-size"
+          (toString cfg.maxKvSize)
+          "--prefill-step-size"
+          (toString cfg.prefillStepSize)
+          "--prompt-cache-size"
+          (toString cfg.promptCacheSize)
         ];
         RunAtLoad = true;
         KeepAlive = true;
