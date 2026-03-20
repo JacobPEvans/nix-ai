@@ -1,6 +1,7 @@
 name: Code Simplifier
 on:
   workflow_dispatch:
+  # STATUS: Disabled — scheduled runs paused until code-simplifier workflow is validated
   # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
   # schedule:
   #   - cron: "0 4 * * 0,3,6"

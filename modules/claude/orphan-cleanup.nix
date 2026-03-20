@@ -40,6 +40,7 @@ in
       # Handles directory symlinks AND real directories (migration from recursive=true)
       # so home-manager can create fresh directory symlinks.
       cleanupConflictingDirectorySymlinks = lib.hm.dag.entryBefore [ "linkGeneration" ] ''
+        . ${./scripts/cleanup-common.sh}
         . ${./scripts/cleanup-conflicting-symlinks.sh} \
           ${lib.escapeShellArgs (componentDirs ++ marketplaceDirs)}
         . ${./scripts/cleanup-stale-symlinks.sh} \
@@ -48,6 +49,7 @@ in
 
       # Phase 2: Remove orphan symlinks AFTER linkGeneration creates new ones.
       cleanupOrphanComponents = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+        . ${./scripts/cleanup-common.sh}
         . ${./scripts/cleanup-broken-symlinks.sh} \
           ${lib.escapeShellArgs (
             [
