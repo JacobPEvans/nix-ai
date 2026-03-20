@@ -8,13 +8,13 @@
 # MLX Inference Server Module
 #
 # Manages the vllm-mlx inference server as a macOS LaunchAgent for Apple Silicon.
-# MLX is ~2x faster than Ollama for token generation on M4 Max with ~50% less memory.
+# MLX is ~2x faster than llama.cpp for token generation on M4 Max with ~50% less memory.
 #
 # Features:
 #   - Always-on LaunchAgent running a default MoE model (~70GB, 10B active)
 #   - Foreground model switching (auto-restores default on exit)
 #   - CLI tools for quick prompts (mlx) and interactive chat (mlx-chat)
-#   - OpenAI-compatible API at http://127.0.0.1:11436/v1
+#   - OpenAI-compatible API at http://127.0.0.1:11434/v1
 #
 # Models stored on dedicated APFS volume: /Volumes/HuggingFace
 #
@@ -46,8 +46,8 @@ in
 
     port = lib.mkOption {
       type = lib.types.port;
-      default = 11436;
-      description = "Port for the vllm-mlx API server (default avoids conflicts with ports 11434, 11435, and 8080)";
+      default = 11434;
+      description = "Port for the vllm-mlx API server (avoids conflict with 8080 used by Open WebUI)";
     };
 
     host = lib.mkOption {

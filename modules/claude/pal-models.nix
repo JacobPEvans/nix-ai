@@ -1,7 +1,7 @@
 # PAL MCP — Dynamic MLX Model Discovery
 #
-# Generates ~/.config/pal-mcp/custom_models.json from MLX models via
-# vllm-mlx /v1/models (OpenAI-compatible).
+# Generates ~/.config/pal-mcp/custom_models.json from the MLX vllm-mlx
+# /v1/models endpoint (OpenAI-compatible).
 #
 # The file is rebuilt at activation time (darwin-rebuild switch) and can be
 # refreshed between rebuilds with: sync-mlx-models
@@ -42,7 +42,7 @@ in
       (pkgs.callPackage ../mcp/pal-package.nix { inherit pal-mcp-server; })
 
       # Refresh custom_models.json between darwin-rebuild switches.
-      # Queries MLX /v1/models for loaded models.
+      # Queries MLX /v1/models for available models.
       (pkgs.writeShellScriptBin "sync-mlx-models" ''
         set -euo pipefail
         ${syncEnv}

@@ -18,7 +18,7 @@ mlx_json=$("$CURL" -sf --connect-timeout 3 --max-time 5 "$MLX_URL" \
   | "$JQ" --from-file "$MLX_JQ_FILE" 2>/dev/null \
   || echo '{"models": []}')
 
-# Only overwrite if MLX returned models (preserve previous file otherwise)
+# Only overwrite if models were found (preserve previous file otherwise)
 model_count=$(echo "$mlx_json" | "$JQ" '.models | length')
 if [ "$model_count" -gt 0 ] || [ ! -f "$OUTPUT_FILE" ]; then
   echo "$mlx_json" > "$OUTPUT_FILE"

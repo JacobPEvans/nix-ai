@@ -19,7 +19,8 @@ One command rebuilds everything, identically, every time.
 | **OpenAI Codex** | Settings |
 | **MCP Servers** | 15+ servers — GitHub, Terraform, Context7, PAL, filesystem, memory, and more |
 | **Plugin Marketplace** | 14 curated plugin repositories |
-| **AI Dev Tools** | cclint, doppler-mcp, claude-flow |
+| **AI Dev Tools** | cclint, doppler-mcp, claude-flow, sync-mlx-models |
+| **MLX** | Local Apple Silicon inference via vllm-mlx with macOS launchd integration |
 
 ## Prerequisites
 

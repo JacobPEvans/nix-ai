@@ -7,7 +7,7 @@
 #
 # Open WebUI Configuration Module
 #
-# Manages the Open WebUI service for interacting with Ollama and other
+# Manages the Open WebUI service for interacting with MLX and other
 # OpenAI-compatible backends via a web browser.
 #
 # NOTE: open-webui is installed via `uv tool install` (not nixpkgs) because:
@@ -16,7 +16,7 @@
 #   The uv-installed binary lands at ~/.local/bin/open-webui
 #
 # Web UI: http://localhost:8080
-# Backend: http://127.0.0.1:11436/v1 (MLX vllm-mlx, OpenAI-compatible)
+# Backend: http://127.0.0.1:11434/v1 (MLX vllm-mlx, OpenAI-compatible)
 #
 {
   config = lib.mkIf pkgs.stdenv.isDarwin {
@@ -34,7 +34,7 @@
         ];
         EnvironmentVariables = {
           # MLX vllm-mlx as the primary backend (OpenAI-compatible)
-          OPENAI_API_BASE_URL = "http://127.0.0.1:11436/v1";
+          OPENAI_API_BASE_URL = "http://127.0.0.1:11434/v1";
           OPENAI_API_KEY = "not-needed";
         };
         RunAtLoad = true;
@@ -47,7 +47,7 @@
     # Notes
     # ============================================================================
     # - Web UI accessible at http://localhost:8080
-    # - Connects to MLX vllm-mlx at http://127.0.0.1:11436/v1 (OpenAI-compatible)
+    # - Connects to MLX vllm-mlx at http://127.0.0.1:11434/v1 (OpenAI-compatible)
     # - Data stored at ~/.open-webui/ (not managed by Nix)
     # - LaunchAgent starts on login (auto-restart if crashes)
     # - Logs: ~/Library/Logs/OpenWebUI/open-webui.log

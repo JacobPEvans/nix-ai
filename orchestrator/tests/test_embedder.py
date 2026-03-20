@@ -1,7 +1,7 @@
 """Tests for the embedding pipeline and vector backends.
 
 All tests use mocked HTTP calls so no live embedding server is required.
-Integration tests with a live Ollama endpoint belong in
+Integration tests with a live MLX endpoint belong in
 test_embedder_integration.py.
 
 Fixtures:
