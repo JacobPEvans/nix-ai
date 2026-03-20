@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.4](https://github.com/JacobPEvans/nix-ai/compare/v1.17.3...v1.17.4) (2026-03-20)
+
+
+### Bug Fixes
+
+* dual-backend MLX module with CLI flag validation ([#248](https://github.com/JacobPEvans/nix-ai/issues/248)) ([1152927](https://github.com/JacobPEvans/nix-ai/commit/11529279aed497c8e2aad82640565ef5c830d5a3))
+
 ## [1.17.3](https://github.com/JacobPEvans/nix-ai/compare/v1.17.2...v1.17.3) (2026-03-20)
 
 
