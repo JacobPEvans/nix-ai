@@ -1,7 +1,7 @@
 # pal-models-mlx.jq
 #
 # Transforms MLX vllm-mlx /v1/models JSON → PAL MCP custom_models.json format.
-# Usage: curl -sf http://127.0.0.1:11436/v1/models | jq --from-file pal-models-mlx.jq
+# Usage: curl -sf http://127.0.0.1:11434/v1/models | jq --from-file pal-models-mlx.jq
 #
 # Input format (OpenAI-compatible):
 #   { "data": [{ "id": "mlx-community/Qwen3.5-122B-A10B-4bit", ... }] }

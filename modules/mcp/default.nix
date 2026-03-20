@@ -76,7 +76,6 @@ in
   # API keys injected via Doppler (doppler-mcp wrapper, at least one required):
   #   - GEMINI_API_KEY (Google Gemini)
   #   - OPENROUTER_API_KEY (OpenRouter - unified model access)
-  #   - OLLAMA_HOST (local Ollama server URL — being deprecated in favor of MLX)
   #
   # Non-secret config is set in env below (belongs in Nix, not Doppler).
 
@@ -94,8 +93,8 @@ in
       # 'pro' = latest Gemini Pro (requires GEMINI_API_KEY).
       # 'auto' = PAL picks best available model based on configured API keys.
       DEFAULT_MODEL = "pro";
-      # Custom API endpoint — MLX inference server (vllm-mlx on port 11436)
-      CUSTOM_API_URL = "http://127.0.0.1:11436/v1";
+      # Custom API endpoint — MLX inference server (vllm-mlx on port 11434)
+      CUSTOM_API_URL = "http://127.0.0.1:11434/v1";
       # Conversation limits
       CONVERSATION_TIMEOUT_HOURS = "6";
       MAX_CONVERSATION_TURNS = "50";

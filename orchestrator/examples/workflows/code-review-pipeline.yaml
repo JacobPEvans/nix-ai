@@ -5,14 +5,14 @@ nodes:
     type: llm_call
     config:
       model: "qwen3-coder:30b"
-      endpoint: "http://localhost:11435/v1"
+      endpoint: "http://localhost:11434/v1"
       system_prompt: "You are a code reviewer. Analyze the diff and identify issues."
     description: "Analyze code diff for issues"
   - name: categorize_issues
     type: llm_call
     config:
       model: "qwen3-coder:30b"
-      endpoint: "http://localhost:11435/v1"
+      endpoint: "http://localhost:11434/v1"
       system_prompt: "Categorize the identified issues by severity: critical, warning, info."
     description: "Categorize issues by severity"
   - name: check_critical

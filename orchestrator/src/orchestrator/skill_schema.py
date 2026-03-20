@@ -38,12 +38,12 @@ class ModelRequirement(BaseModel):
     """Specifies which model a skill needs and how to reach it."""
 
     endpoint: str = Field(
-        default="http://127.0.0.1:11435/v1",
+        default="http://127.0.0.1:11434/v1",
         description="OpenAI-compatible API endpoint URL",
     )
     model: str = Field(
         default="mlx-community/Qwen3.5-27B-4bit",
-        description="Model identifier (HuggingFace ID or Ollama model name)",
+        description="Model identifier (HuggingFace ID for MLX models)",
     )
     size: ModelSize = Field(
         default=ModelSize.MEDIUM,

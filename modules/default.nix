@@ -93,7 +93,6 @@ in
     ./claude
     ./maestro
     ./mlx
-    ./ollama.nix
     ./open-webui.nix
   ];
 
@@ -131,7 +130,7 @@ in
       claudeStatusline.enable = false; # Disabled (kept for easy re-enable)
       claudeStatuslineDaniel3303.enable = true; # Active: ClaudeCodeStatusLine (2-line)
 
-      # MLX inference server (vllm-mlx on port 11435)
+      # MLX inference server (vllm-mlx on port 11434)
       mlx.enable = true;
 
       # GitHub CLI extension for AI workflows

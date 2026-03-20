@@ -58,7 +58,7 @@ def _make_llm_call_node(
 ) -> Callable[[WorkflowState], WorkflowState]:
     """Return a node function that calls an OpenAI-compatible LLM endpoint."""
     cfg = node_def.config
-    endpoint = cfg.get("endpoint", "http://127.0.0.1:11435/v1")
+    endpoint = cfg.get("endpoint", "http://127.0.0.1:11434/v1")
     model = cfg.get("model", "qwen3-coder:30b")
     system_prompt = cfg.get("system_prompt", "You are a helpful assistant.")
     temperature = float(cfg.get("temperature", 0.7))
