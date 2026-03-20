@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.5](https://github.com/JacobPEvans/nix-ai/compare/v1.16.4...v1.16.5) (2026-03-20)
+
+
+### Bug Fixes
+
+* **docs:** remove inline keychain password from testing docs ([#240](https://github.com/JacobPEvans/nix-ai/issues/240)) ([5dee71e](https://github.com/JacobPEvans/nix-ai/commit/5dee71e72721ec579045384a18b95eb7ed7a9179))
+
 ## [1.16.4](https://github.com/JacobPEvans/nix-ai/compare/v1.16.3...v1.16.4) (2026-03-19)
 
 
