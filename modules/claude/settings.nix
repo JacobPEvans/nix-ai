@@ -208,10 +208,10 @@ in
       '';
 
       claudeSettingsMerge = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        export PATH="${pkgs.jq}/bin:$PATH"
         $DRY_RUN_CMD ${../scripts/merge-json-settings.sh} \
           "${settingsJson}" \
-          "${homeDir}/.claude/settings.json" \
-          "${lib.getExe pkgs.jq}"
+          "${homeDir}/.claude/settings.json"
       '';
     };
 

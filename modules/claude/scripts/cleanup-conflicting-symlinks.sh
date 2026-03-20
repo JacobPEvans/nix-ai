@@ -5,8 +5,7 @@
 # Usage (sourced): . this-script dir1 dir2 ...
 # Requires: DRY_RUN_CMD from activation scope.
 
-log_info() { echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] $1" >&2; }
-log_warn() { echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] $1" >&2; }
+# Requires: log_info, log_warn from cleanup-common.sh (sourced by caller)
 
 for dir in "$@"; do
   if [ -L "$dir" ]; then

@@ -51,10 +51,11 @@ From nix-darwin, test changes with:
 sudo darwin-rebuild switch --flake . --override-input nix-ai /Users/you/git/nix-ai/main
 ```
 
-## Part of a Trio
+## Part of a Quartet
 
 | Repo | Purpose |
 | ---- | ------- |
 | **nix-ai** (this repo) | AI coding tools |
+| [nix-devenv](https://github.com/JacobPEvans/nix-devenv) | Reusable dev shells (Terraform, Ansible, K8s, AI/ML) |
 | [nix-home](https://github.com/JacobPEvans/nix-home) | Dev environment (git, zsh, VS Code, tmux) |
-| [nix-darwin](https://github.com/JacobPEvans/nix-darwin) | macOS system config (consumes both) |
+| [nix-darwin](https://github.com/JacobPEvans/nix-darwin) | macOS system config (consumes all three) |

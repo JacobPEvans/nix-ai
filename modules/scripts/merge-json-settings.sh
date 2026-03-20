@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Deep-merge Nix-generated JSON settings with existing runtime state.
-# Generic script used by multiple tools (Gemini, VS Code, etc.).
+# Generic script used by multiple tools (Gemini, Claude, etc.).
+#
+# Canonical source: nix-home/modules/home-manager/scripts/merge-json-settings.sh
+# Keep in sync when modifying. Full dedup planned when nix-home becomes a flake input.
 #
 # Preserves runtime-only keys while updating Nix-managed settings.
 # Merge strategy: existing runtime file as base, Nix config overlaid on top.
@@ -9,13 +12,18 @@
 # Arguments:
 #   $1 - Path to Nix-generated settings JSON (in /nix/store)
 #   $2 - Path to target settings file
-#   $3 - Path to jq binary
+#
+# jq must be on PATH (callers ensure this via PATH export or writeShellApplication).
 
 set -euo pipefail
 
-NIX_SETTINGS="${1:?Usage: merge-json-settings.sh <nix-settings-path> <target-path> <jq-path>}"
-TARGET="${2:?Usage: merge-json-settings.sh <nix-settings-path> <target-path> <jq-path>}"
-JQ="${3:?Usage: merge-json-settings.sh <nix-settings-path> <target-path> <jq-path>}"
+if [[ $# -ne 2 ]]; then
+  echo "Usage: merge-json-settings <nix-settings-path> <target-path>" >&2
+  exit 1
+fi
+
+NIX_SETTINGS="$1"
+TARGET="$2"
 
 TARGET_NAME=$(basename "$TARGET")
 TARGET_DIR=$(dirname "$TARGET")
@@ -25,7 +33,7 @@ if [[ -f "$TARGET" ]] && [[ ! -L "$TARGET" ]]; then
   # File exists and is a real file (not symlink) - merge
   # jq -s '.[0] * .[1]' merges deeply: [0]=existing runtime, [1]=Nix config
   # Nix config wins on conflicts, runtime-only keys are preserved
-  MERGED=$("$JQ" -s '.[0] * .[1]' "$TARGET" "$NIX_SETTINGS" 2>/dev/null) || {
+  MERGED=$(jq -s '.[0] * .[1]' "$TARGET" "$NIX_SETTINGS") || {
     # If merge fails (e.g., invalid JSON in target), just use Nix settings
     echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to merge existing ${TARGET_NAME}, using Nix config" >&2
     cp "$NIX_SETTINGS" "$TARGET"

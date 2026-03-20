@@ -37,7 +37,7 @@
 # CURRENT STATUS
 # ============================================================================
 #
-# NIXPKGS PACKAGES (sourced via unstable overlay in modules/darwin/common.nix):
+# NIXPKGS PACKAGES (from nixpkgs, available on stable 25.11):
 #   github-mcp-server, terraform-mcp-server
 #
 # HOMEBREW PACKAGES (from modules/darwin/homebrew.nix):
@@ -62,13 +62,12 @@
 # Imported in hosts/macbook-m4/home.nix via home.packages.
 #
 # ============================================================================
-# UNSTABLE OVERLAY POLICY
+# ADDING NEW NIXPKGS PACKAGES
 # ============================================================================
 #
-# AI CLI tools are fast-moving and stable nixpkgs lags behind upstream.
-# To add a new nixpkgs AI tool:
-#   1. Add to packages list below
-#   2. Add to unstable overlay in modules/darwin/common.nix
+# Packages are sourced from stable nixpkgs (25.11). To add a new one:
+#   1. Verify availability: nix search nixpkgs <package>
+#   2. Add to packages list below
 #   3. Add to version check script (scripts/workflows/check-package-versions.sh)
 
 { pkgs, ... }:

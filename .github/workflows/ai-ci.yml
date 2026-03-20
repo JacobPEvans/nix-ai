@@ -2,6 +2,7 @@ name: AI CI
 
 on:
   workflow_dispatch:
+  # STATUS: Disabled — automatic triggers replaced by workflow_dispatch-only until ai-workflows stabilizes
   # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
   # workflow_run:
   #   workflows: ["CI Gate"]
@@ -15,6 +16,7 @@ permissions:
   issues: write
   pull-requests: write
 
+# STATUS: Disabled — concurrency group depends on workflow_run context which is unavailable in dispatch-only mode
 # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
 # concurrency:
 #   group: ai-ci-${{ github.event.workflow_run.head_branch }}

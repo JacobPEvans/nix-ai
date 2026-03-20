@@ -3,8 +3,7 @@
 # Usage (sourced): . this-script type1 dir1 type2 dir2 ...
 # Requires: DRY_RUN_CMD from activation scope.
 
-log_info() { echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] $1" >&2; }
-log_warn() { echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] $1" >&2; }
+# Requires: log_info, log_warn from cleanup-common.sh (sourced by caller)
 
 while [ $# -ge 2 ]; do
   type_name="$1"

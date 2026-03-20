@@ -7,6 +7,7 @@ on:
         description: "Commit SHA to review (leave blank for latest main)"
         required: false
         type: string
+  # STATUS: Disabled — automatic triggers replaced by workflow_dispatch-only until ai-workflows stabilizes
   # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
   # pull_request:
   #   types: [opened, synchronize]
@@ -23,6 +24,7 @@ on:
 permissions: {}
 
 jobs:
+  # STATUS: Disabled — post-merge re-dispatch depends on push trigger above
   # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
   # # Push to main → re-dispatch as workflow_dispatch so post-merge suites
   # # can use the commit SHA via inputs.commit_sha (workflow_run context workaround).
@@ -44,6 +46,7 @@ jobs:
   # --- END DISABLED ---
 
   all:
+    # STATUS: Disabled — guard condition not needed without push trigger
     # --- DISABLED AUTOMATIC TRIGGERS (restore by uncommenting) ---
     # if: github.event_name != 'push'
     # --- END DISABLED ---
