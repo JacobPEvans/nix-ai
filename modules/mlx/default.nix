@@ -60,7 +60,7 @@ in
     port = lib.mkOption {
       type = lib.types.port;
       default = 11434;
-      description = "Port for the API server (avoids conflict with 8080 used by Open WebUI)";
+      description = "Port for the API server (avoids conflict with other services on port 8080)";
     };
 
     host = lib.mkOption {
