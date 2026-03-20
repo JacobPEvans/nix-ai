@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.0](https://github.com/JacobPEvans/nix-ai/compare/v1.16.5...v1.17.0) (2026-03-20)
+
+
+### Features
+
+* remove Ollama, unify local inference on MLX port 11434 ([#242](https://github.com/JacobPEvans/nix-ai/issues/242)) ([8d3503d](https://github.com/JacobPEvans/nix-ai/commit/8d3503d566fac8b5e47d9598a0c3c26902e15171))
+
 ## [1.16.5](https://github.com/JacobPEvans/nix-ai/compare/v1.16.4...v1.16.5) (2026-03-20)
 
 
