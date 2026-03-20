@@ -334,6 +334,218 @@ in
         touch $out
       '';
 
+  # ============================================================================
+  # MLX Module Regression Tests
+  # ============================================================================
+
+  # Verify all expected MLX option paths exist, including nested backend settings.
+  mlx-options-regression =
+    let
+      mlxOpts = hmConfig.config.programs.mlx;
+
+      expectedTopLevel = [
+        "backend"
+        "defaultModel"
+        "enable"
+        "host"
+        "huggingFaceHome"
+        "mlxLmSettings"
+        "port"
+        "vllmMlxSettings"
+      ];
+      actualTopLevel = builtins.attrNames mlxOpts;
+      missingTopLevel = builtins.filter (o: !(builtins.elem o actualTopLevel)) expectedTopLevel;
+
+      expectedVllmMlx = [
+        "cacheMemoryMb"
+        "chunkedPrefillTokens"
+        "prefixCacheSize"
+      ];
+      actualVllmMlx = builtins.attrNames mlxOpts.vllmMlxSettings;
+      missingVllmMlx = builtins.filter (o: !(builtins.elem o actualVllmMlx)) expectedVllmMlx;
+
+      expectedMlxLm = [
+        "decodeConcurrency"
+        "prefillStepSize"
+        "promptCacheBytes"
+        "promptCacheSize"
+        "promptConcurrency"
+      ];
+      actualMlxLm = builtins.attrNames mlxOpts.mlxLmSettings;
+      missingMlxLm = builtins.filter (o: !(builtins.elem o actualMlxLm)) expectedMlxLm;
+    in
+    assert
+      missingTopLevel == [ ] || throw "Missing MLX top-level options: ${builtins.toJSON missingTopLevel}";
+    assert
+      missingVllmMlx == [ ]
+      || throw "Missing MLX vllmMlxSettings options: ${builtins.toJSON missingVllmMlx}";
+    assert
+      missingMlxLm == [ ] || throw "Missing MLX mlxLmSettings options: ${builtins.toJSON missingMlxLm}";
+    pkgs.runCommand "check-mlx-options-regression" { } ''
+      echo "MLX option regression: ${toString (builtins.length expectedTopLevel)} top-level, ${toString (builtins.length expectedVllmMlx)} vllm-mlx, ${toString (builtins.length expectedMlxLm)} mlx-lm options verified"
+      touch $out
+    '';
+
+  # Verify MLX evaluated config values match expected defaults.
+  mlx-defaults-regression =
+    let
+      mlxCfg = hmConfig.config.programs.mlx;
+      checks = [
+        {
+          name = "mlx.enable";
+          actual = mlxCfg.enable;
+          expected = true;
+        }
+        {
+          name = "mlx.backend";
+          actual = mlxCfg.backend;
+          expected = "vllm-mlx";
+        }
+        {
+          name = "mlx.defaultModel";
+          actual = mlxCfg.defaultModel;
+          expected = "mlx-community/Qwen3.5-122B-A10B-4bit";
+        }
+        {
+          name = "mlx.port";
+          actual = mlxCfg.port;
+          expected = 11434;
+        }
+        {
+          name = "mlx.vllmMlxSettings.chunkedPrefillTokens";
+          actual = mlxCfg.vllmMlxSettings.chunkedPrefillTokens;
+          expected = 8192;
+        }
+        {
+          name = "mlx.vllmMlxSettings.cacheMemoryMb";
+          actual = mlxCfg.vllmMlxSettings.cacheMemoryMb;
+          expected = null;
+        }
+        {
+          name = "mlx.vllmMlxSettings.prefixCacheSize";
+          actual = mlxCfg.vllmMlxSettings.prefixCacheSize;
+          expected = null;
+        }
+        {
+          name = "mlx.mlxLmSettings.prefillStepSize";
+          actual = mlxCfg.mlxLmSettings.prefillStepSize;
+          expected = 8192;
+        }
+        {
+          name = "mlx.mlxLmSettings.promptCacheSize";
+          actual = mlxCfg.mlxLmSettings.promptCacheSize;
+          expected = null;
+        }
+        {
+          name = "mlx.mlxLmSettings.promptCacheBytes";
+          actual = mlxCfg.mlxLmSettings.promptCacheBytes;
+          expected = null;
+        }
+        {
+          name = "mlx.mlxLmSettings.decodeConcurrency";
+          actual = mlxCfg.mlxLmSettings.decodeConcurrency;
+          expected = null;
+        }
+        {
+          name = "mlx.mlxLmSettings.promptConcurrency";
+          actual = mlxCfg.mlxLmSettings.promptConcurrency;
+          expected = null;
+        }
+      ];
+      failures = builtins.filter (c: c.actual != c.expected) checks;
+      failureMsg = builtins.concatStringsSep "\n" (
+        map (
+          c: "  ${c.name}: expected ${builtins.toJSON c.expected}, got ${builtins.toJSON c.actual}"
+        ) failures
+      );
+    in
+    assert failures == [ ] || throw "MLX default value regression:\n${failureMsg}";
+    pkgs.runCommand "check-mlx-defaults-regression" { } ''
+      echo "MLX defaults regression: ${toString (builtins.length checks)} critical defaults verified"
+      touch $out
+    '';
+
+  # CLI flag allowlist validation — catches invalid flags before they crash the server.
+  # This is the guard that would have caught the original bug (mlx-lm flags on vllm-mlx).
+  mlx-cli-flags =
+    let
+      agentConfig = hmConfig.config.launchd.agents.vllm-mlx.config;
+      progArgs = agentConfig.ProgramArguments;
+
+      # Valid flags from vllm-mlx==0.2.6 --help output.
+      # IMPORTANT: Update this list when changing pinned versions in modules/mlx/default.nix.
+      validVllmMlxFlags = [
+        "--api-key"
+        "--cache-memory-mb"
+        "--cache-memory-percent"
+        "--chunked-prefill-tokens"
+        "--completion-batch-size"
+        "--continuous-batching"
+        "--default-temperature"
+        "--default-top-p"
+        "--disable-prefix-cache"
+        "--embedding-model"
+        "--enable-auto-tool-choice"
+        "--enable-prefix-cache"
+        "--host"
+        "--max-cache-blocks"
+        "--max-num-seqs"
+        "--max-tokens"
+        "--mcp-config"
+        "--no-memory-aware-cache"
+        "--paged-cache-block-size"
+        "--port"
+        "--prefix-cache-size"
+        "--prefill-batch-size"
+        "--rate-limit"
+        "--reasoning-parser"
+        "--stream-interval"
+        "--timeout"
+        "--tool-call-parser"
+        "--use-paged-cache"
+      ];
+
+      # Valid flags from mlx-lm==0.31.1 mlx_lm.server --help output.
+      # IMPORTANT: Update this list when changing pinned versions in modules/mlx/default.nix.
+      validMlxLmFlags = [
+        "--adapter-path"
+        "--chat-template"
+        "--chat-template-args"
+        "--decode-concurrency"
+        "--draft-model"
+        "--host"
+        "--log-level"
+        "--max-tokens"
+        "--min-p"
+        "--model"
+        "--num-draft-tokens"
+        "--pipeline"
+        "--port"
+        "--prefill-step-size"
+        "--prompt-cache-bytes"
+        "--prompt-cache-size"
+        "--prompt-concurrency"
+        "--temp"
+        "--top-k"
+        "--top-p"
+        "--trust-remote-code"
+        "--use-default-chat-template"
+      ];
+
+      validFlags =
+        if hmConfig.config.programs.mlx.backend == "vllm-mlx" then validVllmMlxFlags else validMlxLmFlags;
+
+      usedFlags = builtins.filter (a: builtins.substring 0 2 a == "--") progArgs;
+      invalidFlags = builtins.filter (f: !(builtins.elem f validFlags)) usedFlags;
+    in
+    assert
+      invalidFlags == [ ]
+      || throw "MLX LaunchAgent uses invalid ${hmConfig.config.programs.mlx.backend} flags: ${builtins.toJSON invalidFlags}";
+    pkgs.runCommand "check-mlx-cli-flags" { } ''
+      echo "MLX CLI flags: ${toString (builtins.length usedFlags)} flags validated against ${hmConfig.config.programs.mlx.backend} allowlist"
+      touch $out
+    '';
+
   # Validate the maestro-cli script extraction produces correct output.
   # Builds the script via pkgs.substituteAll and verifies content integrity.
   maestro-script =
