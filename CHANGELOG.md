@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.1](https://github.com/JacobPEvans/nix-ai/compare/v1.17.0...v1.17.1) (2026-03-20)
+
+
+### Bug Fixes
+
+* **checks:** bump test stateVersion to 25.11 ([#244](https://github.com/JacobPEvans/nix-ai/issues/244)) ([616d251](https://github.com/JacobPEvans/nix-ai/commit/616d251f0968ddb28521403e0c6d3f4c7dc58429))
+
 ## [1.17.0](https://github.com/JacobPEvans/nix-ai/compare/v1.16.5...v1.17.0) (2026-03-20)
 
 
