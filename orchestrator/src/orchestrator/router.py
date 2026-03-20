@@ -48,8 +48,6 @@ class SkillRouter:
     and match incoming prompts via cosine similarity.
     """
 
-    # Port 11434 = Ollama embeddings endpoint; port 11435 = MLX LLM endpoint
-    # (intentional difference: embeddings run on Ollama, LLM inference on MLX)
     embedding_endpoint: str = "http://127.0.0.1:11434/v1"
     embedding_model: str = "nomic-embed-text-v1.5"
     threshold: float = 0.3

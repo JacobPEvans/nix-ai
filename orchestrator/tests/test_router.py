@@ -2,7 +2,7 @@
 
 These tests use mocked embeddings to avoid requiring a running
 embedding server. Integration tests with a live endpoint are
-in test_router_integration.py (requires Ollama with nomic-embed-text).
+in test_router_integration.py (requires MLX with nomic-embed-text).
 """
 
 from __future__ import annotations

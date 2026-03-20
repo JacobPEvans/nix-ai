@@ -360,7 +360,7 @@ class EmbeddingConfig(BaseModel):
 
     endpoint: str = Field(
         default="http://localhost:11434/v1",
-        description="OpenAI-compatible embedding endpoint (Ollama default)",
+        description="OpenAI-compatible embedding endpoint (MLX default)",
     )
     model: str = Field(
         default="nomic-embed-text",
