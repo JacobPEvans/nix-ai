@@ -148,7 +148,7 @@ Channels are stored per-repo in the macOS automation keychain.
 The automation keychain must be unlocked for headless operations:
 
 ```bash
-security unlock-keychain -p "" ~/Library/Keychains/automation.keychain-db
+security unlock-keychain ~/Library/Keychains/automation.keychain-db
 ```
 
 ### 2. Verify Channel IDs in Keychain
@@ -201,7 +201,7 @@ This tests the full launchd-initiated flow:
 
 ```bash
 # Ensure keychain is unlocked first
-security unlock-keychain -p "" ~/Library/Keychains/automation.keychain-db
+security unlock-keychain ~/Library/Keychains/automation.keychain-db
 
 # Kickstart the launchd agent
 launchctl kickstart gui/$(id -u)/com.claude.auto-claude-nix
@@ -286,7 +286,7 @@ grep PATH ~/Library/LaunchAgents/com.claude.auto-claude-nix.plist
 **Fix**: Unlock the keychain:
 
 ```bash
-security unlock-keychain -p "" ~/Library/Keychains/automation.keychain-db
+security unlock-keychain ~/Library/Keychains/automation.keychain-db
 ```
 
 **Symptom**: Channel not found in keychain
