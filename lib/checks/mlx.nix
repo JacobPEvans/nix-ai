@@ -20,8 +20,7 @@ in
       actualOptions = builtins.attrNames mlxCfg;
       missingOptions = builtins.filter (o: !(builtins.elem o actualOptions)) expectedOptions;
     in
-    assert
-      missingOptions == [ ] || throw "Missing MLX options: ${builtins.toJSON missingOptions}";
+    assert missingOptions == [ ] || throw "Missing MLX options: ${builtins.toJSON missingOptions}";
     pkgs.runCommand "check-mlx-options-regression" { } ''
       echo "MLX option regression: ${toString (builtins.length expectedOptions)} options verified"
       touch $out
