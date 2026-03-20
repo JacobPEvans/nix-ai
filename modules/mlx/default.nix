@@ -74,7 +74,7 @@ in
     # Current: 8192 (safe for 128GB with ~50GB headroom)
     # Revisit: increase to 16384-32768 on M4 Ultra 256GB
     maxKvSize = lib.mkOption {
-      type = lib.types.int;
+      type = lib.types.ints.positive;
       default = 8192;
       description = "Max KV cache size per session (tokens). Prevents OOM kernel panics on long contexts.";
     };
@@ -85,7 +85,7 @@ in
     # Current: 8192 (balanced speed vs memory for M4 Max 128GB)
     # Revisit: try 16384 after confirming headroom with max-kv-size 8192
     prefillStepSize = lib.mkOption {
-      type = lib.types.int;
+      type = lib.types.ints.positive;
       default = 8192;
       description = "Prefill chunk size (tokens). Larger = faster TTFT on long prompts, more memory.";
     };
@@ -97,7 +97,7 @@ in
     # Current: 5 (PAL + mlx-chat + local AI consumers = 3 distinct system prompts, plus 2 spare)
     # Revisit: increase if adding more consumers or switching to a smaller model
     promptCacheSize = lib.mkOption {
-      type = lib.types.int;
+      type = lib.types.ints.positive;
       default = 5;
       description = "Number of distinct prefix KV caches in LRU. Enables fast TTFT for repeated system prompts.";
     };
