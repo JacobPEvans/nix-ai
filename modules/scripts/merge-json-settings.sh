@@ -33,7 +33,7 @@ if [[ -f "$TARGET" ]] && [[ ! -L "$TARGET" ]]; then
   # File exists and is a real file (not symlink) - merge
   # jq -s '.[0] * .[1]' merges deeply: [0]=existing runtime, [1]=Nix config
   # Nix config wins on conflicts, runtime-only keys are preserved
-  MERGED=$(jq -s '.[0] * .[1]' "$TARGET" "$NIX_SETTINGS" 2>/dev/null) || {
+  MERGED=$(jq -s '.[0] * .[1]' "$TARGET" "$NIX_SETTINGS") || {
     # If merge fails (e.g., invalid JSON in target), just use Nix settings
     echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to merge existing ${TARGET_NAME}, using Nix config" >&2
     cp "$NIX_SETTINGS" "$TARGET"
