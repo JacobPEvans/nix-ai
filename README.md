@@ -19,8 +19,7 @@ One command rebuilds everything, identically, every time.
 | **OpenAI Codex** | Settings |
 | **MCP Servers** | 15+ servers — GitHub, Terraform, Context7, PAL, filesystem, memory, and more |
 | **Plugin Marketplace** | 14 curated plugin repositories |
-| **AI Dev Tools** | cclint, doppler-mcp, claude-flow, sync-ollama-models |
-| **Ollama** | Local model management with macOS launchd integration |
+| **AI Dev Tools** | cclint, doppler-mcp, claude-flow |
 
 ## Prerequisites
 
@@ -56,7 +55,7 @@ nix-ai exports [home-manager](https://github.com/nix-community/home-manager) mod
 
 | Export | What it includes |
 | ------ | --------------- |
-| `homeManagerModules.default` | Full AI stack — Claude, Gemini, Copilot, Codex, MCP, Ollama, dev tools |
+| `homeManagerModules.default` | Full AI stack — Claude, Gemini, Copilot, Codex, MCP, MLX, dev tools |
 | `homeManagerModules.claude` | Just Claude Code |
 | `homeManagerModules.maestro` | Just Maestro orchestration |
 | `lib.ci.claudeSettingsJson` | Pure JSON for CI validation (no derivations needed) |
@@ -118,7 +117,7 @@ modules/
 ├── common/          # Shared permission engine
 ├── gh-extensions/   # GitHub CLI extensions (gh-aw)
 ├── permissions/     # Per-tool permission rules
-├── ollama.nix       # Local model management
+├── mlx/             # MLX inference server (vllm-mlx)
 ├── ai-tools.nix     # AI development tool packages
 ├── gemini.nix       # Gemini CLI configuration
 ├── copilot.nix      # GitHub Copilot configuration

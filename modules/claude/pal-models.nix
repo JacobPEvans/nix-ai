@@ -1,8 +1,7 @@
-# PAL MCP — Dynamic MLX + Static Ollama Model Discovery
+# PAL MCP — Dynamic MLX Model Discovery
 #
-# Generates ~/.config/pal-mcp/custom_models.json by combining:
-#   1. Dynamic MLX models from vllm-mlx /v1/models (OpenAI-compatible)
-#   2. Dynamic Ollama models from /api/tags (via pal-models.jq, if reachable)
+# Generates ~/.config/pal-mcp/custom_models.json from MLX models via
+# vllm-mlx /v1/models (OpenAI-compatible).
 #
 # The file is rebuilt at activation time (darwin-rebuild switch) and can be
 # refreshed between rebuilds with: sync-mlx-models
@@ -22,7 +21,6 @@
 let
   cfg = config.programs.claude;
   mlxCfg = config.programs.mlx;
-  ollamaCfg = config.programs.ollama;
   outputDir = "${config.home.homeDirectory}/.config/pal-mcp";
   outputFile = "${outputDir}/custom_models.json";
 
@@ -31,9 +29,7 @@ let
     export CURL="${pkgs.curl}/bin/curl"
     export JQ="${pkgs.jq}/bin/jq"
     export MLX_JQ_FILE="${../mcp/scripts/pal-models-mlx.jq}"
-    export OLLAMA_JQ_FILE="${../mcp/scripts/pal-models.jq}"
     export MLX_URL="http://${mlxCfg.host}:${toString mlxCfg.port}/v1/models"
-    export OLLAMA_URL="http://localhost:${toString ollamaCfg.port}/api/tags"
     export OUTPUT_DIR="${outputDir}"
     export OUTPUT_FILE="${outputFile}"
   '';
@@ -46,7 +42,7 @@ in
       (pkgs.callPackage ../mcp/pal-package.nix { inherit pal-mcp-server; })
 
       # Refresh custom_models.json between darwin-rebuild switches.
-      # Queries MLX /v1/models (primary) and Ollama /api/tags (fallback).
+      # Queries MLX /v1/models for loaded models.
       (pkgs.writeShellScriptBin "sync-mlx-models" ''
         set -euo pipefail
         ${syncEnv}
@@ -59,8 +55,8 @@ in
     # Merges with the env block defined in mcp/default.nix (DISABLED_TOOLS, etc.).
     programs.claude.mcpServers.pal.env.CUSTOM_MODELS_CONFIG_PATH = outputFile;
 
-    # Generate custom_models.json by merging dynamic MLX + Ollama models.
-    # If either server is unreachable, its section contributes an empty list.
+    # Generate custom_models.json from dynamic MLX models.
+    # If the server is unreachable, the previous file is preserved.
     home.activation.palCustomModels = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       ${syncEnv}
       . ${../mcp/scripts/sync-pal-models.sh}

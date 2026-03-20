@@ -7,9 +7,7 @@
 #   CURL         — path to curl binary
 #   JQ           — path to jq binary
 #   MLX_JQ_FILE  — path to pal-models-mlx.jq
-#   OLLAMA_JQ_FILE — path to pal-models.jq
 #   MLX_URL      — MLX /v1/models endpoint
-#   OLLAMA_URL   — Ollama /api/tags endpoint
 #   OUTPUT_DIR   — directory for output file
 #   OUTPUT_FILE  — full path to custom_models.json
 
@@ -20,18 +18,8 @@ mlx_json=$("$CURL" -sf --connect-timeout 3 --max-time 5 "$MLX_URL" \
   | "$JQ" --from-file "$MLX_JQ_FILE" 2>/dev/null \
   || echo '{"models": []}')
 
-# Query Ollama for any additional local models (if reachable)
-ollama_json=$("$CURL" -sf --connect-timeout 3 --max-time 5 "$OLLAMA_URL" \
-  | "$JQ" --from-file "$OLLAMA_JQ_FILE" 2>/dev/null \
-  || echo '{"models": []}')
-
-# Merge MLX + Ollama models
-merged=$(echo "$mlx_json" \
-  | "$JQ" --argjson ollama "$(echo "$ollama_json" | "$JQ" '.models')" \
-    '.models += $ollama')
-
-# Only overwrite if at least one backend returned models (preserve previous file otherwise)
-model_count=$(echo "$merged" | "$JQ" '.models | length')
+# Only overwrite if MLX returned models (preserve previous file otherwise)
+model_count=$(echo "$mlx_json" | "$JQ" '.models | length')
 if [ "$model_count" -gt 0 ] || [ ! -f "$OUTPUT_FILE" ]; then
-  echo "$merged" > "$OUTPUT_FILE"
+  echo "$mlx_json" > "$OUTPUT_FILE"
 fi

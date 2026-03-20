@@ -93,7 +93,6 @@ in
     ./claude
     ./maestro
     ./mlx
-    ./ollama.nix
     ./open-webui.nix
   ];
 
