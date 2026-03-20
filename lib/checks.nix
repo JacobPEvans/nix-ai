@@ -18,7 +18,7 @@ let
         home = {
           username = "test-user";
           homeDirectory = "/home/test-user";
-          stateVersion = "24.11";
+          stateVersion = "25.11";
         };
       }
     ];
