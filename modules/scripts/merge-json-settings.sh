@@ -17,8 +17,13 @@
 
 set -euo pipefail
 
-NIX_SETTINGS="${1:?Usage: merge-json-settings <nix-settings-path> <target-path>}"
-TARGET="${2:?Usage: merge-json-settings <nix-settings-path> <target-path>}"
+if [[ $# -ne 2 ]]; then
+  echo "Usage: merge-json-settings <nix-settings-path> <target-path>" >&2
+  exit 1
+fi
+
+NIX_SETTINGS="$1"
+TARGET="$2"
 
 TARGET_NAME=$(basename "$TARGET")
 TARGET_DIR=$(dirname "$TARGET")
