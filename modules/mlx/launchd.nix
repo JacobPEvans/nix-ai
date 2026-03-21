@@ -74,11 +74,25 @@ in
     # Log Rotation (closes #255)
     # ==========================================================================
     # newsyslog rotates logs when they exceed 10MB, keeping 3 compressed archives.
-    # macOS newsyslog reads user configs from ~/.config/newsyslog.d/ automatically.
+    # Stock macOS newsyslog only reads /etc/newsyslog.d/ (requires root), so a
+    # companion LaunchAgent invokes it hourly with our user-level config.
     home.file.".config/newsyslog.d/vllm-mlx.conf".text = ''
       # logfilename                                                                [owner:group]  mode  count  size  when  flags
       ${config.home.homeDirectory}/Library/Logs/vllm-mlx/vllm-mlx.error.log        :              644   3      10240 *     J
       ${config.home.homeDirectory}/Library/Logs/vllm-mlx/vllm-mlx.log              :              644   3      10240 *     J
     '';
+
+    launchd.agents.vllm-mlx-logrotate = {
+      enable = true;
+      config = {
+        Label = "dev.vllm-mlx.logrotate";
+        ProgramArguments = [
+          "/usr/sbin/newsyslog"
+          "-f"
+          "${config.home.homeDirectory}/.config/newsyslog.d/vllm-mlx.conf"
+        ];
+        StartCalendarInterval = [ { Minute = 0; } ]; # hourly
+      };
+    };
   };
 }
