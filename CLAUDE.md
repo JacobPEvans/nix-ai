@@ -48,6 +48,20 @@ inputs.nix-ai.inputs.home-manager.follows = "home-manager";
 - `lib/checks/claude.nix` — Claude module regression tests, settings-json, maestro-script
 - `lib/checks/mlx.nix` — MLX option/defaults regression, LaunchAgent flag validation
 
+## Port Allocation
+
+Services managed by nix-ai and their assigned ports. Check this table before assigning
+new ports to avoid collisions (e.g., the 11434/11435/11436 fragmentation during the MLX arc).
+
+| Port | Service | Protocol | Module |
+| ---- | ------- | -------- | ------ |
+| 11434 | vllm-mlx inference server | HTTP (OpenAI-compatible) | `modules/mlx/` |
+| 8080 | Open WebUI | HTTP | `modules/open-webui.nix` |
+| 27124 | Obsidian Local REST API | HTTP | `modules/mcp/` (env only) |
+
+**Reserved/conflicting ports to avoid:**
+- 11435: screenpipe (macOS app, not nix-ai managed — caused port collision in PR #230)
+
 ## Testing Locally
 
 From nix-darwin, test changes with:

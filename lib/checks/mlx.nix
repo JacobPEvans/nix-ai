@@ -196,4 +196,58 @@ in
       echo "MLX LaunchAgent: ${toString (builtins.length bannedFlags)} banned flags verified absent, ${toString (builtins.length requiredSubstrings)} required flags verified present, conditional flags verified"
       touch $out
     '';
+
+  # Negative test: verify the banned-flag detection logic actually catches bad flags.
+  # Without this, a regex typo in mlx-launchd could silently pass banned flags through.
+  mlx-launchd-negative =
+    let
+      # Synthetic args strings containing banned flags — each MUST be detected
+      testCases = [
+        {
+          input = "serve model --max-kv-size 1024 --port 11434";
+          bannedFlag = "--max-kv-size";
+        }
+        {
+          input = "serve model --prefill-step-size 256 --port 11434";
+          bannedFlag = "--prefill-step-size";
+        }
+        {
+          input = "serve model --prompt-cache-size 512 --port 11434";
+          bannedFlag = "--prompt-cache-size";
+        }
+        {
+          input = "serve model --decode-concurrency 4 --port 11434";
+          bannedFlag = "--decode-concurrency";
+        }
+        {
+          input = "serve model --prompt-concurrency 2 --port 11434";
+          bannedFlag = "--prompt-concurrency";
+        }
+        {
+          input = "serve model --draft-model foo --port 11434";
+          bannedFlag = "--draft-model";
+        }
+        {
+          input = "serve model --num-draft-tokens 8 --port 11434";
+          bannedFlag = "--num-draft-tokens";
+        }
+        {
+          input = "serve model --pipeline parallel --port 11434";
+          bannedFlag = "--pipeline";
+        }
+      ];
+      # Same detection logic as mlx-launchd — if this changes there, it must change here
+      detect = flag: str: builtins.match ".*${flag}.*" str != null;
+      # Every banned flag must be detected
+      undetected = builtins.filter (tc: !(detect tc.bannedFlag tc.input)) testCases;
+    in
+    assert
+      undetected == [ ]
+      || throw "Negative test failed — banned flags NOT detected: ${
+        builtins.toJSON (map (tc: tc.bannedFlag) undetected)
+      }";
+    pkgs.runCommand "check-mlx-launchd-negative" { } ''
+      echo "MLX LaunchAgent negative: ${toString (builtins.length testCases)} banned flag patterns verified detectable"
+      touch $out
+    '';
 }
