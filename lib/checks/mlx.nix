@@ -149,41 +149,37 @@ in
       ];
       missingRequired = builtins.filter (f: builtins.match ".*${f}.*" argsStr == null) requiredSubstrings;
 
-      # Conditional flags must NOT appear when their config values are null
-      conditionalAbsent =
-        (
-          if mlxCfg.cacheMemoryMb == null then
-            builtins.match ".*--cache-memory-mb.*" argsStr != null
-          else
-            false
-        )
-        || (
-          if mlxCfg.prefillBatchSize == null then
-            builtins.match ".*--prefill-batch-size.*" argsStr != null
-          else
-            false
-        )
-        || (
-          if !mlxCfg.continuousBatching then
-            builtins.match ".*--continuous-batching.*" argsStr != null
-          else
-            false
-        )
-        || (
-          if mlxCfg.maxNumSeqs == null then builtins.match ".*--max-num-seqs.*" argsStr != null else false
-        )
-        || (
-          if mlxCfg.chunkedPrefillTokens == null then
-            builtins.match ".*--chunked-prefill-tokens.*" argsStr != null
-          else
-            false
-        )
-        || (
-          if mlxCfg.completionBatchSize == null then
-            builtins.match ".*--completion-batch-size.*" argsStr != null
-          else
-            false
-        );
+      # Conditional flags must NOT appear when their config value is null/false.
+      # Data-driven: list of { flag, shouldBeAbsent } — matches bannedFlags pattern above.
+      conditionalChecks = [
+        {
+          flag = "--cache-memory-mb";
+          shouldBeAbsent = mlxCfg.cacheMemoryMb == null;
+        }
+        {
+          flag = "--prefill-batch-size";
+          shouldBeAbsent = mlxCfg.prefillBatchSize == null;
+        }
+        {
+          flag = "--continuous-batching";
+          shouldBeAbsent = !mlxCfg.continuousBatching;
+        }
+        {
+          flag = "--max-num-seqs";
+          shouldBeAbsent = mlxCfg.maxNumSeqs == null;
+        }
+        {
+          flag = "--chunked-prefill-tokens";
+          shouldBeAbsent = mlxCfg.chunkedPrefillTokens == null;
+        }
+        {
+          flag = "--completion-batch-size";
+          shouldBeAbsent = mlxCfg.completionBatchSize == null;
+        }
+      ];
+      conditionalViolations = builtins.filter (
+        c: c.shouldBeAbsent && builtins.match ".*${c.flag}.*" argsStr != null
+      ) conditionalChecks;
     in
     assert
       presentBanned == [ ]
@@ -192,8 +188,10 @@ in
       missingRequired == [ ]
       || throw "Missing required flags in ProgramArguments: ${builtins.toJSON missingRequired}";
     assert
-      !conditionalAbsent
-      || throw "Conditional flags present in ProgramArguments despite null config values";
+      conditionalViolations == [ ]
+      || throw "Conditional flags present despite null/false config: ${
+        builtins.toJSON (map (c: c.flag) conditionalViolations)
+      }";
     pkgs.runCommand "check-mlx-launchd" { } ''
       echo "MLX LaunchAgent: ${toString (builtins.length bannedFlags)} banned flags verified absent, ${toString (builtins.length requiredSubstrings)} required flags verified present, conditional flags verified"
       touch $out

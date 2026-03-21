@@ -424,7 +424,6 @@ in
         runtimeInputs = with pkgs; [
           curl
           jq
-          bc
           coreutils
         ];
         text = builtins.readFile ./scripts/mlx-bench.sh;

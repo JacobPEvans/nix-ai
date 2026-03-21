@@ -15,6 +15,11 @@
 
 set -euo pipefail
 
+# ---- Cleanup ----
+BENCH_TMPDIR=""
+cleanup() { [[ -n "$BENCH_TMPDIR" ]] && rm -rf "$BENCH_TMPDIR"; }
+trap cleanup EXIT
+
 # ---- Configuration ----
 API_URL="${MLX_API_URL:-http://127.0.0.1:11434/v1}"
 MODEL="${MLX_DEFAULT_MODEL:-}"
@@ -47,6 +52,19 @@ if [[ -z "$MODEL" ]]; then
   exit 1
 fi
 
+# ---- Timing helper (resolved once) ----
+if date +%s%N > /dev/null 2>&1 && [[ "$(date +%s%N)" != *N* ]]; then
+  now_ns() { date +%s%N; }
+else
+  now_ns() { python3 -c 'import time; print(int(time.time_ns()))'; }
+fi
+
+# Elapsed seconds between two nanosecond timestamps
+elapsed_s() { echo "$1 $2" | awk '{printf "%.3f", ($2-$1)/1000000000}'; }
+
+# Elapsed milliseconds between two nanosecond timestamps
+elapsed_ms() { echo "$1 $2" | awk '{printf "%.1f", ($2-$1)/1000000}'; }
+
 # ---- Helpers ----
 
 # Send a chat completion request, return the full JSON response
@@ -73,26 +91,21 @@ chat_completion() {
       '{model:$model,messages:$messages,max_tokens:$max_tokens,temperature:0}')"
 }
 
-# Extract tok/s from usage stats
-calc_tok_s() {
-  local response="$1"
-  local wall_s="$2"
-  local completion_tokens
-  completion_tokens=$(echo "$response" | jq -r '.usage.completion_tokens // 0')
-  if [[ "$completion_tokens" -gt 0 ]]; then
-    echo "$completion_tokens $wall_s" | awk '{printf "%.1f", $1/$2}'
-  else
-    echo "0"
-  fi
-}
-
 # Get completion text from response
 get_content() {
   local response="$1"
   echo "$response" | jq -r '.choices[0].message.content // ""'
 }
 
+# Ensure tmpdir exists (created once, cleaned up by trap)
+ensure_tmpdir() {
+  if [[ -z "$BENCH_TMPDIR" ]]; then
+    BENCH_TMPDIR=$(mktemp -d)
+  fi
+}
+
 # ---- Prompt Definitions ----
+# Arrays are positionally coupled — keep lengths in sync.
 
 # Throughput prompts (varied complexity)
 declare -a THROUGHPUT_PROMPTS THROUGHPUT_TOKENS THROUGHPUT_LABELS
@@ -138,6 +151,21 @@ ACCURACY_LABELS=(
   "power_of_2" "git_branch"
 )
 
+# Validate parallel arrays have matching lengths
+validate_arrays() {
+  if [[ ${#THROUGHPUT_PROMPTS[@]} -ne ${#THROUGHPUT_TOKENS[@]} ]] ||
+     [[ ${#THROUGHPUT_PROMPTS[@]} -ne ${#THROUGHPUT_LABELS[@]} ]]; then
+    echo "Error: THROUGHPUT arrays have mismatched lengths" >&2
+    exit 1
+  fi
+  if [[ ${#ACCURACY_PROMPTS[@]} -ne ${#ACCURACY_TOKENS[@]} ]] ||
+     [[ ${#ACCURACY_PROMPTS[@]} -ne ${#ACCURACY_KEYWORDS[@]} ]] ||
+     [[ ${#ACCURACY_PROMPTS[@]} -ne ${#ACCURACY_LABELS[@]} ]]; then
+    echo "Error: ACCURACY arrays have mismatched lengths" >&2
+    exit 1
+  fi
+}
+
 # Prefix-cache system prompt (~500 tokens)
 PREFIX_SYSTEM_PROMPT="You are a senior software engineer specializing in distributed systems, cloud architecture, and performance optimization. You have extensive experience with Kubernetes, Terraform, Ansible, and infrastructure-as-code practices. Your expertise spans across multiple programming languages including Python, Go, Rust, and TypeScript. You follow best practices for code review, testing, and CI/CD pipelines. When answering questions, you provide concise, actionable advice with code examples when relevant. You prioritize security, reliability, and maintainability in all recommendations. You are familiar with observability tools like Prometheus, Grafana, and OpenTelemetry. You understand the tradeoffs between different architectural patterns including microservices, monoliths, and serverless approaches. You always consider cost optimization and operational complexity when making recommendations. Your responses should be practical and grounded in real-world production experience."
 
@@ -153,15 +181,17 @@ run_throughput() {
     local label="${THROUGHPUT_LABELS[$i]}"
 
     if [[ "$jobs" -eq 1 ]]; then
-      # Single request
-      local start_ns end_ns wall_s response
-      start_ns=$(date +%s%N 2>/dev/null || python3 -c 'import time; print(int(time.time_ns()))')
+      local start_ns end_ns wall_s response completion_tokens tok_s
+      start_ns=$(now_ns)
       response=$(chat_completion "$prompt" "$max_tokens")
-      end_ns=$(date +%s%N 2>/dev/null || python3 -c 'import time; print(int(time.time_ns()))')
-      wall_s=$(echo "$start_ns $end_ns" | awk '{printf "%.3f", ($2-$1)/1000000000}')
-      local tok_s completion_tokens
+      end_ns=$(now_ns)
+      wall_s=$(elapsed_s "$start_ns" "$end_ns")
       completion_tokens=$(echo "$response" | jq -r '.usage.completion_tokens // 0')
-      tok_s=$(calc_tok_s "$response" "$wall_s")
+      if [[ "$completion_tokens" -gt 0 ]]; then
+        tok_s=$(echo "$completion_tokens $wall_s" | awk '{printf "%.1f", $1/$2}')
+      else
+        tok_s="0"
+      fi
 
       jq -n --arg test "throughput" --arg label "$label" \
         --argjson jobs "$jobs" --argjson tokens "$completion_tokens" \
@@ -169,24 +199,32 @@ run_throughput() {
         --arg model "$MODEL" \
         '{test:$test,label:$label,jobs:$jobs,tokens:$tokens,tok_s:($tok_s|tonumber),wall_s:($wall_s|tonumber),model:$model}'
     else
-      # Concurrent requests — launch $jobs copies in parallel
-      local tmpdir
-      tmpdir=$(mktemp -d)
-      local start_ns end_ns
-      start_ns=$(date +%s%N 2>/dev/null || python3 -c 'import time; print(int(time.time_ns()))')
+      ensure_tmpdir
+      local start_ns end_ns pids=()
+      start_ns=$(now_ns)
 
       for j in $(seq 1 "$jobs"); do
-        chat_completion "$prompt" "$max_tokens" > "$tmpdir/resp_${j}.json" &
+        chat_completion "$prompt" "$max_tokens" > "$BENCH_TMPDIR/resp_${label}_${j}.json" &
+        pids+=($!)
       done
-      wait
 
-      end_ns=$(date +%s%N 2>/dev/null || python3 -c 'import time; print(int(time.time_ns()))')
+      local failed=0
+      for pid in "${pids[@]}"; do
+        if ! wait "$pid"; then
+          failed=$((failed + 1))
+        fi
+      done
+      if [[ "$failed" -gt 0 ]]; then
+        echo "Warning: $failed/$jobs requests failed for $label" >&2
+      fi
+
+      end_ns=$(now_ns)
       local wall_s total_tokens
-      wall_s=$(echo "$start_ns $end_ns" | awk '{printf "%.3f", ($2-$1)/1000000000}')
+      wall_s=$(elapsed_s "$start_ns" "$end_ns")
       total_tokens=0
       for j in $(seq 1 "$jobs"); do
         local t
-        t=$(jq -r '.usage.completion_tokens // 0' "$tmpdir/resp_${j}.json")
+        t=$(jq -r '.usage.completion_tokens // 0' "$BENCH_TMPDIR/resp_${label}_${j}.json" 2>/dev/null || echo 0)
         total_tokens=$((total_tokens + t))
       done
       local aggregate_tok_s
@@ -197,8 +235,6 @@ run_throughput() {
         --argjson tok_s "$aggregate_tok_s" --argjson wall_s "$wall_s" \
         --arg model "$MODEL" \
         '{test:$test,label:$label,jobs:$jobs,tokens:$tokens,tok_s:($tok_s|tonumber),wall_s:($wall_s|tonumber),model:$model}'
-
-      rm -rf "$tmpdir"
     fi
   done
 }
@@ -244,28 +280,25 @@ run_latency() {
   local iterations=10
   echo "# Latency benchmark ($iterations iterations, model=$MODEL)" >&2
 
-  local tmpdir
-  tmpdir=$(mktemp -d)
-
-  # Use a simple prompt for consistent latency measurement
+  ensure_tmpdir
   local prompt="What is 2+2? Answer with just the number."
   local max_tokens="${MAX_TOKENS_OVERRIDE:-16}"
 
   for i in $(seq 1 "$iterations"); do
     local start_ns end_ns
-    start_ns=$(date +%s%N 2>/dev/null || python3 -c 'import time; print(int(time.time_ns()))')
-    chat_completion "$prompt" "$max_tokens" > "$tmpdir/resp_${i}.json"
-    end_ns=$(date +%s%N 2>/dev/null || python3 -c 'import time; print(int(time.time_ns()))')
-    echo "$start_ns $end_ns" | awk '{printf "%.1f\n", ($2-$1)/1000000}' >> "$tmpdir/latencies.txt"
+    start_ns=$(now_ns)
+    chat_completion "$prompt" "$max_tokens" > /dev/null
+    end_ns=$(now_ns)
+    elapsed_ms "$start_ns" "$end_ns" >> "$BENCH_TMPDIR/latencies.txt"
   done
 
   # Calculate percentiles
   local sorted p50 p95 p99 avg
-  sorted=$(sort -n "$tmpdir/latencies.txt")
+  sorted=$(sort -n "$BENCH_TMPDIR/latencies.txt")
   p50=$(echo "$sorted" | awk "NR==$(( (iterations + 1) / 2 )){print}")
   p95=$(echo "$sorted" | awk "NR==$(( (iterations * 95 + 99) / 100 )){print}")
   p99=$(echo "$sorted" | awk "NR==$iterations{print}")
-  avg=$(awk '{s+=$1} END{printf "%.1f", s/NR}' "$tmpdir/latencies.txt")
+  avg=$(awk '{s+=$1} END{printf "%.1f", s/NR}' "$BENCH_TMPDIR/latencies.txt")
 
   jq -n --arg test "latency" \
     --argjson iterations "$iterations" \
@@ -273,8 +306,6 @@ run_latency() {
     --argjson p95_ms "$p95" --argjson p99_ms "$p99" \
     --arg model "$MODEL" \
     '{test:$test,iterations:$iterations,avg_ms:($avg_ms|tonumber),p50_ms:($p50_ms|tonumber),p95_ms:($p95_ms|tonumber),p99_ms:($p99_ms|tonumber),model:$model}'
-
-  rm -rf "$tmpdir"
 }
 
 run_prefix_cache() {
@@ -286,19 +317,19 @@ run_prefix_cache() {
 
   # Cold run (no cache)
   local start_ns end_ns cold_ms
-  start_ns=$(date +%s%N 2>/dev/null || python3 -c 'import time; print(int(time.time_ns()))')
+  start_ns=$(now_ns)
   chat_completion "$prompt" "$max_tokens" "$PREFIX_SYSTEM_PROMPT" > /dev/null
-  end_ns=$(date +%s%N 2>/dev/null || python3 -c 'import time; print(int(time.time_ns()))')
-  cold_ms=$(echo "$start_ns $end_ns" | awk '{printf "%.1f", ($2-$1)/1000000}')
+  end_ns=$(now_ns)
+  cold_ms=$(elapsed_ms "$start_ns" "$end_ns")
 
   # Warm runs (same system prompt, should hit prefix cache)
   local warm_total=0
   for i in $(seq 1 "$iterations"); do
-    start_ns=$(date +%s%N 2>/dev/null || python3 -c 'import time; print(int(time.time_ns()))')
+    start_ns=$(now_ns)
     chat_completion "$prompt" "$max_tokens" "$PREFIX_SYSTEM_PROMPT" > /dev/null
-    end_ns=$(date +%s%N 2>/dev/null || python3 -c 'import time; print(int(time.time_ns()))')
+    end_ns=$(now_ns)
     local warm_ms
-    warm_ms=$(echo "$start_ns $end_ns" | awk '{printf "%.1f", ($2-$1)/1000000}')
+    warm_ms=$(elapsed_ms "$start_ns" "$end_ns")
     warm_total=$(echo "$warm_total $warm_ms" | awk '{printf "%.1f", $1+$2}')
   done
 
@@ -320,8 +351,8 @@ run_sweep() {
   echo "## Throughput (single)" >&2
   run_throughput 1
 
-  echo "## Throughput (jobs=$JOBS)" >&2
   if [[ "$JOBS" -gt 1 ]]; then
+    echo "## Throughput (jobs=$JOBS)" >&2
     run_throughput "$JOBS"
   fi
 
@@ -343,6 +374,8 @@ if ! curl -sf "${API_URL}/models" > /dev/null 2>&1; then
   echo "Start the server or check MLX_API_URL." >&2
   exit 1
 fi
+
+validate_arrays
 
 echo "# mlx-bench: mode=$MODE model=$MODEL jobs=$JOBS" >&2
 echo "---" >&2
