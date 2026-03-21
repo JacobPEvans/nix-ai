@@ -10,10 +10,14 @@ in
     let
       expectedOptions = [
         "cacheMemoryMb"
+        "chunkedPrefillTokens"
+        "completionBatchSize"
+        "continuousBatching"
         "defaultModel"
         "enable"
         "host"
         "huggingFaceHome"
+        "maxNumSeqs"
         "port"
         "prefillBatchSize"
       ];
@@ -63,6 +67,26 @@ in
         {
           name = "mlx.prefillBatchSize";
           actual = mlxCfg.prefillBatchSize;
+          expected = null;
+        }
+        {
+          name = "mlx.continuousBatching";
+          actual = mlxCfg.continuousBatching;
+          expected = false;
+        }
+        {
+          name = "mlx.maxNumSeqs";
+          actual = mlxCfg.maxNumSeqs;
+          expected = null;
+        }
+        {
+          name = "mlx.chunkedPrefillTokens";
+          actual = mlxCfg.chunkedPrefillTokens;
+          expected = null;
+        }
+        {
+          name = "mlx.completionBatchSize";
+          actual = mlxCfg.completionBatchSize;
           expected = null;
         }
         # Environment variables
@@ -125,20 +149,37 @@ in
       ];
       missingRequired = builtins.filter (f: builtins.match ".*${f}.*" argsStr == null) requiredSubstrings;
 
-      # Conditional flags must NOT appear when their config values are null
-      conditionalAbsent =
-        (
-          if mlxCfg.cacheMemoryMb == null then
-            builtins.match ".*--cache-memory-mb.*" argsStr != null
-          else
-            false
-        )
-        || (
-          if mlxCfg.prefillBatchSize == null then
-            builtins.match ".*--prefill-batch-size.*" argsStr != null
-          else
-            false
-        );
+      # Conditional flags must NOT appear when their config value is null/false.
+      # Data-driven: list of { flag, shouldBeAbsent } — matches bannedFlags pattern above.
+      conditionalChecks = [
+        {
+          flag = "--cache-memory-mb";
+          shouldBeAbsent = mlxCfg.cacheMemoryMb == null;
+        }
+        {
+          flag = "--prefill-batch-size";
+          shouldBeAbsent = mlxCfg.prefillBatchSize == null;
+        }
+        {
+          flag = "--continuous-batching";
+          shouldBeAbsent = !mlxCfg.continuousBatching;
+        }
+        {
+          flag = "--max-num-seqs";
+          shouldBeAbsent = mlxCfg.maxNumSeqs == null;
+        }
+        {
+          flag = "--chunked-prefill-tokens";
+          shouldBeAbsent = mlxCfg.chunkedPrefillTokens == null;
+        }
+        {
+          flag = "--completion-batch-size";
+          shouldBeAbsent = mlxCfg.completionBatchSize == null;
+        }
+      ];
+      conditionalViolations = builtins.filter (
+        c: c.shouldBeAbsent && builtins.match ".*${c.flag}.*" argsStr != null
+      ) conditionalChecks;
     in
     assert
       presentBanned == [ ]
@@ -147,8 +188,10 @@ in
       missingRequired == [ ]
       || throw "Missing required flags in ProgramArguments: ${builtins.toJSON missingRequired}";
     assert
-      !conditionalAbsent
-      || throw "Conditional flags present in ProgramArguments despite null config values";
+      conditionalViolations == [ ]
+      || throw "Conditional flags present despite null/false config: ${
+        builtins.toJSON (map (c: c.flag) conditionalViolations)
+      }";
     pkgs.runCommand "check-mlx-launchd" { } ''
       echo "MLX LaunchAgent: ${toString (builtins.length bannedFlags)} banned flags verified absent, ${toString (builtins.length requiredSubstrings)} required flags verified present, conditional flags verified"
       touch $out
