@@ -132,6 +132,17 @@
     '')
 
     # ==========================================================================
+    # Google Workspace CLI
+    # ==========================================================================
+    # Full Workspace API surface with curated Agent Skills (+triage, +watch, etc.)
+    # Source: https://github.com/googleworkspace/cli
+    # NPM: @googleworkspace/cli (using @latest - pre-v1.0, rapid development)
+    # Key commands: gws gmail +triage, gws gmail +watch, gws drive +upload
+    (writeShellScriptBin "gws" ''
+      exec ${bun}/bin/bunx --bun @googleworkspace/cli@latest "$@"
+    '')
+
+    # ==========================================================================
     # Doppler MCP Wrapper
     # ==========================================================================
     # Wraps any MCP server command with Doppler secret injection.
