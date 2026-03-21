@@ -83,6 +83,10 @@
       url = "github:obra/superpowers-marketplace";
       flake = false;
     };
+    visual-explainer-marketplace = {
+      url = "github:nicobailon/visual-explainer";
+      flake = false;
+    };
     wakatime = {
       url = "github:wakatime/claude-code-wakatime";
       flake = false;
@@ -117,6 +121,7 @@
       obsidian-skills,
       axton-obsidian-visual-skills,
       superpowers-marketplace,
+      visual-explainer-marketplace,
       wakatime,
       pal-mcp-server,
       ...
@@ -144,6 +149,7 @@
           obsidian-skills
           axton-obsidian-visual-skills
           superpowers-marketplace
+          visual-explainer-marketplace
           wakatime
           ;
       };

@@ -331,6 +331,7 @@
         "obsidian-skills": "obsidian-skills",
         "pal-mcp-server": "pal-mcp-server",
         "superpowers-marketplace": "superpowers-marketplace",
+        "visual-explainer-marketplace": "visual-explainer-marketplace",
         "wakatime": "wakatime"
       }
     },
@@ -347,6 +348,22 @@
       "original": {
         "owner": "obra",
         "repo": "superpowers-marketplace",
+        "type": "github"
+      }
+    },
+    "visual-explainer-marketplace": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1773079619,
+        "narHash": "sha256-fDMUkcxYuM1jJkdlWgNUz74ndj3qRikSgAiZLYdbeFY=",
+        "owner": "nicobailon",
+        "repo": "visual-explainer",
+        "rev": "61f06e818e8fd49a86351d5981dcc6eeeae2f890",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nicobailon",
+        "repo": "visual-explainer",
         "type": "github"
       }
     },
