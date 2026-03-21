@@ -30,6 +30,26 @@ loop that requires force-killing the process.
 Cache staleness is handled automatically by `verify-cache-integrity.sh` on every
 `darwin-rebuild switch`. No manual cache deletion is ever needed.
 
+## Never Mutate Plugin Cache from Activation Scripts
+
+`home.activation` scripts MUST NOT run `claude plugins update`, `claude plugins marketplace update`,
+or any command that creates/deletes directories under `~/.claude/plugins/cache/`.
+
+These commands regenerate cache directories with new hashes, which breaks `${CLAUDE_PLUGIN_ROOT}`
+references in active Claude Code sessions. All registered hooks (PreToolUse, PostToolUse, Stop)
+resolve `${CLAUDE_PLUGIN_ROOT}` at session start — when the old hash path disappears, every hook
+call fails, including the Stop hook, creating an unbreakable error loop.
+
+The correct mechanism is:
+
+- **Nix-managed marketplace symlinks** update the store path on rebuild
+- **`verify-cache-integrity.sh`** (in `orphan-cleanup.nix`) detects stale caches via hash comparison
+  and purges only when the store path actually changed
+- **Claude Code detects marketplace changes on new session start** — no forced re-index needed
+
+Commit `edba1ad` (2025-03-19) introduced an `updateClaudePlugins` activation script that violated
+this rule, causing intermittent hook failures in active sessions. It was removed in the subsequent fix.
+
 ## Migration Path
 
 Phase 1 of `orphan-cleanup.nix` handles the one-time migration from `recursive = true`
