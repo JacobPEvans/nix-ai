@@ -2,11 +2,15 @@
 # Safe wrapper for vllm-mlx throughput benchmark — runs preflight before loading model.
 # Usage: mlx-bench-safe [vllm-mlx-bench args...]
 
-# Extract --model argument
+# Extract --model argument (handles both --model value and --model=value)
 model=""
 prev=""
 for arg in "$@"; do
-  if [ "$prev" = "--model" ]; then model="$arg"; fi
+  if [[ "$arg" == --model=* ]]; then
+    model="${arg#*=}"
+  elif [ "$prev" = "--model" ]; then
+    model="$arg"
+  fi
   prev="$arg"
 done
 

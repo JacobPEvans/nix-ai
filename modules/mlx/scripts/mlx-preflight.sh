@@ -21,9 +21,9 @@ if [ ! -d "$model_path" ]; then
   exit 1
 fi
 
-# Model disk size (reliable proxy — 4-bit safetensors ≈ 1:1 disk:memory)
-model_bytes=$(du -sk "$model_path" | awk '{print $1}')
-model_gb=$(( model_bytes / 1048576 ))
+# Model disk size in GB (awk for floating-point precision, rounded up)
+model_kb=$(du -sk "$model_path" | awk '{print $1}')
+model_gb=$(awk "BEGIN {printf \"%d\", ($model_kb / 1048576) + 0.5}")
 
 # Total system RAM
 total_bytes=$(sysctl -n hw.memsize)
@@ -32,8 +32,8 @@ total_gb=$(( total_bytes / 1073741824 ))
 # Available = total - safety overhead
 available_gb=$(( total_gb - safety_gb ))
 
-# Estimated memory = model + 30% for KV cache and runtime
-estimated_gb=$(( model_gb * 13 / 10 ))
+# Estimated memory = model + 30% for KV cache and runtime (rounded up)
+estimated_gb=$(awk "BEGIN {printf \"%d\", ($model_gb * 1.3) + 0.5}")
 
 if [ "$model_gb" -gt "$available_gb" ]; then
   echo "BLOCKED: Model too large for available memory" >&2

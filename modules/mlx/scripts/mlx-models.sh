@@ -25,10 +25,10 @@ for model_dir in "$hf_home/hub"/models--*; do
   model_id="${dir_name#models--}"
   model_id="${model_id//--//}"
 
-  # Size in GB
+  # Size in GB (awk for floating-point precision, rounded up)
   size_kb=$(du -sk "$model_dir" | awk '{print $1}')
-  size_gb=$(( size_kb / 1048576 ))
-  est_gb=$(( size_gb * 13 / 10 ))
+  size_gb=$(awk "BEGIN {printf \"%d\", ($size_kb / 1048576) + 0.5}")
+  est_gb=$(awk "BEGIN {printf \"%d\", ($size_gb * 1.3) + 0.5}")
 
   # Status
   if [ "$size_gb" -gt "$available_gb" ]; then

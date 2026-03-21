@@ -5,7 +5,11 @@
 model=""
 prev=""
 for arg in "$@"; do
-  if [ "$prev" = "--model" ]; then model="$arg"; fi
+  if [[ "$arg" == --model=* ]]; then
+    model="${arg#*=}"
+  elif [ "$prev" = "--model" ]; then
+    model="$arg"
+  fi
   prev="$arg"
 done
 
