@@ -39,9 +39,8 @@ _:
     # Requires: GitLab API token
     "gitlab@claude-plugins-official" = false;
 
-    # Greptile - AI-powered codebase search
-    # Requires: GREPTILE_API_KEY env var
-    "greptile@claude-plugins-official" = true;
+    # Greptile - removed (2026-03-20): great product, not worth the cost for our use case
+    "greptile@claude-plugins-official" = false;
 
     # =========================================================================
     # Documentation & Context
