@@ -154,7 +154,16 @@ in
   # Selective tool loading: --tools limits which Google services are exposed
   google-workspace = {
     command = "doppler-mcp";
-    args = [ "uvx" "workspace-mcp" "--tools" "gmail" "drive" "calendar" ];
+    args = [
+      "uvx"
+      "--from"
+      "google-workspace-mcp==0.1.2"
+      "workspace-mcp"
+      "--tools"
+      "gmail"
+      "drive"
+      "calendar"
+    ];
   };
   google-maps = official "google-maps" // {
     disabled = true;

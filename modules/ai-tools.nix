@@ -50,6 +50,7 @@
 #   gh-copilot: @githubnext/github-copilot-cli@latest (unversioned - upstream)
 #   chatgpt: chatgpt-cli@3.3.0
 #   claude-flow: claude-flow@2.0.0
+#   gws: @googleworkspace/cli@latest (pre-v1.0, rapid development - same as gh-copilot)
 #
 # UVX WRAPPER PACKAGES (Python packages not in nixpkgs/homebrew):
 #   hf: huggingface-hub==1.6.0 CLI (model downloads, used with HuggingFace MCP)
