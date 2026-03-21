@@ -3,6 +3,7 @@
 # Plugins from community-maintained marketplaces:
 # - cc-marketplace: Official source for claudecodecommands.directory plugins
 # - superpowers-marketplace: Enhanced Claude capabilities (obra/Jesse Vincent)
+# - visual-explainer-marketplace: Rich HTML diagrams, diff reviews, slides (nicobailon)
 # - bitwarden-marketplace: Enterprise-grade session analysis and config validation
 
 _:
@@ -28,6 +29,10 @@ _:
     # Obsidian Visual Skills - Diagrams (axtonliu/axton-obsidian-visual-skills)
     # Marketplace declares single plugin "obsidian-visual-skills" bundling 3 skills
     "obsidian-visual-skills@axton-obsidian-visual-skills" = true;
+
+    # Visual Explainer - HTML diagrams, diff reviews, plan audits, slides, data tables
+    # Marketplace declares single plugin "visual-explainer" with 1 skill + 8 commands
+    "visual-explainer@visual-explainer-marketplace" = true;
 
     # Bitwarden Marketplace - Enterprise-grade session analysis and config validation
     # claude-retrospective: 3 skills (retrospecting, extracting-session-data, analyzing-git-sessions)

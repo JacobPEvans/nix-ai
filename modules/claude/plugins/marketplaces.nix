@@ -192,6 +192,15 @@ let
       };
     };
 
+    # --- Visualization ---
+    # Rich HTML pages for diagrams, diff reviews, slides, data tables (nicobailon)
+    "visual-explainer-marketplace" = {
+      source = {
+        type = "github";
+        url = "nicobailon/visual-explainer";
+      };
+    };
+
     # --- Enterprise / Well-Known ---
     # Bitwarden AI plugins: session retrospective, config validation, code review
     "bitwarden-marketplace" = {
