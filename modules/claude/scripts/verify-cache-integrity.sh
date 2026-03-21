@@ -46,9 +46,10 @@ if [[ -f "$HASH_FILE" ]]; then
   done < "$HASH_FILE"
 fi
 
-# Build new hashes, purge stale caches
+# Build new hashes and detect staleness
 # Marketplaces are directory symlinks to /nix/store/ (plugins.nix without recursive)
 declare -A new_hashes
+stale_detected=false
 while IFS= read -r -d '' entry; do
   name=$(basename "$entry")
 
@@ -61,13 +62,29 @@ while IFS= read -r -d '' entry; do
   new_hashes["$name"]="$hash"
 
   if [[ "${old_hashes[$name]:-}" != "$hash" ]]; then
+    stale_detected=true
+  fi
+done < <(find "$MARKETPLACES_DIR" -mindepth 1 -maxdepth 1 -type l -print0)
+
+# Session-aware guard: if caches are stale but Claude Code is running, defer the
+# purge to avoid breaking active sessions. Hook scripts inside cache directories are
+# resolved at session start — deleting them mid-session causes an unbreakable error
+# loop (every hook fails, including Stop). By also skipping the hash file update,
+# the next rebuild will re-detect staleness and purge when no sessions are active.
+if [[ "$stale_detected" == true ]] && pgrep -qx "claude"; then
+  log_info "Stale caches detected but Claude Code session is active — deferring purge"
+  exit 0
+fi
+
+# Purge stale caches (safe — no active sessions)
+for name in "${!new_hashes[@]}"; do
+  if [[ "${old_hashes[$name]:-}" != "${new_hashes[$name]}" ]]; then
     if [[ -d "$CACHE_DIR/$name" ]]; then
       rm -rf "${CACHE_DIR:?}/$name"
       log_info "Purged stale cache: $name"
-      log_info "  Store path changed to: $target"
     fi
   fi
-done < <(find "$MARKETPLACES_DIR" -mindepth 1 -maxdepth 1 -type l -print0)
+done
 
 # Write updated hashes atomically to avoid leaving a partially written file
 mkdir -p "$CACHE_DIR"
