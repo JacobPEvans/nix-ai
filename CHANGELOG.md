@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.6](https://github.com/JacobPEvans/nix-ai/compare/v1.17.5...v1.17.6) (2026-03-21)
+
+
+### Bug Fixes
+
+* remove plugin cache mutation from activation scripts ([#258](https://github.com/JacobPEvans/nix-ai/issues/258)) ([4df8af5](https://github.com/JacobPEvans/nix-ai/commit/4df8af59171a49405b3eb42e91938dfca5ca4db2))
+
 ## [1.17.5](https://github.com/JacobPEvans/nix-ai/compare/v1.17.4...v1.17.5) (2026-03-20)
 
 
