@@ -417,17 +417,6 @@ in
           --with "openai==1.82.0" \
           python3 ${./scripts/mlx-chat.py} "$@"
       '')
-
-      # mlx-bench — benchmark throughput, accuracy, latency, prefix-cache
-      (pkgs.writeShellApplication {
-        name = "mlx-bench";
-        runtimeInputs = with pkgs; [
-          curl
-          jq
-          coreutils
-        ];
-        text = builtins.readFile ./scripts/mlx-bench.sh;
-      })
     ];
 
     # ==========================================================================
