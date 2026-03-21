@@ -320,5 +320,27 @@
     #   default = false;
     #   description = "Disable prefix caching entirely. Not recommended.";
     # };
+
+    # ---- OOM PREVENTION (2026-03-21 incident: Jetsam fired 3x, killed nothing) ----
+    # Three python3.13 processes consumed 171.9 GB against 128 GB RAM.
+    # Root cause: no ProcessType set, so Jetsam couldn't determine kill priority.
+
+    memoryLimitGb = lib.mkOption {
+      type = lib.types.ints.positive;
+      default = 90;
+      description = "Soft RSS limit in GB for vllm-mlx LaunchAgent. Process becomes Jetsam-eligible above this threshold.";
+    };
+
+    memoryHardLimitGb = lib.mkOption {
+      type = lib.types.ints.positive;
+      default = 100;
+      description = "Hard RSS limit in GB. Kernel kills process above this. Leaves 28GB for OS + apps on 128GB systems.";
+    };
+
+    safetyOverheadGb = lib.mkOption {
+      type = lib.types.ints.positive;
+      default = 20;
+      description = "GB reserved for OS + other apps during pre-flight memory checks.";
+    };
   };
 }

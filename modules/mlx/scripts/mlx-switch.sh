@@ -9,6 +9,8 @@ plist="$HOME/Library/LaunchAgents/$label.plist"
 
 trap 'lsof -ti :"$MLX_PORT" 2>/dev/null | xargs kill 2>/dev/null; sleep 1; launchctl bootstrap "$domain" "$plist" 2>/dev/null; echo "Default restored."' EXIT
 
+mlx-preflight "$model" || exit 1
+
 launchctl bootout "$domain/$label" 2>/dev/null || true
 while lsof -ti :"${MLX_PORT:?}" >/dev/null 2>&1; do sleep 1; done
 

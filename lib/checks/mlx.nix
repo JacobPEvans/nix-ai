@@ -18,8 +18,11 @@ in
         "host"
         "huggingFaceHome"
         "maxNumSeqs"
+        "memoryHardLimitGb"
+        "memoryLimitGb"
         "port"
         "prefillBatchSize"
+        "safetyOverheadGb"
       ];
       actualOptions = builtins.attrNames mlxCfg;
       missingOptions = builtins.filter (o: !(builtins.elem o actualOptions)) expectedOptions;
@@ -89,6 +92,21 @@ in
           actual = mlxCfg.completionBatchSize;
           expected = null;
         }
+        {
+          name = "mlx.memoryLimitGb";
+          actual = mlxCfg.memoryLimitGb;
+          expected = 90;
+        }
+        {
+          name = "mlx.memoryHardLimitGb";
+          actual = mlxCfg.memoryHardLimitGb;
+          expected = 100;
+        }
+        {
+          name = "mlx.safetyOverheadGb";
+          actual = mlxCfg.safetyOverheadGb;
+          expected = 20;
+        }
         # Environment variables
         {
           name = "mlx.env.MLX_API_URL";
@@ -104,6 +122,11 @@ in
           name = "mlx.env.MLX_HOST";
           actual = hmConfig.config.home.sessionVariables.MLX_HOST;
           expected = "127.0.0.1";
+        }
+        {
+          name = "mlx.env.MLX_SAFETY_OVERHEAD";
+          actual = hmConfig.config.home.sessionVariables.MLX_SAFETY_OVERHEAD;
+          expected = "20";
         }
       ];
       failures = builtins.filter (c: c.actual != c.expected) checks;
@@ -194,6 +217,27 @@ in
       }";
     pkgs.runCommand "check-mlx-launchd" { } ''
       echo "MLX LaunchAgent: ${toString (builtins.length bannedFlags)} banned flags verified absent, ${toString (builtins.length requiredSubstrings)} required flags verified present, conditional flags verified"
+      touch $out
+    '';
+
+  # Verify OOM prevention keys are set in the LaunchAgent config.
+  # Catches regressions where ProcessType or resource limits are removed.
+  mlx-launchd-memory-safety =
+    let
+      launchdCfg = hmConfig.config.launchd.agents.vllm-mlx.config;
+    in
+    assert
+      launchdCfg.ProcessType == "Background"
+      || throw "ProcessType must be \"Background\" for Jetsam eligibility, got: ${builtins.toJSON launchdCfg.ProcessType}";
+    assert
+      launchdCfg ? SoftResourceLimits || throw "SoftResourceLimits missing from LaunchAgent config";
+    assert
+      launchdCfg ? HardResourceLimits || throw "HardResourceLimits missing from LaunchAgent config";
+    assert
+      launchdCfg.HardResourceLimits.ResidentSetSize >= launchdCfg.SoftResourceLimits.ResidentSetSize
+      || throw "HardResourceLimits.ResidentSetSize must be >= SoftResourceLimits.ResidentSetSize";
+    pkgs.runCommand "check-mlx-launchd-memory-safety" { } ''
+      echo "MLX LaunchAgent memory safety: ProcessType=Background, soft=${toString mlxCfg.memoryLimitGb}GB, hard=${toString mlxCfg.memoryHardLimitGb}GB verified"
       touch $out
     '';
 

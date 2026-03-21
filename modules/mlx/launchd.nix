@@ -62,6 +62,16 @@ in
         KeepAlive = true;
         # 2 min throttle — 70GB model loads take 20-60s, prevents rapid crash-restart loops (closes #256)
         ThrottleInterval = 120;
+        # OOM prevention: classify for Jetsam and set memory ceilings.
+        # Background = Jetsam-eligible under pressure; KeepAlive auto-restarts after kill.
+        # ResidentSetSize = relevant metric for Apple Silicon unified memory (mmap-based, not sbrk).
+        ProcessType = "Background";
+        SoftResourceLimits = {
+          ResidentSetSize = cfg.memoryLimitGb * 1073741824;
+        };
+        HardResourceLimits = {
+          ResidentSetSize = cfg.memoryHardLimitGb * 1073741824;
+        };
         EnvironmentVariables = {
           HF_HOME = cfg.huggingFaceHome;
         };

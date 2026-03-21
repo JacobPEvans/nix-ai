@@ -15,10 +15,8 @@ let
   inherit (mlxShared)
     cfg
     vllmMlxPkg
-    vllmMlxVersion
     apiUrl
     ;
-  vllmMlxPin = "vllm-mlx==${vllmMlxVersion}";
 in
 {
   config = lib.mkIf cfg.enable {
@@ -31,6 +29,7 @@ in
       MLX_PORT = toString cfg.port;
       MLX_HOST = cfg.host;
       MLX_HF_HOME = cfg.huggingFaceHome;
+      MLX_SAFETY_OVERHEAD = toString cfg.safetyOverheadGb;
     };
 
     # ==========================================================================
@@ -87,23 +86,40 @@ in
       '')
 
       # ======================================================================
-      # Benchmark Suite
+      # Pre-flight Memory Check
       # ======================================================================
 
-      # mlx-bench — LLM throughput/latency benchmark (loads model directly)
-      (pkgs.writeShellScriptBin "mlx-bench" ''
-        exec ${pkgs.uv}/bin/uvx --from "${vllmMlxPin}" vllm-mlx-bench "$@"
-      '')
+      # mlx-preflight — validate model fits in memory before loading
+      (pkgs.writeShellApplication {
+        name = "mlx-preflight";
+        runtimeInputs = with pkgs; [ coreutils ];
+        text = builtins.readFile ./scripts/mlx-preflight.sh;
+      })
 
-      # mlx-bench-engine — engine benchmark with cache/batching knobs
-      (pkgs.writeShellScriptBin "mlx-bench-engine" ''
-        exec ${pkgs.uv}/bin/uvx --from "${vllmMlxPin}" vllm-mlx bench "$@"
-      '')
+      # ======================================================================
+      # Benchmark Suite (with OOM safety wrappers)
+      # ======================================================================
 
-      # mlx-bench-raw — raw MLX prefill + decode tok/s (no vllm-mlx overhead)
-      (pkgs.writeShellScriptBin "mlx-bench-raw" ''
-        exec ${pkgs.uv}/bin/uvx --from mlx-lm mlx_lm.benchmark "$@"
-      '')
+      # mlx-bench — vllm-mlx throughput/latency benchmark (pre-flight protected)
+      (pkgs.writeShellApplication {
+        name = "mlx-bench";
+        runtimeInputs = [ vllmMlxPkg ];
+        text = builtins.readFile ./scripts/mlx-bench-safe.sh;
+      })
+
+      # mlx-bench-engine — engine benchmark with cache/batching knobs (pre-flight protected)
+      (pkgs.writeShellApplication {
+        name = "mlx-bench-engine";
+        runtimeInputs = [ vllmMlxPkg ];
+        text = builtins.readFile ./scripts/mlx-bench-engine-safe.sh;
+      })
+
+      # mlx-bench-raw — raw MLX prefill + decode tok/s (pre-flight protected, ulimit capped)
+      (pkgs.writeShellApplication {
+        name = "mlx-bench-raw";
+        runtimeInputs = with pkgs; [ uv ];
+        text = builtins.readFile ./scripts/mlx-bench-raw-safe.sh;
+      })
 
       # mlx-eval — accuracy evaluation against the live vllm-mlx server API
       (pkgs.writeShellScriptBin "mlx-eval" ''
@@ -135,6 +151,21 @@ in
           done
           echo "vllm-mlx ready (''${elapsed}s)"
         '';
+      })
+
+      # ======================================================================
+      # Model Inventory
+      # ======================================================================
+
+      # mlx-models — list all downloaded models with memory fit status
+      (pkgs.writeShellApplication {
+        name = "mlx-models";
+        runtimeInputs = with pkgs; [
+          coreutils
+          curl
+          jq
+        ];
+        text = builtins.readFile ./scripts/mlx-models.sh;
       })
     ];
   };
