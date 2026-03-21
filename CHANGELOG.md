@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.0](https://github.com/JacobPEvans/nix-ai/compare/v1.17.6...v1.18.0) (2026-03-21)
+
+
+### Features
+
+* **mlx:** concurrency options and mlx-bench benchmark script ([#260](https://github.com/JacobPEvans/nix-ai/issues/260)) ([e1cefde](https://github.com/JacobPEvans/nix-ai/commit/e1cefdeab9d0f4014eb01e990e401654c43f922e))
+
 ## [1.17.6](https://github.com/JacobPEvans/nix-ai/compare/v1.17.5...v1.17.6) (2026-03-21)
 
 
