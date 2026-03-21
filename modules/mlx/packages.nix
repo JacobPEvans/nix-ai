@@ -17,6 +17,13 @@ let
     vllmMlxPkg
     apiUrl
     ;
+
+  # Shared OOM-safe benchmark wrapper — extracts --model arg, runs preflight, caps ulimit
+  mlxBenchWrapperPkg = pkgs.writeShellApplication {
+    name = "mlx-bench-wrapper";
+    runtimeInputs = with pkgs; [ coreutils ];
+    text = builtins.readFile ./scripts/mlx-bench-wrapper.sh;
+  };
 in
 {
   config = lib.mkIf cfg.enable {
@@ -97,29 +104,24 @@ in
       })
 
       # ======================================================================
-      # Benchmark Suite (with OOM safety wrappers)
+      # Benchmark Suite (shared OOM-safe wrapper: preflight + ulimit -v 110GB)
       # ======================================================================
+      mlxBenchWrapperPkg
 
-      # mlx-bench — vllm-mlx throughput/latency benchmark (pre-flight protected)
-      (pkgs.writeShellApplication {
-        name = "mlx-bench";
-        runtimeInputs = [ vllmMlxPkg ];
-        text = builtins.readFile ./scripts/mlx-bench-safe.sh;
-      })
+      # mlx-bench — vllm-mlx throughput/latency benchmark
+      (pkgs.writeShellScriptBin "mlx-bench" ''
+        exec ${lib.getExe mlxBenchWrapperPkg} ${lib.getExe vllmMlxPkg}-bench "$@"
+      '')
 
-      # mlx-bench-engine — engine benchmark with cache/batching knobs (pre-flight protected)
-      (pkgs.writeShellApplication {
-        name = "mlx-bench-engine";
-        runtimeInputs = [ vllmMlxPkg ];
-        text = builtins.readFile ./scripts/mlx-bench-engine-safe.sh;
-      })
+      # mlx-bench-engine — engine benchmark with cache/batching knobs
+      (pkgs.writeShellScriptBin "mlx-bench-engine" ''
+        exec ${lib.getExe mlxBenchWrapperPkg} "${lib.getExe vllmMlxPkg} bench" "$@"
+      '')
 
-      # mlx-bench-raw — raw MLX prefill + decode tok/s (pre-flight protected, ulimit capped)
-      (pkgs.writeShellApplication {
-        name = "mlx-bench-raw";
-        runtimeInputs = with pkgs; [ uv ];
-        text = builtins.readFile ./scripts/mlx-bench-raw-safe.sh;
-      })
+      # mlx-bench-raw — raw MLX prefill + decode (bypasses vllm-mlx memory controls)
+      (pkgs.writeShellScriptBin "mlx-bench-raw" ''
+        exec ${lib.getExe mlxBenchWrapperPkg} "${pkgs.uv}/bin/uvx --from mlx-lm mlx_lm.benchmark" "$@"
+      '')
 
       # mlx-eval — accuracy evaluation against the live vllm-mlx server API
       (pkgs.writeShellScriptBin "mlx-eval" ''

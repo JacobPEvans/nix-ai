@@ -25,10 +25,26 @@ for model_dir in "$hf_home/hub"/models--*; do
   model_id="${dir_name#models--}"
   model_id="${model_id//--//}"
 
-  # Size in GB (awk for floating-point precision, rounded up)
-  size_kb=$(du -sk "$model_dir" | awk '{print $1}')
-  size_gb=$(awk "BEGIN {printf \"%d\", ($size_kb / 1048576) + 0.5}")
-  est_gb=$(awk "BEGIN {printf \"%d\", ($size_gb * 1.3) + 0.5}")
+  # Size in GB (single awk call for precision; cache du results by mtime)
+  cache_file="${XDG_CACHE_HOME:-$HOME/.cache}/mlx-model-sizes"
+  dir_mtime=$(stat -f "%m" "$model_dir")
+  cached=$(grep "^${dir_name} ${dir_mtime} " "$cache_file" 2>/dev/null)
+  if [ -n "$cached" ]; then
+    read -r _ _ size_gb est_gb <<< "$cached"
+  else
+    read -r size_gb est_gb < <(
+      du -sk "$model_dir" | awk '{
+        gb = int($1 / 1048576 + 0.5)
+        est = int(gb * 1.3 + 0.5)
+        print gb, est
+      }'
+    )
+    mkdir -p "$(dirname "$cache_file")"
+    # Remove stale entry for this model, add fresh one
+    grep -v "^${dir_name} " "$cache_file" 2>/dev/null > "${cache_file}.tmp" || true
+    printf "%s %s %s %s\n" "$dir_name" "$dir_mtime" "$size_gb" "$est_gb" >> "${cache_file}.tmp"
+    mv "${cache_file}.tmp" "$cache_file"
+  fi
 
   # Status
   if [ "$size_gb" -gt "$available_gb" ]; then

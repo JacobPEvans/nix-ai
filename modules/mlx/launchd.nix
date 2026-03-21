@@ -19,6 +19,13 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = cfg.memoryHardLimitGb >= cfg.memoryLimitGb;
+        message = "programs.mlx.memoryHardLimitGb (${toString cfg.memoryHardLimitGb}) must be >= memoryLimitGb (${toString cfg.memoryLimitGb})";
+      }
+    ];
+
     # ==========================================================================
     # LaunchAgent for Auto-Start
     # ==========================================================================

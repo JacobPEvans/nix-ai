@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-# Safe wrapper for vllm-mlx throughput benchmark — runs preflight before loading model.
-# Usage: mlx-bench-safe [vllm-mlx-bench args...]
+# Shared OOM-safe wrapper for MLX benchmark tools.
+# Runs mlx-preflight before loading a model, caps virtual memory at 110 GB.
+# Usage: mlx-bench-wrapper <command> [args...]
+#   command: the benchmark executable or command to run after safety checks
+
+cmd="${1:?Usage: mlx-bench-wrapper <command> [args...]}"
+shift
 
 # Extract --model argument (handles both --model value and --model=value)
 model=""
@@ -21,4 +26,4 @@ fi
 # Cap virtual memory at 110 GB (in KB) to prevent unbounded growth
 ulimit -v $((110 * 1024 * 1024)) 2>/dev/null || true
 
-exec vllm-mlx-bench "$@"
+exec $cmd "$@"

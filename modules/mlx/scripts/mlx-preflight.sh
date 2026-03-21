@@ -21,9 +21,14 @@ if [ ! -d "$model_path" ]; then
   exit 1
 fi
 
-# Model disk size in GB (awk for floating-point precision, rounded up)
-model_kb=$(du -sk "$model_path" | awk '{print $1}')
-model_gb=$(awk "BEGIN {printf \"%d\", ($model_kb / 1048576) + 0.5}")
+# Model disk size and estimated memory in GB (single awk call for precision)
+read -r model_gb estimated_gb < <(
+  du -sk "$model_path" | awk '{
+    gb = int($1 / 1048576 + 0.5)
+    est = int(gb * 1.3 + 0.5)
+    print gb, est
+  }'
+)
 
 # Total system RAM
 total_bytes=$(sysctl -n hw.memsize)
@@ -31,9 +36,6 @@ total_gb=$(( total_bytes / 1073741824 ))
 
 # Available = total - safety overhead
 available_gb=$(( total_gb - safety_gb ))
-
-# Estimated memory = model + 30% for KV cache and runtime (rounded up)
-estimated_gb=$(awk "BEGIN {printf \"%d\", ($model_gb * 1.3) + 0.5}")
 
 if [ "$model_gb" -gt "$available_gb" ]; then
   echo "BLOCKED: Model too large for available memory" >&2
