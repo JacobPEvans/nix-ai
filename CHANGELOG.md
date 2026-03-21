@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.20.0](https://github.com/JacobPEvans/nix-ai/compare/v1.19.1...v1.20.0) (2026-03-21)
+
+
+### Features
+
+* add Google Workspace MCP server and gws CLI ([#269](https://github.com/JacobPEvans/nix-ai/issues/269)) ([e25cee2](https://github.com/JacobPEvans/nix-ai/commit/e25cee23ac306e9d9be82bab538cee3bb4add0da))
+* add visual-explainer marketplace plugin ([#272](https://github.com/JacobPEvans/nix-ai/issues/272)) ([b7d5094](https://github.com/JacobPEvans/nix-ai/commit/b7d5094263702058059ed0a384ca5ea10335263b))
+
+
+### Bug Fixes
+
+* add port allocation docs and negative regression tests ([#262](https://github.com/JacobPEvans/nix-ai/issues/262)) ([f3e192d](https://github.com/JacobPEvans/nix-ai/commit/f3e192dff69f09a8ba76c99a88e555b1f8572132))
+* **deps:** drop llama-index meta-package, remove 9 unused transitive deps ([#274](https://github.com/JacobPEvans/nix-ai/issues/274)) ([92ce757](https://github.com/JacobPEvans/nix-ai/commit/92ce75716aeab79bd5a6cad019edad79edae54eb))
+* **mlx:** cap KV cache at 16GB to prevent OOM ([#271](https://github.com/JacobPEvans/nix-ai/issues/271)) ([630f9a3](https://github.com/JacobPEvans/nix-ai/commit/630f9a365083c6ba2a3ea50de3772a224a8fb808))
+* **pal:** bulletproof MCP diagnostics, logs, and activation ([#266](https://github.com/JacobPEvans/nix-ai/issues/266)) ([6836fe9](https://github.com/JacobPEvans/nix-ai/commit/6836fe97271c991a57a17c6110336e879574dbd5))
+
 ## [1.19.1](https://github.com/JacobPEvans/nix-ai/compare/v1.19.0...v1.19.1) (2026-03-21)
 
 
