@@ -12,7 +12,13 @@
   ...
 }:
 let
-  inherit (mlxShared) cfg vllmMlxPkg apiUrl;
+  inherit (mlxShared)
+    cfg
+    vllmMlxPkg
+    vllmMlxVersion
+    apiUrl
+    ;
+  vllmMlxPin = "vllm-mlx==${vllmMlxVersion}";
 in
 {
   config = lib.mkIf cfg.enable {
@@ -86,12 +92,12 @@ in
 
       # mlx-bench — LLM throughput/latency benchmark (loads model directly)
       (pkgs.writeShellScriptBin "mlx-bench" ''
-        exec ${pkgs.uv}/bin/uvx --from "vllm-mlx==0.2.6" vllm-mlx-bench "$@"
+        exec ${pkgs.uv}/bin/uvx --from "${vllmMlxPin}" vllm-mlx-bench "$@"
       '')
 
       # mlx-bench-engine — engine benchmark with cache/batching knobs
       (pkgs.writeShellScriptBin "mlx-bench-engine" ''
-        exec ${pkgs.uv}/bin/uvx --from "vllm-mlx==0.2.6" vllm-mlx bench "$@"
+        exec ${pkgs.uv}/bin/uvx --from "${vllmMlxPin}" vllm-mlx bench "$@"
       '')
 
       # mlx-bench-raw — raw MLX prefill + decode tok/s (no vllm-mlx overhead)
@@ -103,7 +109,7 @@ in
       (pkgs.writeShellScriptBin "mlx-eval" ''
         exec ${pkgs.uv}/bin/uvx --from "lm-eval[api]" lm-eval run \
           --model local-chat-completions \
-          --model_args "base_url=''${MLX_API_URL:-http://127.0.0.1:11434/v1},model=''${MLX_DEFAULT_MODEL},tokenizer_backend=None,tokenized_requests=False" \
+          --model_args "base_url=''${MLX_API_URL:-${apiUrl}},model=''${MLX_DEFAULT_MODEL},tokenizer_backend=None,tokenized_requests=False" \
           --apply_chat_template \
           "$@"
       '')
@@ -119,7 +125,7 @@ in
         text = ''
           timeout=''${1:-120}
           elapsed=0
-          while ! curl -sf "http://127.0.0.1:''${MLX_PORT:-11434}/v1/models" > /dev/null 2>&1; do
+          while ! curl -sf "${apiUrl}/models" > /dev/null; do
             sleep 2
             elapsed=$((elapsed + 2))
             if [ "$elapsed" -ge "$timeout" ]; then

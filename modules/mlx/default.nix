@@ -25,11 +25,15 @@
 let
   cfg = config.programs.mlx;
 
+  # Pinned version — single source of truth. Shared via mlxShared so
+  # benchmark wrappers in packages.nix use the same version.
+  vllmMlxVersion = "0.2.6";
+
   # Central vllm-mlx wrapper — single source of truth for the pinned version.
   # The LaunchAgent needs a Nix store path (not a PATH lookup), so the
   # derivation lives here. Also added to home.packages for CLI access.
   vllmMlxPkg = pkgs.writeShellScriptBin "vllm-mlx" ''
-    exec ${pkgs.uv}/bin/uvx --from "vllm-mlx==0.2.6" vllm-mlx "$@"
+    exec ${pkgs.uv}/bin/uvx --from "vllm-mlx==${vllmMlxVersion}" vllm-mlx "$@"
   '';
 
   apiUrl = "http://${cfg.host}:${toString cfg.port}/v1";
@@ -47,6 +51,7 @@ in
     inherit
       cfg
       vllmMlxPkg
+      vllmMlxVersion
       apiUrl
       launchAgentLabel
       ;
