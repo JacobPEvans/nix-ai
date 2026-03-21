@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.19.0](https://github.com/JacobPEvans/nix-ai/compare/v1.18.0...v1.19.0) (2026-03-21)
+
+
+### Features
+
+* **mlx:** split module, add benchmarks & health check ([#263](https://github.com/JacobPEvans/nix-ai/issues/263)) ([cc4a95f](https://github.com/JacobPEvans/nix-ai/commit/cc4a95f9bc9a7481eee211cdd6738970854ab76b))
+
 ## [1.18.0](https://github.com/JacobPEvans/nix-ai/compare/v1.17.6...v1.18.0) (2026-03-21)
 
 
