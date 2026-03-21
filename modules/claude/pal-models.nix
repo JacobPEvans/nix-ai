@@ -55,11 +55,27 @@ in
     # Merges with the env block defined in mcp/default.nix (DISABLED_TOOLS, etc.).
     programs.claude.mcpServers.pal.env.CUSTOM_MODELS_CONFIG_PATH = outputFile;
 
+    # Point PAL logs to a writable location (default tries to write inside the
+    # read-only Nix store, producing "Permission denied: logs/" warnings).
+    programs.claude.mcpServers.pal.env.PAL_LOG_DIR =
+      "${config.home.homeDirectory}/.local/state/pal-mcp";
+
     # Generate custom_models.json from dynamic MLX models.
     # If the server is unreachable, the previous file is preserved.
     home.activation.palCustomModels = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       ${syncEnv}
+      mkdir -p "${config.home.homeDirectory}/.local/state/pal-mcp"
       . ${../mcp/scripts/sync-pal-models.sh}
+    '';
+
+    # Non-blocking health check — runs after activation to surface PAL issues
+    # early (Doppler auth, missing secrets). Never blocks activation (always exits 0).
+    home.activation.palHealthCheck = lib.hm.dag.entryAfter [ "writeBoundary" "palCustomModels" ] ''
+      if [ -z "''${DRY_RUN_CMD:-}" ]; then
+        export DOPPLER="${pkgs.doppler}/bin/doppler"
+        export PAL_LOG_DIR="${config.home.homeDirectory}/.local/state/pal-mcp"
+        . ${../mcp/scripts/check-pal-health.sh}
+      fi
     '';
   };
 }

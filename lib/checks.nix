@@ -5,6 +5,7 @@
   src,
   home-manager,
   aiModule,
+  pal-mcp-server,
 }:
 let
   # Shared test module configuration — used by claude and mlx regression checks
@@ -28,3 +29,4 @@ in
 (import ./checks/lint.nix { inherit pkgs src; })
 // (import ./checks/claude.nix { inherit pkgs hmConfig; })
 // (import ./checks/mlx.nix { inherit pkgs hmConfig; })
+// (import ./checks/pal.nix { inherit pkgs pal-mcp-server; })
