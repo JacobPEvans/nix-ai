@@ -97,11 +97,11 @@ in
       description = "Prefill batch size (tokens). Null = server default. Larger = faster TTFT, more memory.";
     };
 
-    # ---- INACTIVE PERFORMANCE OPTIONS (vllm-mlx 0.2.6) ----
+    # ---- CONCURRENCY & BATCHING OPTIONS (vllm-mlx 0.2.6) ----
     # Complete parameter reference from `vllm-mlx serve --help`.
-    # Each option explains what it does, the server default, why it's disabled
-    # for our setup (M4 Max 128GB, Qwen3.5-122B, single-user, agentic workloads),
-    # and when to revisit.
+    # Each option explains what it does, the server default, why it defaults to off,
+    # and when to enable it. All configurable but off by default — enable in
+    # nix-darwin config to benchmark concurrent query performance.
 
     # ---- ACTIVE TUNING (uncomment to override server defaults) ----
 
@@ -115,35 +115,46 @@ in
     #   description = "Fraction of RAM for cache (0.0-1.0). Alternative to cacheMemoryMb.";
     # };
 
-    # chunkedPrefillTokens — Max prefill tokens per scheduler step (--chunked-prefill-tokens).
-    # Server default: 0 (disabled). Prevents prefill starvation in multi-request scenarios.
-    # Disabled: single-user setup, no contention during prefill.
-    # Revisit: if enabling continuousBatching for multi-user.
-    # chunkedPrefillTokens = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.ints.unsigned;
-    #   default = null;
-    #   description = "Max prefill tokens per scheduler step. 0 = disabled. Prevents prefill starvation.";
-    # };
+    # continuousBatching — Enable continuous batching (--continuous-batching).
+    # Server default: disabled. Improves multi-user throughput by interleaving
+    # prefill and decode across requests, but adds scheduling overhead for
+    # single-user workloads (~5% slower per-request in isolation).
+    # Default: false. Enable to benchmark concurrent query throughput.
+    continuousBatching = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable continuous batching. Better multi-user throughput, slight single-user overhead.";
+    };
 
     # maxNumSeqs — Max concurrent sequences (--max-num-seqs).
     # Server default: unset (no limit). Caps parallel request handling.
-    # Disabled: single-user LaunchAgent, one request at a time.
-    # Revisit: if serving multiple concurrent consumers.
-    # maxNumSeqs = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.ints.positive;
-    #   default = null;
-    #   description = "Max concurrent sequences. Null = no limit.";
-    # };
+    # Default: null (no limit). Set to 2-8 when enabling continuousBatching
+    # to control memory pressure from concurrent requests.
+    maxNumSeqs = lib.mkOption {
+      type = lib.types.nullOr lib.types.ints.positive;
+      default = null;
+      description = "Max concurrent sequences. Null = no limit. Set with continuousBatching.";
+    };
+
+    # chunkedPrefillTokens — Max prefill tokens per scheduler step (--chunked-prefill-tokens).
+    # Server default: 0 (disabled). Prevents prefill starvation in multi-request
+    # scenarios by limiting how many tokens are prefilled before yielding to decode.
+    # Default: null (disabled). Set to 256-2048 when enabling continuousBatching.
+    chunkedPrefillTokens = lib.mkOption {
+      type = lib.types.nullOr lib.types.ints.unsigned;
+      default = null;
+      description = "Max prefill tokens per scheduler step. 0 = disabled. Prevents prefill starvation.";
+    };
 
     # completionBatchSize — Completion batch size (--completion-batch-size).
-    # Server default: unset. Controls decode batching.
-    # Disabled: single-user, no batching benefit.
-    # Revisit: if adding concurrent consumers.
-    # completionBatchSize = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.ints.positive;
-    #   default = null;
-    #   description = "Completion batch size. Null = server default.";
-    # };
+    # Server default: unset. Controls decode batching — how many tokens are
+    # generated per decode step across concurrent sequences.
+    # Default: null (server default). Tune alongside maxNumSeqs.
+    completionBatchSize = lib.mkOption {
+      type = lib.types.nullOr lib.types.ints.positive;
+      default = null;
+      description = "Completion batch size. Null = server default. Tune with continuousBatching.";
+    };
 
     # streamInterval — Tokens to batch before streaming (--stream-interval).
     # Server default: unset. 1 = smooth streaming, higher = more throughput.
@@ -193,19 +204,6 @@ in
     #   type = lib.types.nullOr lib.types.ints.positive;
     #   default = null;
     #   description = "Request timeout in seconds. Server default: 300.";
-    # };
-
-    # ---- MULTI-USER (not applicable for single-user LaunchAgent) ----
-
-    # continuousBatching — Enable continuous batching (--continuous-batching).
-    # Server default: disabled. Improves multi-user throughput but adds overhead
-    # for single-user workloads (slower per-request).
-    # Disabled: single-user LaunchAgent, no multi-user benefit.
-    # Revisit: if serving multiple concurrent consumers.
-    # continuousBatching = lib.mkOption {
-    #   type = lib.types.bool;
-    #   default = false;
-    #   description = "Enable continuous batching. Better multi-user, slower single-user.";
     # };
 
     # ---- EXPERIMENTAL ----
@@ -419,6 +417,18 @@ in
           --with "openai==1.82.0" \
           python3 ${./scripts/mlx-chat.py} "$@"
       '')
+
+      # mlx-bench — benchmark throughput, accuracy, latency, prefix-cache
+      (pkgs.writeShellApplication {
+        name = "mlx-bench";
+        runtimeInputs = with pkgs; [
+          curl
+          jq
+          bc
+          coreutils
+        ];
+        text = builtins.readFile ./scripts/mlx-bench.sh;
+      })
     ];
 
     # ==========================================================================
@@ -444,6 +454,21 @@ in
         ++ lib.optionals (cfg.prefillBatchSize != null) [
           "--prefill-batch-size"
           (toString cfg.prefillBatchSize)
+        ]
+        ++ lib.optionals cfg.continuousBatching [
+          "--continuous-batching"
+        ]
+        ++ lib.optionals (cfg.maxNumSeqs != null) [
+          "--max-num-seqs"
+          (toString cfg.maxNumSeqs)
+        ]
+        ++ lib.optionals (cfg.chunkedPrefillTokens != null) [
+          "--chunked-prefill-tokens"
+          (toString cfg.chunkedPrefillTokens)
+        ]
+        ++ lib.optionals (cfg.completionBatchSize != null) [
+          "--completion-batch-size"
+          (toString cfg.completionBatchSize)
         ];
         RunAtLoad = true;
         KeepAlive = true;

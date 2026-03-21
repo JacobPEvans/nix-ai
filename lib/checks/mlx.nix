@@ -10,10 +10,14 @@ in
     let
       expectedOptions = [
         "cacheMemoryMb"
+        "chunkedPrefillTokens"
+        "completionBatchSize"
+        "continuousBatching"
         "defaultModel"
         "enable"
         "host"
         "huggingFaceHome"
+        "maxNumSeqs"
         "port"
         "prefillBatchSize"
       ];
@@ -63,6 +67,26 @@ in
         {
           name = "mlx.prefillBatchSize";
           actual = mlxCfg.prefillBatchSize;
+          expected = null;
+        }
+        {
+          name = "mlx.continuousBatching";
+          actual = mlxCfg.continuousBatching;
+          expected = false;
+        }
+        {
+          name = "mlx.maxNumSeqs";
+          actual = mlxCfg.maxNumSeqs;
+          expected = null;
+        }
+        {
+          name = "mlx.chunkedPrefillTokens";
+          actual = mlxCfg.chunkedPrefillTokens;
+          expected = null;
+        }
+        {
+          name = "mlx.completionBatchSize";
+          actual = mlxCfg.completionBatchSize;
           expected = null;
         }
         # Environment variables
@@ -136,6 +160,27 @@ in
         || (
           if mlxCfg.prefillBatchSize == null then
             builtins.match ".*--prefill-batch-size.*" argsStr != null
+          else
+            false
+        )
+        || (
+          if !mlxCfg.continuousBatching then
+            builtins.match ".*--continuous-batching.*" argsStr != null
+          else
+            false
+        )
+        || (
+          if mlxCfg.maxNumSeqs == null then builtins.match ".*--max-num-seqs.*" argsStr != null else false
+        )
+        || (
+          if mlxCfg.chunkedPrefillTokens == null then
+            builtins.match ".*--chunked-prefill-tokens.*" argsStr != null
+          else
+            false
+        )
+        || (
+          if mlxCfg.completionBatchSize == null then
+            builtins.match ".*--completion-batch-size.*" argsStr != null
           else
             false
         );

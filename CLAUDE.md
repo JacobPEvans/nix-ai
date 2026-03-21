@@ -39,9 +39,14 @@ inputs.nix-ai.inputs.home-manager.follows = "home-manager";
 - `modules/default.nix` — Module entry point (imports all AI modules)
 - `modules/claude/` — Claude Code settings, plugins, statusline, auto-claude
 - `modules/mcp/` — MCP server definitions
+- `modules/mlx/` — MLX inference server (vllm-mlx LaunchAgent, CLI tools, perf tuning)
 - `modules/common/` — Shared permission engine and formatters
 - `lib/claude-settings.nix` — Pure settings generator (CI-only; deployment uses modules/claude/settings.nix)
 - `lib/claude-registry.nix` — Marketplace format functions
+- `lib/checks.nix` — Check aggregator (imports lib/checks/{lint,claude,mlx}.nix)
+- `lib/checks/lint.nix` — Formatting, statix, deadnix, shellcheck
+- `lib/checks/claude.nix` — Claude module regression tests, settings-json, maestro-script
+- `lib/checks/mlx.nix` — MLX option/defaults regression, LaunchAgent flag validation
 
 ## Testing Locally
 
