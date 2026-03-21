@@ -23,6 +23,8 @@ let
   mlxCfg = config.programs.mlx;
   outputDir = "${config.home.homeDirectory}/.config/pal-mcp";
   outputFile = "${outputDir}/custom_models.json";
+  palLogDir = "${config.home.homeDirectory}/.local/state/pal-mcp";
+  palPkg = pkgs.callPackage ../mcp/pal-package.nix { inherit pal-mcp-server; };
 
   # Shared environment for the sync script (used by both CLI tool and activation)
   syncEnv = ''
@@ -39,7 +41,7 @@ in
     # Install pal-mcp-server as a Nix package so `doppler-mcp pal-mcp-server`
     # resolves via PATH. The package is built from the pinned flake input.
     home.packages = [
-      (pkgs.callPackage ../mcp/pal-package.nix { inherit pal-mcp-server; })
+      palPkg
 
       # Refresh custom_models.json between darwin-rebuild switches.
       # Queries MLX /v1/models for available models.
@@ -57,23 +59,25 @@ in
 
     # Point PAL logs to a writable location (default tries to write inside the
     # read-only Nix store, producing "Permission denied: logs/" warnings).
-    programs.claude.mcpServers.pal.env.PAL_LOG_DIR =
-      "${config.home.homeDirectory}/.local/state/pal-mcp";
+    programs.claude.mcpServers.pal.env.PAL_LOG_DIR = palLogDir;
 
     # Generate custom_models.json from dynamic MLX models.
     # If the server is unreachable, the previous file is preserved.
     home.activation.palCustomModels = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       ${syncEnv}
-      mkdir -p "${config.home.homeDirectory}/.local/state/pal-mcp"
+      $DRY_RUN_CMD mkdir -p "${palLogDir}"
       . ${../mcp/scripts/sync-pal-models.sh}
     '';
 
     # Non-blocking health check — runs after activation to surface PAL issues
     # early (Doppler auth, missing secrets). Never blocks activation (always exits 0).
+    # Skipped on dry-run (not prefixed with $DRY_RUN_CMD) because the check makes
+    # network calls to Doppler that are inappropriate for a dry-run.
     home.activation.palHealthCheck = lib.hm.dag.entryAfter [ "writeBoundary" "palCustomModels" ] ''
       if [ -z "''${DRY_RUN_CMD:-}" ]; then
         export DOPPLER="${pkgs.doppler}/bin/doppler"
-        export PAL_LOG_DIR="${config.home.homeDirectory}/.local/state/pal-mcp"
+        export PAL_MCP_BIN="${palPkg}/bin/pal-mcp-server"
+        export PAL_LOG_DIR="${palLogDir}"
         . ${../mcp/scripts/check-pal-health.sh}
       fi
     '';

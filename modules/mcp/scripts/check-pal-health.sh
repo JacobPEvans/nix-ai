@@ -5,8 +5,12 @@
 # Non-blocking: always exits 0 (warnings only, never fails activation).
 #
 # Expected env vars (set by caller in pal-models.nix):
-#   DOPPLER  — path to doppler binary
-#   PAL_LOG_DIR — writable directory for PAL logs
+#   DOPPLER      — path to doppler binary
+#   PAL_MCP_BIN  — path to pal-mcp-server binary (Nix store path)
+#   PAL_LOG_DIR  — writable directory for PAL logs
+#
+# Intentionally omits -e: each check runs independently and failures are
+# tallied in _fail rather than aborting the script.
 set -uo pipefail
 
 _pass=0
@@ -15,12 +19,12 @@ _fail=0
 echo ""
 echo "--- PAL MCP Health Check ---"
 
-# 1. Verify pal-mcp-server binary exists
-if command -v pal-mcp-server >/dev/null 2>&1; then
+# 1. Verify pal-mcp-server binary exists (uses Nix store path, not PATH lookup)
+if [ -x "${PAL_MCP_BIN:-}" ]; then
   echo "  PASS: pal-mcp-server binary found"
   _pass=$((_pass + 1))
 else
-  echo "  FAIL: pal-mcp-server binary not found on PATH"
+  echo "  FAIL: pal-mcp-server binary not found or not executable"
   _fail=$((_fail + 1))
 fi
 
