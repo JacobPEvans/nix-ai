@@ -50,6 +50,7 @@
 #   gh-copilot: @githubnext/github-copilot-cli@latest (unversioned - upstream)
 #   chatgpt: chatgpt-cli@3.3.0
 #   claude-flow: claude-flow@2.0.0
+#   gws: @googleworkspace/cli@latest (pre-v1.0, rapid development - same as gh-copilot)
 #
 # UVX WRAPPER PACKAGES (Python packages not in nixpkgs/homebrew):
 #   hf: huggingface-hub==1.6.0 CLI (model downloads, used with HuggingFace MCP)
@@ -129,6 +130,17 @@
     # NPM: claude-flow (pinned version)
     (writeShellScriptBin "claude-flow" ''
       exec ${bun}/bin/bunx --bun claude-flow@3.5.15 "$@"
+    '')
+
+    # ==========================================================================
+    # Google Workspace CLI
+    # ==========================================================================
+    # Full Workspace API surface with curated Agent Skills (+triage, +watch, etc.)
+    # Source: https://github.com/googleworkspace/cli
+    # NPM: @googleworkspace/cli (using @latest - pre-v1.0, rapid development)
+    # Key commands: gws gmail +triage, gws gmail +watch, gws drive +upload
+    (writeShellScriptBin "gws" ''
+      exec ${bun}/bin/bunx --bun @googleworkspace/cli@latest "$@"
     '')
 
     # ==========================================================================
