@@ -40,20 +40,22 @@
     #
     # vllm-mlx 0.2.6 replaced the old token-count KV cache (--max-kv-size) with a
     # memory-aware cache that auto-sizes based on available RAM and evicts via LRU.
-    # The default allocates ~20% of RAM (~25.6GB on 128GB), which combined with
-    # ~70GB model weights leaves comfortable headroom for macOS + apps.
+    # The server default allocates ~20% of RAM (~25.6GB on 128GB), which combined
+    # with ~65GB model weights consumes ~90GB — leaving only ~38GB for macOS + apps.
+    # With 10+ Claude Code sessions this caused V8 OOM crashes and swap exhaustion.
 
     # cacheMemoryMb — Override the memory-aware cache size (--cache-memory-mb).
-    # Default: null = auto-detect (~20% RAM = ~25.6GB on 128GB systems).
+    # Default: 16384 (16GB). Balances prefix cache reuse with OOM prevention.
+    # With a 65GB model, 16GB cache uses ~81GB total, leaving ~47GB on 128GB systems
+    # for macOS + 3 Claude Code sessions. If MLX ever causes another OOM, lower to 8192.
+    # Set to null to restore server auto-detect (~20% RAM = ~25.6GB — too aggressive).
     # Prevents kernel panic: IOGPUMemory completeMemory() prepare count underflow
-    # on long agentic sessions (58k+ tokens). The memory-aware LRU eviction handles
-    # this automatically, but an explicit cap can be set if needed.
+    # on long agentic sessions (58k+ tokens).
     # Ref: https://github.com/ml-explore/mlx-lm/issues/883
-    # Revisit: increase on M4 Ultra 256GB, or decrease if running a larger model.
     cacheMemoryMb = lib.mkOption {
       type = lib.types.nullOr lib.types.ints.positive;
-      default = null;
-      description = "Cache memory limit in MB. Null = auto-detect (~20% RAM). Overrides memory-aware cache sizing.";
+      default = 16384;
+      description = "Cache memory limit in MB. Null = auto-detect (~20% RAM). Default 16GB prevents OOM with large models. Lower to 8192 if OOM recurs.";
     };
 
     # prefillBatchSize — Batch size for prompt prefill processing (--prefill-batch-size).
