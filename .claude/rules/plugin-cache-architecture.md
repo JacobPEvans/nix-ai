@@ -47,7 +47,7 @@ The correct mechanism is:
   and purges only when the store path actually changed
 - **Claude Code detects marketplace changes on new session start** — no forced re-index needed
 
-Commit `edba1ad` (2025-03-19) introduced an `updateClaudePlugins` activation script that violated
+Commit `edba1ad` (2026-03-19) introduced an `updateClaudePlugins` activation script that violated
 this rule, causing intermittent hook failures in active sessions. It was removed in the subsequent fix.
 
 ## Migration Path
