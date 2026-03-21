@@ -228,7 +228,7 @@ run_throughput() {
         total_tokens=$((total_tokens + t))
       done
       local aggregate_tok_s
-      aggregate_tok_s=$(echo "$total_tokens $wall_s" | awk '{printf "%.1f", $1/$2}')
+      aggregate_tok_s=$(echo "$total_tokens $wall_s" | awk '{if ($2 > 0) printf "%.1f", $1/$2; else print "0.0"}')
 
       jq -n --arg test "throughput" --arg label "$label" \
         --argjson jobs "$jobs" --argjson tokens "$total_tokens" \
@@ -297,7 +297,7 @@ run_latency() {
   sorted=$(sort -n "$BENCH_TMPDIR/latencies.txt")
   p50=$(echo "$sorted" | awk "NR==$(( (iterations + 1) / 2 )){print}")
   p95=$(echo "$sorted" | awk "NR==$(( (iterations * 95 + 99) / 100 )){print}")
-  p99=$(echo "$sorted" | awk "NR==$iterations{print}")
+  p99=$(echo "$sorted" | awk "NR==$(( (iterations * 99 + 99) / 100 )){print}")
   avg=$(awk '{s+=$1} END{printf "%.1f", s/NR}' "$BENCH_TMPDIR/latencies.txt")
 
   jq -n --arg test "latency" \
