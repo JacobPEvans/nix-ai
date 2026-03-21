@@ -147,8 +147,23 @@ in
   brave-search = official "brave-search" // {
     disabled = true;
   };
-  gdrive = official "gdrive" // {
-    disabled = true;
+  # Google Workspace - Gmail, Drive, Calendar integration
+  # Source: https://github.com/taylorwilsdon/google_workspace_mcp
+  # Requires: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET env vars (via Doppler)
+  # Auth: One-time OAuth browser flow, tokens stored locally
+  # Selective tool loading: --tools limits which Google services are exposed
+  google-workspace = {
+    command = "doppler-mcp";
+    args = [
+      "uvx"
+      "--from"
+      "google-workspace-mcp==0.1.2"
+      "workspace-mcp"
+      "--tools"
+      "gmail"
+      "drive"
+      "calendar"
+    ];
   };
   google-maps = official "google-maps" // {
     disabled = true;

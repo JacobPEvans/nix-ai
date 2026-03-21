@@ -50,6 +50,7 @@
 #   gh-copilot: @githubnext/github-copilot-cli@latest (unversioned - upstream)
 #   chatgpt: chatgpt-cli@3.3.0
 #   claude-flow: claude-flow@2.0.0
+#   gws: @googleworkspace/cli@latest (pre-v1.0, rapid development - same as gh-copilot)
 #
 # UVX WRAPPER PACKAGES (Python packages not in nixpkgs/homebrew):
 #   hf: huggingface-hub==1.6.0 CLI (model downloads, used with HuggingFace MCP)
@@ -132,6 +133,17 @@
     '')
 
     # ==========================================================================
+    # Google Workspace CLI
+    # ==========================================================================
+    # Full Workspace API surface with curated Agent Skills (+triage, +watch, etc.)
+    # Source: https://github.com/googleworkspace/cli
+    # NPM: @googleworkspace/cli (using @latest - pre-v1.0, rapid development)
+    # Key commands: gws gmail +triage, gws gmail +watch, gws drive +upload
+    (writeShellScriptBin "gws" ''
+      exec ${bun}/bin/bunx --bun @googleworkspace/cli@latest "$@"
+    '')
+
+    # ==========================================================================
     # Doppler MCP Wrapper
     # ==========================================================================
     # Wraps any MCP server command with Doppler secret injection.
@@ -162,6 +174,10 @@
         echo "$(date -u +%FT%TZ) doppler-mcp preflight failed. Exit: $_preflight" >> "$LOG_FILE"
         ${pkgs.doppler}/bin/doppler --version >> "$LOG_FILE" 2>&1 || true
         ${pkgs.doppler}/bin/doppler me >> "$LOG_FILE" 2>&1 || true
+        # Make failure visible to MCP client (Claude Code reads stderr)
+        echo "ERROR: PAL MCP cannot start — Doppler auth failed (exit $_preflight)" >&2
+        echo "Fix: Run 'doppler login' then restart Claude Code" >&2
+        echo "Diagnostics: $LOG_FILE" >&2
         exit "$_preflight"
       fi
       # Preflight passed — exec the real command, restoring proper signal forwarding

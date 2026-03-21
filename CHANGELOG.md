@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.19.1](https://github.com/JacobPEvans/nix-ai/compare/v1.19.0...v1.19.1) (2026-03-21)
+
+
+### Bug Fixes
+
+* defer cache purge when Claude Code sessions are active ([#268](https://github.com/JacobPEvans/nix-ai/issues/268)) ([8b63780](https://github.com/JacobPEvans/nix-ai/commit/8b6378041feb499f5cc087c9d6b6657fc36ee5e3))
+* disable greptile plugin (cost) ([#264](https://github.com/JacobPEvans/nix-ai/issues/264)) ([6c780a1](https://github.com/JacobPEvans/nix-ai/commit/6c780a1933934b60153e48d7171f01a2ea41fecd))
+
+## [1.19.0](https://github.com/JacobPEvans/nix-ai/compare/v1.18.0...v1.19.0) (2026-03-21)
+
+
+### Features
+
+* **mlx:** split module, add benchmarks & health check ([#263](https://github.com/JacobPEvans/nix-ai/issues/263)) ([cc4a95f](https://github.com/JacobPEvans/nix-ai/commit/cc4a95f9bc9a7481eee211cdd6738970854ab76b))
+
 ## [1.18.0](https://github.com/JacobPEvans/nix-ai/compare/v1.17.6...v1.18.0) (2026-03-21)
 
 

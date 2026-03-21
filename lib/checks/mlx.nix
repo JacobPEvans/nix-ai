@@ -62,7 +62,7 @@ in
         {
           name = "mlx.cacheMemoryMb";
           actual = mlxCfg.cacheMemoryMb;
-          expected = null;
+          expected = 16384;
         }
         {
           name = "mlx.prefillBatchSize";

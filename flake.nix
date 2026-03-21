@@ -231,7 +231,7 @@
           pkgs = nixpkgs.legacyPackages.${system};
         in
         import ./lib/checks.nix {
-          inherit pkgs home-manager;
+          inherit pkgs home-manager pal-mcp-server;
           src = ./.;
           aiModule = self.homeManagerModules.default;
         }
