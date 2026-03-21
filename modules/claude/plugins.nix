@@ -36,41 +36,5 @@ in
 {
   config = lib.mkIf cfg.enable {
     home.file = marketplaceSymlinks;
-
-    # After linkGeneration updates the marketplace symlinks to the new nix store
-    # path, sync Claude Code's runtime plugin cache so it picks up new versions.
-    # Only targets jacobpevans-cc-plugins — other marketplaces manage their own
-    # update cadence. Fails open: if claude CLI is missing or updates fail, log
-    # a warning and continue.
-    home.activation.updateClaudePlugins =
-      lib.hm.dag.entryAfter [ "linkGeneration" "verifyCacheIntegrity" ]
-        ''
-          # Resolve claude binary — activation runs as root via sudo so
-          # homebrew/nix-profile paths aren't in PATH by default.
-          CLAUDE=""
-          for p in \
-            "$(command -v claude 2>/dev/null)" \
-            /opt/homebrew/bin/claude \
-            /usr/local/bin/claude \
-            "$HOME/.nix-profile/bin/claude" \
-            /etc/profiles/per-user/*/bin/claude; do
-            [ -n "$p" ] && [ -f "$p" ] && [ -x "$p" ] && CLAUDE="$p" && break
-          done
-
-          if [ -n "$DRY_RUN_CMD" ]; then
-            echo "claude-plugins: dry-run — skipping plugin cache sync" >&2
-          elif [ -n "$CLAUDE" ]; then
-            echo "claude-plugins: syncing jacobpevans-cc-plugins cache (using $CLAUDE)..." >&2
-            "$CLAUDE" plugins marketplace update jacobpevans-cc-plugins \
-              || echo "claude-plugins: marketplace update failed (non-fatal)" >&2
-            "$CLAUDE" plugins list | grep '@jacobpevans-cc-plugins' | sed 's/.*❯ //' \
-              | while IFS= read -r plugin; do
-                  "$CLAUDE" plugins update "$plugin" \
-                    || echo "claude-plugins: failed to update $plugin (non-fatal)" >&2
-                done
-          else
-            echo "claude-plugins: claude CLI not found — skipping plugin cache sync" >&2
-          fi
-        '';
   };
 }
