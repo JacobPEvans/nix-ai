@@ -65,7 +65,7 @@ in
     # If the server is unreachable, the previous file is preserved.
     home.activation.palCustomModels = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       ${syncEnv}
-      $DRY_RUN_CMD mkdir -p "${palLogDir}"
+      $DRY_RUN_CMD bash -c '(umask 077 && mkdir -p "${palLogDir}")'
       . ${../mcp/scripts/sync-pal-models.sh}
     '';
 

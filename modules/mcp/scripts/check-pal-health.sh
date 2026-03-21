@@ -29,16 +29,18 @@ else
 fi
 
 # 2. Verify Doppler can authenticate
+_doppler_authed=0
 if "$DOPPLER" me >/dev/null 2>&1; then
   echo "  PASS: Doppler authenticated"
   _pass=$((_pass + 1))
+  _doppler_authed=1
 else
   echo "  WARN: Doppler not authenticated — run 'doppler login'"
   _fail=$((_fail + 1))
 fi
 
 # 3. Verify PAL secrets are accessible (only if Doppler authed)
-if [ "$_fail" -eq 0 ]; then
+if [ "$_doppler_authed" -eq 1 ]; then
   for secret in GEMINI_API_KEY OPENROUTER_API_KEY; do
     if "$DOPPLER" secrets get "$secret" \
          --project ai-ci-automation \
