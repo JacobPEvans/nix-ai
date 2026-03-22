@@ -304,7 +304,6 @@ def write_results(category: str, results: list[dict]) -> None:
         "tests": results,
         "summary": {
             "total": len(results),
-            "scores": [r.get("score", 0) for r in results],
             "mean_score": mean_score,
             "total_tokens": sum(r.get("tokens", 0) for r in results),
             "total_latency": sum(r.get("latency", 0) for r in results),
