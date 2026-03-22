@@ -3,10 +3,10 @@ import sys
 from pathlib import Path
 
 # Add parent to path for common imports
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 from common import timed_completion, score_contains_all, write_results, print_test_result
 
-FIXTURES_DIR = Path(__file__).parent / "fixtures" / "buggy_code"
+FIXTURES_DIR = Path(__file__).parent.parent / "fixtures" / "buggy_code"
 
 SYSTEM_PROMPT = (
     "You are an expert code reviewer. Analyze the following code for bugs, "

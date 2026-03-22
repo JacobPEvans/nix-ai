@@ -4,7 +4,7 @@ import random
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 from common import timed_completion, score_exact, score_contains_all, write_results, print_test_result
 
 _SYSTEM = "You are a careful reading assistant. Answer questions based solely on the provided text."

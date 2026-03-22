@@ -41,42 +41,42 @@ START=$(date +%s)
 echo ""
 echo ">>> 1/8: Reasoning & Logic (~10 min)"
 echo "------------------------------------------------------------"
-uv run --with "$UV_DEPS" test_reasoning.py
+uv run --with "$UV_DEPS" tests/test_reasoning.py
 
 echo ""
 echo ">>> 2/8: Code Generation (~15 min)"
 echo "------------------------------------------------------------"
-uv run --with "$UV_DEPS" test_code_generation.py
+uv run --with "$UV_DEPS" tests/test_code_generation.py
 
 echo ""
 echo ">>> 3/8: Code Review & Bug Detection (~10 min)"
 echo "------------------------------------------------------------"
-uv run --with "$UV_DEPS" test_code_review.py
+uv run --with "$UV_DEPS" tests/test_code_review.py
 
 echo ""
 echo ">>> 4/8: Tool Use Chains (~10 min)"
 echo "------------------------------------------------------------"
-uv run --with "$UV_DEPS" test_tool_use.py
+uv run --with "$UV_DEPS" tests/test_tool_use.py
 
 echo ""
 echo ">>> 5/8: Instruction Following (~5 min)"
 echo "------------------------------------------------------------"
-uv run --with "$UV_DEPS" test_instruction_following.py
+uv run --with "$UV_DEPS" tests/test_instruction_following.py
 
 echo ""
 echo ">>> 6/8: Structured Output (~5 min)"
 echo "------------------------------------------------------------"
-uv run --with "$UV_DEPS" test_structured_output.py
+uv run --with "$UV_DEPS" tests/test_structured_output.py
 
 echo ""
 echo ">>> 7/8: Long Context (~5 min)"
 echo "------------------------------------------------------------"
-uv run --with "$UV_DEPS" test_long_context.py
+uv run --with "$UV_DEPS" tests/test_long_context.py
 
 echo ""
 echo ">>> 8/8: Conversation Coherence (~5 min)"
 echo "------------------------------------------------------------"
-uv run --with "$UV_DEPS" test_conversation.py
+uv run --with "$UV_DEPS" tests/test_conversation.py
 
 echo ""
 echo ">>> Generating Report"
