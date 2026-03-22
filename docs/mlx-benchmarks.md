@@ -62,6 +62,49 @@ System: macOS 26.3.1, vllm-mlx 0.2.6.
 | TTFT warm | latency | 0.29s | Repeated prompt, prefix cache hit |
 | Cache speedup | ratio | 3.9x | warm vs cold TTFT |
 
+### 2026-03-22 — Memory-Tracked Throughput Sweep
+
+Config: KV cache 16 GB, ProcessType=Background, HardResourceLimits 100 GB.
+System: macOS 26.3.1, vllm-mlx 0.2.6, PID 1438.
+
+Sequential generation tests with memory snapshots via `footprint` (process)
+and `vm_stat` (system). All values in GB unless noted.
+
+#### Throughput
+
+| Test | Tokens | Time | tok/s |
+|------|--------|------|-------|
+| Short gen | 50 | 1.95s | 25.6 |
+| Medium gen | 256 | 5.39s | 47.5 |
+| Long gen | 512 | 10.43s | 49.1 |
+| Rapid fire 1/3 | 50 | 1.32s | 37.9 |
+| Rapid fire 2/3 | 50 | 1.27s | 39.4 |
+| Rapid fire 3/3 | 50 | 1.22s | 41.0 |
+
+#### Memory Timeline
+
+| Time | Phase | vllm RSS (GB) | vllm Peak (GB) | Free (GB) | Active (GB) | Wired (GB) | Compressed (GB) | Swap |
+|------|-------|---------------|----------------|-----------|-------------|------------|-----------------|------|
+| 23:24:05 | idle (pre-test) | 65 | 65 | 0.9 | 58.9 | 5.7 | 2.7 | 0.00M |
+| 23:24:07 | after short gen (50 tok) | 65 | 65 | 0.7 | 22.1 | 69.8 | 2.7 | 0.00M |
+| 23:24:13 | after medium gen (256 tok) | 65 | 65 | 1.4 | 21.7 | 70.7 | 2.6 | 0.00M |
+| 23:24:23 | after long gen (512 tok) | 65 | 65 | 1.7 | 22.5 | 70.6 | 2.6 | 0.00M |
+| 23:24:28 | after 3x rapid short gen | 65 | 65 | 1.5 | 22.3 | 71.3 | 2.6 | 0.00M |
+| 23:24:33 | idle (post-test, +5s) | 65 | 65 | 2.2 | 86.3 | 5.0 | 2.6 | 0.00M |
+
+#### Memory Observations
+
+- **vllm-mlx RSS is constant at 65 GB** throughout all tests — no memory leaks, no
+  growth from KV cache accumulation. Peak never exceeds baseline.
+- **Wired memory spikes during generation** (5.7 → 71.3 GB) as MLX allocates Metal
+  GPU buffers for KV cache and compute. These return to active memory after generation
+  completes (visible in the post-test idle row: wired drops back to 5.0 GB).
+- **Zero swap throughout** — the 16 GB KV cache cap keeps total memory well within
+  the 128 GB physical limit.
+- **Throughput increases with token count**: 25.6 tok/s (50 tok) → 49.1 tok/s (512 tok).
+  Short generations are TTFT-dominated; longer generations amortize prefill cost and
+  approach the memory-bandwidth ceiling (~50 tok/s for this model).
+
 ### 2026-03-20 — Initial Baseline (Issue #257)
 
 Config: KV cache uncapped (~25.6 GB auto-detect), no ProcessType, no resource limits.
