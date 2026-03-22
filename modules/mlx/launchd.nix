@@ -19,13 +19,6 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
-    assertions = [
-      {
-        assertion = cfg.memoryHardLimitGb >= cfg.memoryLimitGb;
-        message = "programs.mlx.memoryHardLimitGb (${toString cfg.memoryHardLimitGb}) must be >= memoryLimitGb (${toString cfg.memoryLimitGb})";
-      }
-    ];
-
     # ==========================================================================
     # LaunchAgent for Auto-Start
     # ==========================================================================
@@ -69,13 +62,8 @@ in
         KeepAlive = true;
         # 2 min throttle — 70GB model loads take 20-60s, prevents rapid crash-restart loops (closes #256)
         ThrottleInterval = 120;
-        # OOM prevention: classify for Jetsam and set memory ceilings.
-        # Background = Jetsam-eligible under pressure; KeepAlive auto-restarts after kill.
-        # ResidentSetSize = relevant metric for Apple Silicon unified memory (mmap-based, not sbrk).
+        # OOM prevention: Background = Jetsam-eligible; hard RSS ceiling enforced by kernel.
         ProcessType = "Background";
-        SoftResourceLimits = {
-          ResidentSetSize = cfg.memoryLimitGb * 1073741824;
-        };
         HardResourceLimits = {
           ResidentSetSize = cfg.memoryHardLimitGb * 1073741824;
         };

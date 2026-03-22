@@ -15,15 +15,10 @@ let
   inherit (mlxShared)
     cfg
     vllmMlxPkg
+    vllmMlxVersion
     apiUrl
     ;
-
-  # Shared OOM-safe benchmark wrapper — extracts --model arg, runs preflight, caps ulimit
-  mlxBenchWrapperPkg = pkgs.writeShellApplication {
-    name = "mlx-bench-wrapper";
-    runtimeInputs = with pkgs; [ coreutils ];
-    text = builtins.readFile ./scripts/mlx-bench-wrapper.sh;
-  };
+  vllmMlxPin = "vllm-mlx==${vllmMlxVersion}";
 in
 {
   config = lib.mkIf cfg.enable {
@@ -36,7 +31,6 @@ in
       MLX_PORT = toString cfg.port;
       MLX_HOST = cfg.host;
       MLX_HF_HOME = cfg.huggingFaceHome;
-      MLX_SAFETY_OVERHEAD = toString cfg.safetyOverheadGb;
     };
 
     # ==========================================================================
@@ -104,23 +98,22 @@ in
       })
 
       # ======================================================================
-      # Benchmark Suite (shared OOM-safe wrapper: preflight + ulimit -v 110GB)
+      # Benchmark Suite
       # ======================================================================
-      mlxBenchWrapperPkg
 
-      # mlx-bench — vllm-mlx throughput/latency benchmark
+      # mlx-bench — LLM throughput/latency benchmark (loads model directly)
       (pkgs.writeShellScriptBin "mlx-bench" ''
-        exec ${lib.getExe mlxBenchWrapperPkg} ${lib.getExe vllmMlxPkg}-bench "$@"
+        exec ${pkgs.uv}/bin/uvx --from "${vllmMlxPin}" vllm-mlx-bench "$@"
       '')
 
       # mlx-bench-engine — engine benchmark with cache/batching knobs
       (pkgs.writeShellScriptBin "mlx-bench-engine" ''
-        exec ${lib.getExe mlxBenchWrapperPkg} "${lib.getExe vllmMlxPkg} bench" "$@"
+        exec ${pkgs.uv}/bin/uvx --from "${vllmMlxPin}" vllm-mlx bench "$@"
       '')
 
-      # mlx-bench-raw — raw MLX prefill + decode (bypasses vllm-mlx memory controls)
+      # mlx-bench-raw — raw MLX prefill + decode (no vllm-mlx overhead)
       (pkgs.writeShellScriptBin "mlx-bench-raw" ''
-        exec ${lib.getExe mlxBenchWrapperPkg} "${pkgs.uv}/bin/uvx --from mlx-lm mlx_lm.benchmark" "$@"
+        exec ${pkgs.uv}/bin/uvx --from mlx-lm mlx_lm.benchmark "$@"
       '')
 
       # mlx-eval — accuracy evaluation against the live vllm-mlx server API
