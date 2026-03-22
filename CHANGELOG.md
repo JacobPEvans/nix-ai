@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.20.1](https://github.com/JacobPEvans/nix-ai/compare/v1.20.0...v1.20.1) (2026-03-22)
+
+
+### Bug Fixes
+
+* **mlx:** simplify OOM prevention to minimal 3-layer defense ([54208d2](https://github.com/JacobPEvans/nix-ai/commit/54208d28147db1fb7cfeccfe76dacd7a1dd3aa4c))
+* quote flake URL in orchestrator .envrc ([10c57ba](https://github.com/JacobPEvans/nix-ai/commit/10c57badb8bfa8b7ccfd610346ea16a5bf417a95))
+
 ## [1.20.0](https://github.com/JacobPEvans/nix-ai/compare/v1.19.1...v1.20.0) (2026-03-21)
 
 
