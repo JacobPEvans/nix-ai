@@ -1,0 +1,275 @@
+# Benchmark CI — MLX inference benchmarks and agent framework comparisons
+#
+# Runs on macos-latest (macOS 26 Tahoe) to match the target hardware environment.
+# Public repo = free macOS runner minutes.
+#
+# Two-tier design:
+#   Tier 1 (any macOS): schema validation, dry-run, framework-eval (when MLX server available)
+#   Tier 2 (self-hosted, future): full inference benchmarks (throughput, TTFT, tool-calling)
+#
+# Inference suites self-guard: if MLX server is unreachable, they write skipped:true and exit 0.
+#
+# PR runs:    Upload artifacts + post sticky PR comment. No commits to main.
+# Scheduled:  Upload artifacts + open PR to commit results + regenerate docs summary.
+# Dispatch:   Same as scheduled. Accepts suite selector and runner label override.
+name: Benchmark CI
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"  # Weekly, Monday 04:00 UTC
+  workflow_dispatch:
+    inputs:
+      suites:
+        description: "Comma-separated suites or 'all' (throughput,ttft,tool-calling,code-accuracy,framework-eval,capability-comparison)"
+        default: "all"
+      runner_label:
+        description: "Runner label override (leave blank for macos-latest; use 'self-hosted' for M-series)"
+        default: ""
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "modules/mlx/**"
+      - "mlx-server/benchmarks/**"
+      - "orchestrator/examples/evaluations/**"
+      - "scripts/benchmarks/**"
+      - "data/benchmarks/schema.json"
+
+concurrency:
+  group: benchmark-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  # ============================================================
+  # VALIDATE — schema check + dry-run (ubuntu, always)
+  # ============================================================
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        run: pip install uv --quiet
+
+      - name: Validate schema.json
+        run: uv run scripts/benchmarks/validate-schema.py data/benchmarks/schema.json
+
+      - name: Dry-run check
+        run: uv run scripts/benchmarks/dry-run-check.py
+
+  # ============================================================
+  # BENCHMARK — matrix of suites (macOS)
+  # ============================================================
+  benchmark:
+    name: Benchmark / ${{ matrix.suite }}
+    needs: validate
+    runs-on: ${{ inputs.runner_label || 'macos-latest' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - throughput
+          - ttft
+          - tool-calling
+          - code-accuracy
+          - framework-eval
+          - capability-comparison
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        run: pip install uv --quiet
+
+      - name: Install Nix
+        if: ${{ matrix.suite != 'framework-eval' }}
+        uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Check suite filter
+        id: filter
+        env:
+          SUITES_INPUT: ${{ inputs.suites || 'all' }}
+          SUITE: ${{ matrix.suite }}
+        run: |
+          if [[ "$SUITES_INPUT" == "all" ]] || echo "$SUITES_INPUT" | tr ',' '\n' | grep -qx "$SUITE"; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run suite
+        id: run-suite
+        if: steps.filter.outputs.run == 'true'
+        env:
+          MLX_API_URL: ${{ vars.MLX_API_URL || 'http://127.0.0.1:11434/v1' }}
+          MLX_DEFAULT_MODEL: ${{ vars.MLX_DEFAULT_MODEL || 'mlx-community/Qwen3.5-122B-A10B-4bit' }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          RUNNER_NAME: ${{ runner.name }}
+        run: uv run scripts/benchmarks/collect-results.py --suite ${{ matrix.suite }}
+
+      - name: Skip suite (filtered out)
+        if: steps.filter.outputs.run == 'false'
+        run: echo "Suite ${{ matrix.suite }} skipped by suite filter."
+
+      - name: Upload artifact
+        if: steps.filter.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-${{ matrix.suite }}-${{ github.sha }}
+          path: data/benchmarks/*.json
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Extract result summary
+        id: summary
+        if: steps.filter.outputs.run == 'true'
+        shell: bash
+        run: |
+          result_file=$(ls -t data/benchmarks/*.json 2>/dev/null | head -1)
+          if [ -z "$result_file" ]; then
+            echo "body=No result file produced." >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          skipped=$(python3 -c "import json; d=json.load(open('${result_file}')); print('true' if d.get('skipped') else 'false')")
+          if [ "$skipped" = "true" ]; then
+            echo "body=**Skipped** — MLX server not available on this runner." >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Build a markdown summary table from the results array
+          summary=$(python3 << 'PYEOF'
+          import json, glob
+          files = sorted(glob.glob("data/benchmarks/*.json"), key=lambda f: -__import__("os").path.getmtime(f))
+          if not files:
+              print("No result files found.")
+              raise SystemExit(0)
+          d = json.load(open(files[0]))
+          results = d.get("results", [])
+          errors = d.get("errors", [])
+          model = d.get("model", "unknown")
+          system = d.get("system", {})
+          chip = system.get("chip", "unknown")
+          lines = []
+          lines.append(f"**Model:** `{model}` on {chip}")
+          lines.append("")
+          if results:
+              lines.append("| Metric | Score | Gap vs Opus |")
+              lines.append("|--------|-------|-------------|")
+              for r in results:
+                  name = r.get("name", "?")
+                  value = r.get("value", 0)
+                  tags = r.get("tags", {})
+                  gap = tags.get("gap_pct", "n/a")
+                  if gap != "n/a":
+                      gap = f"-{gap}%"
+                  lines.append(f"| {name} | {value:.2f} | {gap} |")
+          elif errors:
+              for e in errors:
+                  lines.append(f"> {e}")
+          else:
+              lines.append("No results or errors recorded.")
+          print("\n".join(lines))
+          PYEOF
+          )
+
+          {
+            echo "body<<SUMMARY_EOF"
+            echo "$summary"
+            echo "SUMMARY_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Post PR comment
+        if: |
+          steps.filter.outputs.run == 'true' &&
+          github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: benchmark-${{ matrix.suite }}
+          message: |
+            ### Benchmark: `${{ matrix.suite }}`
+
+            ${{ steps.summary.outputs.body }}
+
+            <details><summary>Full JSON artifact</summary>
+
+            Download `benchmark-${{ matrix.suite }}-${{ github.sha }}` from the [Actions run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+
+            </details>
+
+            _Triggered by `${{ github.sha }}`_
+
+  # ============================================================
+  # STORE RESULTS — commit via PR (non-PR triggers only)
+  # ============================================================
+  store-results:
+    name: Store Results
+    needs: benchmark
+    if: |
+      always() &&
+      github.event_name != 'pull_request' &&
+      needs.benchmark.result != 'cancelled'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.GH_ACTION_JACOBPEVANS_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Download all benchmark artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: benchmark-*-${{ github.sha }}
+          path: data/benchmarks/
+          merge-multiple: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        run: pip install uv --quiet
+
+      - name: Regenerate docs summary
+        run: uv run scripts/benchmarks/generate-summary.py
+
+      - name: Create results PR
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          sign-commits: true
+          branch: chore/benchmark-results-${{ github.sha }}
+          delete-branch: true
+          commit-message: "chore(benchmarks): add results for ${{ github.sha }}"
+          title: "chore(benchmarks): add results for ${{ github.sha }}"
+          body: |
+            Automated benchmark results from ${{ github.event_name }} run.
+
+            **Commit**: ${{ github.sha }}
+            **Trigger**: ${{ github.event_name }}
+            **Suites**: ${{ inputs.suites || 'all' }}
+
+            Result files added to `data/benchmarks/` and `docs/mlx-benchmarks.md` summary regenerated.
+          labels: type:chore,automation:dependencies
