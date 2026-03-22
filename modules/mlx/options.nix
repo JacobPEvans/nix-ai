@@ -247,7 +247,7 @@
         ]
       );
       default = "auto";
-      description = "Tool call parser. Auto-detect is safest for models without specific guidance.";
+      description = "Tool call parser. Only used with enableAutoToolChoice. Auto-detect is safest for models without specific guidance.";
     };
 
     # reasoningParser — Reasoning content extraction (--reasoning-parser).

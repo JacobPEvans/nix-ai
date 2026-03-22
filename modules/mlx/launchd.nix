@@ -61,7 +61,7 @@ in
         ++ lib.optionals cfg.enableAutoToolChoice [
           "--enable-auto-tool-choice"
         ]
-        ++ lib.optionals (cfg.toolCallParser != null) [
+        ++ lib.optionals (cfg.enableAutoToolChoice && cfg.toolCallParser != null) [
           "--tool-call-parser"
           cfg.toolCallParser
         ]

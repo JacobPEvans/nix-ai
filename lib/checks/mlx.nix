@@ -206,7 +206,7 @@ in
         }
         {
           flag = "--tool-call-parser";
-          shouldBeAbsent = mlxCfg.toolCallParser == null;
+          shouldBeAbsent = mlxCfg.toolCallParser == null || !mlxCfg.enableAutoToolChoice;
         }
         {
           flag = "--reasoning-parser";
