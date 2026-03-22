@@ -65,6 +65,11 @@ def fmt_timestamp(ts: str) -> str:
         return ts[:16]
 
 
+def _skipped_row(date: str, sha: str, ncols: int) -> str:
+    cells = ["—"] * (ncols - 2)
+    return f"| {date} | {sha} | _(skipped — no MLX hardware)_ | " + " | ".join(cells) + " |"
+
+
 def render_framework_table(runs: list[dict]) -> str:
     if not runs:
         return "_No results yet._\n"
@@ -77,7 +82,7 @@ def render_framework_table(runs: list[dict]) -> str:
         date = fmt_timestamp(run.get("timestamp", ""))
         sha = run.get("git_sha", "")[:7]
         if run.get("skipped"):
-            lines.append(f"| {date} | {sha} | _(skipped — no MLX hardware)_ | — | — | — |")
+            lines.append(_skipped_row(date, sha, 6))
             continue
         for item in run.get("results", []):
             fw = item.get("tags", {}).get("framework", item.get("name", ""))
@@ -101,7 +106,7 @@ def render_capability_table(runs: list[dict]) -> str:
         date = fmt_timestamp(run.get("timestamp", ""))
         sha = run.get("git_sha", "")[:7]
         if run.get("skipped"):
-            lines.append(f"| {date} | {sha} | _(skipped — no MLX hardware)_ | — | — | — |")
+            lines.append(_skipped_row(date, sha, 6))
             continue
         for item in run.get("results", []):
             category = item.get("name", "")
@@ -114,7 +119,7 @@ def render_capability_table(runs: list[dict]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def render_generic_table(suite: str, runs: list[dict]) -> str:  # noqa: ARG001
+def render_generic_table(runs: list[dict]) -> str:
     if not runs:
         return "_No results yet._\n"
 
@@ -126,7 +131,7 @@ def render_generic_table(suite: str, runs: list[dict]) -> str:  # noqa: ARG001
         date = fmt_timestamp(run.get("timestamp", ""))
         sha = run.get("git_sha", "")[:7]
         if run.get("skipped"):
-            lines.append(f"| {date} | {sha} | _(skipped — no MLX hardware)_ | — | — | — |")
+            lines.append(_skipped_row(date, sha, 6))
             continue
         for item in run.get("results", []):
             name = item.get("name", "")
@@ -146,7 +151,7 @@ def render_suite(suite: str, runs: list[dict]) -> str:
     elif suite == "capability-comparison":
         body = render_capability_table(runs)
     else:
-        body = render_generic_table(suite, runs)
+        body = render_generic_table(runs)
     return heading + body
 
 
@@ -177,15 +182,16 @@ def generate_table(grouped: dict[str, list[dict]]) -> str:
 def update_docs(table: str) -> None:
     content = DOCS_PATH.read_text()
 
-    if SENTINEL_START not in content:
+    start_idx = content.find(SENTINEL_START)
+    if start_idx == -1:
         raise ValueError(f"Sentinel '{SENTINEL_START}' not found in {DOCS_PATH}")
-    if SENTINEL_END not in content:
+    end_idx = content.find(SENTINEL_END, start_idx)
+    if end_idx == -1:
         raise ValueError(f"Sentinel '{SENTINEL_END}' not found in {DOCS_PATH}")
 
-    before = content[: content.index(SENTINEL_START) + len(SENTINEL_START)]
-    after = content[content.index(SENTINEL_END):]
-    updated = before + "\n\n" + table + "\n\n" + after
-    DOCS_PATH.write_text(updated)
+    before = content[: start_idx + len(SENTINEL_START)]
+    after = content[end_idx:]
+    DOCS_PATH.write_text(before + "\n\n" + table + "\n\n" + after)
     print(f"Updated {DOCS_PATH}")
 
 

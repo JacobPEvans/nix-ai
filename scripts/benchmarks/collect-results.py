@@ -23,6 +23,7 @@ Output:
 """
 
 import argparse
+import importlib.metadata
 import json
 import os
 import re
@@ -39,6 +40,7 @@ AGENT_SCRIPTS_DIR = REPO_ROOT / "orchestrator" / "examples" / "evaluations"
 BENCHMARKS_DIR = REPO_ROOT / "mlx-server" / "benchmarks"
 MLX_API_URL = os.environ.get("MLX_API_URL", "http://127.0.0.1:11434/v1")
 MLX_DEFAULT_MODEL = os.environ.get("MLX_DEFAULT_MODEL", "mlx-community/Qwen3.5-122B-A10B-4bit")
+SCHEMA_VERSION = "1"
 
 FRAMEWORK_SCRIPTS = [
     ("eval_langgraph.py", "langgraph"),
@@ -78,13 +80,10 @@ def collect_system_info() -> dict:
     except ValueError:
         memory_gb = 0
 
-    vllm_ver = _run(["pip", "show", "vllm-mlx"])
-    vllm_version = "unknown"
-    if vllm_ver != "unknown":
-        for line in vllm_ver.splitlines():
-            if line.startswith("Version:"):
-                vllm_version = line.split(":", 1)[1].strip()
-                break
+    try:
+        vllm_version = importlib.metadata.version("vllm-mlx")
+    except importlib.metadata.PackageNotFoundError:
+        vllm_version = "unknown"
 
     runner = os.environ.get("RUNNER_NAME", "local")
 
@@ -102,10 +101,6 @@ def get_git_sha() -> str:
     if sha == "unknown":
         sha = os.environ.get("GITHUB_SHA", "unknown")[:7]
     return sha
-
-
-def get_model_name() -> str:
-    return os.environ.get("MLX_DEFAULT_MODEL", MLX_DEFAULT_MODEL)
 
 
 def get_trigger() -> str:
@@ -266,14 +261,7 @@ def run_capability_suite() -> tuple[list[dict], list[str]]:
 
 
 def run_inference_stub(suite: str) -> tuple[list[dict], list[str], bool]:
-    """Placeholder for inference suites that require MLX hardware."""
-    if not mlx_server_available():
-        return (
-            [],
-            [f"{suite}: MLX server not available — requires M-series hardware with vllm-mlx running"],
-            True,
-        )
-    # Inference suite implementations are tracked in Issue #9
+    """Placeholder for inference suites that require MLX hardware (Issue #9)."""
     return [], [f"{suite}: inference suite collection not yet implemented — run mlx-bench* tools manually"], False
 
 
@@ -283,7 +271,7 @@ def run_inference_stub(suite: str) -> tuple[list[dict], list[str], bool]:
 
 def build_dry_run_result(suite: str, system: dict, git_sha: str) -> dict:
     return {
-        "schema_version": "1",
+        "schema_version": SCHEMA_VERSION,
         "timestamp": datetime.now(UTC).strftime("%Y-%m-%dT%H%M%SZ"),
         "git_sha": git_sha,
         "trigger": get_trigger(),
@@ -334,27 +322,33 @@ def main() -> None:
 
     skipped = False
     errors: list[str] = []
+    mlx_available = mlx_server_available()
 
     if args.suite == "framework-eval":
         suite_results, errors = run_framework_suite()
     elif args.suite == "capability-comparison":
-        if not mlx_server_available():
+        if not mlx_available:
             suite_results = []
             errors = ["capability-comparison: MLX server not available — requires M-series hardware"]
             skipped = True
         else:
             suite_results, errors = run_capability_suite()
     else:
-        suite_results, errors, skipped = run_inference_stub(args.suite)
+        if not mlx_available:
+            suite_results = []
+            errors = [f"{args.suite}: MLX server not available — requires M-series hardware with vllm-mlx running"]
+            skipped = True
+        else:
+            suite_results, errors, skipped = run_inference_stub(args.suite)
 
     result: dict = {
-        "schema_version": "1",
+        "schema_version": SCHEMA_VERSION,
         "timestamp": timestamp,
         "git_sha": git_sha,
         "trigger": get_trigger(),
         "pr_number": get_pr_number(),
         "suite": args.suite,
-        "model": get_model_name(),
+        "model": MLX_DEFAULT_MODEL,
         "system": system,
         "results": suite_results,
         "errors": errors,
