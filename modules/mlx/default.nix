@@ -14,8 +14,8 @@
 #   - Always-on LaunchAgent running a default MoE model (~70GB, 10B active)
 #   - Foreground model switching (auto-restores default on exit)
 #   - CLI tools for quick prompts (mlx) and interactive chat (mlx-chat)
-#   - Benchmark suite: throughput (mlx-bench), engine (mlx-bench-engine),
-#     raw MLX (mlx-bench-raw), accuracy evaluation (mlx-eval)
+#   - Benchmark suite: mlx-bench-all (full suite), plus individual tools
+#     mlx-bench, mlx-bench-engine, mlx-bench-raw, mlx-eval
 #   - OpenAI-compatible API at http://127.0.0.1:11434/v1
 #
 # Models stored on dedicated APFS volume: /Volumes/HuggingFace

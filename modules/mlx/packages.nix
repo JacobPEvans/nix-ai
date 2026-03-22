@@ -19,6 +19,7 @@ let
     apiUrl
     ;
   vllmMlxPin = "vllm-mlx==${vllmMlxVersion}";
+  evalTasksDir = ./eval-tasks;
 in
 {
   config = lib.mkIf cfg.enable {
@@ -31,6 +32,7 @@ in
       MLX_PORT = toString cfg.port;
       MLX_HOST = cfg.host;
       MLX_HF_HOME = cfg.huggingFaceHome;
+      MLX_EVAL_TASKS_DIR = "${evalTasksDir}";
     };
 
     # ==========================================================================
@@ -124,6 +126,18 @@ in
           --apply_chat_template \
           "$@"
       '')
+
+      # mlx-bench-all — full suite orchestrator (throughput + TTFT + accuracy)
+      (pkgs.writeShellApplication {
+        name = "mlx-bench-all";
+        runtimeInputs = with pkgs; [
+          curl
+          jq
+          bc
+          coreutils
+        ];
+        text = builtins.readFile ./scripts/mlx-bench-all.sh;
+      })
 
       # ======================================================================
       # Health Check

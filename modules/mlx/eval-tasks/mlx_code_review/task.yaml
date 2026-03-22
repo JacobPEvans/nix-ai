@@ -1,0 +1,24 @@
+# lm-eval custom task: Code Review Bug Detection
+#
+# Tests whether the model can identify planted bugs in code snippets.
+# Each sample contains a code snippet with a known bug; the model must identify it.
+#
+# Run: mlx-eval --tasks mlx_code_review --include_path <eval-tasks-dir>
+#
+task: mlx_code_review
+dataset_path: json
+dataset_kwargs:
+  data_files:
+    test: dataset.jsonl
+output_type: generate_until
+generation_kwargs:
+  max_gen_toks: 512
+  temperature: 0
+  do_sample: false
+doc_to_text: "{{prompt}}"
+doc_to_target: "{{bug_keyword}}"
+process_results: !function utils.process_results
+metric_list:
+  - metric: bug_detection_rate
+    aggregation: mean
+    higher_is_better: true

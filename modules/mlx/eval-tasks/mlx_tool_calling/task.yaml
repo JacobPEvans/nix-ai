@@ -1,0 +1,24 @@
+# lm-eval custom task: Tool Calling Decision Accuracy
+#
+# Tests whether the model correctly decides to call (or abstain from) a tool.
+# Uses generate_until with regex scoring against expected tool-call patterns.
+#
+# Run: mlx-eval --tasks mlx_tool_calling --include_path <eval-tasks-dir>
+#
+task: mlx_tool_calling
+dataset_path: json
+dataset_kwargs:
+  data_files:
+    test: dataset.jsonl
+output_type: generate_until
+generation_kwargs:
+  max_gen_toks: 256
+  temperature: 0
+  do_sample: false
+doc_to_text: "{{prompt}}"
+doc_to_target: "{{expected}}"
+process_results: !function utils.process_results
+metric_list:
+  - metric: tool_accuracy
+    aggregation: mean
+    higher_is_better: true
