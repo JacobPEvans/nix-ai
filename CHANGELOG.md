@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.22.0](https://github.com/JacobPEvans/nix-ai/compare/v1.21.0...v1.22.0) (2026-03-22)
+
+
+### Features
+
+* **orchestrator:** add agent framework evaluation scripts ([7490ad0](https://github.com/JacobPEvans/nix-ai/commit/7490ad05b50b93da3df109eab374394a95464543))
+
 ## [1.21.0](https://github.com/JacobPEvans/nix-ai/compare/v1.20.1...v1.21.0) (2026-03-22)
 
 
