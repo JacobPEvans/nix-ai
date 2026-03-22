@@ -261,7 +261,7 @@ def run_capability_suite() -> tuple[list[dict], list[str]]:
 
 
 def run_inference_stub(suite: str) -> tuple[list[dict], list[str], bool]:
-    """Placeholder for inference suites that require MLX hardware (Issue #9)."""
+    """Placeholder for inference suites that require MLX hardware (Issue #303)."""
     return [], [f"{suite}: inference suite collection not yet implemented — run mlx-bench* tools manually"], False
 
 
@@ -272,7 +272,7 @@ def run_inference_stub(suite: str) -> tuple[list[dict], list[str], bool]:
 def build_dry_run_result(suite: str, system: dict, git_sha: str) -> dict:
     return {
         "schema_version": SCHEMA_VERSION,
-        "timestamp": datetime.now(UTC).strftime("%Y-%m-%dT%H%M%SZ"),
+        "timestamp": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "git_sha": git_sha,
         "trigger": get_trigger(),
         "pr_number": get_pr_number(),
@@ -310,7 +310,9 @@ def main() -> None:
     args = parser.parse_args()
 
     schema = json.loads(SCHEMA_PATH.read_text())
-    timestamp = datetime.now(UTC).strftime("%Y-%m-%dT%H%M%SZ")
+    now = datetime.now(UTC)
+    timestamp = now.strftime("%Y-%m-%dT%H:%M:%SZ")   # RFC 3339 for JSON body
+    filename_ts = now.strftime("%Y-%m-%dT%H%M%SZ")   # compact (no colons) for filename
     git_sha = get_git_sha()
     system = collect_system_info()
 
@@ -363,7 +365,7 @@ def main() -> None:
 
     out_dir = REPO_ROOT / "data" / "benchmarks"
     out_dir.mkdir(parents=True, exist_ok=True)
-    filename = f"{timestamp}-{git_sha}-{args.suite}.json"
+    filename = f"{filename_ts}-{git_sha}-{args.suite}.json"
     out_path = out_dir / filename
     out_path.write_text(json.dumps(result, indent=2) + "\n")
     print(f"Wrote {out_path}", file=sys.stderr)

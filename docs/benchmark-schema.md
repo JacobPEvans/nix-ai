@@ -16,7 +16,7 @@ Example: `data/benchmarks/2026-03-22T014523Z-0b1e958-framework-eval.json`
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `schema_version` | `"1"` | Yes | Always `"1"`. Bump for breaking changes. |
-| `timestamp` | string (ISO 8601) | Yes | UTC run-start time |
+| `timestamp` | string (RFC 3339) | Yes | UTC run-start time (e.g. `2026-03-22T01:45:23Z`) |
 | `git_sha` | string (≥7 chars) | Yes | Repo commit SHA at run time |
 | `trigger` | `schedule` \| `pr` \| `workflow_dispatch` | Yes | What triggered the run |
 | `pr_number` | integer \| null | No | PR number if trigger is `pr` |

@@ -58,11 +58,12 @@ def load_results(limit: int) -> dict[str, list[dict]]:
 
 
 def fmt_timestamp(ts: str) -> str:
-    try:
-        dt = datetime.strptime(ts, "%Y-%m-%dT%H%M%SZ")
-        return dt.strftime("%Y-%m-%d %H:%M")
-    except ValueError:
-        return ts[:16]
+    for fmt in ("%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H%M%SZ"):
+        try:
+            return datetime.strptime(ts, fmt).strftime("%Y-%m-%d %H:%M")
+        except ValueError:
+            pass
+    return ts[:16]
 
 
 def _skipped_row(date: str, sha: str, ncols: int) -> str:
@@ -86,7 +87,7 @@ def render_framework_table(runs: list[dict]) -> str:
             continue
         for item in run.get("results", []):
             fw = item.get("tags", {}).get("framework", item.get("name", ""))
-            latency = f"{item['value']:.2f}"
+            latency = f"{item.get('value', 0):.2f}"
             tokens = item.get("tags", {}).get("tokens", "—")
             steps = item.get("tags", {}).get("steps", "—")
             lines.append(f"| {date} | {sha} | {fw} | {latency} | {tokens} | {steps} |")
@@ -110,7 +111,7 @@ def render_capability_table(runs: list[dict]) -> str:
             continue
         for item in run.get("results", []):
             category = item.get("name", "")
-            score = f"{item['value']:.2f}"
+            score = f"{item.get('value', 0):.2f}"
             baseline = item.get("tags", {}).get("claude_baseline", "—")
             gap = item.get("tags", {}).get("gap_pct", "—")
             gap_str = f"{gap}%" if gap != "—" else "—"
