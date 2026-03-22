@@ -10,16 +10,8 @@ let
   # ============================================================================
   # JacobPEvans Personal Plugins - Auto-discovered from flake input
   # ============================================================================
-  # Dynamically discovers all plugin directories from the jacobpevans-cc-plugins
-  # flake input using builtins.readDir. New plugins added to the repo are
-  # automatically enabled after `nix flake update jacobpevans-cc-plugins`.
-  #
-  # Known plugins (for reference, not used for enablement):
-  #   After consolidation: 15 plugins
-  #   - git-guards, content-guards, git-workflows, github-workflows
-  #   - infra-orchestration, ai-delegation, config-management, codeql-resolver
-  #   - process-cleanup, pr-lifecycle, git-standards, code-standards
-  #   - infra-standards, project-standards, session-analytics
+  # Plugins from `jacobpevans-cc-plugins` are discovered and enabled automatically.
+  # The list of plugins is determined by the repository contents at flake update time.
   jacobpevansPlugins =
     let
       entries = builtins.readDir jacobpevans-cc-plugins;
