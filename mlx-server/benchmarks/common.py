@@ -292,7 +292,7 @@ def write_results(category: str, results: list[dict]) -> None:
     """Write test results to JSON file in CI-compatible format."""
     mean_score = sum(r.get("score", 0) for r in results) / max(len(results), 1)
     # CLAUDE_BASELINES is defined below; accessible at call time (Python late binding)
-    baseline = CLAUDE_BASELINES.get(category, {}).get("mean_score")
+    baseline = CLAUDE_BASELINES.get("opus", {}).get(category, {}).get("mean_score")
     output = {
         "category": category,
         "model": get_model(),
@@ -325,100 +325,146 @@ def write_results(category: str, results: list[dict]) -> None:
     print(f"  Results written to {path}")
 
 
-# --- Claude Opus 4.6 Baselines ---
+# --- Claude Baselines ---
 # Hardcoded expected performance based on known capabilities.
 # These are NOT measured in this suite — they represent what we'd expect from Claude.
+# Refresh only when user explicitly requests Claude benchmark testing updates.
 
 CLAUDE_BASELINES = {
-    "reasoning": {
-        "mean_score": 0.95,
-        "per_test": {
-            "bird_train": 1.0,
-            "constraint_satisfaction": 1.0,
-            "syllogism": 1.0,
-            "bayes_theorem": 1.0,
-            "counterfactual": 1.0,
-            "missionaries_cannibals": 1.0,
-            "chinese_remainder": 1.0,
-            "temporal_reasoning": 1.0,
-            "multi_hop": 0.9,
-            "floating_point": 1.0,
+    # Opus 4.6 — frontier reasoning model (Claude Code's default)
+    "opus": {
+        "reasoning": {
+            "mean_score": 0.95,
+            "per_test": {
+                "bird_train": 1.0, "constraint_satisfaction": 1.0,
+                "syllogism": 1.0, "bayes_theorem": 1.0,
+                "counterfactual": 1.0, "missionaries_cannibals": 1.0,
+                "chinese_remainder": 1.0, "temporal_reasoning": 1.0,
+                "multi_hop": 0.9, "floating_point": 1.0,
+            },
+        },
+        "code_generation": {
+            "mean_score": 0.95,
+            "per_test": {
+                "lru_cache": 1.0, "async_rate_limiter": 1.0,
+                "typescript_generics": 1.0, "nix_derivation": 0.9,
+                "csv_to_json_bash": 1.0, "dijkstra": 1.0,
+                "generate_tests": 0.9, "regex_engine": 0.8,
+            },
+        },
+        "code_review": {
+            "mean_score": 0.92,
+            "per_test": {
+                "auth_bypass": 0.95, "race_condition": 0.90,
+                "memory_leak": 0.95, "subtle_off_by_one": 0.85,
+                "type_coercion": 0.95, "clean_code": 0.90,
+            },
+        },
+        "tool_use": {
+            "mean_score": 0.96,
+            "per_test": {
+                "config_port_check": 1.0, "grep_count_write": 1.0,
+                "csv_error_recovery": 0.9, "api_error_recovery": 0.9,
+                "refactor_chain": 1.0,
+            },
+        },
+        "instruction_following": {
+            "mean_score": 0.83,
+            "per_test": {
+                "lipogram": 0.9, "persona": 1.0, "yaml_only": 1.0,
+                "word_count": 0.5, "numbered_steps": 1.0, "multi_constraint": 1.0,
+            },
+        },
+        "structured_output": {
+            "mean_score": 0.95,
+            "per_test": {
+                "flat_object": 1.0, "nested_object": 1.0,
+                "array_of_objects": 1.0, "enum_fields": 1.0,
+                "optional_required": 0.9, "recursive_structure": 0.8,
+                "api_response": 0.9, "conflicting_instructions": 1.0,
+            },
+        },
+        "long_context": {
+            "mean_score": 0.975,
+            "per_test": {
+                "needle_2k": 1.0, "synthesis_8k": 1.0,
+                "needle_16k": 1.0, "multi_needle_32k": 0.9,
+            },
+        },
+        "conversation": {
+            "mean_score": 0.975,
+            "per_test": {
+                "pronoun_resolution": 1.0, "running_counter": 1.0,
+                "preference_memory": 1.0, "contradiction_detection": 0.9,
+            },
         },
     },
-    "code_generation": {
-        "mean_score": 0.95,
-        "per_test": {
-            "lru_cache": 1.0,
-            "async_rate_limiter": 1.0,
-            "typescript_generics": 1.0,
-            "nix_derivation": 0.9,
-            "csv_to_json_bash": 1.0,
-            "dijkstra": 1.0,
-            "generate_tests": 0.9,
-            "regex_engine": 0.8,
+    # Sonnet 4.6 — fast coding model (Claude Code subagent default)
+    "sonnet": {
+        "reasoning": {
+            "mean_score": 0.85,
+            "per_test": {
+                "bird_train": 1.0, "constraint_satisfaction": 0.8,
+                "syllogism": 1.0, "bayes_theorem": 1.0,
+                "counterfactual": 0.9, "missionaries_cannibals": 0.7,
+                "chinese_remainder": 1.0, "temporal_reasoning": 0.9,
+                "multi_hop": 0.7, "floating_point": 1.0,
+            },
         },
-    },
-    "code_review": {
-        "mean_score": 0.92,
-        "per_test": {
-            "auth_bypass": 0.95,
-            "race_condition": 0.90,
-            "memory_leak": 0.95,
-            "subtle_off_by_one": 0.85,
-            "type_coercion": 0.95,
-            "clean_code": 0.90,
+        "code_generation": {
+            "mean_score": 0.90,
+            "per_test": {
+                "lru_cache": 1.0, "async_rate_limiter": 0.9,
+                "typescript_generics": 1.0, "nix_derivation": 0.7,
+                "csv_to_json_bash": 0.9, "dijkstra": 1.0,
+                "generate_tests": 0.8, "regex_engine": 0.8,
+            },
         },
-    },
-    "tool_use": {
-        "mean_score": 0.96,
-        "per_test": {
-            "config_port_check": 1.0,
-            "grep_count_write": 1.0,
-            "csv_error_recovery": 0.9,
-            "api_error_recovery": 0.9,
-            "refactor_chain": 1.0,
+        "code_review": {
+            "mean_score": 0.85,
+            "per_test": {
+                "auth_bypass": 0.90, "race_condition": 0.80,
+                "memory_leak": 0.90, "subtle_off_by_one": 0.75,
+                "type_coercion": 0.90, "clean_code": 0.85,
+            },
         },
-    },
-    "instruction_following": {
-        "mean_score": 0.83,
-        "per_test": {
-            "lipogram": 0.9,
-            "persona": 1.0,
-            "yaml_only": 1.0,
-            "word_count": 0.5,
-            "numbered_steps": 1.0,
-            "multi_constraint": 1.0,
+        "tool_use": {
+            "mean_score": 0.90,
+            "per_test": {
+                "config_port_check": 1.0, "grep_count_write": 1.0,
+                "csv_error_recovery": 0.8, "api_error_recovery": 0.8,
+                "refactor_chain": 0.9,
+            },
         },
-    },
-    "structured_output": {
-        "mean_score": 0.95,
-        "per_test": {
-            "flat_object": 1.0,
-            "nested_object": 1.0,
-            "array_of_objects": 1.0,
-            "enum_fields": 1.0,
-            "optional_required": 0.9,
-            "recursive_structure": 0.8,
-            "api_response": 0.9,
-            "conflicting_instructions": 1.0,
+        "instruction_following": {
+            "mean_score": 0.75,
+            "per_test": {
+                "lipogram": 0.7, "persona": 0.9, "yaml_only": 1.0,
+                "word_count": 0.4, "numbered_steps": 0.9, "multi_constraint": 0.9,
+            },
         },
-    },
-    "long_context": {
-        "mean_score": 0.975,
-        "per_test": {
-            "needle_2k": 1.0,
-            "synthesis_8k": 1.0,
-            "needle_16k": 1.0,
-            "multi_needle_32k": 0.9,
+        "structured_output": {
+            "mean_score": 0.90,
+            "per_test": {
+                "flat_object": 1.0, "nested_object": 1.0,
+                "array_of_objects": 1.0, "enum_fields": 1.0,
+                "optional_required": 0.8, "recursive_structure": 0.6,
+                "api_response": 0.8, "conflicting_instructions": 1.0,
+            },
         },
-    },
-    "conversation": {
-        "mean_score": 0.975,
-        "per_test": {
-            "pronoun_resolution": 1.0,
-            "running_counter": 1.0,
-            "preference_memory": 1.0,
-            "contradiction_detection": 0.9,
+        "long_context": {
+            "mean_score": 0.925,
+            "per_test": {
+                "needle_2k": 1.0, "synthesis_8k": 1.0,
+                "needle_16k": 1.0, "multi_needle_32k": 0.7,
+            },
+        },
+        "conversation": {
+            "mean_score": 0.90,
+            "per_test": {
+                "pronoun_resolution": 1.0, "running_counter": 0.9,
+                "preference_memory": 0.9, "contradiction_detection": 0.8,
+            },
         },
     },
 }
