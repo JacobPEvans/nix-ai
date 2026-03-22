@@ -15,11 +15,11 @@ let
   # automatically enabled after `nix flake update jacobpevans-cc-plugins`.
   #
   # Known plugins (for reference, not used for enablement):
-  #   After consolidation: 15 plugins
+  #   After consolidation: 16 plugins
   #   - git-guards, content-guards, git-workflows, github-workflows
   #   - infra-orchestration, ai-delegation, config-management, codeql-resolver
   #   - process-cleanup, pr-lifecycle, git-standards, code-standards
-  #   - infra-standards, project-standards, session-analytics
+  #   - infra-standards, project-standards, session-analytics, pal-health
   jacobpevansPlugins =
     let
       entries = builtins.readDir jacobpevans-cc-plugins;
