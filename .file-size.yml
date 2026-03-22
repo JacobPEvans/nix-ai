@@ -1,0 +1,6 @@
+# Per-repo file-size config for JacobPEvans/.github/_file-size.yml
+# options.nix: vllm-mlx parameter reference (active + commented-out options)
+# ai-tools: multi-tool AI package definitions
+extended:
+  limit: 20480
+  files: [options, ai-tools]
