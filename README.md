@@ -125,8 +125,7 @@ modules/
 └── codex.nix        # OpenAI Codex configuration
 lib/
 ├── claude-settings.nix    # Pure settings generator
-├── claude-registry.nix    # Marketplace format functions
-└── security-policies.nix  # Permission policy engine
+└── claude-registry.nix    # Marketplace format functions
 ```
 
 ## Part of a trio

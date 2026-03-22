@@ -34,6 +34,23 @@ inputs.nix-ai.inputs.nixpkgs.follows = "nixpkgs";
 inputs.nix-ai.inputs.home-manager.follows = "home-manager";
 ```
 
+## Separation Guidelines
+
+### What belongs here (nix-ai)
+
+- AI CLI tools (Claude Code, Gemini, Copilot, Codex, block-goose)
+- MCP servers and wrappers (github-mcp-server, terraform-mcp-server, doppler-mcp, etc.)
+- AI-specific GitHub CLI extensions (gh-aw)
+- AI tool configuration files (`.claude/`, `.gemini/`, `.copilot/`)
+- MLX inference server (vllm-mlx LaunchAgent + wrappers)
+- AI-specific shell utilities (sync-mlx-models, check-pal-mcp, hf CLI wrapper)
+
+### Package placement
+
+- `home.packages` (this repo): AI tools, MCP servers, AI-specific CLI wrappers
+- `programs.gh.extensions` (this repo): AI GitHub CLI extensions only
+- `environment.systemPackages` (nix-darwin): AI/ML system libs requiring system-level install (whisper-cpp, openai-whisper)
+
 ## Key Files
 
 - `modules/default.nix` — Module entry point (imports all AI modules)
@@ -60,6 +77,7 @@ new ports to avoid collisions (e.g., the 11434/11435/11436 fragmentation during 
 | 27124 | Obsidian Local REST API | HTTP | `modules/mcp/` (env only) |
 
 **Reserved/conflicting ports to avoid:**
+
 - 11435: screenpipe (macOS app, not nix-ai managed — caused port collision in PR #230)
 
 ## Testing Locally

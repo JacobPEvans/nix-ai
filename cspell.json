@@ -23,6 +23,7 @@
     "statix",
     "testgen",
     "thinkdeep",
+    "screenpipe",
     "vllm",
     "worktree",
     "worktrees"
