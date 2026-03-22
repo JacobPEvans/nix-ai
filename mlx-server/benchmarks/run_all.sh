@@ -16,7 +16,7 @@ mkdir -p "$RESULTS_DIR"
 
 API_URL="${MLX_API_URL:-http://127.0.0.1:11434/v1}"
 MODEL="${MLX_DEFAULT_MODEL:-mlx-community/Qwen3.5-122B-A10B-4bit}"
-UV_DEPS="openai>=1.82.0,jsonschema>=4.0"
+UV_DEPS="openai>=1.82.0,jsonschema>=4.0,pyyaml"
 
 echo "============================================================"
 echo "  MLX vs Claude Opus 4.6 — Capability Benchmark Suite"
