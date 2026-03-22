@@ -1,3 +1,4 @@
+<!-- cspell:words TTFT hellaswag -->
 # MLX Benchmark Results
 
 Performance tracking for the vllm-mlx inference server across configuration changes.
@@ -5,15 +6,53 @@ Performance tracking for the vllm-mlx inference server across configuration chan
 ## System
 
 - **Hardware**: Apple M4 Max, 128 GB unified memory
-- **OS**: macOS Tahoe 26.3.0
+- **OS**: macOS 26.3.1 (Tahoe)
 - **Server**: vllm-mlx 0.2.6 (OpenAI-compatible API on port 11434)
 - **Model**: mlx-community/Qwen3.5-122B-A10B-4bit (~65 GB on disk)
+
+## How to Run
+
+All benchmark tools are installed via nix-ai's MLX module. Run from any
+terminal with the nix-ai home-manager profile active.
+
+```bash
+# Verify server is running and model is loaded
+mlx-status
+
+# Check model fits in memory before loading
+mlx-preflight mlx-community/Qwen3.5-122B-A10B-4bit
+
+# List all downloaded models with memory fit status
+mlx-models
+
+# Throughput benchmark (raw MLX, bypasses vllm-mlx overhead)
+mlx-bench-raw --model mlx-community/Qwen3.5-122B-A10B-4bit --max-tokens 512
+
+# Throughput benchmark (through vllm-mlx server)
+mlx-bench --model mlx-community/Qwen3.5-122B-A10B-4bit --max-tokens 512
+
+# Engine benchmark with cache/batching knobs
+mlx-bench-engine --model mlx-community/Qwen3.5-122B-A10B-4bit
+
+# Quick API latency test (TTFT)
+# Run twice: first = cold TTFT, second = warm TTFT (prefix cache hit)
+curl -s http://127.0.0.1:11434/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model":"mlx-community/Qwen3.5-122B-A10B-4bit",
+       "messages":[{"role":"user","content":"Hello"}],
+       "max_tokens":1,"temperature":0}' \
+  -o /dev/null -w "TTFT: %{time_total}s\n"
+
+# Accuracy evaluation (lm-eval harness against live API)
+mlx-eval --tasks hellaswag --limit 100
+```
 
 ## Results
 
 ### 2026-03-22 — Post-OOM Guardrails (PR #273 merged)
 
 Config: KV cache 16 GB, ProcessType=Background, HardResourceLimits 100 GB.
+System: macOS 26.3.1, vllm-mlx 0.2.6.
 
 | Test | Metric | Value | Notes |
 |------|--------|-------|-------|
@@ -26,6 +65,7 @@ Config: KV cache 16 GB, ProcessType=Background, HardResourceLimits 100 GB.
 ### 2026-03-20 — Initial Baseline (Issue #257)
 
 Config: KV cache uncapped (~25.6 GB auto-detect), no ProcessType, no resource limits.
+System: macOS 26.3.0, vllm-mlx 0.2.6.
 
 | Test | Metric | Value | Notes |
 |------|--------|-------|-------|
