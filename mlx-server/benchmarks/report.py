@@ -181,11 +181,11 @@ def main() -> None:
     # Overall composite
     lines.append("## Overall Composite Score")
     lines.append("")
-    lines.append(f"| Metric | Value |")
-    lines.append(f"|--------|-------|")
+    lines.append("| Metric | Value |")
+    lines.append("|--------|-------|")
     lines.append(f"| MLX composite | {composite_mlx:.3f} |")
     lines.append(f"| Claude composite | {composite_claude:.3f} |")
-    lines.append(f"| Overall gap | {format_gap(composite_mlx - composite_claude)} |")
+    lines.append(f"| Overall gap | {format_gap(overall_gap)} |")
     lines.append(f"| Verdict | **{overall_verdict}** |")
     lines.append("")
 

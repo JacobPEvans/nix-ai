@@ -171,15 +171,21 @@ def run_review(fixture: dict) -> dict:
     language = "python" if fixture["file"].endswith(".py") else "javascript"
     user_message = f"Review this {language} code:\n\n```{language}\n{code}\n```"
 
-    response, elapsed = timed_completion(
-        system=SYSTEM_PROMPT,
-        user=user_message,
-    )
+    try:
+        response, elapsed, tokens = timed_completion([
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_message},
+        ])
+    except Exception:
+        response, elapsed, tokens = "", 0.0, 0
 
     scores = score_file_review(response, fixture)
     result = {
+        "name": fixture["file"].replace(".py", "").replace(".js", ""),
         "fixture": fixture["file"],
-        "elapsed_s": round(elapsed, 3),
+        "score": scores["f1"],
+        "latency": round(elapsed, 2),
+        "tokens": tokens,
         **scores,
         "response_preview": response[:300],
     }
@@ -215,7 +221,7 @@ def main():
                 f"| Elapsed: {result['elapsed_s']}s"
             )
 
-        print_test_result(result["f1"] >= 0.5, f"  Score >= 0.5 threshold")
+        print_test_result(result["name"], result["score"], result["latency"], result["tokens"])
 
     # Aggregate summary
     overall_recall = total_tp / total_planted if total_planted > 0 else 0.0
@@ -225,16 +231,10 @@ def main():
     print(f"  Overall bug recall: {total_tp}/{total_planted} ({overall_recall:.1%})")
     print(f"  False-positive test: {'PASS' if fp_test_passed else 'FAIL'}")
 
-    summary = {
-        "benchmark": "code_review",
-        "total_true_positives": total_tp,
-        "total_planted_bugs": total_planted,
-        "overall_recall": round(overall_recall, 4),
-        "false_positive_test_passed": fp_test_passed,
-        "per_fixture": all_results,
-    }
-    write_results("code_review", summary)
-    return summary
+    write_results("code_review", all_results)
+
+    mean_score = sum(r["score"] for r in all_results) / max(len(all_results), 1)
+    print(f"\n  Category summary: mean F1 = {mean_score:.2f}")
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from common import get_client, get_model, score_exact, score_contains_all, write_results, print_test_result, DEFAULT_MAX_TOKENS
+from common import get_client, get_model, score_exact, score_contains_all, write_results, print_test_result
 import time
 
 

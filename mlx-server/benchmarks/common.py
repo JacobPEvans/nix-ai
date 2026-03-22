@@ -19,8 +19,14 @@ DEFAULT_TEMPERATURE = 0
 DEFAULT_MAX_TOKENS = 2048
 
 
+_client: OpenAI | None = None
+
+
 def get_client() -> OpenAI:
-    return OpenAI(base_url=API_URL, api_key="EMPTY")
+    global _client
+    if _client is None:
+        _client = OpenAI(base_url=API_URL, api_key="EMPTY")
+    return _client
 
 
 def get_model() -> str:
