@@ -144,7 +144,7 @@
 
 ### Bug Fixes
 
-* change MLX port from 11435 to 11436 (screenpipe conflict) ([#230](https://github.com/JacobPEvans/nix-ai/issues/230)) ([8a8dde9](https://github.com/JacobPEvans/nix-ai/commit/8a8dde9e90ef09491089115fbb19ecaa7856e605))
+* change MLX port from 11435 to 11436 (external port conflict) ([#230](https://github.com/JacobPEvans/nix-ai/issues/230)) ([8a8dde9](https://github.com/JacobPEvans/nix-ai/commit/8a8dde9e90ef09491089115fbb19ecaa7856e605))
 
 ## [1.16.0](https://github.com/JacobPEvans/nix-ai/compare/v1.15.0...v1.16.0) (2026-03-19)
 

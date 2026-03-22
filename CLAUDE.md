@@ -79,7 +79,7 @@ new ports to avoid collisions (e.g., the 11434/11435/11436 fragmentation during 
 
 **Reserved/conflicting ports to avoid:**
 
-- 11435: screenpipe (macOS app, not nix-ai managed — caused port collision in PR #230)
+- 11435: reserved — external macOS app conflict (see PR #230)
 
 ## Testing Locally
 
