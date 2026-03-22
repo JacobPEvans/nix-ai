@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.22.1](https://github.com/JacobPEvans/nix-ai/compare/v1.22.0...v1.22.1) (2026-03-22)
+
+
+### Bug Fixes
+
+* move git policy to nix-home, add separation guidelines ([#293](https://github.com/JacobPEvans/nix-ai/issues/293)) ([c927776](https://github.com/JacobPEvans/nix-ai/commit/c9277768fcb697b9b2724c33794278181def8518))
+* remove stale manual plugin list from development.nix comment ([#292](https://github.com/JacobPEvans/nix-ai/issues/292)) ([d2e7dc3](https://github.com/JacobPEvans/nix-ai/commit/d2e7dc3e2f5cf50703b0efcd4809b64ce2db5c04))
+
 ## [1.22.0](https://github.com/JacobPEvans/nix-ai/compare/v1.21.0...v1.22.0) (2026-03-22)
 
 
