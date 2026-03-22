@@ -49,6 +49,7 @@ inputs.nix-ai.inputs.home-manager.follows = "home-manager";
 
 - `home.packages` (this repo): AI tools, MCP servers, AI-specific CLI wrappers
 - `programs.gh.extensions` (this repo): AI GitHub CLI extensions only
+- `home.file` (this repo): AI tool configuration files (`.claude/`, `.gemini/`, etc.)
 - `environment.systemPackages` (nix-darwin): AI/ML system libs requiring system-level install (whisper-cpp, openai-whisper)
 
 ## Key Files
