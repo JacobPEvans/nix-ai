@@ -211,40 +211,60 @@
     # };
 
     # ---- TOOL INTEGRATION ----
+    # Server-side tool calling returns structured tool_calls in OpenAI API responses.
+    # Without these flags, streaming tool calls are broken (raw XML leaks as text)
+    # and non-streaming relies on a fragile generic parser.
 
-    # reasoningParser — Reasoning content extraction (--reasoning-parser).
-    # Options: qwen3, deepseek_r1, harmony.
-    # Disabled: not needed for current API consumers.
-    # Revisit: if using reasoning-aware consumers (e.g., qwen3 for our model).
-    # reasoningParser = lib.mkOption {
-    #   type = lib.types.nullOr (lib.types.enum [ "qwen3" "deepseek_r1" "harmony" ]);
-    #   default = null;
-    #   description = "Reasoning content extraction parser. Options: qwen3, deepseek_r1, harmony.";
-    # };
-
-    # enableAutoToolChoice — Auto tool choice for supported models (--enable-auto-tool-choice).
-    # Server default: disabled.
-    # Disabled: tool calling managed by consumers, not the server.
-    # Revisit: if using native tool calling via the API.
-    # enableAutoToolChoice = lib.mkOption {
-    #   type = lib.types.bool;
-    #   default = false;
-    #   description = "Enable automatic tool choice for supported models.";
-    # };
+    # enableAutoToolChoice — Activate model-specific tool call parsing (--enable-auto-tool-choice).
+    # No-op when request has no `tools` parameter, so safe to leave on.
+    # Default: true — primary use case is tool calling via PAL MCP.
+    enableAutoToolChoice = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Enable automatic tool choice for supported models. No-op when request has no tools.";
+    };
 
     # toolCallParser — Tool call parser (--tool-call-parser).
-    # Options: auto, mistral, qwen, qwen3_coder, llama, hermes, deepseek, kimi,
-    #          granite, nemotron, xlam, functionary, glm47.
-    # Disabled: tool calling managed by consumers.
-    # Revisit: if enabling enableAutoToolChoice.
-    # toolCallParser = lib.mkOption {
-    #   type = lib.types.nullOr (lib.types.enum [
-    #     "auto" "mistral" "qwen" "qwen3_coder" "llama" "hermes"
-    #     "deepseek" "kimi" "granite" "nemotron" "xlam" "functionary" "glm47"
-    #   ]);
-    #   default = null;
-    #   description = "Tool call parser. Only used with enableAutoToolChoice.";
-    # };
+    # Default: "auto" — Qwen3.5 has no official parser recommendation yet;
+    # auto-detect handles the format the model actually produces.
+    # Override to "hermes" (Qwen2.5), "qwen3_coder" (Qwen3-Coder), etc. if needed.
+    toolCallParser = lib.mkOption {
+      type = lib.types.nullOr (
+        lib.types.enum [
+          "auto"
+          "mistral"
+          "qwen"
+          "qwen3_coder"
+          "llama"
+          "hermes"
+          "deepseek"
+          "kimi"
+          "granite"
+          "nemotron"
+          "xlam"
+          "functionary"
+          "glm47"
+        ]
+      );
+      default = "auto";
+      description = "Tool call parser. Only used with enableAutoToolChoice. Auto-detect is safest for models without specific guidance.";
+    };
+
+    # reasoningParser — Reasoning content extraction (--reasoning-parser).
+    # Extracts <think>...</think> into structured reasoning_content field.
+    # No-op when model doesn't produce thinking tags — safe to leave on.
+    # Default: "qwen3" — matches Qwen3.5 model family.
+    reasoningParser = lib.mkOption {
+      type = lib.types.nullOr (
+        lib.types.enum [
+          "qwen3"
+          "deepseek_r1"
+          "harmony"
+        ]
+      );
+      default = "qwen3";
+      description = "Reasoning content extraction parser. No-op when model doesn't produce think tags.";
+    };
 
     # mcpConfig — MCP configuration file (--mcp-config).
     # Path to JSON/YAML MCP config for server-side tool integration.

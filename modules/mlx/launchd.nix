@@ -57,6 +57,17 @@ in
         ++ lib.optionals (cfg.completionBatchSize != null) [
           "--completion-batch-size"
           (toString cfg.completionBatchSize)
+        ]
+        ++ lib.optionals cfg.enableAutoToolChoice [
+          "--enable-auto-tool-choice"
+        ]
+        ++ lib.optionals (cfg.enableAutoToolChoice && cfg.toolCallParser != null) [
+          "--tool-call-parser"
+          cfg.toolCallParser
+        ]
+        ++ lib.optionals (cfg.reasoningParser != null) [
+          "--reasoning-parser"
+          cfg.reasoningParser
         ];
         RunAtLoad = true;
         KeepAlive = true;
