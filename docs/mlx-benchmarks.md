@@ -8,6 +8,7 @@ Performance tracking for the vllm-mlx inference server across configuration chan
 - **Hardware**: Apple M4 Max, 128 GB unified memory
 - **OS**: macOS 26.3.1 (Tahoe)
 - **Server**: vllm-mlx 0.2.6 (OpenAI-compatible API on port 11434)
+- **Client**: `curl` for API latency tests, custom bash script with `footprint`/`vm_stat` for memory-tracked sweeps
 - **Model**: mlx-community/Qwen3.5-122B-A10B-4bit (~65 GB on disk)
 
 ## How to Run
