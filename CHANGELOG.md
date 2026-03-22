@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.23.0](https://github.com/JacobPEvans/nix-ai/compare/v1.22.1...v1.23.0) (2026-03-22)
+
+
+### Features
+
+* **benchmarks:** add MLX benchmark CI/CD system ([#306](https://github.com/JacobPEvans/nix-ai/issues/306)) ([46d5f7f](https://github.com/JacobPEvans/nix-ai/commit/46d5f7f579383c6e650f2a7ff43e6f1c8fab51c0))
+
 ## [1.22.1](https://github.com/JacobPEvans/nix-ai/compare/v1.22.0...v1.22.1) (2026-03-22)
 
 
