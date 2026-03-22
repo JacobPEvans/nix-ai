@@ -21,7 +21,7 @@
         intelligence_score: 17,
         speed_score: 12,
         json_mode: false,
-        function_calling: false,
+        function_calling: true,
         images: false
       }
   ]

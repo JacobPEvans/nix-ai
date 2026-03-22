@@ -15,12 +15,15 @@ in
         "continuousBatching"
         "defaultModel"
         "enable"
+        "enableAutoToolChoice"
         "host"
         "huggingFaceHome"
         "maxNumSeqs"
         "memoryHardLimitGb"
         "port"
         "prefillBatchSize"
+        "reasoningParser"
+        "toolCallParser"
       ];
       actualOptions = builtins.attrNames mlxCfg;
       missingOptions = builtins.filter (o: !(builtins.elem o actualOptions)) expectedOptions;
@@ -94,6 +97,21 @@ in
           name = "mlx.memoryHardLimitGb";
           actual = mlxCfg.memoryHardLimitGb;
           expected = 100;
+        }
+        {
+          name = "mlx.enableAutoToolChoice";
+          actual = mlxCfg.enableAutoToolChoice;
+          expected = true;
+        }
+        {
+          name = "mlx.toolCallParser";
+          actual = mlxCfg.toolCallParser;
+          expected = "auto";
+        }
+        {
+          name = "mlx.reasoningParser";
+          actual = mlxCfg.reasoningParser;
+          expected = "qwen3";
         }
         # Environment variables
         {
@@ -181,6 +199,18 @@ in
         {
           flag = "--completion-batch-size";
           shouldBeAbsent = mlxCfg.completionBatchSize == null;
+        }
+        {
+          flag = "--enable-auto-tool-choice";
+          shouldBeAbsent = !mlxCfg.enableAutoToolChoice;
+        }
+        {
+          flag = "--tool-call-parser";
+          shouldBeAbsent = mlxCfg.toolCallParser == null;
+        }
+        {
+          flag = "--reasoning-parser";
+          shouldBeAbsent = mlxCfg.reasoningParser == null;
         }
       ];
       conditionalViolations = builtins.filter (
