@@ -291,14 +291,12 @@ def extract_code_block(text: str, language: str = "") -> str:
 def write_results(category: str, results: list[dict]) -> None:
     """Write test results to JSON file in CI-compatible format."""
     mean_score = sum(r.get("score", 0) for r in results) / max(len(results), 1)
-    # CLAUDE_BASELINES is defined below; accessible at call time (Python late binding)
     baseline = CLAUDE_BASELINES.get("opus", {}).get(category, {}).get("mean_score")
     output = {
         "category": category,
         "model": get_model(),
         "api_url": API_URL,
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        # Top-level shortcuts for CI consumer (collect-results.py reads these)
         "score": mean_score,
         "claude_baseline": baseline,
         "tests": results,

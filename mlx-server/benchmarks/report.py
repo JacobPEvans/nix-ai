@@ -11,8 +11,6 @@ def load_results() -> dict[str, dict]:
     """Load all result JSON files from RESULTS_DIR. Returns {category: data}."""
     loaded = {}
     for path in sorted(RESULTS_DIR.glob("*.json")):
-        if path.name == "report.md":
-            continue
         try:
             data = json.loads(path.read_text())
             category = data.get("category", path.stem)

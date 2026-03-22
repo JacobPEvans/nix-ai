@@ -66,7 +66,7 @@ def test_lru_cache() -> dict:
     code = extract_code_block(content, "python")
     score = score_code_runs(code, "python", test_code=_LRU_ASSERTIONS)
     print_test_result("lru_cache", score, elapsed, tokens)
-    return {"name": "lru_cache", "score": score, "latency": round(elapsed, 2), "tokens": tokens}
+    return {"name": "lru_cache", "score": score, "latency": round(elapsed, 2), "tokens": tokens, "response_preview": content[:300]}
 
 
 # ---------------------------------------------------------------------------
@@ -115,6 +115,7 @@ def test_async_rate_limiter() -> dict:
         "score": score,
         "latency": round(elapsed, 2),
         "tokens": tokens,
+        "response_preview": content[:300],
     }
 
 
@@ -150,6 +151,7 @@ def test_typescript_generics() -> dict:
             "skipped": True,
             "latency": round(elapsed, 2),
             "tokens": tokens,
+            "response_preview": content[:300],
         }
     print_test_result("typescript_generics", score, elapsed, tokens)
     return {
@@ -157,6 +159,7 @@ def test_typescript_generics() -> dict:
         "score": score,
         "latency": round(elapsed, 2),
         "tokens": tokens,
+        "response_preview": content[:300],
     }
 
 
@@ -191,6 +194,7 @@ def test_nix_derivation() -> dict:
             "skipped": True,
             "latency": round(elapsed, 2),
             "tokens": tokens,
+            "response_preview": content[:300],
         }
     print_test_result("nix_derivation", score, elapsed, tokens)
     return {
@@ -198,6 +202,7 @@ def test_nix_derivation() -> dict:
         "score": score,
         "latency": round(elapsed, 2),
         "tokens": tokens,
+        "response_preview": content[:300],
     }
 
 
@@ -230,6 +235,7 @@ def test_csv_to_json_bash() -> dict:
         "score": score,
         "latency": round(elapsed, 2),
         "tokens": tokens,
+        "response_preview": content[:300],
     }
 
 
@@ -278,7 +284,7 @@ def test_dijkstra() -> dict:
     code = extract_code_block(content, "python")
     score = score_code_runs(code, "python", test_code=_DIJKSTRA_ASSERTIONS)
     print_test_result("dijkstra", score, elapsed, tokens)
-    return {"name": "dijkstra", "score": score, "latency": round(elapsed, 2), "tokens": tokens}
+    return {"name": "dijkstra", "score": score, "latency": round(elapsed, 2), "tokens": tokens, "response_preview": content[:300]}
 
 
 # ---------------------------------------------------------------------------
@@ -337,6 +343,7 @@ def test_generate_tests() -> dict:
         "score": score,
         "latency": round(elapsed, 2),
         "tokens": tokens,
+        "response_preview": content[:300],
     }
 
 
@@ -389,6 +396,7 @@ def test_regex_engine() -> dict:
         "score": score,
         "latency": round(elapsed, 2),
         "tokens": tokens,
+        "response_preview": content[:300],
     }
 
 
