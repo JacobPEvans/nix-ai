@@ -27,7 +27,12 @@
     "thinkdeep",
     "vllm",
     "worktree",
-    "worktrees"
+    "worktrees",
+    "DDTHHMMSSZ",
+    "TTFT",
+    "ttft",
+    "smolagents",
+    "pageable"
   ],
   "ignorePaths": [
     "flake.lock",

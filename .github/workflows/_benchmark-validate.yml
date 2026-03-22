@@ -1,0 +1,31 @@
+# Reusable: Benchmark schema validation and dry-run check
+#
+# Called by ci-gate.yml when scripts/benchmarks/** or schema files change.
+# Runs on ubuntu-latest — no MLX hardware or inference required.
+name: Benchmark Validate
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate schema and dry-run
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        run: pip install uv --quiet
+
+      - name: Validate schema.json
+        run: uv run scripts/benchmarks/validate-schema.py data/benchmarks/schema.json
+
+      - name: Dry-run check
+        run: uv run scripts/benchmarks/dry-run-check.py

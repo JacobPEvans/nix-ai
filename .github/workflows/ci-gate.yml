@@ -48,6 +48,7 @@ jobs:
     outputs:
       nix: ${{ steps.filter.outputs.nix }}
       markdown: ${{ steps.filter.outputs.markdown }}
+      benchmark: ${{ steps.filter.outputs.benchmark }}
       is-deps-only: ${{ steps.detect-deps.outputs.is-deps-only }}
     steps:
       - uses: actions/checkout@v6
@@ -64,6 +65,9 @@ jobs:
             markdown:
               - '**.md'
               - '.markdownlint*'
+            benchmark:
+              - 'scripts/benchmarks/**'
+              - 'data/benchmarks/schema.json'
 
       - name: Detect Dependency-Only Commits
         id: detect-deps
@@ -103,17 +107,23 @@ jobs:
     if: needs.changes.outputs.nix == 'true' || needs.changes.outputs.markdown == 'true'
     uses: JacobPEvans/.github/.github/workflows/_file-size.yml@main
 
+  benchmark-validate:
+    name: Benchmark Validate
+    needs: changes
+    if: needs.changes.outputs.benchmark == 'true'
+    uses: ./.github/workflows/_benchmark-validate.yml
+
   # ==========================================================================
   # MERGE GATE - The ONLY required check in branch protection
   # ==========================================================================
   gate:
     name: Merge Gate
-    needs: [changes, nix-validate, markdown-lint, file-size]
+    needs: [changes, nix-validate, markdown-lint, file-size, benchmark-validate]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       - name: Check all results
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: nix-validate, markdown-lint, file-size
+          allowed-skips: nix-validate, markdown-lint, file-size, benchmark-validate
           jobs: ${{ toJSON(needs) }}

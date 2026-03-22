@@ -1,0 +1,165 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MLX Benchmark Result",
+  "description": "Structured result envelope for a single benchmark suite run",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "timestamp",
+    "git_sha",
+    "trigger",
+    "suite",
+    "model",
+    "system",
+    "results"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1",
+      "description": "Schema version — bump when making breaking changes"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp of when the run started"
+    },
+    "git_sha": {
+      "type": "string",
+      "minLength": 7,
+      "description": "Full or short git commit SHA of the repo at run time"
+    },
+    "trigger": {
+      "type": "string",
+      "enum": ["schedule", "pr", "workflow_dispatch"],
+      "description": "What triggered this benchmark run"
+    },
+    "pr_number": {
+      "type": ["integer", "null"],
+      "description": "Pull request number if trigger is 'pr', otherwise null"
+    },
+    "suite": {
+      "type": "string",
+      "enum": [
+        "throughput",
+        "ttft",
+        "tool-calling",
+        "code-accuracy",
+        "framework-eval",
+        "capability-comparison"
+      ],
+      "description": "Which benchmark suite was executed"
+    },
+    "model": {
+      "type": "string",
+      "description": "Model name/ID used for inference (e.g. Qwen3.5-122B-A10B-4bit)"
+    },
+    "skipped": {
+      "type": "boolean",
+      "description": "True when the suite was skipped (e.g. MLX server unavailable on standard runner)"
+    },
+    "system": {
+      "type": "object",
+      "required": ["os", "chip", "memory_gb"],
+      "additionalProperties": false,
+      "properties": {
+        "os": {
+          "type": "string",
+          "description": "Operating system and version (e.g. macOS 15.3.2)"
+        },
+        "chip": {
+          "type": "string",
+          "description": "CPU/chip model (e.g. Apple M4 Max)"
+        },
+        "memory_gb": {
+          "type": "integer",
+          "description": "Total system RAM in GB"
+        },
+        "vllm_mlx_version": {
+          "type": "string",
+          "description": "vllm-mlx package version if available"
+        },
+        "runner": {
+          "type": "string",
+          "description": "GitHub Actions runner label (e.g. macos-latest, self-hosted)"
+        }
+      }
+    },
+    "results": {
+      "type": "array",
+      "description": "Individual test/metric results",
+      "items": {
+        "type": "object",
+        "required": ["name", "metric", "value", "unit"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Test or measurement name (e.g. 'langgraph', 'tok_per_sec_512')"
+          },
+          "metric": {
+            "type": "string",
+            "description": "Metric type (e.g. 'latency', 'throughput', 'score', 'f1')"
+          },
+          "value": {
+            "type": "number",
+            "description": "Numeric metric value"
+          },
+          "unit": {
+            "type": "string",
+            "description": "Unit of measurement (e.g. 'seconds', 'tok/s', 'ratio', 'bool')"
+          },
+          "tags": {
+            "type": "object",
+            "description": "Arbitrary string key-value metadata (e.g. framework, output_tokens)",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "raw": {
+            "description": "Original unmodified output from the underlying tool or script"
+          }
+        }
+      }
+    },
+    "memory_snapshots": {
+      "type": "array",
+      "description": "Memory usage measurements at different phases of the run",
+      "items": {
+        "type": "object",
+        "required": ["phase", "rss_gb"],
+        "additionalProperties": false,
+        "properties": {
+          "phase": {
+            "type": "string",
+            "description": "Run phase (e.g. 'before', 'loading', 'peak', 'after')"
+          },
+          "rss_gb": {
+            "type": "number",
+            "description": "Process RSS memory in GB"
+          },
+          "free_gb": {
+            "type": "number",
+            "description": "Free system memory in GB"
+          },
+          "wired_gb": {
+            "type": "number",
+            "description": "Wired (non-pageable) memory in GB"
+          },
+          "swap_mb": {
+            "type": "number",
+            "description": "Swap usage in MB"
+          }
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "description": "Non-fatal errors or warnings encountered during the run",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

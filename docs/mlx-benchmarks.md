@@ -50,6 +50,9 @@ mlx-eval --tasks hellaswag --limit 100
 
 ## Results
 
+<!-- BENCHMARK-TABLE-START -->
+<!-- BENCHMARK-TABLE-END -->
+
 ### 2026-03-22 — Full Suite with Tool Calling & Code Accuracy
 
 Config: KV cache 16 GB, ProcessType=Background, HardResourceLimits 100 GB,
