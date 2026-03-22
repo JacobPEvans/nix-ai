@@ -239,8 +239,10 @@ def run_capability_suite() -> tuple[list[dict], list[str]]:
             continue
 
         category = json_path.stem
-        score = category_data.get("score", 0)
-        baseline = category_data.get("claude_baseline", None)
+        # Top-level "score" and "claude_baseline" written by common.write_results();
+        # fall back to summary.mean_score for any files that predate that convention.
+        score = category_data.get("score") or category_data.get("summary", {}).get("mean_score", 0)
+        baseline = category_data.get("claude_baseline")
 
         tags: dict[str, str] = {"category": category}
         if baseline is not None:
