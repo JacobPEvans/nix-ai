@@ -226,7 +226,6 @@
         # Expose lib functions
         claude-settings = import ./lib/claude-settings.nix;
         claude-registry = import ./lib/claude-registry.nix;
-        security-policies = import ./lib/security-policies.nix;
         versions = import ./lib/versions.nix;
       };
 

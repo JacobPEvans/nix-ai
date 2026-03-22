@@ -123,10 +123,9 @@ modules/
 ├── gemini.nix       # Gemini CLI configuration
 ├── copilot.nix      # GitHub Copilot configuration
 └── codex.nix        # OpenAI Codex configuration
-lib/
+lib/                  # Key lib files (not full listing)
 ├── claude-settings.nix    # Pure settings generator
-├── claude-registry.nix    # Marketplace format functions
-└── security-policies.nix  # Permission policy engine
+└── claude-registry.nix    # Marketplace format functions
 ```
 
 ## Part of a trio
