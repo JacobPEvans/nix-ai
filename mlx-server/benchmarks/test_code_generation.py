@@ -61,7 +61,7 @@ def test_lru_cache() -> dict:
                 ),
             },
         ],
-        max_tokens=2048,
+        max_tokens=4096,
     )
     code = extract_code_block(content, "python")
     score = score_code_runs(code, "python", test_code=_LRU_ASSERTIONS)
@@ -105,7 +105,7 @@ def test_async_rate_limiter() -> dict:
                 ),
             },
         ],
-        max_tokens=2048,
+        max_tokens=4096,
     )
     code = extract_code_block(content, "python")
     score = score_code_runs(code, "python", test_code=_RATE_LIMITER_TEST)
@@ -138,7 +138,7 @@ def test_typescript_generics() -> dict:
                 ),
             },
         ],
-        max_tokens=2048,
+        max_tokens=4096,
     )
     code = extract_code_block(content, "typescript")
     score = score_code_runs(code, "typescript")
@@ -179,7 +179,7 @@ def test_nix_derivation() -> dict:
                 ),
             },
         ],
-        max_tokens=2048,
+        max_tokens=4096,
     )
     code = extract_code_block(content, "nix")
     score = score_code_runs(code, "nix")
@@ -220,7 +220,7 @@ def test_csv_to_json_bash() -> dict:
                 ),
             },
         ],
-        max_tokens=2048,
+        max_tokens=4096,
     )
     code = extract_code_block(content, "bash")
     score = score_code_runs(code, "bash")
@@ -273,7 +273,7 @@ def test_dijkstra() -> dict:
                 ),
             },
         ],
-        max_tokens=2048,
+        max_tokens=4096,
     )
     code = extract_code_block(content, "python")
     score = score_code_runs(code, "python", test_code=_DIJKSTRA_ASSERTIONS)
@@ -325,7 +325,7 @@ def test_generate_tests() -> dict:
                 ),
             },
         ],
-        max_tokens=2048,
+        max_tokens=4096,
     )
     test_code = extract_code_block(content, "python")
     # Prepend the implementation so test functions can call it, then run everything
@@ -379,7 +379,7 @@ def test_regex_engine() -> dict:
                 ),
             },
         ],
-        max_tokens=2048,
+        max_tokens=4096,
     )
     code = extract_code_block(content, "python")
     score = score_code_runs(code, "python", test_code=_REGEX_ASSERTIONS)

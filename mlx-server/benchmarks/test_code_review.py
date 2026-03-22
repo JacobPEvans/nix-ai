@@ -211,14 +211,14 @@ def main():
             status = "PASS" if result["false_positives"] == 0 else "FAIL"
             fp_test_passed = result["false_positives"] == 0
             print(f"  False-positive test: {status}")
-            print(f"  F1: {result['f1']:.2f} | Elapsed: {result['elapsed_s']}s")
+            print(f"  F1: {result['f1']:.2f} | Elapsed: {result['latency']}s")
         else:
             total_tp += result["true_positives"]
             total_planted += result["total_planted"]
             print(
                 f"  Bugs found: {result['true_positives']}/{result['total_planted']} "
                 f"| Recall: {result['recall']:.2f} | F1: {result['f1']:.2f} "
-                f"| Elapsed: {result['elapsed_s']}s"
+                f"| Elapsed: {result['latency']}s"
             )
 
         print_test_result(result["name"], result["score"], result["latency"], result["tokens"])
