@@ -87,6 +87,17 @@ in
       '')
 
       # ======================================================================
+      # Pre-flight Memory Check
+      # ======================================================================
+
+      # mlx-preflight — validate model fits in memory before loading
+      (pkgs.writeShellApplication {
+        name = "mlx-preflight";
+        runtimeInputs = with pkgs; [ coreutils ];
+        text = builtins.readFile ./scripts/mlx-preflight.sh;
+      })
+
+      # ======================================================================
       # Benchmark Suite
       # ======================================================================
 
@@ -100,7 +111,7 @@ in
         exec ${pkgs.uv}/bin/uvx --from "${vllmMlxPin}" vllm-mlx bench "$@"
       '')
 
-      # mlx-bench-raw — raw MLX prefill + decode tok/s (no vllm-mlx overhead)
+      # mlx-bench-raw — raw MLX prefill + decode (no vllm-mlx overhead)
       (pkgs.writeShellScriptBin "mlx-bench-raw" ''
         exec ${pkgs.uv}/bin/uvx --from mlx-lm mlx_lm.benchmark "$@"
       '')
@@ -135,6 +146,21 @@ in
           done
           echo "vllm-mlx ready (''${elapsed}s)"
         '';
+      })
+
+      # ======================================================================
+      # Model Inventory
+      # ======================================================================
+
+      # mlx-models — list all downloaded models with memory fit status
+      (pkgs.writeShellApplication {
+        name = "mlx-models";
+        runtimeInputs = with pkgs; [
+          coreutils
+          curl
+          jq
+        ];
+        text = builtins.readFile ./scripts/mlx-models.sh;
       })
     ];
   };

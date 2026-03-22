@@ -62,6 +62,11 @@ in
         KeepAlive = true;
         # 2 min throttle — 70GB model loads take 20-60s, prevents rapid crash-restart loops (closes #256)
         ThrottleInterval = 120;
+        # OOM prevention: Background = Jetsam-eligible; hard RSS ceiling enforced by kernel.
+        ProcessType = "Background";
+        HardResourceLimits = {
+          ResidentSetSize = cfg.memoryHardLimitGb * 1073741824;
+        };
         EnvironmentVariables = {
           HF_HOME = cfg.huggingFaceHome;
         };

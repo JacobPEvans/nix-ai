@@ -320,5 +320,15 @@
     #   default = false;
     #   description = "Disable prefix caching entirely. Not recommended.";
     # };
+
+    # ---- OOM PREVENTION (2026-03-21 incident: 171.9 GB on 128 GB RAM) ----
+    # ProcessType=Background makes vllm-mlx Jetsam-eligible; HardResourceLimits
+    # sets a kernel-enforced RSS ceiling. KeepAlive auto-restarts after Jetsam kill.
+
+    memoryHardLimitGb = lib.mkOption {
+      type = lib.types.ints.positive;
+      default = 100;
+      description = "Hard RSS limit in GB. Kernel kills process above this. Leaves 28GB for OS + apps on 128GB systems.";
+    };
   };
 }

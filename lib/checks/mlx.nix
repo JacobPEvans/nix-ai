@@ -18,6 +18,7 @@ in
         "host"
         "huggingFaceHome"
         "maxNumSeqs"
+        "memoryHardLimitGb"
         "port"
         "prefillBatchSize"
       ];
@@ -88,6 +89,11 @@ in
           name = "mlx.completionBatchSize";
           actual = mlxCfg.completionBatchSize;
           expected = null;
+        }
+        {
+          name = "mlx.memoryHardLimitGb";
+          actual = mlxCfg.memoryHardLimitGb;
+          expected = 100;
         }
         # Environment variables
         {
@@ -194,6 +200,22 @@ in
       }";
     pkgs.runCommand "check-mlx-launchd" { } ''
       echo "MLX LaunchAgent: ${toString (builtins.length bannedFlags)} banned flags verified absent, ${toString (builtins.length requiredSubstrings)} required flags verified present, conditional flags verified"
+      touch $out
+    '';
+
+  # Verify OOM prevention: ProcessType + HardResourceLimits in LaunchAgent.
+  mlx-launchd-memory-safety =
+    let
+      launchdCfg = hmConfig.config.launchd.agents.vllm-mlx.config;
+    in
+    assert
+      launchdCfg.ProcessType == "Background"
+      || throw "ProcessType must be \"Background\" for Jetsam eligibility";
+    assert
+      launchdCfg.HardResourceLimits.ResidentSetSize > 0
+      || throw "HardResourceLimits.ResidentSetSize must be positive";
+    pkgs.runCommand "check-mlx-launchd-memory-safety" { } ''
+      echo "MLX LaunchAgent memory safety: ProcessType=Background, hard=${toString mlxCfg.memoryHardLimitGb}GB verified"
       touch $out
     '';
 
