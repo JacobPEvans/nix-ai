@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.21.0](https://github.com/JacobPEvans/nix-ai/compare/v1.20.1...v1.21.0) (2026-03-22)
+
+
+### Features
+
+* **mlx:** enable server-side tool calling for vllm-mlx ([#280](https://github.com/JacobPEvans/nix-ai/issues/280)) ([7771757](https://github.com/JacobPEvans/nix-ai/commit/77717579cb52be012e4a8bba99f4af9b1a2583c4))
+
 ## [1.20.1](https://github.com/JacobPEvans/nix-ai/compare/v1.20.0...v1.20.1) (2026-03-22)
 
 
