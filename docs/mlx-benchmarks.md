@@ -1,4 +1,4 @@
-<!-- cspell:words TTFT hellaswag parameterize keyerror -->
+<!-- cspell:words TTFT hellaswag parameterize keyerror counterfactuals -->
 # MLX Benchmark Results
 
 Performance tracking for the vllm-mlx inference server across configuration changes.
@@ -46,7 +46,29 @@ curl -s http://127.0.0.1:11434/v1/chat/completions \
 
 # Accuracy evaluation (lm-eval harness against live API)
 mlx-eval --tasks hellaswag --limit 100
+
+# Capability comparison suite (MLX vs Claude Opus 4.6, ~1 hour)
+cd mlx-server/benchmarks && ./run_all.sh
 ```
+
+## Capability Comparison Suite
+
+The `mlx-server/benchmarks/` directory contains a comprehensive comparison of the
+flagship MLX model against Claude Opus 4.6 across 8 capability dimensions:
+
+| Category | Tests | Time | What It Measures |
+|----------|-------|------|-----------------|
+| Reasoning & Logic | 10 | ~10 min | Math, deduction, constraint satisfaction, counterfactuals |
+| Code Generation | 8 | ~15 min | Python/TS/Nix/Bash generation with execution validation |
+| Code Review | 6 | ~10 min | Bug detection (security, race conditions, off-by-one) |
+| Tool Use Chains | 5 | ~10 min | Multi-step tool orchestration, error recovery |
+| Instruction Following | 6 | ~5 min | System prompt adherence, constraint satisfaction |
+| Structured Output | 8 | ~5 min | JSON schema conformance at progressive complexity |
+| Long Context | 4 | ~5 min | Needle-in-haystack at 2K/8K/16K/32K tokens |
+| Conversation | 4 | ~5 min | Multi-turn coherence, reference tracking, state |
+
+Each test has a hardcoded Claude Opus 4.6 baseline. The report (`/tmp/mlx-benchmark-results/report.md`)
+explicitly lists shortcomings, minor gaps, and areas at parity.
 
 ## Results
 
