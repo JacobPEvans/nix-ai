@@ -1,0 +1,21 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-03-23T04:44:45Z",
+  "git_sha": "b83a70f",
+  "trigger": "schedule",
+  "pr_number": null,
+  "suite": "ttft",
+  "model": "mlx-community/Qwen3.5-122B-A10B-4bit",
+  "system": {
+    "os": "macOS 15.7.4",
+    "chip": "Apple M1 (Virtual)",
+    "memory_gb": 7,
+    "vllm_mlx_version": "unknown",
+    "runner": "GitHub Actions 1000049672"
+  },
+  "results": [],
+  "errors": [
+    "ttft: MLX server not available \u2014 requires M-series hardware with vllm-mlx running"
+  ],
+  "skipped": true
+}
