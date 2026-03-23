@@ -129,7 +129,7 @@
     # Source: https://github.com/ruvnet/claude-flow
     # NPM: claude-flow (pinned version)
     (writeShellScriptBin "claude-flow" ''
-      exec ${bun}/bin/bunx --bun claude-flow@3.5.15 "$@"
+      exec ${bun}/bin/bunx --bun claude-flow@3.5.42 "$@"
     '')
 
     # ==========================================================================
