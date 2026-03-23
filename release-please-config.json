@@ -2,6 +2,8 @@
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "packages": {
     ".": {
+      "$comment": "versioning: always-bump-minor is REQUIRED org-wide policy — prevents release-please from ever computing a major version bump. Major bumps are human-initiated only via .release-please-manifest.json. Do NOT remove.",
+      "versioning": "always-bump-minor",
       "release-type": "simple",
       "version-file": "VERSION",
       "include-v-in-tag": true,
