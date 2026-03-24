@@ -45,27 +45,31 @@ let
   # Extract enabled plugins from modular configuration
   inherit (claudePlugins.pluginConfig) enabledPlugins;
 
-  # Synthetic marketplace for repos with skills but no marketplace structure.
-  # browser-use/browser-use has Claude Code skills in skills/ but lacks
-  # .claude-plugin/marketplace.json. This derivation wraps the skills into
-  # a proper marketplace directory that Claude Code can discover.
-  browserUseMarketplace = pkgs.runCommand "browser-use-marketplace" { } ''
-    mkdir -p $out/.claude-plugin $out/browser-use
-    cat > $out/.claude-plugin/marketplace.json <<'MANIFEST'
-    {
-      "name": "browser-use-skills",
-      "owner": {"name": "Browser Use", "url": "https://browser-use.com"},
-      "plugins": [
-        {
-          "name": "browser-use",
-          "source": "./browser-use",
-          "description": "Browser automation via browser-use CLI and Python library"
+  # Synthetic marketplace wrapper for browser-use skills (repo lacks .claude-plugin structure)
+  browserUseMarketplace =
+    let
+      manifestJson = builtins.toFile "marketplace.json" (
+        builtins.toJSON {
+          name = "browser-use-skills";
+          owner = {
+            name = "Browser Use";
+            url = "https://browser-use.com";
+          };
+          plugins = [
+            {
+              name = "browser-use";
+              source = "./browser-use";
+              description = "Browser automation via browser-use CLI and Python library";
+            }
+          ];
         }
-      ]
-    }
-    MANIFEST
-    ln -s ${browser-use-skills}/skills $out/browser-use/skills
-  '';
+      );
+    in
+    pkgs.runCommand "browser-use-marketplace" { } ''
+      mkdir -p $out/.claude-plugin $out/browser-use
+      cp ${manifestJson} $out/.claude-plugin/marketplace.json
+      ln -s ${browser-use-skills}/skills $out/browser-use/skills
+    '';
 
   # Helper to build command/agent entries from discovered names
   mkSourceEntries =

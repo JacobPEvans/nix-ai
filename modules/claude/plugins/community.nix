@@ -44,9 +44,7 @@ _:
     # bitwarden-security-engineer, bitwarden-product-analyst, bitwarden-init,
     # atlassian-reader, bitwarden-atlassian-tools
 
-    # Browser Automation - browser-use (synthetic marketplace — repo lacks native structure)
-    # Bundles 4 skills: CLI automation, cloud API, open-source library, remote browser
-    # CLI skills require `browser-use` installed (via uv tool install)
+    # Browser Automation - browser-use (CLI skills require `browser-use` installed via uv)
     "browser-use@browser-use-skills" = true;
 
     # REMOVED - redundant or unused:
