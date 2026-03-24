@@ -80,6 +80,22 @@
         "type": "github"
       }
     },
+    "browser-use-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1774309468,
+        "narHash": "sha256-9f5H5/8a0EoO4qRNczixS0zenvPBhf3wFcSEgPYarRY=",
+        "owner": "browser-use",
+        "repo": "browser-use",
+        "rev": "32e69f3aad9096cc069bad63ca4259afd53e3aaa",
+        "type": "github"
+      },
+      "original": {
+        "owner": "browser-use",
+        "repo": "browser-use",
+        "type": "github"
+      }
+    },
     "cc-dev-tools": {
       "flake": false,
       "locked": {
@@ -316,6 +332,7 @@
         "axton-obsidian-visual-skills": "axton-obsidian-visual-skills",
         "bills-claude-skills": "bills-claude-skills",
         "bitwarden-marketplace": "bitwarden-marketplace",
+        "browser-use-skills": "browser-use-skills",
         "cc-dev-tools": "cc-dev-tools",
         "cc-marketplace": "cc-marketplace",
         "claude-code-plugins": "claude-code-plugins",

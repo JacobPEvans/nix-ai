@@ -4,6 +4,7 @@
 # Imported by common.nix to keep it clean and high-level.
 {
   config,
+  pkgs,
   lib,
   ai-assistant-instructions,
   marketplaceInputs,
@@ -42,6 +43,32 @@ let
 
   # Extract enabled plugins from modular configuration
   inherit (claudePlugins.pluginConfig) enabledPlugins;
+
+  # Synthetic marketplace wrapper for browser-use skills (repo lacks .claude-plugin structure)
+  browserUseMarketplace =
+    let
+      manifestJson = builtins.toFile "marketplace.json" (
+        builtins.toJSON {
+          name = "browser-use-skills";
+          owner = {
+            name = "Browser Use";
+            url = "https://browser-use.com";
+          };
+          plugins = [
+            {
+              name = "browser-use";
+              source = "./browser-use";
+              description = "Browser automation via browser-use CLI and Python library";
+            }
+          ];
+        }
+      );
+    in
+    pkgs.runCommand "browser-use-marketplace" { } ''
+      mkdir -p $out/.claude-plugin $out/browser-use
+      cp ${manifestJson} $out/.claude-plugin/marketplace.json
+      ln -s ${marketplaceInputs.browser-use-skills}/skills $out/browser-use/skills
+    '';
 
   # Helper to build command/agent entries from discovered names
   mkSourceEntries =
@@ -109,10 +136,20 @@ in
     # Marketplaces from modular configuration with flakeInput for Nix symlinks
     # See: modules/home-manager/ai-cli/claude/plugins/marketplaces.nix
     # Adding flakeInput enables Nix to create immutable symlinks instead of runtime downloads
-    # All marketplace names match flake input names -- zero special cases
-    marketplaces = lib.mapAttrs (
-      name: marketplace: marketplace // { flakeInput = marketplaceInputs.${name}; }
-    ) claudePlugins.pluginConfig.marketplaces;
+    # Standard marketplaces use raw flake input; synthetic ones override with a derivation
+    marketplaces =
+      let
+        base = lib.mapAttrs (
+          name: marketplace: marketplace // { flakeInput = marketplaceInputs.${name}; }
+        ) claudePlugins.pluginConfig.marketplaces;
+      in
+      base
+      // {
+        # Override flakeInput for synthetic marketplace (source defined in marketplaces.nix)
+        "browser-use-skills" = base."browser-use-skills" // {
+          flakeInput = browserUseMarketplace;
+        };
+      };
 
     enabled = enabledPlugins;
     # Enable runtime plugin installation from community marketplaces.
