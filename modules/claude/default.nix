@@ -88,7 +88,7 @@ in
           echo "wakatime: Doppler unreachable — creating placeholder config" >&2
           (
             umask 077
-            printf '[settings]\napi_key =\nwrites_only = false\n' \
+            printf '[settings]\napi_key = %s\nwrites_only = false\n' "" \
               > "${config.home.homeDirectory}/.wakatime.cfg"
           )
         fi
