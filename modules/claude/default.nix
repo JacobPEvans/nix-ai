@@ -79,7 +79,7 @@ in
           -p ai-ci-automation -c prd --plain 2>/dev/null); then
           (
             umask 077
-            printf '[settings]\napi_key = %s\n' "$WAKA_KEY" \
+            printf '[settings]\napi_key = %s\nwrites_only = false\n' "$WAKA_KEY" \
               > "${config.home.homeDirectory}/.wakatime.cfg"
           )
         elif [ -f "${config.home.homeDirectory}/.wakatime.cfg" ]; then
@@ -88,7 +88,7 @@ in
           echo "wakatime: Doppler unreachable — creating placeholder config" >&2
           (
             umask 077
-            printf '[settings]\napi_key =\n' \
+            printf '[settings]\napi_key =\nwrites_only = false\n' \
               > "${config.home.homeDirectory}/.wakatime.cfg"
           )
         fi
