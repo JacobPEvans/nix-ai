@@ -67,30 +67,17 @@ in
     # NOTE: "local" marketplace setup removed - Claude Code doesn't use it by default.
     # See docs/CLAUDE-MARKETPLACE-ARCHITECTURE.md for details.
     home.activation = {
-      # WakaTime config - fetches API key from Doppler at activation time.
-      # Always overwrites on rebuild. Graceful fallback if Doppler is unreachable.
-      # umask 077 subshell: file created with 600 perms atomically (no race window).
-      # Uses doppler exit code (not stdout content) to detect failure, preventing
-      # any partial stdout output from being written as a corrupt api_key.
+      # WakaTime config — fetches API key from Doppler at activation time.
+      # Graceful fallback: keeps existing config if Doppler is unreachable.
       wakatimeConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         if [ -n "$DRY_RUN_CMD" ]; then
           echo "wakatime: dry-run — skipping Doppler fetch" >&2
         elif WAKA_KEY=$(${pkgs.doppler}/bin/doppler secrets get WAKATIME_API_KEY \
           -p ai-ci-automation -c prd --plain 2>/dev/null); then
-          (
-            umask 077
-            printf '[settings]\napi_key = %s\n' "$WAKA_KEY" \
-              > "${config.home.homeDirectory}/.wakatime.cfg"
-          )
-        elif [ -f "${config.home.homeDirectory}/.wakatime.cfg" ]; then
-          echo "wakatime: Doppler unreachable — keeping existing config" >&2
+          (umask 077; printf '[settings]\napi_key = %s\nwrites_only = false\n' "$WAKA_KEY" \
+            > "${config.home.homeDirectory}/.wakatime.cfg")
         else
-          echo "wakatime: Doppler unreachable — creating placeholder config" >&2
-          (
-            umask 077
-            printf '[settings]\napi_key =\n' \
-              > "${config.home.homeDirectory}/.wakatime.cfg"
-          )
+          echo "wakatime: Doppler unreachable — keeping existing config" >&2
         fi
       '';
     };
