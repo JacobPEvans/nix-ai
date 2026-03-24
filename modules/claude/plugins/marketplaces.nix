@@ -209,6 +209,16 @@ let
         url = "bitwarden/ai-plugins";
       };
     };
+
+    # --- Synthetic Marketplaces (repos with skills but no marketplace structure) ---
+    # flakeInput for these is overridden in claude-config.nix with a derivation
+    # that wraps the raw skills into a proper .claude-plugin directory layout.
+    "browser-use-skills" = {
+      source = {
+        type = "github";
+        url = "browser-use/browser-use";
+      };
+    };
   };
 
   # Validate all marketplaces at evaluation time

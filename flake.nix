@@ -145,6 +145,7 @@
           anthropic-agent-skills
           bills-claude-skills
           bitwarden-marketplace
+          browser-use-skills
           cc-dev-tools
           cc-marketplace
           claude-code-plugins-plus
@@ -174,7 +175,6 @@
               claude-code-plugins
               claude-cookbooks
               pal-mcp-server
-              browser-use-skills
               ;
           };
         };
@@ -189,7 +189,6 @@
               claude-code-plugins
               claude-cookbooks
               pal-mcp-server
-              browser-use-skills
               ;
           };
         };

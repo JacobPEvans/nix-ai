@@ -4,8 +4,7 @@
 # Consumed by nix-darwin (or any home-manager setup) via:
 #   nix-ai.homeManagerModules.default
 #
-# Module arguments injected via _module.args from flake.nix:
-#   ai-assistant-instructions, marketplaceInputs, claude-cookbooks, claude-code-plugins, browser-use-skills
+# Module arguments injected via _module.args from flake.nix (see homeManagerModules)
 
 {
   config,
@@ -15,7 +14,6 @@
   marketplaceInputs,
   claude-cookbooks,
   claude-code-plugins,
-  browser-use-skills,
   userConfig ? {
     ai.claudeSchemaUrl = "https://json.schemastore.org/claude-code-settings.json";
   },
@@ -32,7 +30,6 @@ let
       ai-assistant-instructions
       marketplaceInputs
       claude-cookbooks
-      browser-use-skills
       ;
   };
 
