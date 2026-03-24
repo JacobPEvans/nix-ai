@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.24.0](https://github.com/JacobPEvans/nix-ai/compare/v1.23.0...v1.24.0) (2026-03-24)
+
+
+### Features
+
+* add browser-use skills via synthetic marketplace ([#319](https://github.com/JacobPEvans/nix-ai/issues/319)) ([c4315cb](https://github.com/JacobPEvans/nix-ai/commit/c4315cb05953f4380622e6d17db8a783f6bc1c44))
+
+
+### Bug Fixes
+
+* **claude:** set writes_only=false in wakatime config ([#318](https://github.com/JacobPEvans/nix-ai/issues/318)) ([0969bce](https://github.com/JacobPEvans/nix-ai/commit/0969bcecfb27a25afb37cab78cd7b1ff6982f169))
+
 ## [1.23.0](https://github.com/JacobPEvans/nix-ai/compare/v1.22.1...v1.23.0) (2026-03-22)
 
 
