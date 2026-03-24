@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.24.1](https://github.com/JacobPEvans/nix-ai/compare/v1.24.0...v1.24.1) (2026-03-24)
+
+
+### Bug Fixes
+
+* **deps:** close Renovate automation gaps for all version-pinned packages ([#321](https://github.com/JacobPEvans/nix-ai/issues/321)) ([3d7e2a7](https://github.com/JacobPEvans/nix-ai/commit/3d7e2a767f8edbc70b9ea4f6981042ec53098e0b))
+
 ## [1.24.0](https://github.com/JacobPEvans/nix-ai/compare/v1.23.0...v1.24.0) (2026-03-24)
 
 
