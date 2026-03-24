@@ -6,7 +6,8 @@
 
 pkgs.buildGoModule rec {
   pname = "gh-aw";
-  version = "0.62.5"; # Update from https://github.com/github/gh-aw/releases
+  # renovate: datasource=github-releases depName=github/gh-aw
+  version = "0.62.5";
 
   src = fetchFromGitHub {
     owner = "github";

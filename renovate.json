@@ -7,11 +7,15 @@
   "nix": {
     "enabled": true
   },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 7am on Monday"]
+  },
   "customManagers": [
     {
       "description": "bunx wrapper npm packages pinned in Nix modules",
       "customType": "regex",
-      "fileMatch": ["modules/ai-tools\\.nix"],
+      "fileMatch": ["\\.nix$"],
       "matchStrings": [
         "bunx\\s+--bun\\s+(?<depName>(?:@[^@/]+\\/)?[^@\\s]+)@(?<currentValue>[\\d][^\\s]*)"
       ],
@@ -20,10 +24,11 @@
     {
       "description": "uv/uvx wrapper PyPI packages pinned in Nix modules",
       "customType": "regex",
-      "fileMatch": ["modules/ai-tools\\.nix", "modules/mlx/default\\.nix"],
+      "fileMatch": ["\\.nix$"],
       "matchStrings": [
-        "uvx\\s+--from\\s+\"(?<depName>[a-zA-Z0-9_-]+)==(?<currentValue>[\\d][^\\s\"]*)\""
-        , "uv\\s+run\\s+--with\\s+\"(?<depName>[a-zA-Z0-9_-]+)==(?<currentValue>[\\d][^\\s\"]*)\""
+        "uvx\\s+--from\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\"",
+        "uv\\s+run[^\"]*--with\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\"",
+        "\"--from\"\\n\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\""
       ],
       "datasourceTemplate": "pypi"
     }
@@ -32,7 +37,7 @@
     {
       "description": "Bunx wrapper npm packages - weekly updates",
       "matchDatasources": ["npm"],
-      "matchFileNames": ["modules/ai-tools.nix"],
+      "matchManagers": ["custom.regex"],
       "groupName": "npm-wrappers",
       "schedule": ["after 7am on Monday"],
       "minimumReleaseAge": "3 days"
@@ -40,23 +45,23 @@
     {
       "description": "uv/uvx wrapper PyPI packages - weekly updates",
       "matchDatasources": ["pypi"],
-      "matchFileNames": ["modules/ai-tools.nix", "modules/mlx/default.nix"],
+      "matchManagers": ["custom.regex"],
       "groupName": "pypi-wrappers",
       "schedule": ["after 7am on Monday"],
       "minimumReleaseAge": "3 days"
     },
     {
       "description": "MLX Python packages - weekly updates (upstream changes daily, short soak time)",
-      "matchManagers": ["uv"],
-      "matchFileNames": ["mlx-server/uv.lock"],
+      "matchManagers": ["pep621"],
+      "matchFileNames": ["mlx-server/**"],
       "groupName": "mlx-packages",
       "schedule": ["after 7am on Monday"],
       "minimumReleaseAge": "2 days"
     },
     {
       "description": "Orchestrator Python packages - weekly updates",
-      "matchManagers": ["uv"],
-      "matchFileNames": ["orchestrator/uv.lock"],
+      "matchManagers": ["pep621"],
+      "matchFileNames": ["orchestrator/**"],
       "groupName": "orchestrator-packages",
       "schedule": ["after 7am on Monday"],
       "minimumReleaseAge": "3 days"

@@ -27,6 +27,7 @@ let
 
   # Pinned version — single source of truth. Shared via mlxShared so
   # benchmark wrappers in packages.nix use the same version.
+  # renovate: datasource=pypi depName=vllm-mlx
   vllmMlxVersion = "0.2.6";
 
   # Central vllm-mlx wrapper — single source of truth for the pinned version.
