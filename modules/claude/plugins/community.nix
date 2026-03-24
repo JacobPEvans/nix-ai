@@ -5,6 +5,7 @@
 # - superpowers-marketplace: Enhanced Claude capabilities (obra/Jesse Vincent)
 # - visual-explainer-marketplace: Rich HTML diagrams, diff reviews, slides (nicobailon)
 # - bitwarden-marketplace: Enterprise-grade session analysis and config validation
+# - browser-use-skills: Browser automation (synthetic marketplace — repo lacks native structure)
 
 _:
 
@@ -42,6 +43,11 @@ _:
     # NOT enabled - Bitwarden-specific: bitwarden-code-review, bitwarden-software-engineer,
     # bitwarden-security-engineer, bitwarden-product-analyst, bitwarden-init,
     # atlassian-reader, bitwarden-atlassian-tools
+
+    # Browser Automation - browser-use (synthetic marketplace — repo lacks native structure)
+    # Bundles 4 skills: CLI automation, cloud API, open-source library, remote browser
+    # CLI skills require `browser-use` installed (via uv tool install)
+    "browser-use@browser-use-skills" = true;
 
     # REMOVED - redundant or unused:
     # double-check - unnecessary

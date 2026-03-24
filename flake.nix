@@ -92,6 +92,12 @@
       flake = false;
     };
 
+    # Skill-only repos (no marketplace structure — wrapped via synthetic derivation)
+    browser-use-skills = {
+      url = "github:browser-use/browser-use";
+      flake = false;
+    };
+
     # PAL MCP server - pinned for supply-chain safety; auto-bumped by deps-update-flake.yml
     pal-mcp-server = {
       url = "github:BeehiveInnovations/pal-mcp-server";
@@ -123,6 +129,7 @@
       superpowers-marketplace,
       visual-explainer-marketplace,
       wakatime,
+      browser-use-skills,
       pal-mcp-server,
       ...
     }:
@@ -167,6 +174,7 @@
               claude-code-plugins
               claude-cookbooks
               pal-mcp-server
+              browser-use-skills
               ;
           };
         };
@@ -181,6 +189,7 @@
               claude-code-plugins
               claude-cookbooks
               pal-mcp-server
+              browser-use-skills
               ;
           };
         };

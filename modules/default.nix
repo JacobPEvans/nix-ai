@@ -5,7 +5,7 @@
 #   nix-ai.homeManagerModules.default
 #
 # Module arguments injected via _module.args from flake.nix:
-#   ai-assistant-instructions, marketplaceInputs, claude-cookbooks, claude-code-plugins
+#   ai-assistant-instructions, marketplaceInputs, claude-cookbooks, claude-code-plugins, browser-use-skills
 
 {
   config,
@@ -15,6 +15,7 @@
   marketplaceInputs,
   claude-cookbooks,
   claude-code-plugins,
+  browser-use-skills,
   userConfig ? {
     ai.claudeSchemaUrl = "https://json.schemastore.org/claude-code-settings.json";
   },
@@ -31,6 +32,7 @@ let
       ai-assistant-instructions
       marketplaceInputs
       claude-cookbooks
+      browser-use-skills
       ;
   };
 
@@ -116,6 +118,14 @@ in
           if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q "^open-webui"; then
             echo "-> Installing open-webui via uv (Python 3.14)..."
             $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install open-webui --python 3.14
+          fi
+        '';
+
+        # browser-use: CLI for browser automation (not in nixpkgs)
+        installBrowserUse = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q "^browser-use"; then
+            echo "-> Installing browser-use via uv..."
+            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install browser-use
           fi
         '';
       };
