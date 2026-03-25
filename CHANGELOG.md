@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.24.2](https://github.com/JacobPEvans/nix-ai/compare/v1.24.1...v1.24.2) (2026-03-25)
+
+
+### Bug Fixes
+
+* **security:** pin uv tool installs and block compromised LiteLLM ([#324](https://github.com/JacobPEvans/nix-ai/issues/324)) ([9279aa4](https://github.com/JacobPEvans/nix-ai/commit/9279aa418a85d03e2debb933a2adaad1bd6873ad))
+
 ## [1.24.1](https://github.com/JacobPEvans/nix-ai/compare/v1.24.0...v1.24.1) (2026-03-24)
 
 
