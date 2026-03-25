@@ -114,7 +114,7 @@ in
         installOpenWebui = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q "^open-webui"; then
             echo "-> Installing open-webui via uv (Python 3.14)..."
-            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install open-webui --python 3.14
+            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "open-webui==0.8.5" --python 3.14
           fi
         '';
 
@@ -122,7 +122,7 @@ in
         installBrowserUse = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q "^browser-use"; then
             echo "-> Installing browser-use via uv..."
-            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install browser-use
+            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "browser-use==0.12.5"
           fi
         '';
       };
