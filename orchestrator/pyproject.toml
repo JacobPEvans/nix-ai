@@ -30,6 +30,14 @@ dev = [
   "ruff>=0.11.0",
 ]
 
+[tool.uv]
+# Security: LiteLLM 1.82.7 and 1.82.8 contained a supply-chain backdoor
+# (credential stealer by TeamPCP, discovered 2026-03-24).
+# Block compromised versions; allow future patched releases.
+constraint-dependencies = [
+  "litellm!=1.82.7,!=1.82.8",
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

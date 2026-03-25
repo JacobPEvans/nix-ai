@@ -31,6 +31,15 @@
         "\"--from\"\\n\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\""
       ],
       "datasourceTemplate": "pypi"
+    },
+    {
+      "description": "uv tool install PyPI packages pinned in Nix modules",
+      "customType": "regex",
+      "fileMatch": ["\\.nix$"],
+      "matchStrings": [
+        "uv\\s+tool\\s+install\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\""
+      ],
+      "datasourceTemplate": "pypi"
     }
   ],
   "packageRules": [
@@ -56,7 +65,7 @@
       "matchFileNames": ["mlx-server/**"],
       "groupName": "mlx-packages",
       "schedule": ["after 7am on Monday"],
-      "minimumReleaseAge": "2 days"
+      "minimumReleaseAge": "3 days"
     },
     {
       "description": "Orchestrator Python packages - weekly updates",
