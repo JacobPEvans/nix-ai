@@ -46,7 +46,7 @@ in
         {
           name = "mlx.defaultModel";
           actual = mlxCfg.defaultModel;
-          expected = "mlx-community/Qwen3.5-122B-A10B-4bit";
+          expected = "mlx-community/Qwen3.5-27B-4bit";
         }
         {
           name = "mlx.port";
@@ -114,6 +114,11 @@ in
           expected = "qwen3";
         }
         # Environment variables
+        {
+          name = "mlx.env.MLX_DEFAULT_MODEL";
+          actual = hmConfig.config.home.sessionVariables.MLX_DEFAULT_MODEL;
+          expected = mlxCfg.defaultModel;
+        }
         {
           name = "mlx.env.MLX_API_URL";
           actual = hmConfig.config.home.sessionVariables.MLX_API_URL;
