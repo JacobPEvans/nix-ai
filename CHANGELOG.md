@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.24.3](https://github.com/JacobPEvans/nix-ai/compare/v1.24.2...v1.24.3) (2026-03-25)
+
+
+### Bug Fixes
+
+* **mlx:** switch default model to Qwen3.5-27B to prevent memory freezes ([#328](https://github.com/JacobPEvans/nix-ai/issues/328)) ([3945679](https://github.com/JacobPEvans/nix-ai/commit/39456794a507a617c6c4f9a2fbd4f76f4312fa91))
+
 ## [1.24.2](https://github.com/JacobPEvans/nix-ai/compare/v1.24.1...v1.24.2) (2026-03-25)
 
 
