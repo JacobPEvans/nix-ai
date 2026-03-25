@@ -46,7 +46,7 @@ in
         {
           name = "mlx.defaultModel";
           actual = mlxCfg.defaultModel;
-          expected = "mlx-community/Qwen3.5-122B-A10B-4bit";
+          expected = "mlx-community/Qwen3.5-27B-4bit";
         }
         {
           name = "mlx.port";
