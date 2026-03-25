@@ -8,7 +8,7 @@ api="${MLX_API_URL:?}"
 if pid=$(lsof -ti :"$port" 2>/dev/null | head -1); then
   model=$(curl -sf "$api/models" | jq -r '.data[0].id // "unknown"' 2>/dev/null || echo "unknown")
   mem_mb=$(/usr/bin/footprint -p "$pid" 2>/dev/null \
-    | awk 'NR==2 { for(i=1;i<=NF;i++) if($i=="Footprint:") {
+    | awk '/Footprint:/ { for(i=1;i<=NF;i++) if($i=="Footprint:") {
         val=$(i+1); unit=$(i+2)
         if(unit~/GB/) printf "%.0f\n", val*1024
         else if(unit~/MB/) print val
