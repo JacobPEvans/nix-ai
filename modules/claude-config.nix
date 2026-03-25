@@ -47,12 +47,14 @@ let
   # Synthetic marketplace wrapper for browser-use skills (repo lacks .claude-plugin structure)
   browserUseMarketplace =
     let
+      # Pinned to match uv-installed CLI version (modules/default.nix installBrowserUse)
+      browserUseVersion = "0.12.5";
       manifestJson = builtins.toFile "marketplace.json" (
         builtins.toJSON {
           name = "browser-use-skills";
           metadata = {
             description = "Browser automation skills from browser-use";
-            version = "0.12.5";
+            version = browserUseVersion;
           };
           owner = {
             name = "Browser Use";
@@ -63,7 +65,7 @@ let
               name = "browser-use";
               source = "./browser-use";
               description = "Browser automation via browser-use CLI and Python library";
-              version = "0.12.5";
+              version = browserUseVersion;
               author = {
                 name = "Browser Use";
               };
