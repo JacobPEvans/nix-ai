@@ -97,7 +97,12 @@ let
 
     # Plugin configuration
     # Uses toClaudeMarketplaceFormat (single source of truth from lib/claude-registry.nix)
-    extraKnownMarketplaces = lib.mapAttrs toClaudeMarketplaceFormat cfg.plugins.marketplaces;
+    # Exclude localOnly marketplaces (synthetic — upstream lacks .claude-plugin structure)
+    extraKnownMarketplaces =
+      let
+        remote = lib.filterAttrs (_: m: !m.localOnly) cfg.plugins.marketplaces;
+      in
+      lib.mapAttrs toClaudeMarketplaceFormat remote;
 
     enabledPlugins = cfg.plugins.enabled;
 

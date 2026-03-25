@@ -50,6 +50,10 @@ let
       manifestJson = builtins.toFile "marketplace.json" (
         builtins.toJSON {
           name = "browser-use-skills";
+          metadata = {
+            description = "Browser automation skills from browser-use";
+            version = "0.12.5";
+          };
           owner = {
             name = "Browser Use";
             url = "https://browser-use.com";
@@ -59,6 +63,10 @@ let
               name = "browser-use";
               source = "./browser-use";
               description = "Browser automation via browser-use CLI and Python library";
+              version = "0.12.5";
+              author = {
+                name = "Browser Use";
+              };
             }
           ];
         }

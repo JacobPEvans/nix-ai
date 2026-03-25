@@ -28,6 +28,11 @@ let
         default = null;
         description = "Flake input for Nix-managed (immutable) plugins";
       };
+      localOnly = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "If true, exclude from extraKnownMarketplaces (for synthetic marketplaces without upstream structure)";
+      };
     };
   };
 
