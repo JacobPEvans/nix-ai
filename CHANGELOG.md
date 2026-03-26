@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.24.5](https://github.com/JacobPEvans/nix-ai/compare/v1.24.4...v1.24.5) (2026-03-26)
+
+
+### Bug Fixes
+
+* **security:** add Python security scanning and OSV scanner to CI ([#341](https://github.com/JacobPEvans/nix-ai/issues/341)) ([e4645d5](https://github.com/JacobPEvans/nix-ai/commit/e4645d5cf7e3837a3afde8eb278aced0d235c551))
+
 ## [1.24.4](https://github.com/JacobPEvans/nix-ai/compare/v1.24.3...v1.24.4) (2026-03-26)
 
 
