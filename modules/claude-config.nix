@@ -73,10 +73,28 @@ let
           ];
         }
       );
+      # Per-plugin manifest (Claude Code requires .claude-plugin/plugin.json in each plugin dir)
+      pluginJson = builtins.toFile "plugin.json" (
+        builtins.toJSON {
+          name = "browser-use";
+          version = browserUseVersion;
+          description = "Browser automation via browser-use CLI and Python library";
+          author = {
+            name = "Browser Use";
+          };
+          skills = [
+            "./skills/browser-use"
+            "./skills/cloud"
+            "./skills/open-source"
+            "./skills/remote-browser"
+          ];
+        }
+      );
     in
     pkgs.runCommand "browser-use-marketplace" { } ''
-      mkdir -p $out/.claude-plugin $out/browser-use
+      mkdir -p $out/.claude-plugin $out/browser-use/.claude-plugin
       cp ${manifestJson} $out/.claude-plugin/marketplace.json
+      cp ${pluginJson} $out/browser-use/.claude-plugin/plugin.json
       ln -s ${marketplaceInputs.browser-use-skills}/skills $out/browser-use/skills
     '';
 
