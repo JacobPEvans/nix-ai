@@ -9,7 +9,6 @@
 # pygments <= 2.19.2: ReDoS in AdlLexer (archetype.py)
 # Severity: Low (CVSS 3.3) — requires local access, no remote exploit
 # Status: No patched version available; upstream has not responded
-# Affected lockfiles: mlx-server/uv.lock, orchestrator/uv.lock
 # Review date: 2026-03-26
 id = "GHSA-5239-wwwm-4pmq"
 reason = "No fix available — pygments 2.19.2 is latest. Low severity, local-access-only ReDoS."

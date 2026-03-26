@@ -1,0 +1,14 @@
+# OSV Scanner configuration
+# https://google.github.io/osv-scanner/configuration/
+#
+# Vulnerabilities listed here have been reviewed and accepted because
+# no fixed version is available upstream. Re-evaluate when new releases
+# ship for the affected packages.
+
+[[IgnoredVulns]]
+# pygments <= 2.19.2: ReDoS in AdlLexer (archetype.py)
+# Severity: Low (CVSS 3.3) — requires local access, no remote exploit
+# Status: No patched version available; upstream has not responded
+# Review date: 2026-03-26
+id = "GHSA-5239-wwwm-4pmq"
+reason = "No fix available — pygments 2.19.2 is latest. Low severity, local-access-only ReDoS."
