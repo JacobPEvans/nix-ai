@@ -1,6 +1,5 @@
-# Ignore vulnerabilities with no available fix upstream
-#
-# These are tracked in issue #358 for resolution when patches become available.
+# Suppress OSV scanner alerts for unfixable or pending-upgrade vulnerabilities.
+# Fixable upgrades are tracked in issue #358.
 
 # pygments 2.19.2 — Low severity (3.3), no patched version available
 [[IgnoredVulns]]
