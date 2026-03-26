@@ -70,8 +70,12 @@ jobs:
               - 'scripts/benchmarks/**'
               - 'data/benchmarks/schema.json'
             python:
-              - 'mlx-server/**'
-              - 'orchestrator/**'
+              - 'mlx-server/**.py'
+              - 'mlx-server/pyproject.toml'
+              - 'mlx-server/uv.lock'
+              - 'orchestrator/**.py'
+              - 'orchestrator/pyproject.toml'
+              - 'orchestrator/uv.lock'
 
       - name: Detect Dependency-Only Commits
         id: detect-deps
