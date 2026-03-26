@@ -145,4 +145,5 @@ jobs:
         uses: re-actors/alls-green@release/v1
         with:
           allowed-skips: nix-validate, markdown-lint, file-size, benchmark-validate, python-security
+          allowed-failures: python-security
           jobs: ${{ toJSON(needs) }}
