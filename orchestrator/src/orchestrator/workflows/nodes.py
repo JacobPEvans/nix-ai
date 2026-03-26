@@ -59,7 +59,7 @@ def _make_llm_call_node(
     """Return a node function that calls an OpenAI-compatible LLM endpoint."""
     cfg = node_def.config
     endpoint = cfg.get("endpoint", "http://127.0.0.1:11434/v1")
-    model = cfg.get("model", "qwen3-coder:30b")
+    model = cfg.get("model", "mlx-community/Qwen3-Coder-30B-A3B-Instruct")
     system_prompt = cfg.get("system_prompt", "You are a helpful assistant.")
     temperature = float(cfg.get("temperature", 0.7))
     max_tokens = int(cfg.get("max_tokens", 4096))

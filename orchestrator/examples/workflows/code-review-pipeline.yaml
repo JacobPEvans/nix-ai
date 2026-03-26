@@ -4,15 +4,15 @@ nodes:
   - name: analyze_diff
     type: llm_call
     config:
-      model: "qwen3-coder:30b"
-      endpoint: "http://localhost:11434/v1"
+      model: "mlx-community/Qwen3-Coder-30B-A3B-Instruct"
+      endpoint: "http://127.0.0.1:11434/v1"
       system_prompt: "You are a code reviewer. Analyze the diff and identify issues."
     description: "Analyze code diff for issues"
   - name: categorize_issues
     type: llm_call
     config:
-      model: "qwen3-coder:30b"
-      endpoint: "http://localhost:11434/v1"
+      model: "mlx-community/Qwen3-Coder-30B-A3B-Instruct"
+      endpoint: "http://127.0.0.1:11434/v1"
       system_prompt: "Categorize the identified issues by severity: critical, warning, info."
     description: "Categorize issues by severity"
   - name: check_critical
