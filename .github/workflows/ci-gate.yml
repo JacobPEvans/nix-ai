@@ -49,6 +49,7 @@ jobs:
       nix: ${{ steps.filter.outputs.nix }}
       markdown: ${{ steps.filter.outputs.markdown }}
       benchmark: ${{ steps.filter.outputs.benchmark }}
+      python: ${{ steps.filter.outputs.python }}
       is-deps-only: ${{ steps.detect-deps.outputs.is-deps-only }}
     steps:
       - uses: actions/checkout@v6
@@ -68,6 +69,9 @@ jobs:
             benchmark:
               - 'scripts/benchmarks/**'
               - 'data/benchmarks/schema.json'
+            python:
+              - 'mlx-server/**'
+              - 'orchestrator/**'
 
       - name: Detect Dependency-Only Commits
         id: detect-deps
@@ -79,9 +83,9 @@ jobs:
           # 1. Author is jacobpevans-github-actions (Renovate bot, with or without [bot] suffix)
           # 2. Commit message starts with "chore(deps)"
           if [[ "$AUTHOR" == "jacobpevans-github-actions"* && "$COMMIT_MSG" == chore\(deps\)* ]]; then
-            echo "is-deps-only=true" >> $GITHUB_OUTPUT
+            echo "is-deps-only=true" >> "$GITHUB_OUTPUT"
           else
-            echo "is-deps-only=false" >> $GITHUB_OUTPUT
+            echo "is-deps-only=false" >> "$GITHUB_OUTPUT"
           fi
 
   # ==========================================================================
@@ -113,17 +117,32 @@ jobs:
     if: needs.changes.outputs.benchmark == 'true'
     uses: ./.github/workflows/_benchmark-validate.yml
 
+  python-security:
+    name: Python Security
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
+    uses: JacobPEvans/.github/.github/workflows/_python-security.yml@main
+    with:
+      python-dirs: 'mlx-server orchestrator'
+    secrets: inherit
+
+  osv-scan:
+    name: OSV Scan
+    needs: changes
+    if: always()
+    uses: JacobPEvans/.github/.github/workflows/_osv-scan.yml@main
+
   # ==========================================================================
   # MERGE GATE - The ONLY required check in branch protection
   # ==========================================================================
   gate:
     name: Merge Gate
-    needs: [changes, nix-validate, markdown-lint, file-size, benchmark-validate]
+    needs: [changes, nix-validate, markdown-lint, file-size, benchmark-validate, python-security, osv-scan]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       - name: Check all results
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: nix-validate, markdown-lint, file-size, benchmark-validate
+          allowed-skips: nix-validate, markdown-lint, file-size, benchmark-validate, python-security
           jobs: ${{ toJSON(needs) }}

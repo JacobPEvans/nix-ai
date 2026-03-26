@@ -50,6 +50,25 @@ The correct mechanism is:
 Commit `edba1ad` (2026-03-19) introduced an `updateClaudePlugins` activation script that violated
 this rule, causing intermittent hook failures in active sessions. It was removed in the subsequent fix.
 
+## Synthetic Marketplaces
+
+Repos with skills but no native `.claude-plugin/` structure (e.g., `browser-use/browser-use`)
+need a synthetic marketplace wrapper. The derivation in `claude-config.nix` must create:
+
+1. **Marketplace manifest**: `.claude-plugin/marketplace.json` at the marketplace root
+2. **Per-plugin manifest**: `.claude-plugin/plugin.json` inside each plugin directory
+3. **Skills symlink**: linking to the upstream repo's skills
+
+Without the per-plugin `plugin.json`, Claude Code reports "Plugin X not found in marketplace Y"
+even when the marketplace.json correctly declares the plugin.
+
+Additionally, Claude Code discovers marketplaces via `~/.claude/plugins/known_marketplaces.json`
+(its actual registry), NOT directly from `extraKnownMarketplaces` in `settings.json`. Entries
+propagate from `extraKnownMarketplaces` only when Claude Code can successfully fetch the
+marketplace from the declared GitHub source. Synthetic marketplaces fail this fetch (no upstream
+structure), so the `knownMarketplacesMerge` activation in `settings.nix` ensures the local
+`installLocation` is registered directly.
+
 ## Migration Path
 
 Phase 1 of `orphan-cleanup.nix` handles the one-time migration from `recursive = true`

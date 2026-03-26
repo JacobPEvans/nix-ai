@@ -127,6 +127,35 @@ let
     };
   };
 
+  # Synthetic marketplaces need entries in known_marketplaces.json (Claude Code's actual registry).
+  # Claude Code populates this file by fetching from GitHub sources in extraKnownMarketplaces,
+  # but synthetic marketplaces fail the fetch (upstream has no .claude-plugin structure).
+  # This overlay ensures the local installLocation is registered so Claude Code reads from disk.
+  syntheticMarketplaces = lib.filterAttrs (_: m: m.flakeInput != null) cfg.plugins.marketplaces;
+  knownMarketplacesOverlay = lib.mapAttrs (
+    name: m:
+    let
+      formatted = toClaudeMarketplaceFormat name m;
+      marketplaceName = lib.last (lib.splitString "/" name);
+    in
+    {
+      inherit (formatted) source;
+      installLocation = "${homeDir}/.claude/plugins/marketplaces/${marketplaceName}";
+      lastUpdated = "1970-01-01T00:00:00.000Z";
+    }
+  ) syntheticMarketplaces;
+
+  knownMarketplacesJson =
+    pkgs.runCommand "known-marketplaces-overlay.json"
+      {
+        nativeBuildInputs = [ pkgs.jq ];
+        passAsFile = [ "json" ];
+        json = builtins.toJSON knownMarketplacesOverlay;
+      }
+      ''
+        jq '.' "$jsonPath" > $out
+      '';
+
   # Pretty-print JSON
   settingsJson =
     pkgs.runCommand "claude-settings.json"
@@ -212,6 +241,17 @@ in
         $DRY_RUN_CMD ${../scripts/merge-json-settings.sh} \
           "${settingsJson}" \
           "${homeDir}/.claude/settings.json"
+      '';
+
+      # Ensure Nix-managed marketplaces are in known_marketplaces.json (Claude Code's actual registry).
+      # Claude Code populates this by fetching from GitHub, but synthetic marketplaces (repos without
+      # .claude-plugin structure) fail the fetch. This merge ensures the local installLocation is
+      # registered so Claude Code reads the synthetic marketplace from the Nix-managed symlink.
+      knownMarketplacesMerge = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        export PATH="${pkgs.jq}/bin:$PATH"
+        $DRY_RUN_CMD ${../scripts/merge-json-settings.sh} \
+          "${knownMarketplacesJson}" \
+          "${homeDir}/.claude/plugins/known_marketplaces.json"
       '';
     };
 
