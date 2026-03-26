@@ -137,7 +137,7 @@ jobs:
         id: prepare
         if: steps.filter.outputs.run == 'true'
         run: |
-          result_file=$(ls -t data/benchmarks/*.json 2>/dev/null | head -1)
+          result_file=$(ls -t data/benchmarks/*-*.json 2>/dev/null | head -1)
           if [ -z "$result_file" ]; then
             echo "[]" > /tmp/benchmark-output.json
             exit 0
