@@ -144,5 +144,5 @@ jobs:
       - name: Check all results
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: nix-validate, markdown-lint, file-size, benchmark-validate, python-security
+          allowed-skips: nix-validate, markdown-lint, file-size, benchmark-validate, python-security, osv-scan
           jobs: ${{ toJSON(needs) }}
