@@ -133,19 +133,32 @@ jobs:
           if-no-files-found: warn
           retention-days: 90
 
-      - name: Post PR comment
+      - name: Prepare benchmark output
+        id: prepare
+        if: steps.filter.outputs.run == 'true'
+        run: |
+          result_file=$(ls -t data/benchmarks/*-*.json 2>/dev/null | head -1)
+          if [ -z "$result_file" ]; then
+            echo "[]" > /tmp/benchmark-output.json
+            exit 0
+          fi
+          jq 'if .skipped then [] else [.results[] | {name, unit, value}] end' "$result_file" > /tmp/benchmark-output.json
+
+      - name: Post benchmark results
         if: |
           steps.filter.outputs.run == 'true' &&
           github.event_name == 'pull_request'
-        uses: marocchino/sticky-pull-request-comment@v3
+        uses: benchmark-action/github-action-benchmark@v1
         with:
-          header: benchmark-${{ matrix.suite }}
-          message: |
-            ### Benchmark: `${{ matrix.suite }}`
-
-            See artifact `benchmark-${{ matrix.suite }}-${{ github.sha }}` for full JSON result.
-
-            _Triggered by ${{ github.sha }}_
+          tool: customBiggerIsBetter
+          output-file-path: /tmp/benchmark-output.json
+          name: ${{ matrix.suite }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-on-alert: true
+          alert-threshold: "130%"
+          summary-always: true
+          comment-always: true
+          auto-push: false
 
   # ============================================================
   # STORE RESULTS — commit via PR (non-PR triggers only)
