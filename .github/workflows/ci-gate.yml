@@ -121,16 +121,22 @@ jobs:
     name: Python Security
     needs: changes
     if: needs.changes.outputs.python == 'true'
-    uses: JacobPEvans/.github/.github/workflows/_python-security.yml@main
+    # TODO: Revert to @main after JacobPEvans/.github#139 merges
+    uses: JacobPEvans/.github/.github/workflows/_python-security.yml@fix/pip-audit-ignore-vulns
     with:
       python-dirs: 'mlx-server orchestrator'
+      # Ignore CVEs with no upstream fix — remove entries once patched versions exist
+      ignore-vulns: 'CVE-2026-4539'
     secrets: inherit
 
   osv-scan:
     name: OSV Scan
     needs: changes
     if: always()
-    uses: JacobPEvans/.github/.github/workflows/_osv-scan.yml@main
+    # TODO: Revert to @main after JacobPEvans/.github#139 merges
+    uses: JacobPEvans/.github/.github/workflows/_osv-scan.yml@fix/pip-audit-ignore-vulns
+    with:
+      config: osv-scanner.toml
 
   # ==========================================================================
   # MERGE GATE - The ONLY required check in branch protection

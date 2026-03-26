@@ -1,0 +1,16 @@
+# OSV Scanner vulnerability ignore configuration
+#
+# Only list CVEs with NO fix version available. Remove entries once upstream releases a fix.
+# See: https://google.github.io/osv-scanner/configuration/
+
+[[IgnoredVulns]]
+id = "GHSA-5239-wwwm-4pmq"
+reason = "pygments <=2.19.2 ReDoS in AdlLexer (CVE-2026-4539) — no fix released upstream"
+
+[[IgnoredVulns]]
+id = "GHSA-jm6w-m3j8-898g"
+reason = "nltk <=3.9.4 unbounded recursion in JSONTaggedDecoder — no fix released upstream"
+
+[[IgnoredVulns]]
+id = "GHSA-rf74-v2fm-23pw"
+reason = "nltk <=3.9.3 unbounded recursion in JSONTaggedDecoder — no fix released upstream"
