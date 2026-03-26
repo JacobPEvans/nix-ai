@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.24.4](https://github.com/JacobPEvans/nix-ai/compare/v1.24.3...v1.24.4) (2026-03-26)
+
+
+### Bug Fixes
+
+* **ci:** replace stub benchmark PR comments with benchmark-action ([#333](https://github.com/JacobPEvans/nix-ai/issues/333)) ([64c56a7](https://github.com/JacobPEvans/nix-ai/commit/64c56a7f5a820e0b30f3b79f23306b0b9f50feb2))
+* **mlx:** use footprint for memory reporting in mlx-status ([#332](https://github.com/JacobPEvans/nix-ai/issues/332)) ([a7b57f7](https://github.com/JacobPEvans/nix-ai/commit/a7b57f73e1b31c756948ebe245375318e5e26332))
+
 ## [1.24.3](https://github.com/JacobPEvans/nix-ai/compare/v1.24.2...v1.24.3) (2026-03-25)
 
 
