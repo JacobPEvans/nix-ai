@@ -9,12 +9,25 @@ AI CLI ecosystem for Claude, Gemini, Copilot, MCP servers via Nix home-manager m
 3. **Worktrees required**: Run `/init-worktree` before any work
 4. **No direct main commits**: Always use feature branches
 
-## Build Validation
+## Validation
+
+**Static** (every change):
 
 ```bash
-nix flake check    # Runs formatting, statix, deadnix checks
+nix flake check    # Formatting, statix, deadnix, regression tests
 nix fmt            # Fix formatting
 ```
+
+**Runtime** (changes to plugins, hooks, settings, activations, MCP servers):
+
+```bash
+sudo darwin-rebuild switch --flake ~/git/nix-darwin/main \
+  --override-input nix-ai /Users/jevans/git/nix-ai/<worktree>
+```
+
+Then verify in a live Claude Code session — static checks validate Nix
+evaluation, not runtime behavior. Start a fresh session and confirm the
+feature loads without errors before claiming done.
 
 ## Architecture
 
@@ -80,14 +93,6 @@ new ports to avoid collisions (e.g., the 11434/11435/11436 fragmentation during 
 **Reserved/conflicting ports to avoid:**
 
 - 11435: reserved — external macOS app conflict (see PR #230)
-
-## Testing Locally
-
-From nix-darwin, test changes with:
-
-```bash
-sudo darwin-rebuild switch --flake . --override-input nix-ai /Users/you/git/nix-ai/main
-```
 
 ## Part of a Quartet
 
