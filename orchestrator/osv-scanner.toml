@@ -1,0 +1,5 @@
+# Ignore vulnerabilities with no available fix
+# pygments 2.19.2 — Low severity (3.3), no patched version available
+[[IgnoredVulns]]
+id = "GHSA-5239-wwwm-4pmq"
+reason = "pygments 2.19.2 is the latest version; no fix available upstream"
