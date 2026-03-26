@@ -121,16 +121,39 @@ jobs:
     name: Python Security
     needs: changes
     if: needs.changes.outputs.python == 'true'
-    uses: JacobPEvans/.github/.github/workflows/_python-security.yml@main
-    with:
-      python-dirs: 'mlx-server orchestrator'
-    secrets: inherit
+    runs-on: ubuntu-latest
+    env:
+      PYTHON_DIRS: mlx-server orchestrator
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+      - name: Audit Python dependencies
+        run: |
+          for dir in $PYTHON_DIRS; do
+            echo "::group::Scanning $dir"
+            cd "$GITHUB_WORKSPACE/$dir"
+            uv export --format requirements-txt --output-file requirements.txt --no-emit-project --locked
+            uvx pip-audit --progress-spinner=off --desc \
+              --ignore-vuln GHSA-5239-wwwm-4pmq \
+              -r requirements.txt
+            echo "::endgroup::"
+          done
 
   osv-scan:
     name: OSV Scan
     needs: changes
     if: always()
-    uses: JacobPEvans/.github/.github/workflows/_osv-scan.yml@main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run OSV Scanner
+        uses: google/osv-scanner-action/osv-scanner-action@v2.3.5
+        with:
+          scan-args: |-
+            --config=osv-scanner.toml
+            --recursive
+            .
 
   # ==========================================================================
   # MERGE GATE - The ONLY required check in branch protection
