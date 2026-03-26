@@ -13,10 +13,10 @@ pkgs.buildGoModule rec {
     owner = "github";
     repo = "gh-aw";
     rev = "v${version}"; # Use commit SHA if no tags exist
-    hash = "sha256-1M1z2KLlvZAz/tgQqK4EUgwdSxUJHKq85t3NH5H4pg0=";
+    hash = "sha256-lQ6jZflEsPxoDELR1ntYEB6238ygl6fvmh99jKV62Vs=";
   };
 
-  vendorHash = "sha256-U2TfzFapK1T7lZ7wO9yIPWw8jiVNSGoDaXXyR2SmkIs=";
+  vendorHash = "sha256-R0m6RDgnprYB+boh+eDp+5dYhoepwc0qyLvCylS77pU=";
 
   # Build from cmd/gh-aw directory
   subPackages = [ "cmd/gh-aw" ];
