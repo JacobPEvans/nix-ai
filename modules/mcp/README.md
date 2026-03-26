@@ -257,3 +257,33 @@ The server definition is still deployed — it will connect when the server is a
 
 Verify the binary is in PATH. For nixpkgs packages, ensure it's installed in your profile
 or system packages. For bunx/uvx, ensure bun/uv is installed.
+
+### doppler-mcp server shows "Failed to connect"
+
+**Root cause (diagnosed 2026-03-25):** Claude Code launches all MCP servers in parallel at
+session startup. The `doppler-mcp` wrapper previously ran a synchronous preflight check
+(`doppler run ... -- true`) before the actual MCP server could start. This Doppler API
+round-trip — fetching secrets just to run `true` — delayed the MCP server's stdio handshake
+past Claude Code's connection timeout. The preflight also doubled startup time by fetching
+secrets twice (once for check, once for real command).
+
+**Fix:** The preflight was removed from `doppler-mcp` (in `modules/ai-tools.nix`).
+The wrapper now goes straight to `exec doppler run ... -- "$@"`. Auth failures are handled
+natively by `doppler run` (exits non-zero with a clear error message).
+
+**If you still see failures after the fix:**
+
+1. Verify Doppler auth: `doppler me`
+2. Test the wrapper manually: `doppler-mcp pal-mcp-server` (Ctrl-C to stop)
+3. Check the log: `cat ~/.local/state/doppler-mcp.log`
+4. If Doppler auth expired: `doppler login`, then restart Claude Code
+5. Run `check-pal-mcp` for full diagnostics
+
+**Mid-session recovery** (if server failed at startup but Doppler is now healthy):
+
+```bash
+claude mcp remove pal -s user && claude mcp add pal -s user -- doppler-mcp pal-mcp-server
+```
+
+This reconnects the server, but tools won't appear in the current session's ToolSearch.
+Restart Claude Code for full tool availability.
