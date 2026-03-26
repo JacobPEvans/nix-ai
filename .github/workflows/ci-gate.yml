@@ -49,6 +49,7 @@ jobs:
       nix: ${{ steps.filter.outputs.nix }}
       markdown: ${{ steps.filter.outputs.markdown }}
       benchmark: ${{ steps.filter.outputs.benchmark }}
+      python: ${{ steps.filter.outputs.python }}
       is-deps-only: ${{ steps.detect-deps.outputs.is-deps-only }}
     steps:
       - uses: actions/checkout@v6
@@ -68,6 +69,9 @@ jobs:
             benchmark:
               - 'scripts/benchmarks/**'
               - 'data/benchmarks/schema.json'
+            python:
+              - 'mlx-server/**'
+              - 'orchestrator/**'
 
       - name: Detect Dependency-Only Commits
         id: detect-deps
@@ -113,17 +117,33 @@ jobs:
     if: needs.changes.outputs.benchmark == 'true'
     uses: ./.github/workflows/_benchmark-validate.yml
 
+  python-security:
+    name: Python Security
+    if: needs.changes.outputs.python == 'true'
+    needs: [changes]
+    uses: JacobPEvans/.github/.github/workflows/_python-security.yml@main
+    with:
+      python-dirs: 'mlx-server orchestrator'
+    secrets: inherit
+
+  osv-scan:
+    name: OSV Scan
+    if: always()
+    needs: [changes]
+    uses: JacobPEvans/.github/.github/workflows/_osv-scan.yml@main
+    secrets: inherit
+
   # ==========================================================================
   # MERGE GATE - The ONLY required check in branch protection
   # ==========================================================================
   gate:
     name: Merge Gate
-    needs: [changes, nix-validate, markdown-lint, file-size, benchmark-validate]
+    needs: [changes, nix-validate, markdown-lint, file-size, benchmark-validate, python-security, osv-scan]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       - name: Check all results
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: nix-validate, markdown-lint, file-size, benchmark-validate
+          allowed-skips: nix-validate, markdown-lint, file-size, benchmark-validate, python-security, osv-scan
           jobs: ${{ toJSON(needs) }}
