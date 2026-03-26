@@ -256,15 +256,24 @@ in
       allow = formatters.claude.formatAllowed permissions;
       deny = formatters.claude.formatDenied permissions ++ [
         # Script file creation via Bash (blocked by script-guards policy)
+        # Bare patterns catch direct redirects; wildcard variants catch flags/args
         "Bash(cat > *.sh)"
         "Bash(cat > *.py)"
         "Bash(cat >> *.sh)"
         "Bash(cat >> *.py)"
+        "Bash(cat * > *.sh)"
+        "Bash(cat * > *.py)"
+        "Bash(cat * >> *.sh)"
+        "Bash(cat * >> *.py)"
         "Bash(tee *.sh)"
         "Bash(tee *.py)"
+        "Bash(tee * *.sh)"
+        "Bash(tee * *.py)"
         "Bash(printf > *.sh)"
         "Bash(printf > *.py)"
-        # Block heredoc file creation
+        "Bash(printf * > *.sh)"
+        "Bash(printf * > *.py)"
+        # Block heredoc usage via cat (defense-in-depth against script file creation)
         "Bash(cat << *)"
         "Bash(cat <<- *)"
       ];
