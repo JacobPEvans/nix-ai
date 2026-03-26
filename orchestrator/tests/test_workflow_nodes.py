@@ -122,6 +122,21 @@ class TestMakeLlmCallNode:
         assert result["output"] == "the answer"
         assert result["messages"][-1]["content"] == "the answer"
 
+    @patch("orchestrator.workflows.nodes.OpenAI")
+    def test_default_model_is_huggingface_id(self, mock_openai_cls: MagicMock) -> None:
+        """Verify the default model uses a HuggingFace ID, not an Ollama-style tag."""
+        mock_client = MagicMock()
+        mock_openai_cls.return_value = mock_client
+        mock_choice = MagicMock()
+        mock_choice.message.content = "ok"
+        mock_client.chat.completions.create.return_value = MagicMock(choices=[mock_choice])
+
+        node_def = NodeDefinition(name="llm", type=NodeType.LLM_CALL)
+        _make_llm_call_node(node_def)({"messages": []})
+
+        call_kwargs = mock_client.chat.completions.create.call_args.kwargs
+        assert call_kwargs["model"] == "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit"
+
 
 # ---------------------------------------------------------------------------
 # TestMakeToolExecNode
