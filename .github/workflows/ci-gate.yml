@@ -121,10 +121,11 @@ jobs:
     name: Python Security
     needs: changes
     if: needs.changes.outputs.python == 'true'
-    uses: JacobPEvans/.github/.github/workflows/_python-security.yml@main
+    uses: JacobPEvans/.github/.github/workflows/_python-security.yml@fix/pip-audit-ignore-vulns
     with:
       python-dirs: 'mlx-server orchestrator'
       # Ignore CVEs with no upstream fix — remove entries once patched versions exist
+      # Revert to @main after JacobPEvans/.github#139 merges
       ignore-vulns: 'CVE-2026-4539'
     secrets: inherit
 
