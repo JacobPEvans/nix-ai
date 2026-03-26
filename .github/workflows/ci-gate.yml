@@ -137,13 +137,12 @@ jobs:
   # ==========================================================================
   gate:
     name: Merge Gate
-    needs: [changes, nix-validate, markdown-lint, file-size, benchmark-validate, python-security, osv-scan]
+    needs: [changes, nix-validate, markdown-lint, file-size, benchmark-validate]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       - name: Check all results
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: nix-validate, markdown-lint, file-size, benchmark-validate, python-security, osv-scan
-          allowed-failures: python-security, osv-scan
+          allowed-skips: nix-validate, markdown-lint, file-size, benchmark-validate
           jobs: ${{ toJSON(needs) }}
