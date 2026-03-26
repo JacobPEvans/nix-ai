@@ -254,7 +254,20 @@ in
     # Formatted by common/formatters.nix to Claude Code format
     permissions = {
       allow = formatters.claude.formatAllowed permissions;
-      deny = formatters.claude.formatDenied permissions;
+      deny = formatters.claude.formatDenied permissions ++ [
+        # Script file creation via Bash (blocked by script-guards policy)
+        "Bash(cat > *.sh)"
+        "Bash(cat > *.py)"
+        "Bash(cat >> *.sh)"
+        "Bash(cat >> *.py)"
+        "Bash(tee *.sh)"
+        "Bash(tee *.py)"
+        "Bash(printf > *.sh)"
+        "Bash(printf > *.py)"
+        # Block heredoc file creation
+        "Bash(cat << *)"
+        "Bash(cat <<- *)"
+      ];
       ask = formatters.claude.formatAsk permissions;
     };
 
