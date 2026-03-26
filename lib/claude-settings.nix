@@ -34,12 +34,7 @@ in
   alwaysThinkingEnabled = true;
 
   # Plugin marketplace configuration - transformed to Claude's expected format
-  # Exclude localOnly marketplaces (synthetic — upstream lacks .claude-plugin structure)
-  extraKnownMarketplaces =
-    let
-      remote = lib.filterAttrs (_: m: !(m.localOnly or false)) plugins.marketplaces;
-    in
-    lib.mapAttrs toClaudeMarketplaceFormat remote;
+  extraKnownMarketplaces = lib.mapAttrs toClaudeMarketplaceFormat plugins.marketplaces;
 
   # Enabled plugins from marketplaces
   inherit (plugins) enabledPlugins;

@@ -218,7 +218,6 @@ let
         type = "github";
         url = "browser-use/browser-use";
       };
-      localOnly = true;
     };
   };
 
