@@ -124,6 +124,8 @@ jobs:
     uses: JacobPEvans/.github/.github/workflows/_python-security.yml@main
     with:
       python-dirs: 'mlx-server orchestrator'
+      # Ignore CVEs with no upstream fix — remove entries once patched versions exist
+      ignore-vulns: 'CVE-2026-4539'
     secrets: inherit
 
   osv-scan:
