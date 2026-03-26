@@ -1,4 +1,7 @@
-# Ignore vulnerabilities with no available fix
+# Ignore vulnerabilities with no available fix upstream
+#
+# These are tracked in issue #351 for resolution when patches become available.
+
 # pygments 2.19.2 — Low severity (3.3), no patched version available
 [[IgnoredVulns]]
 id = "GHSA-5239-wwwm-4pmq"
