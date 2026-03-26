@@ -21,8 +21,8 @@ nix fmt            # Fix formatting
 **Runtime** (changes to plugins, hooks, settings, activations, MCP servers):
 
 ```bash
-sudo darwin-rebuild switch --flake ~/git/nix-darwin/main \
-  --override-input nix-ai /Users/jevans/git/nix-ai/<worktree>
+sudo darwin-rebuild switch --flake "$HOME/git/nix-darwin/main" \
+  --override-input nix-ai "$HOME/git/nix-ai/<worktree>"
 ```
 
 Then verify in a live Claude Code session — static checks validate Nix
