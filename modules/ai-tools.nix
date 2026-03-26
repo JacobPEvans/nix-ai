@@ -151,8 +151,8 @@
     # Used by mcp/default.nix withDoppler helper — secrets never stored in any file.
     # Usage: doppler-mcp <command> [args...]
     #
-    # Logs invocations to $XDG_STATE_HOME/doppler-mcp.log for diagnosing MCP startup
-    # failures (Doppler auth errors, missing secrets, etc.).
+    # Logs invocations (command + args) to $XDG_STATE_HOME/doppler-mcp.log.
+    # Doppler auth errors go to stderr (handled by `doppler run` natively).
     #
     # IMPORTANT: No synchronous preflight check. A `doppler run -- true` preflight
     # used to run here, but it caused 100% MCP startup failures in Claude Code.
@@ -175,7 +175,7 @@
       touch "$LOG_FILE" && chmod 600 "$LOG_FILE"
       # Log invocation for audit trail. No preflight — go straight to exec.
       # Auth failures are handled natively by `doppler run` (non-zero exit + stderr).
-      echo "$(date -u +%FT%TZ) doppler-mcp starting: $*" >> "$LOG_FILE"
+      echo "$(date -u +%FT%TZ) doppler-mcp starting: $(printf '%q ' "$@")" >> "$LOG_FILE"
       exec ${pkgs.doppler}/bin/doppler run -p ai-ci-automation -c prd -- "$@"
     '')
 

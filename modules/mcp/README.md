@@ -275,7 +275,7 @@ natively by `doppler run` (exits non-zero with a clear error message).
 
 1. Verify Doppler auth: `doppler me`
 2. Test the wrapper manually: `doppler-mcp pal-mcp-server` (Ctrl-C to stop)
-3. Check the log: `cat ~/.local/state/doppler-mcp.log`
+3. Check the invocation log: `cat ~/.local/state/doppler-mcp.log` (records commands only; Doppler auth errors go to stderr — re-run the logged command in a terminal to see them)
 4. If Doppler auth expired: `doppler login`, then restart Claude Code
 5. Run `check-pal-mcp` for full diagnostics
 
