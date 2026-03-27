@@ -1,9 +1,27 @@
-# MLX module regression tests and LaunchAgent validation (vllm-mlx 0.2.6)
+# MLX module regression tests, LaunchAgent validation, and ecosystem checks
 { pkgs, hmConfig }:
 let
   mlxCfg = hmConfig.config.programs.mlx;
+  activationAttrs = hmConfig.config.home.activation;
 in
 {
+  # Verify MLX ecosystem activation scripts are present.
+  # Catches accidental removal of parakeet-mlx or mlx-vlm during refactoring.
+  mlx-ecosystem-activation =
+    let
+      expectedActivations = [
+        "installParakeetMlx"
+        "installMlxVlm"
+      ];
+      missingActivations = builtins.filter (a: !(builtins.hasAttr a activationAttrs)) expectedActivations;
+    in
+    assert
+      missingActivations == [ ]
+      || throw "Missing MLX ecosystem activation scripts: ${builtins.toJSON missingActivations}";
+    pkgs.runCommand "check-mlx-ecosystem-activation" { } ''
+      echo "MLX ecosystem: ${toString (builtins.length expectedActivations)} activation scripts verified"
+      touch $out
+    '';
   # Verify all expected MLX option paths exist.
   # Flat structure — no nested backend settings (vllm-mlx only since v0.2.6).
   mlx-options-regression =

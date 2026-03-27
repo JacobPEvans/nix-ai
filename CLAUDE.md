@@ -66,6 +66,71 @@ inputs.nix-ai.inputs.home-manager.follows = "home-manager";
 - `lib/checks/claude.nix` — Claude module regression tests, settings-json, maestro-script
 - `lib/checks/mlx.nix` — MLX option/defaults regression, LaunchAgent flag validation
 
+## MLX Ecosystem Stack
+
+Three user-facing tools built on the MLX core framework for Apple Silicon inference:
+
+| Role | Package | Purpose | Install Method |
+| ---- | ------- | ------- | -------------- |
+| Ears (Audio) | `parakeet-mlx` | Real-time speech-to-text | `uv tool install` (persistent) |
+| Eyes (Vision) | `mlx-vlm` | Screen/camera image analysis | `uv tool install` (persistent) |
+| Brain (LLM) | `vllm-mlx` | LLM inference API server | `uvx` wrapper (LaunchAgent) |
+
+### Dependency graph
+
+```mermaid
+graph TD
+    subgraph "MLX Inference Stack"
+        subgraph "User-Facing Tools"
+            EARS["Ears — parakeet-mlx<br/><i>Speech-to-text</i>"]
+            EYES["Eyes — mlx-vlm<br/><i>Vision analysis</i>"]
+            BRAIN["Brain — vllm-mlx<br/><i>LLM inference API</i>"]
+        end
+
+        subgraph "Shared Libraries"
+            MLX_LM["mlx-lm"]
+            MLX_EMB["mlx-embeddings"]
+            TRANSFORMERS["transformers"]
+            HF_HUB["huggingface-hub"]
+        end
+
+        subgraph "Foundation"
+            MLX["mlx<br/><i>Core framework</i>"]
+        end
+    end
+
+    subgraph "System Dependencies"
+        FFMPEG["ffmpeg"]
+        OPENCV["opencv-python"]
+    end
+
+    EARS --> MLX
+    EARS --> HF_HUB
+    EARS --> FFMPEG
+
+    EYES --> MLX_LM
+    EYES --> MLX
+    EYES --> TRANSFORMERS
+    EYES --> OPENCV
+
+    BRAIN --> MLX_LM
+    BRAIN --> EYES
+    BRAIN --> MLX_EMB
+    BRAIN --> TRANSFORMERS
+    BRAIN --> HF_HUB
+
+    MLX_LM --> MLX
+    MLX_LM --> TRANSFORMERS
+    MLX_EMB --> MLX
+    MLX_EMB --> EYES
+```
+
+### Version management
+
+- **Runtime pins**: `modules/mlx/packages.nix` (activation scripts for Ears/Eyes, uvx wrapper for Brain)
+- **Compatibility gate**: `mlx-server/pyproject.toml` — all packages listed; `uv lock` fails if versions conflict
+- **Auto-update**: Renovate regex + pep621 managers, 3-day `minimumReleaseAge`, weekly schedule
+
 ## Port Allocation
 
 Services managed by nix-ai and their assigned ports. Check this table before assigning
