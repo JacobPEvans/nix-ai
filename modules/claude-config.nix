@@ -106,6 +106,28 @@ let
       source = "${sourcePath}/${name}.md";
     }) names;
 
+  # Deny patterns for Bash script file creation (defense-in-depth)
+  scriptCreationDenyPatterns = [
+    "Bash(cat > *.sh)"
+    "Bash(cat > *.py)"
+    "Bash(cat >> *.sh)"
+    "Bash(cat >> *.py)"
+    "Bash(cat * > *.sh)"
+    "Bash(cat * > *.py)"
+    "Bash(cat * >> *.sh)"
+    "Bash(cat * >> *.py)"
+    "Bash(tee *.sh)"
+    "Bash(tee *.py)"
+    "Bash(tee * *.sh)"
+    "Bash(tee * *.py)"
+    "Bash(printf > *.sh)"
+    "Bash(printf > *.py)"
+    "Bash(printf * > *.sh)"
+    "Bash(printf * > *.py)"
+    "Bash(cat << *)"
+    "Bash(cat <<- *)"
+  ];
+
 in
 {
   enable = true;
@@ -249,34 +271,10 @@ in
       # CLAUDE_CODE_EFFORT_LEVEL = "medium";
     };
 
-    # Permissions from unified ai-assistant-instructions system
-    # Uses common/permissions.nix which reads from agentsmd/permissions/
-    # Formatted by common/formatters.nix to Claude Code format
+    # Permissions from ai-assistant-instructions (common/permissions.nix)
     permissions = {
       allow = formatters.claude.formatAllowed permissions;
-      deny = formatters.claude.formatDenied permissions ++ [
-        # Script file creation via Bash (blocked by script-guards policy)
-        # Bare patterns catch direct redirects; wildcard variants catch flags/args
-        "Bash(cat > *.sh)"
-        "Bash(cat > *.py)"
-        "Bash(cat >> *.sh)"
-        "Bash(cat >> *.py)"
-        "Bash(cat * > *.sh)"
-        "Bash(cat * > *.py)"
-        "Bash(cat * >> *.sh)"
-        "Bash(cat * >> *.py)"
-        "Bash(tee *.sh)"
-        "Bash(tee *.py)"
-        "Bash(tee * *.sh)"
-        "Bash(tee * *.py)"
-        "Bash(printf > *.sh)"
-        "Bash(printf > *.py)"
-        "Bash(printf * > *.sh)"
-        "Bash(printf * > *.py)"
-        # Block heredoc usage via cat (defense-in-depth against script file creation)
-        "Bash(cat << *)"
-        "Bash(cat <<- *)"
-      ];
+      deny = formatters.claude.formatDenied permissions ++ scriptCreationDenyPatterns;
       ask = formatters.claude.formatAsk permissions;
     };
 
