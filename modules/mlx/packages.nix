@@ -184,7 +184,7 @@ in
       activation = {
         # Ears — real-time speech-to-text transcription
         installParakeetMlx = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q 'parakeet-mlx.*0\.5\.1'; then
+          if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q '^parakeet-mlx v0\.5\.1'; then
             echo "-> Installing parakeet-mlx 0.5.1..."
             $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "parakeet-mlx==0.5.1" --force
           fi
@@ -192,7 +192,7 @@ in
 
         # Eyes — vision language model analysis
         installMlxVlm = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q 'mlx-vlm.*0\.4\.1'; then
+          if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q '^mlx-vlm v0\.4\.1'; then
             echo "-> Installing mlx-vlm 0.4.1..."
             $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "mlx-vlm==0.4.1" --force
           fi
