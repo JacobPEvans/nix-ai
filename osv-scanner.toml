@@ -3,15 +3,15 @@
 
 [[IgnoredVulns]]
 id = "GHSA-5239-wwwm-4pmq"
-ignoreUntil = "2026-06-26"
+ignoreUntil = "2026-06-26T00:00:00Z"
 reason = "pygments: no fix available as of 2026-03-26"
 
 [[IgnoredVulns]]
 id = "GHSA-jm6w-m3j8-898g"
-ignoreUntil = "2026-06-26"
+ignoreUntil = "2026-06-26T00:00:00Z"
 reason = "nltk: no fix available as of 2026-03-26"
 
 [[IgnoredVulns]]
 id = "GHSA-rf74-v2fm-23pw"
-ignoreUntil = "2026-06-26"
+ignoreUntil = "2026-06-26T00:00:00Z"
 reason = "nltk: no fix available as of 2026-03-26"
