@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.24.8](https://github.com/JacobPEvans/nix-ai/compare/v1.24.7...v1.24.8) (2026-03-29)
+
+
+### Bug Fixes
+
+* remove stale versions from wrapper package comments ([#368](https://github.com/JacobPEvans/nix-ai/issues/368)) ([5ac0e31](https://github.com/JacobPEvans/nix-ai/commit/5ac0e31f43779aa701ef94b27e42588732dff0ac))
+* **security:** upgrade pygments and remove all CVE ignores ([#369](https://github.com/JacobPEvans/nix-ai/issues/369)) ([1cac3ad](https://github.com/JacobPEvans/nix-ai/commit/1cac3ad60a1a6f22f845e19dd6eaed5435114cfa))
+
 ## [1.24.7](https://github.com/JacobPEvans/nix-ai/compare/v1.24.6...v1.24.7) (2026-03-29)
 
 
