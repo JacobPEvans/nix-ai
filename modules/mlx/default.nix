@@ -25,10 +25,14 @@
 let
   cfg = config.programs.mlx;
 
-  # Pinned version — single source of truth. Shared via mlxShared so
-  # benchmark wrappers in packages.nix use the same version.
+  # Pinned versions — single source of truth. Shared via mlxShared so
+  # packages.nix uses the same values without duplication.
   # renovate: datasource=pypi depName=vllm-mlx
   vllmMlxVersion = "0.2.6";
+  # renovate: datasource=pypi depName=parakeet-mlx
+  parakeetMlxVersion = "0.5.1";
+  # renovate: datasource=pypi depName=mlx-vlm
+  mlxVlmVersion = "0.4.1";
 
   # Central vllm-mlx wrapper — single source of truth for the pinned version.
   # The LaunchAgent needs a Nix store path (not a PATH lookup), so the
@@ -53,6 +57,8 @@ in
       cfg
       vllmMlxPkg
       vllmMlxVersion
+      parakeetMlxVersion
+      mlxVlmVersion
       apiUrl
       launchAgentLabel
       ;

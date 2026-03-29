@@ -17,6 +17,8 @@ let
     cfg
     vllmMlxPkg
     vllmMlxVersion
+    parakeetMlxVersion
+    mlxVlmVersion
     apiUrl
     ;
   vllmMlxPin = "vllm-mlx==${vllmMlxVersion}";
@@ -184,17 +186,17 @@ in
       activation = {
         # Ears — real-time speech-to-text transcription
         installParakeetMlx = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q '^parakeet-mlx v0\.5\.1'; then
-            echo "-> Installing parakeet-mlx 0.5.1..."
-            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "parakeet-mlx==0.5.1" --force
+          if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q '^parakeet-mlx v${parakeetMlxVersion}'; then
+            echo "-> Installing parakeet-mlx ${parakeetMlxVersion}..."
+            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "parakeet-mlx==${parakeetMlxVersion}" --force
           fi
         '';
 
         # Eyes — vision language model analysis
         installMlxVlm = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q '^mlx-vlm v0\.4\.1'; then
-            echo "-> Installing mlx-vlm 0.4.1..."
-            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "mlx-vlm==0.4.1" --force
+          if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q '^mlx-vlm v${mlxVlmVersion}'; then
+            echo "-> Installing mlx-vlm ${mlxVlmVersion}..."
+            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "mlx-vlm==${mlxVlmVersion}" --force
           fi
         '';
       };
