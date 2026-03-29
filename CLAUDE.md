@@ -85,8 +85,8 @@ Three user-facing tools built on the MLX core framework for Apple Silicon infere
 
 | Role | Package | Purpose | Install Method |
 | ---- | ------- | ------- | -------------- |
-| Ears (Audio) | `parakeet-mlx` | Real-time speech-to-text | `uv tool install` (persistent) |
-| Eyes (Vision) | `mlx-vlm` | Screen/camera image analysis | `uv tool install` (persistent) |
+| Ears (Audio) | `parakeet-mlx` | Real-time speech-to-text | `uvx` wrapper (Nix derivation) |
+| Eyes (Vision) | `mlx-vlm` | Screen/camera image analysis | `uvx` wrapper (Nix derivation) |
 | Brain (LLM) | `vllm-mlx` | LLM inference API server | `uvx` wrapper (LaunchAgent) |
 
 ### Dependency graph
@@ -140,9 +140,9 @@ graph TD
 
 ### Version management
 
-- **Runtime pins**: `modules/mlx/packages.nix` (activation scripts for Ears/Eyes, uvx wrapper for Brain)
-- **Compatibility gate**: `mlx-server/pyproject.toml` — all packages listed; `uv lock` fails if versions conflict
-- **Auto-update**: Renovate regex + pep621 managers, 3-day `minimumReleaseAge`, weekly schedule
+- **Version constants**: `modules/mlx/default.nix` — single source of truth with Renovate annotations
+- **uvx wrappers**: `modules/mlx/packages.nix` — declarative Nix derivations for all three tools
+- **Auto-update**: Renovate annotation-based manager bumps version constants, weekly schedule
 
 ## Port Allocation
 

@@ -1,9 +1,9 @@
 #
 # MLX Module — CLI Tools, Environment & Ecosystem
 #
-# All home.packages, home.sessionVariables, and home.activation for the MLX module.
+# All home.packages and home.sessionVariables for the MLX module.
 # Includes: vllm-mlx wrapper, mlx CLI tools, benchmark suite, health check,
-# and ecosystem tool installation (parakeet-mlx, mlx-vlm).
+# and ecosystem uvx wrappers (parakeet-mlx, mlx-vlm).
 #
 {
   config,
@@ -168,38 +168,23 @@ in
         })
 
         # ======================================================================
-        # MLX Ecosystem — System Dependencies
+        # MLX Ecosystem — Ears & Eyes
         # ======================================================================
 
-        # ffmpeg — required by parakeet-mlx for audio processing
-        pkgs.ffmpeg
+        # parakeet-mlx — real-time speech-to-text transcription
+        (pkgs.writeShellApplication {
+          name = "parakeet-mlx";
+          runtimeInputs = [ pkgs.ffmpeg ]; # librosa needs ffmpeg for audio decoding
+          text = ''
+            exec ${pkgs.uv}/bin/uvx --from "parakeet-mlx==${parakeetMlxVersion}" parakeet-mlx "$@"
+          '';
+        })
+
+        # mlx-vlm-generate — vision language model image analysis
+        (pkgs.writeShellScriptBin "mlx-vlm-generate" ''
+          exec ${pkgs.uv}/bin/uvx --from "mlx-vlm==${mlxVlmVersion}" mlx_vlm.generate "$@"
+        '')
       ];
-
-      # ==========================================================================
-      # MLX Ecosystem — Persistent Tool Installation
-      # ==========================================================================
-      # Ears (parakeet-mlx) and Eyes (mlx-vlm) are installed via `uv tool install`
-      # (persistent in ~/.local/bin/) rather than ephemeral uvx. Version-aware
-      # checks skip reinstallation when the target version is already present.
-      # Renovate auto-detects `uv tool install "pkg==version"` patterns.
-
-      activation = {
-        # Ears — real-time speech-to-text transcription
-        installParakeetMlx = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q '^parakeet-mlx v${parakeetMlxVersion}'; then
-            echo "-> Installing parakeet-mlx ${parakeetMlxVersion}..."
-            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "parakeet-mlx==${parakeetMlxVersion}" --force
-          fi
-        '';
-
-        # Eyes — vision language model analysis
-        installMlxVlm = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q '^mlx-vlm v${mlxVlmVersion}'; then
-            echo "-> Installing mlx-vlm ${mlxVlmVersion}..."
-            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "mlx-vlm==${mlxVlmVersion}" --force
-          fi
-        '';
-      };
     };
   };
 }

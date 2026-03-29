@@ -1,13 +1,10 @@
 [project]
 name = "mlx-server"
 version = "0.1.0"
-description = "Apple MLX local inference stack — compatibility validation environment"
+description = "Apple MLX local inference server environment"
 requires-python = ">=3.14"
 dependencies = [
   "mlx>=0.31.1",
   "mlx-lm>=0.31.1",
-  "vllm-mlx>=0.2.6",
-  "parakeet-mlx>=0.5.1",
-  "mlx-vlm>=0.4.1",
   "huggingface-hub>=0.30.2",
 ]
