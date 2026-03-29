@@ -53,7 +53,7 @@
 #   gws: @googleworkspace/cli@latest (pre-v1.0, rapid development - same as gh-copilot)
 #
 # UVX WRAPPER PACKAGES (Python packages not in nixpkgs/homebrew):
-#   hf: huggingface-hub==1.6.0 CLI (model downloads, used with HuggingFace MCP)
+#   hf: huggingface-hub CLI (model downloads, used with HuggingFace MCP)
 #   vllm-mlx: defined in modules/mlx.nix (owns the wrapper + LaunchAgent)
 #
 # PIPX PACKAGES (Python, installed separately):
