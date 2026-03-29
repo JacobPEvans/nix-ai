@@ -151,8 +151,18 @@
     # Used by mcp/default.nix withDoppler helper — secrets never stored in any file.
     # Usage: doppler-mcp <command> [args...]
     #
-    # Logs failures to $XDG_STATE_HOME/doppler-mcp.log for diagnosing MCP startup
-    # failures (Doppler auth errors, missing secrets, etc.).
+    # Logs invocations (command + args) to $XDG_STATE_HOME/doppler-mcp.log.
+    # Doppler auth errors go to stderr (handled by `doppler run` natively).
+    #
+    # IMPORTANT: No synchronous preflight check. A `doppler run -- true` preflight
+    # used to run here, but it caused 100% MCP startup failures in Claude Code.
+    # When Claude Code launches ~17 servers in parallel, the preflight's Doppler API
+    # round-trip (fetching secrets just to run `true`) delayed the MCP server's stdio
+    # handshake past Claude Code's connection timeout. The preflight also fetched
+    # secrets TWICE — once for the check, once for the real `exec doppler run`.
+    # Since `doppler run` already exits non-zero on auth failure with a clear error
+    # message, the preflight provided no safety benefit — just latency.
+    # Removed 2026-03-25. See modules/mcp/README.md → Troubleshooting.
     (writeShellScriptBin "doppler-mcp" ''
       set -euo pipefail
       if [ "$#" -lt 1 ]; then
@@ -163,25 +173,9 @@
       LOG_FILE="''${XDG_STATE_HOME:-$HOME/.local/state}/doppler-mcp.log"
       mkdir -p "$(dirname "$LOG_FILE")"
       touch "$LOG_FILE" && chmod 600 "$LOG_FILE"
-      # Preflight: verify Doppler auth before launching the MCP server.
-      # Only this check's stderr is logged; the wrapped command's stderr
-      # flows to the caller unchanged (important for MCP JSON-RPC communication).
-      set +e
-      ${pkgs.doppler}/bin/doppler run -p ai-ci-automation -c prd -- true 1>/dev/null 2>>"$LOG_FILE"
-      _preflight=$?
-      set -e
-      if [ "$_preflight" -ne 0 ]; then
-        echo "$(date -u +%FT%TZ) doppler-mcp preflight failed. Exit: $_preflight" >> "$LOG_FILE"
-        ${pkgs.doppler}/bin/doppler --version >> "$LOG_FILE" 2>&1 || true
-        ${pkgs.doppler}/bin/doppler me >> "$LOG_FILE" 2>&1 || true
-        # Make failure visible to MCP client (Claude Code reads stderr)
-        echo "ERROR: PAL MCP cannot start — Doppler auth failed (exit $_preflight)" >&2
-        echo "Fix: Run 'doppler login' then restart Claude Code" >&2
-        echo "Diagnostics: $LOG_FILE" >&2
-        exit "$_preflight"
-      fi
-      # Preflight passed — exec the real command, restoring proper signal forwarding
-      # and leaving stderr unredirected for the MCP server.
+      # Log invocation for audit trail. No preflight — go straight to exec.
+      # Auth failures are handled natively by `doppler run` (non-zero exit + stderr).
+      echo "$(date -u +%FT%TZ) doppler-mcp starting: $(printf '%q ' "$@")" >> "$LOG_FILE"
       exec ${pkgs.doppler}/bin/doppler run -p ai-ci-automation -c prd -- "$@"
     '')
 
@@ -238,6 +232,20 @@
         ${pkgs.coreutils}/bin/tail -20 "$LOG_FILE"
       else
         echo "   No log file found at $LOG_FILE (no failures recorded)"
+      fi
+
+      echo ""
+      echo "5. Claude Code MCP connection status:"
+      if command -v claude &>/dev/null; then
+        pal_status=$(claude mcp list 2>/dev/null | grep "^pal:" || true)
+        if [ -n "$pal_status" ]; then
+          echo "   $pal_status"
+        else
+          echo "   PAL not found in Claude Code MCP server list"
+          echo "   Register: claude mcp add pal -s user -- doppler-mcp pal-mcp-server"
+        fi
+      else
+        echo "   claude CLI not in PATH — skipping"
       fi
 
       echo ""
