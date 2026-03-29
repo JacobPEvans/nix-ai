@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.24.6](https://github.com/JacobPEvans/nix-ai/compare/v1.24.5...v1.24.6) (2026-03-27)
+
+
+### Bug Fixes
+
+* remove doppler-mcp preflight check causing MCP startup race ([#343](https://github.com/JacobPEvans/nix-ai/issues/343)) ([6451d27](https://github.com/JacobPEvans/nix-ai/commit/6451d27ff69d4e18c4eb2abb6539439bd78e72ce))
+
 ## [1.24.5](https://github.com/JacobPEvans/nix-ai/compare/v1.24.4...v1.24.5) (2026-03-26)
 
 
