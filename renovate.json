@@ -60,20 +60,16 @@
       "minimumReleaseAge": "3 days"
     },
     {
-      "description": "MLX Python packages - weekly updates (upstream changes daily, short soak time)",
+      "description": "Group MLX Python packages into a single PR",
       "matchManagers": ["pep621"],
       "matchFileNames": ["mlx-server/**"],
-      "groupName": "mlx-packages",
-      "schedule": ["after 7am on Monday"],
-      "minimumReleaseAge": "3 days"
+      "groupName": "mlx-packages"
     },
     {
-      "description": "Orchestrator Python packages - weekly updates",
+      "description": "Group Orchestrator Python packages into a single PR",
       "matchManagers": ["pep621"],
       "matchFileNames": ["orchestrator/**"],
-      "groupName": "orchestrator-packages",
-      "schedule": ["after 7am on Monday"],
-      "minimumReleaseAge": "3 days"
+      "groupName": "orchestrator-packages"
     }
   ]
 }
