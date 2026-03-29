@@ -106,7 +106,7 @@ let
       source = "${sourcePath}/${name}.md";
     }) names;
 
-  # Deny patterns for Bash script file creation (defense-in-depth)
+  # Block heredoc usage via cat (defense-in-depth against script file creation)
   scriptCreationDenyPatterns = [
     "Bash(cat > *.sh)"
     "Bash(cat > *.py)"
