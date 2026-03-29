@@ -1,4 +1,4 @@
-# MLX module regression tests and LaunchAgent validation (vllm-mlx 0.2.6)
+# MLX module regression tests and LaunchAgent validation
 { pkgs, hmConfig }:
 let
   mlxCfg = hmConfig.config.programs.mlx;

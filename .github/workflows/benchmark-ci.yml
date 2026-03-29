@@ -148,7 +148,7 @@ jobs:
         id: has_results
         if: steps.filter.outputs.run == 'true'
         run: |
-          if [ -s /tmp/benchmark-output.json ] && [ "$(cat /tmp/benchmark-output.json)" != "[]" ]; then
+          if jq -e 'length > 0' /tmp/benchmark-output.json > /dev/null 2>&1; then
             echo "has_data=true" >> "$GITHUB_OUTPUT"
           else
             echo "has_data=false" >> "$GITHUB_OUTPUT"
