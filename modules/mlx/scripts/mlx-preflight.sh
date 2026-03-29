@@ -7,7 +7,7 @@ model="${1:?Usage: mlx-preflight <model-hf-id>}"
 hf_home="${MLX_HF_HOME:-/Volumes/HuggingFace}"
 
 # Resolve HuggingFace model ID to local cache path
-cache_name="models--${model//\/--}"
+cache_name="models--${model//\//--}"
 model_path="$hf_home/hub/$cache_name"
 
 if [ ! -d "$model_path" ]; then
