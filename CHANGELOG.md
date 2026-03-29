@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.25.0](https://github.com/JacobPEvans/nix-ai/compare/v1.24.8...v1.25.0) (2026-03-29)
+
+
+### Features
+
+* **mlx:** establish ecosystem stack with parakeet-mlx and mlx-vlm ([#365](https://github.com/JacobPEvans/nix-ai/issues/365)) ([265cd12](https://github.com/JacobPEvans/nix-ai/commit/265cd128f514cb611ba34a6bb491c33dc555370c))
+
+
+### Bug Fixes
+
+* **ci:** skip benchmark-action when no results to post ([#363](https://github.com/JacobPEvans/nix-ai/issues/363)) ([d454020](https://github.com/JacobPEvans/nix-ai/commit/d4540204b78858460a938c3375fa5ef6251b78f9))
+* **deps:** centralize Python version and Renovate pep621 policy ([#373](https://github.com/JacobPEvans/nix-ai/issues/373)) ([4fce2a9](https://github.com/JacobPEvans/nix-ai/commit/4fce2a962be645260e58cdddbcb80c6387975c33))
+* **mlx:** correct mlx-preflight path construction ([#360](https://github.com/JacobPEvans/nix-ai/issues/360)) ([02ca479](https://github.com/JacobPEvans/nix-ai/commit/02ca4794ff2d88c5c4ca5f5ec5b14062cf9eebf4))
+
 ## [1.24.8](https://github.com/JacobPEvans/nix-ai/compare/v1.24.7...v1.24.8) (2026-03-29)
 
 
