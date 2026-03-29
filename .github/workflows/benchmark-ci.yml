@@ -144,9 +144,20 @@ jobs:
           fi
           jq 'if .skipped then [] else [.results[] | {name, unit, value}] end' "$result_file" > /tmp/benchmark-output.json
 
+      - name: Check for results
+        id: has_results
+        if: steps.filter.outputs.run == 'true'
+        run: |
+          if [ -s /tmp/benchmark-output.json ] && [ "$(cat /tmp/benchmark-output.json)" != "[]" ]; then
+            echo "has_data=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_data=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Post benchmark results
         if: |
           steps.filter.outputs.run == 'true' &&
+          steps.has_results.outputs.has_data == 'true' &&
           github.event_name == 'pull_request'
         uses: benchmark-action/github-action-benchmark@v1
         with:
