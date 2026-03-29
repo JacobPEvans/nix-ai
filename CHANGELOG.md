@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.25.1](https://github.com/JacobPEvans/nix-ai/compare/v1.25.0...v1.25.1) (2026-03-29)
+
+
+### Bug Fixes
+
+* remove unnecessary comments from python centralization ([#374](https://github.com/JacobPEvans/nix-ai/issues/374)) ([b287dce](https://github.com/JacobPEvans/nix-ai/commit/b287dceedd17e0496d856d889ffde39b6719368a))
+
 ## [1.25.0](https://github.com/JacobPEvans/nix-ai/compare/v1.24.8...v1.25.0) (2026-03-29)
 
 
