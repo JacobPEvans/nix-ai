@@ -66,6 +66,7 @@
       "groupName": "mlx-packages",
       "schedule": ["after 7am on Monday"],
       "minimumReleaseAge": "3 days",
+      "matchUpdateTypes": ["minor", "patch"],
       "automerge": true,
       "automergeType": "pr",
       "automergeStrategy": "squash"
@@ -77,6 +78,7 @@
       "groupName": "orchestrator-packages",
       "schedule": ["after 7am on Monday"],
       "minimumReleaseAge": "3 days",
+      "matchUpdateTypes": ["minor", "patch"],
       "automerge": true,
       "automergeType": "pr",
       "automergeStrategy": "squash"
