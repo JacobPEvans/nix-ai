@@ -16,8 +16,11 @@ let
   scriptDir = "${homeDir}/.claude/scripts";
   logDir = "${homeDir}/.claude/logs";
 
+  # Python interpreter — version centralized in lib/python.nix
+  python = import ../../lib/python.nix { inherit pkgs; };
+
   # Python with required packages
-  pythonWithDeps = pkgs.python314.withPackages (ps: [
+  pythonWithDeps = python.withPackages (ps: [
     (ps.slack-sdk.overridePythonAttrs (_: {
       doCheck = false;
     }))
