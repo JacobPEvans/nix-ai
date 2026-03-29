@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.24.7](https://github.com/JacobPEvans/nix-ai/compare/v1.24.6...v1.24.7) (2026-03-29)
+
+
+### Bug Fixes
+
+* **docs:** distinguish static vs runtime validation; fix OSV scan ([#353](https://github.com/JacobPEvans/nix-ai/issues/353)) ([759c613](https://github.com/JacobPEvans/nix-ai/commit/759c613ab5f7da61dba02bd84b6c314e19d4fe1e))
+
 ## [1.24.6](https://github.com/JacobPEvans/nix-ai/compare/v1.24.5...v1.24.6) (2026-03-27)
 
 

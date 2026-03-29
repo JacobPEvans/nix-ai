@@ -46,14 +46,14 @@
 #   gemini-cli: Google Gemini CLI (moved from nixpkgs due to severe version lag)
 #
 # BUNX WRAPPER PACKAGES (npm packages not in nixpkgs/homebrew):
-#   cclint: @felixgeelhaar/cclint@0.12.1
-#   gh-copilot: @githubnext/github-copilot-cli@latest (unversioned - upstream)
-#   chatgpt: chatgpt-cli@3.3.0
-#   claude-flow: claude-flow@2.0.0
-#   gws: @googleworkspace/cli@latest (pre-v1.0, rapid development - same as gh-copilot)
+#   cclint: @felixgeelhaar/cclint (CLAUDE.md linter)
+#   gh-copilot: @githubnext/github-copilot-cli (unversioned - upstream)
+#   chatgpt: chatgpt-cli (ChatGPT terminal client)
+#   claude-flow: claude-flow (multi-agent orchestration)
+#   gws: @googleworkspace/cli (pre-v1.0, rapid development - same as gh-copilot)
 #
 # UVX WRAPPER PACKAGES (Python packages not in nixpkgs/homebrew):
-#   hf: huggingface-hub==1.6.0 CLI (model downloads, used with HuggingFace MCP)
+#   hf: huggingface-hub CLI (model downloads, used with HuggingFace MCP)
 #   vllm-mlx: defined in modules/mlx.nix (owns the wrapper + LaunchAgent)
 #
 # PIPX PACKAGES (Python, installed separately):

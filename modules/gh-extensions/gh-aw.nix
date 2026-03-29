@@ -7,7 +7,7 @@
 pkgs.buildGoModule rec {
   pname = "gh-aw";
   # renovate: datasource=github-releases depName=github/gh-aw
-  version = "0.64.0";
+  version = "0.64.3";
 
   src = fetchFromGitHub {
     owner = "github";
