@@ -65,7 +65,10 @@
       "matchFileNames": ["mlx-server/**"],
       "groupName": "mlx-packages",
       "schedule": ["after 7am on Monday"],
-      "minimumReleaseAge": "3 days"
+      "minimumReleaseAge": "3 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash"
     },
     {
       "description": "Orchestrator Python packages - weekly updates",
@@ -73,7 +76,10 @@
       "matchFileNames": ["orchestrator/**"],
       "groupName": "orchestrator-packages",
       "schedule": ["after 7am on Monday"],
-      "minimumReleaseAge": "3 days"
+      "minimumReleaseAge": "3 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash"
     }
   ]
 }
