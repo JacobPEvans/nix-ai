@@ -16,7 +16,6 @@ let
   scriptDir = "${homeDir}/.claude/scripts";
   logDir = "${homeDir}/.claude/logs";
 
-  # Python interpreter — version centralized in lib/python.nix
   python = import ../../lib/python.nix { inherit pkgs; };
 
   # Python with required packages
