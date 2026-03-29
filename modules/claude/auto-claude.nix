@@ -18,7 +18,6 @@ let
   scriptPath = "${homeDir}/.claude/scripts/auto-claude.sh";
   logDir = "${homeDir}/.claude/logs";
 
-  # Python interpreter — version centralized in lib/python.nix
   python = import ../../lib/python.nix { inherit pkgs; };
 
   # Python environment for auto-claude scripts
