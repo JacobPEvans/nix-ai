@@ -86,7 +86,7 @@ in
         # mlx-chat — interactive multi-turn chat via openai SDK
         (pkgs.writeShellScriptBin "mlx-chat" ''
           exec ${pkgs.uv}/bin/uv run \
-            --with "openai==1.82.0" \
+            --with "openai==2.30.0" \
             python3 ${./scripts/mlx-chat.py} "$@"
         '')
 
