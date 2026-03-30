@@ -7,16 +7,16 @@
 pkgs.buildGoModule rec {
   pname = "gh-aw";
   # renovate: datasource=github-releases depName=github/gh-aw
-  version = "0.64.3";
+  version = "0.64.4";
 
   src = fetchFromGitHub {
     owner = "github";
     repo = "gh-aw";
     rev = "v${version}"; # Use commit SHA if no tags exist
-    hash = "sha256-1M1z2KLlvZAz/tgQqK4EUgwdSxUJHKq85t3NH5H4pg0=";
+    hash = "sha256-FElsGNDXgiq8opydz2atSTO0eJdL4AYjrwyMPet86DQ=";
   };
 
-  vendorHash = "sha256-U2TfzFapK1T7lZ7wO9yIPWw8jiVNSGoDaXXyR2SmkIs=";
+  vendorHash = "sha256-6dC1CSl7T2a1gg3GKUwqfEh0SnbOf/XubmPJpXTu/Mo=";
 
   # Build from cmd/gh-aw directory
   subPackages = [ "cmd/gh-aw" ];
