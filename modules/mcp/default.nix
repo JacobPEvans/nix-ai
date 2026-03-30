@@ -157,7 +157,7 @@ in
     args = [
       "uvx"
       "--from"
-      "google-workspace-mcp==0.1.2"
+      "google-workspace-mcp==2.0.1"
       "workspace-mcp"
       "--tools"
       "gmail"
