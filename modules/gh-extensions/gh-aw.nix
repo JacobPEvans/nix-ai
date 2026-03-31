@@ -13,7 +13,7 @@ pkgs.buildGoModule rec {
     owner = "github";
     repo = "gh-aw";
     rev = "v${version}"; # Use commit SHA if no tags exist
-    hash = "sha256-FElsGNDXgiq8opydz2atSTO0eJdL4AYjrwyMPet86DQ=";
+    hash = "sha256-uS4A1wey9ZIsuas0hDOpSsHDxSUXKzh/3zqCXyc2Y2w=";
   };
 
   vendorHash = "sha256-6dC1CSl7T2a1gg3GKUwqfEh0SnbOf/XubmPJpXTu/Mo=";
