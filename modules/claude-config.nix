@@ -98,6 +98,17 @@ let
       ln -s ${marketplaceInputs.browser-use-skills}/skills $out/browser-use/skills
     '';
 
+  # Overlay for bitwarden marketplace: injects .local.md into claude-retrospective plugin
+  bitwardenMarketplaceWithOverrides = pkgs.symlinkJoin {
+    name = "bitwarden-marketplace-with-overrides";
+    paths = [
+      marketplaceInputs.bitwarden-marketplace
+      (pkgs.writeTextDir "plugins/claude-retrospective/.local.md" (
+        builtins.readFile ./claude/plugins/overrides/claude-retrospective.local.md
+      ))
+    ];
+  };
+
   # Helper to build command/agent entries from discovered names
   mkSourceEntries =
     sourcePath: names:
@@ -176,6 +187,10 @@ in
         # Override flakeInput for synthetic marketplace (source defined in marketplaces.nix)
         "browser-use-skills" = base."browser-use-skills" // {
           flakeInput = browserUseMarketplace;
+        };
+        # Override flakeInput to inject .local.md into claude-retrospective plugin
+        "bitwarden-marketplace" = base."bitwarden-marketplace" // {
+          flakeInput = bitwardenMarketplaceWithOverrides;
         };
       };
 
