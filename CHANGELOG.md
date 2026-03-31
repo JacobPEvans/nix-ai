@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.25.3](https://github.com/JacobPEvans/nix-ai/compare/v1.25.2...v1.25.3) (2026-03-31)
+
+
+### Bug Fixes
+
+* **deps:** correct gh-aw v0.65.0 source hash ([#386](https://github.com/JacobPEvans/nix-ai/issues/386)) ([8fd8952](https://github.com/JacobPEvans/nix-ai/commit/8fd8952afd95d3546d081a97f8cab51a3f6e504b))
+
 ## [1.25.2](https://github.com/JacobPEvans/nix-ai/compare/v1.25.1...v1.25.2) (2026-03-31)
 
 
