@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.25.2](https://github.com/JacobPEvans/nix-ai/compare/v1.25.1...v1.25.2) (2026-03-31)
+
+
+### Bug Fixes
+
+* **deps:** update all flake inputs ([#384](https://github.com/JacobPEvans/nix-ai/issues/384)) ([b997f2d](https://github.com/JacobPEvans/nix-ai/commit/b997f2dd7ada5e5712f0d0aa1cdca04b28c60cb6))
+
 ## [1.25.1](https://github.com/JacobPEvans/nix-ai/compare/v1.25.0...v1.25.1) (2026-03-29)
 
 
