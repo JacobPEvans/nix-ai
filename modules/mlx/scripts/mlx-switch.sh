@@ -7,13 +7,11 @@ label="dev.vllm-mlx.server"
 domain="gui/$(id -u)"
 plist="$HOME/Library/LaunchAgents/$label.plist"
 
-# Prevent concurrent model switches — overlapping multi-GB NVMe reads can
-# saturate the SSD and stall system services (runningboardd → WindowServer).
-LOCK_FILE="/tmp/mlx-switch.lock"
-exec 9>"$LOCK_FILE"
-/usr/bin/flock -n 9 || { echo "Another mlx-switch is in progress. Aborting."; exit 1; }
+# Serialize model switches — only one at a time for optimal I/O scheduling.
+LOCK_FILE="${TMPDIR:-/tmp}/mlx-switch.lock"
+/usr/bin/shlock -f "$LOCK_FILE" -p $$ || { echo "Another mlx-switch is in progress. Aborting."; exit 1; }
 
-trap 'lsof -ti :"$MLX_PORT" 2>/dev/null | xargs kill 2>/dev/null; sleep 1; launchctl bootstrap "$domain" "$plist" 2>/dev/null; echo "Default restored."' EXIT
+trap 'lsof -ti :"$MLX_PORT" 2>/dev/null | xargs kill 2>/dev/null; sleep 1; launchctl bootstrap "$domain" "$plist" 2>/dev/null; rm -f "$LOCK_FILE"; echo "Default restored."' EXIT
 
 mlx-preflight "$model" || exit 1
 
