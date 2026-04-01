@@ -73,9 +73,10 @@ in
   #   docgen, tracer
   # See: https://github.com/BeehiveInnovations/pal-mcp-server
   #
-  # API keys injected via Doppler (doppler-mcp wrapper, at least one required):
-  #   - GEMINI_API_KEY (Google Gemini)
-  #   - OPENROUTER_API_KEY (OpenRouter - unified model access)
+  # API keys injected via Doppler (doppler-mcp wrapper):
+  #   - GEMINI_API_KEY (Google Gemini — pro, flash models)
+  #   - OPENAI_API_KEY (OpenAI — o3, o4-mini, gpt-5, codex models)
+  #   - OPENROUTER_API_KEY (OpenRouter — unified multi-model access)
   #
   # Non-secret config is set in env below (belongs in Nix, not Doppler).
 
@@ -88,13 +89,16 @@ in
     env = {
       # Enable ALL PAL tools (default disables: analyze,refactor,testgen,secaudit,docgen,tracer)
       DISABLED_TOOLS = "";
-      # Valid options: 'auto', 'pro', 'flash', 'o3', 'o3-mini', 'o4-mini', 'gpt-5', 'grok',
-      # 'opus-4.1', 'sonnet-4.1', or any DIAL/custom model name.
-      # 'pro' = latest Gemini Pro (requires GEMINI_API_KEY).
-      # 'auto' = PAL picks best available model based on configured API keys.
-      DEFAULT_MODEL = "pro";
+      # 'auto' = PAL picks best available model per-task based on configured API keys.
+      # Falls back across providers: OpenAI -> Gemini -> OpenRouter -> MLX.
+      # Other options: 'pro', 'flash', 'o3', 'o4-mini', 'gpt-5', 'gpt-5.1-codex',
+      # 'grok', 'opus-4.1', 'sonnet-4.1', or any DIAL/custom model name.
+      DEFAULT_MODEL = "auto";
       # Custom API endpoint — MLX inference server (vllm-mlx on port 11434)
       CUSTOM_API_URL = "http://127.0.0.1:11434/v1";
+      # MLX timeout tuning (PAL reads from providers/openai_compatible.py)
+      CUSTOM_CONNECT_TIMEOUT = "30"; # 30s for localhost MLX (catches stalled server)
+      CUSTOM_READ_TIMEOUT = "300"; # 5min for large model inference
       # Conversation limits
       CONVERSATION_TIMEOUT_HOURS = "6";
       MAX_CONVERSATION_TURNS = "50";

@@ -23,6 +23,7 @@ let
     "${homeDir}/.claude/commands"
     "${homeDir}/.claude/agents"
     "${homeDir}/.claude/skills"
+    "${homeDir}/.claude/rules"
     "${homeDir}/.gemini/commands"
   ];
 
@@ -59,6 +60,8 @@ in
               "${homeDir}/.claude/agents"
               "skill"
               "${homeDir}/.claude/skills"
+              "rule"
+              "${homeDir}/.claude/rules"
               "gemini command"
               "${homeDir}/.gemini/commands"
             ]
