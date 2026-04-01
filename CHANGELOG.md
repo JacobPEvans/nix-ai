@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.25.4](https://github.com/JacobPEvans/nix-ai/compare/v1.25.3...v1.25.4) (2026-04-01)
+
+
+### Bug Fixes
+
+* **mlx:** disable reasoning parser to fix streaming tool calls ([cb18f84](https://github.com/JacobPEvans/nix-ai/commit/cb18f846c8ba334a57155e15ff5634bb19bcde94))
+
 ## [1.25.3](https://github.com/JacobPEvans/nix-ai/compare/v1.25.2...v1.25.3) (2026-03-31)
 
 
