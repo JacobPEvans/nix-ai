@@ -70,7 +70,9 @@
       src = marketplaceInputs.jacobpevans-cc-plugins;
       entries = builtins.readDir src;
 
-      # Same discovery filter as plugins/development.nix
+      # Discovery filter matching plugins/development.nix + pathExists guard.
+      # nonPluginDirs is kept for fast-path (avoids stat calls) and consistency
+      # with development.nix which uses the same list.
       nonPluginDirs = [
         "docs"
         "schemas"
@@ -87,7 +89,7 @@
         && builtins.pathExists "${src}/${name}/.claude-plugin/plugin.json";
       pluginDirNames = builtins.attrNames (lib.filterAttrs isPluginDir entries);
 
-      # Read plugin metadata from each plugin.json
+      # Read plugin metadata from each plugin.json (defaults for robustness)
       readPluginMeta =
         name:
         let
@@ -95,14 +97,15 @@
         in
         {
           inherit name;
-          inherit (meta) description version author;
+          description = meta.description or "";
+          version = meta.version or "0.0.1";
+          author = meta.author or { name = "Unknown"; };
           source = "./${name}";
         };
 
-      # Preserve marketplace-level metadata from upstream, replace plugins array
+      # Preserve all upstream marketplace metadata, only replace plugins array
       existingManifest = builtins.fromJSON (builtins.readFile "${src}/.claude-plugin/marketplace.json");
-      manifest = {
-        inherit (existingManifest) name owner metadata;
+      manifest = existingManifest // {
         plugins = map readPluginMeta pluginDirNames;
       };
 
@@ -111,16 +114,20 @@
     pkgs.runCommand "jacobpevans-cc-plugins-patched" { } ''
       mkdir -p $out/.claude-plugin
 
-      # Symlink all top-level entries except .claude-plugin
-      for f in ${src}/*; do
-        [ "$(basename "$f")" = ".claude-plugin" ] && continue
-        ln -s "$f" "$out/$(basename "$f")"
+      # Symlink all entries except .claude-plugin (guard against empty glob)
+      for f in ${src}/* ${src}/.[!.]*; do
+        [ -e "$f" ] || continue
+        name=$(basename "$f")
+        [ "$name" = ".claude-plugin" ] && continue
+        ln -s "$f" "$out/$name"
       done
 
-      # Symlink hidden entries except .claude-plugin
-      for f in ${src}/.[!.]*; do
-        [ "$(basename "$f")" = ".claude-plugin" ] && continue
-        ln -s "$f" "$out/$(basename "$f")"
+      # Preserve upstream .claude-plugin contents, only replace marketplace.json
+      for f in ${src}/.claude-plugin/*; do
+        [ -e "$f" ] || continue
+        name=$(basename "$f")
+        [ "$name" = "marketplace.json" ] && continue
+        ln -s "$f" "$out/.claude-plugin/$name"
       done
 
       # Generated marketplace.json replaces the manual one
