@@ -226,9 +226,9 @@
     };
 
     # toolCallParser — Tool call parser (--tool-call-parser).
-    # Default: "auto" — Qwen3.5 has no official parser recommendation yet;
-    # auto-detect handles the format the model actually produces.
-    # Override to "hermes" (Qwen2.5), "qwen3_coder" (Qwen3-Coder), etc. if needed.
+    # Default: "hermes" — handles Nemotron XML format (<tool_call><function=...>)
+    # that Qwen3.5 produces, and supports native tool format for multi-turn
+    # conversations. Override to "auto", "qwen3_coder", etc. if needed.
     toolCallParser = lib.mkOption {
       type = lib.types.nullOr (
         lib.types.enum [
