@@ -1,0 +1,6 @@
+# Local Override: Report Storage
+
+Always write retrospective reports to `~/.claude/skills/retrospecting/reports/`
+instead of `${CLAUDE_PROJECT_DIR}/.claude/skills/retrospecting/reports/`.
+This ensures reports are centralized across all projects rather than scattered
+in each project's `.claude/` directory.

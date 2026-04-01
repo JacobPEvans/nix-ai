@@ -28,6 +28,11 @@ let
         default = null;
         description = "Flake input for Nix-managed (immutable) plugins";
       };
+      overlayFiles = lib.mkOption {
+        type = lib.types.attrsOf lib.types.path;
+        default = { };
+        description = "Files to overlay onto the marketplace (dest path relative to marketplace root → source file)";
+      };
     };
   };
 

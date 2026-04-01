@@ -1,16 +1,18 @@
-# Marketplace Override Derivations
+# Marketplace Derivation Overrides
 #
-# Derivations that wrap flake inputs to fix or enhance marketplace structure.
-# Imported by claude-config.nix — each derivation is used as a flakeInput override.
+# Custom derivations that wrap marketplace flake inputs to add local content
+# or create synthetic marketplace structure for repos that lack it.
+# Consumed by claude-config.nix via the marketplaces flakeInput override mechanism.
 {
   pkgs,
   lib,
   marketplaceInputs,
+  ...
 }:
 
 {
   # Synthetic marketplace wrapper for browser-use skills (repo lacks .claude-plugin structure)
-  browserUse =
+  browserUseMarketplace =
     let
       # Pinned to match uv-installed CLI version (modules/default.nix installBrowserUse)
       browserUseVersion = "0.12.5";
@@ -65,7 +67,7 @@
 
   # Auto-generated marketplace manifest for jacobpevans-cc-plugins
   # Ensures every plugin directory is registered — eliminates manual marketplace.json maintenance.
-  jacobpevans =
+  jacobpevansMarketplace =
     let
       src = marketplaceInputs.jacobpevans-cc-plugins;
       entries = builtins.readDir src;

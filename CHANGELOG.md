@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.26.0](https://github.com/JacobPEvans/nix-ai/compare/v1.25.4...v1.26.0) (2026-04-01)
+
+
+### Features
+
+* **claude:** add overlayFiles option for marketplace plugins ([#388](https://github.com/JacobPEvans/nix-ai/issues/388)) ([ef96354](https://github.com/JacobPEvans/nix-ai/commit/ef963545391eac936e0b67b187c8883a11810a3e))
+
+## [1.25.4](https://github.com/JacobPEvans/nix-ai/compare/v1.25.3...v1.25.4) (2026-04-01)
+
+
+### Bug Fixes
+
+* **mlx:** disable reasoning parser to fix streaming tool calls ([cb18f84](https://github.com/JacobPEvans/nix-ai/commit/cb18f846c8ba334a57155e15ff5634bb19bcde94))
+
 ## [1.25.3](https://github.com/JacobPEvans/nix-ai/compare/v1.25.2...v1.25.3) (2026-03-31)
 
 

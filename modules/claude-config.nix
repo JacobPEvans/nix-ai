@@ -44,10 +44,11 @@ let
   # Extract enabled plugins from modular configuration
   inherit (claudePlugins.pluginConfig) enabledPlugins;
 
-  # Marketplace override derivations (extracted to stay under file-size limit)
+  # Marketplace derivation overrides (synthetic wrappers, auto-generated manifests)
   marketplaceOverrides = import ./claude/marketplace-overrides.nix {
     inherit pkgs lib marketplaceInputs;
   };
+  inherit (marketplaceOverrides) browserUseMarketplace jacobpevansMarketplace;
 
   # Helper to build command/agent entries from discovered names
   mkSourceEntries =
@@ -126,11 +127,11 @@ in
       // {
         # Override flakeInput for synthetic marketplace (source defined in marketplaces.nix)
         "browser-use-skills" = base."browser-use-skills" // {
-          flakeInput = marketplaceOverrides.browserUse;
+          flakeInput = browserUseMarketplace;
         };
         # Override flakeInput with auto-generated marketplace manifest
         "jacobpevans-cc-plugins" = base."jacobpevans-cc-plugins" // {
-          flakeInput = marketplaceOverrides.jacobpevans;
+          flakeInput = jacobpevansMarketplace;
         };
       };
 
