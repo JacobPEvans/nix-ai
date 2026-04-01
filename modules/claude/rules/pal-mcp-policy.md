@@ -10,7 +10,7 @@ It is the token offloading backbone. **Never declare it unavailable without inve
 ## Configuration
 
 - **DEFAULT_MODEL=auto**: PAL picks best model per-task based on available API keys
-- **Providers**: OpenAI (o3, o4-mini, gpt-5, codex) → Gemini (pro, flash) → OpenRouter → MLX (local)
+- **Providers**: OpenAI → Gemini → OpenRouter → MLX (local). Run `mcp__pal__listmodels` for available models.
 - **Secrets**: Injected via Doppler with encrypted fallback cache (no network dependency on start)
 
 ## Availability Check Protocol (MANDATORY)
