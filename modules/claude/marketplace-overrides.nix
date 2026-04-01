@@ -64,14 +64,4 @@
       ln -s ${marketplaceInputs.browser-use-skills}/skills $out/browser-use/skills
     '';
 
-  # Overlay for bitwarden marketplace: injects .local.md into claude-retrospective plugin
-  bitwardenMarketplaceWithOverrides = pkgs.symlinkJoin {
-    name = "bitwarden-marketplace-with-overrides";
-    paths = [
-      marketplaceInputs.bitwarden-marketplace
-      (pkgs.writeTextDir "plugins/claude-retrospective/.local.md" (
-        builtins.readFile ./plugins/overrides/claude-retrospective.local.md
-      ))
-    ];
-  };
 }

@@ -12,7 +12,12 @@
 #   which pollute Claude Code's plugin cache when it re-indexes
 # Phase 1 of orphan-cleanup.nix handles the one-time migration from
 # recursive (real dirs) to directory symlinks.
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.programs.claude;
@@ -25,10 +30,27 @@ let
   # Create symlink entries for Nix-managed marketplaces
   nixManagedMarketplaces = lib.filterAttrs (_: m: m.flakeInput != null) cfg.plugins.marketplaces;
 
+  # Apply overlayFiles automatically via symlinkJoin when non-empty.
+  # Marketplaces without overlays use raw flakeInput (no-op path).
+  effectiveSource =
+    name: marketplace:
+    if marketplace.overlayFiles == { } then
+      marketplace.flakeInput
+    else
+      pkgs.symlinkJoin {
+        name = "${getMarketplaceName name}-with-overlays";
+        paths = [
+          marketplace.flakeInput
+        ]
+        ++ lib.mapAttrsToList (
+          destPath: srcFile: pkgs.writeTextDir destPath (builtins.readFile srcFile)
+        ) marketplace.overlayFiles;
+      };
+
   marketplaceSymlinks = lib.mapAttrs' (
     name: marketplace:
     lib.nameValuePair ".claude/plugins/marketplaces/${getMarketplaceName name}" {
-      source = marketplace.flakeInput;
+      source = effectiveSource name marketplace;
     }
   ) nixManagedMarketplaces;
 

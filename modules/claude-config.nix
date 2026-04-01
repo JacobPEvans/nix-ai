@@ -48,7 +48,7 @@ let
   marketplaceOverrides = import ./claude/marketplace-overrides.nix {
     inherit pkgs marketplaceInputs;
   };
-  inherit (marketplaceOverrides) browserUseMarketplace bitwardenMarketplaceWithOverrides;
+  inherit (marketplaceOverrides) browserUseMarketplace;
 
   # Helper to build command/agent entries from discovered names
   mkSourceEntries =
@@ -128,10 +128,6 @@ in
         # Override flakeInput for synthetic marketplace (source defined in marketplaces.nix)
         "browser-use-skills" = base."browser-use-skills" // {
           flakeInput = browserUseMarketplace;
-        };
-        # Override flakeInput to inject .local.md into claude-retrospective plugin
-        "bitwarden-marketplace" = base."bitwarden-marketplace" // {
-          flakeInput = bitwardenMarketplaceWithOverrides;
         };
       };
 
