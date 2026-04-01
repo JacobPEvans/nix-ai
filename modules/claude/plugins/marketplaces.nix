@@ -208,6 +208,9 @@ let
         type = "github";
         url = "bitwarden/ai-plugins";
       };
+      overlayFiles = {
+        "plugins/claude-retrospective/.local.md" = ./overrides/claude-retrospective.local.md;
+      };
     };
 
     # --- Synthetic Marketplaces (repos with skills but no marketplace structure) ---
