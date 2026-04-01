@@ -195,7 +195,7 @@ in
           builtins.elemAt args (configArgIdx + 1)
         else
           "";
-      configArgPresent = configFileArg != "";
+      configArgPresent = configFileArg != "" && builtins.match ".*/nix/store/.*" configFileArg != null;
     in
     assert
       presentBanned == [ ]

@@ -11,8 +11,16 @@ if lsof -ti :"$port" 2>/dev/null | head -1 > /dev/null; then
   model=$(curl -sf "$api/models" | jq -r '.data[0].id // "unknown"' 2>/dev/null || echo "unknown")
 
   # Get memory from the vllm-mlx child process (the real memory consumer).
-  vllm_pid=$(pgrep -f "vllm-mlx serve" 2>/dev/null | head -1)
+  # Prefer the backend that is a child of the proxy bound to $port.
   proxy_pid=$(lsof -ti :"$port" 2>/dev/null | head -1)
+  vllm_pid=""
+  if [ -n "$proxy_pid" ]; then
+    vllm_pid=$(pgrep -P "$proxy_pid" -f "vllm-mlx serve" 2>/dev/null | head -1)
+  fi
+  # Fallback: broad search if no child match (unexpected layout).
+  if [ -z "$vllm_pid" ]; then
+    vllm_pid=$(pgrep -f "vllm-mlx serve" 2>/dev/null | head -1)
+  fi
 
   if [ -n "$vllm_pid" ]; then
     mem_mb=$(/usr/bin/footprint -p "$vllm_pid" 2>/dev/null \

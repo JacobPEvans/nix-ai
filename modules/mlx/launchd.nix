@@ -26,7 +26,9 @@ in
     # llama-swap proxy listens on the API port and manages vllm-mlx child
     # processes on ephemeral ports (startPort = 11436+). HardResourceLimits
     # is omitted — it would only cap the proxy process, not the vllm-mlx
-    # children where the actual memory lives.
+    # children where the actual memory lives. As a result, programs.mlx.memoryHardLimitGb
+    # is not enforced under the llama-swap architecture; primary OOM protection
+    # is --cache-memory-mb on each vllm-mlx backend (set in the generated config).
     launchd.agents.vllm-mlx = {
       enable = true;
       config = {
@@ -44,7 +46,8 @@ in
         ThrottleInterval = 120;
         # Background = Jetsam-eligible (applies to proxy; vllm-mlx children inherit separately).
         ProcessType = "Background";
-        # Do not kill child vllm-mlx processes when launchd stops the proxy.
+        # Do not abandon the process group; ensure child vllm-mlx processes
+        # are terminated when launchd stops the proxy.
         AbandonProcessGroup = false;
         EnvironmentVariables = {
           HF_HOME = cfg.huggingFaceHome;
