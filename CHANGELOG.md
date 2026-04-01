@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.27.0](https://github.com/JacobPEvans/nix-ai/compare/v1.26.0...v1.27.0) (2026-04-01)
+
+
+### Features
+
+* **claude:** auto-generate marketplace.json for jacobpevans-cc-plugins ([#391](https://github.com/JacobPEvans/nix-ai/issues/391)) ([78b0e1d](https://github.com/JacobPEvans/nix-ai/commit/78b0e1d2bbba391b43c2c0e4f567655d9f83d1a5))
+
 ## [1.26.0](https://github.com/JacobPEvans/nix-ai/compare/v1.25.4...v1.26.0) (2026-04-01)
 
 
