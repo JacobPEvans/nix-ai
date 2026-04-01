@@ -106,12 +106,12 @@ in
         {
           name = "mlx.toolCallParser";
           actual = mlxCfg.toolCallParser;
-          expected = "auto";
+          expected = "hermes";
         }
         {
           name = "mlx.reasoningParser";
           actual = mlxCfg.reasoningParser;
-          expected = "qwen3";
+          expected = null;
         }
         # Environment variables
         {

@@ -226,9 +226,9 @@
     };
 
     # toolCallParser — Tool call parser (--tool-call-parser).
-    # Default: "auto" — Qwen3.5 has no official parser recommendation yet;
-    # auto-detect handles the format the model actually produces.
-    # Override to "hermes" (Qwen2.5), "qwen3_coder" (Qwen3-Coder), etc. if needed.
+    # Default: "hermes" — handles Nemotron XML format (<tool_call><function=...>)
+    # that Qwen3.5 produces, and supports native tool format for multi-turn
+    # conversations. Override to "auto", "qwen3_coder", etc. if needed.
     toolCallParser = lib.mkOption {
       type = lib.types.nullOr (
         lib.types.enum [
@@ -247,14 +247,21 @@
           "glm47"
         ]
       );
-      default = "auto";
-      description = "Tool call parser. Only used with enableAutoToolChoice. Auto-detect is safest for models without specific guidance.";
+      default = "hermes";
+      description = "Tool call parser. Only used with enableAutoToolChoice. 'hermes' handles Nemotron XML (<tool_call><function=...>) and supports native tool format for multi-turn conversations.";
     };
 
     # reasoningParser — Reasoning content extraction (--reasoning-parser).
     # Extracts <think>...</think> into structured reasoning_content field.
-    # No-op when model doesn't produce thinking tags — safe to leave on.
-    # Default: "qwen3" — matches Qwen3.5 model family.
+    # DISABLED: vllm-mlx 0.2.6 has a bug where --reasoning-parser and
+    # --tool-call-parser are mutually exclusive in streaming mode (server.py
+    # L1920-1946 bypasses the tool parser when reasoning parser is active).
+    # This breaks any consumer relying on streaming tool_calls (e.g., agent
+    # frameworks that send stream:true with tools and expect structured
+    # choice.delta.tool_calls in SSE chunks).
+    # Without this flag, <think> blocks still appear in content text — most
+    # consumers parse them from text as a fallback.
+    # Re-enable when vllm-mlx integrates both parsers in the streaming path.
     reasoningParser = lib.mkOption {
       type = lib.types.nullOr (
         lib.types.enum [
@@ -263,8 +270,8 @@
           "harmony"
         ]
       );
-      default = "qwen3";
-      description = "Reasoning content extraction parser. No-op when model doesn't produce think tags.";
+      default = null;
+      description = "Reasoning content extraction parser. Disabled by default — conflicts with tool-call-parser in streaming mode (vllm-mlx bug).";
     };
 
     # mcpConfig — MCP configuration file (--mcp-config).
