@@ -25,7 +25,11 @@ let
         "tests"
       ];
       isPluginDir =
-        name: type: type == "directory" && !(lib.hasPrefix "." name) && !(builtins.elem name nonPluginDirs);
+        name: type:
+        type == "directory"
+        && !(lib.hasPrefix "." name)
+        && !(builtins.elem name nonPluginDirs)
+        && builtins.pathExists "${jacobpevans-cc-plugins}/${name}/.claude-plugin/plugin.json";
       pluginNames = builtins.attrNames (lib.filterAttrs isPluginDir entries);
     in
     lib.genAttrs (map (name: "${name}@jacobpevans-cc-plugins") pluginNames) (_: true);
