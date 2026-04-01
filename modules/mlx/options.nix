@@ -358,5 +358,48 @@
       default = 100;
       description = "Hard RSS limit in GB. Kernel kills process above this. Leaves 28GB for OS + apps on 128GB systems.";
     };
+
+    # ---- MODEL SWITCHING (llama-swap proxy) ----
+    # llama-swap sits on the API port and manages vllm-mlx backends as child processes.
+    # Model switching is transparent: send a request with model: "X" and the proxy handles it.
+
+    models = lib.mkOption {
+      type = lib.types.attrsOf (
+        lib.types.submodule {
+          options = {
+            extraArgs = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              description = "Additional vllm-mlx serve arguments for this model";
+            };
+            ttl = lib.mkOption {
+              type = lib.types.ints.unsigned;
+              default = 0;
+              description = "Seconds of idle time before unloading. 0 = use proxy.idleTtl default.";
+            };
+            aliases = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              description = "Alternative model names that route to this model";
+            };
+          };
+        }
+      );
+      default = { };
+      description = "Additional models available for on-demand switching via llama-swap proxy. The defaultModel is always available with TTL 0.";
+    };
+
+    proxy = {
+      healthCheckTimeout = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 180;
+        description = "Seconds to wait for a backend to become healthy. 70GB models take 20-60s to load; 180s covers the worst case.";
+      };
+      idleTtl = lib.mkOption {
+        type = lib.types.ints.unsigned;
+        default = 1800;
+        description = "Default idle TTL in seconds for non-default models. 0 = never auto-unload. Default 30 min.";
+      };
+    };
   };
 }

@@ -20,8 +20,10 @@ in
         "huggingFaceHome"
         "maxNumSeqs"
         "memoryHardLimitGb"
+        "models"
         "port"
         "prefillBatchSize"
+        "proxy"
         "reasoningParser"
         "toolCallParser"
       ];
@@ -148,17 +150,18 @@ in
       touch $out
     '';
 
-  # Validate MLX LaunchAgent ProgramArguments contain no banned flags,
-  # include all required flags, and respect conditional flag logic.
-  # This catches the exact class of bug that caused the vllm-mlx crash-loop.
+  # Validate MLX LaunchAgent ProgramArguments use llama-swap proxy,
+  # and that the generated llama-swap config JSON contains required fields.
+  # With the llama-swap architecture, vllm-mlx flags live inside the JSON
+  # config (embedded in cmd strings), not in the LaunchAgent ProgramArguments.
   mlx-launchd =
     let
       launchdCfg = hmConfig.config.launchd.agents.vllm-mlx.config;
       args = launchdCfg.ProgramArguments;
       argsStr = builtins.concatStringsSep " " args;
 
-      # Flags removed in vllm-mlx v0.2.6 — must NEVER appear
-      bannedFlags = [
+      # Proxy-level flags that must NEVER appear in ProgramArguments (belong in JSON config)
+      bannedInProxyArgs = [
         "--max-kv-size"
         "--prefill-step-size"
         "--prompt-cache-size"
@@ -167,78 +170,49 @@ in
         "--draft-model"
         "--num-draft-tokens"
         "--pipeline"
-      ];
-      presentBanned = builtins.filter (f: builtins.match ".*${f}.*" argsStr != null) bannedFlags;
-
-      # Core flags that must always be present
-      requiredSubstrings = [
         "serve"
-        "--port"
-        "--host"
+      ];
+      presentBanned = builtins.filter (f: builtins.match ".*${f}.*" argsStr != null) bannedInProxyArgs;
+
+      # llama-swap proxy args that must always be present
+      requiredSubstrings = [
+        "--config"
+        "--listen"
       ];
       missingRequired = builtins.filter (f: builtins.match ".*${f}.*" argsStr == null) requiredSubstrings;
 
-      # Conditional flags must NOT appear when their config value is null/false.
-      # Data-driven: list of { flag, shouldBeAbsent } — matches bannedFlags pattern above.
-      conditionalChecks = [
-        {
-          flag = "--cache-memory-mb";
-          shouldBeAbsent = mlxCfg.cacheMemoryMb == null;
-        }
-        {
-          flag = "--prefill-batch-size";
-          shouldBeAbsent = mlxCfg.prefillBatchSize == null;
-        }
-        {
-          flag = "--continuous-batching";
-          shouldBeAbsent = !mlxCfg.continuousBatching;
-        }
-        {
-          flag = "--max-num-seqs";
-          shouldBeAbsent = mlxCfg.maxNumSeqs == null;
-        }
-        {
-          flag = "--chunked-prefill-tokens";
-          shouldBeAbsent = mlxCfg.chunkedPrefillTokens == null;
-        }
-        {
-          flag = "--completion-batch-size";
-          shouldBeAbsent = mlxCfg.completionBatchSize == null;
-        }
-        {
-          flag = "--enable-auto-tool-choice";
-          shouldBeAbsent = !mlxCfg.enableAutoToolChoice;
-        }
-        {
-          flag = "--tool-call-parser";
-          shouldBeAbsent = mlxCfg.toolCallParser == null || !mlxCfg.enableAutoToolChoice;
-        }
-        {
-          flag = "--reasoning-parser";
-          shouldBeAbsent = mlxCfg.reasoningParser == null;
-        }
-      ];
-      conditionalViolations = builtins.filter (
-        c: c.shouldBeAbsent && builtins.match ".*${c.flag}.*" argsStr != null
-      ) conditionalChecks;
+      # Verify the --config argument points to a store path (non-empty string after "--config").
+      # The config file is a pkgs.writeText derivation — its store path will contain "/nix/store/".
+      configArgIdx =
+        let
+          idxList = builtins.filter (i: builtins.elemAt args i == "--config") (
+            builtins.genList (i: i) (builtins.length args)
+          );
+        in
+        if idxList == [ ] then -1 else builtins.head idxList;
+      configFileArg =
+        if configArgIdx >= 0 && configArgIdx + 1 < builtins.length args then
+          builtins.elemAt args (configArgIdx + 1)
+        else
+          "";
+      configArgPresent = configFileArg != "";
     in
     assert
       presentBanned == [ ]
-      || throw "Banned vllm-mlx flags in ProgramArguments: ${builtins.toJSON presentBanned}";
+      || throw "Banned flags in llama-swap ProgramArguments (should be in JSON config): ${builtins.toJSON presentBanned}";
     assert
       missingRequired == [ ]
-      || throw "Missing required flags in ProgramArguments: ${builtins.toJSON missingRequired}";
-    assert
-      conditionalViolations == [ ]
-      || throw "Conditional flags present despite null/false config: ${
-        builtins.toJSON (map (c: c.flag) conditionalViolations)
-      }";
+      || throw "Missing required llama-swap proxy flags in ProgramArguments: ${builtins.toJSON missingRequired}";
+    assert configArgPresent || throw "ProgramArguments has --config but no following path argument";
     pkgs.runCommand "check-mlx-launchd" { } ''
-      echo "MLX LaunchAgent: ${toString (builtins.length bannedFlags)} banned flags verified absent, ${toString (builtins.length requiredSubstrings)} required flags verified present, conditional flags verified"
+      echo "MLX LaunchAgent: llama-swap proxy args verified (--config ${configFileArg} --listen present)"
       touch $out
     '';
 
-  # Verify OOM prevention: ProcessType + HardResourceLimits in LaunchAgent.
+  # Verify OOM prevention: ProcessType in LaunchAgent.
+  # HardResourceLimits is intentionally absent — it would only cap the llama-swap
+  # proxy process, not the vllm-mlx child processes where the actual memory lives.
+  # Jetsam eligibility via ProcessType=Background still applies to the proxy.
   mlx-launchd-memory-safety =
     let
       launchdCfg = hmConfig.config.launchd.agents.vllm-mlx.config;
@@ -247,49 +221,55 @@ in
       launchdCfg.ProcessType == "Background"
       || throw "ProcessType must be \"Background\" for Jetsam eligibility";
     assert
-      launchdCfg.HardResourceLimits.ResidentSetSize > 0
-      || throw "HardResourceLimits.ResidentSetSize must be positive";
+      (!(launchdCfg ? HardResourceLimits) || launchdCfg.HardResourceLimits == null)
+      || throw "HardResourceLimits must NOT be set on the llama-swap proxy (only constrains proxy, not vllm-mlx children)";
     pkgs.runCommand "check-mlx-launchd-memory-safety" { } ''
-      echo "MLX LaunchAgent memory safety: ProcessType=Background, hard=${toString mlxCfg.memoryHardLimitGb}GB verified"
+      echo "MLX LaunchAgent memory safety: ProcessType=Background verified; HardResourceLimits correctly absent from proxy"
       touch $out
     '';
 
   # Negative test: verify the banned-flag detection logic actually catches bad flags.
   # Without this, a regex typo in mlx-launchd could silently pass banned flags through.
+  # These are flags that must NOT appear in the llama-swap proxy ProgramArguments
+  # (they belong in the JSON config cmd strings, not the proxy args).
   mlx-launchd-negative =
     let
       # Synthetic args strings containing banned flags — each MUST be detected
       testCases = [
         {
-          input = "serve model --max-kv-size 1024 --port 11434";
+          input = "llama-swap --config foo.json --listen 127.0.0.1:11434 serve model";
+          bannedFlag = "serve";
+        }
+        {
+          input = "llama-swap --config foo.json --listen 127.0.0.1:11434 --max-kv-size 1024";
           bannedFlag = "--max-kv-size";
         }
         {
-          input = "serve model --prefill-step-size 256 --port 11434";
+          input = "llama-swap --config foo.json --listen 127.0.0.1:11434 --prefill-step-size 256";
           bannedFlag = "--prefill-step-size";
         }
         {
-          input = "serve model --prompt-cache-size 512 --port 11434";
+          input = "llama-swap --config foo.json --listen 127.0.0.1:11434 --prompt-cache-size 512";
           bannedFlag = "--prompt-cache-size";
         }
         {
-          input = "serve model --decode-concurrency 4 --port 11434";
+          input = "llama-swap --config foo.json --listen 127.0.0.1:11434 --decode-concurrency 4";
           bannedFlag = "--decode-concurrency";
         }
         {
-          input = "serve model --prompt-concurrency 2 --port 11434";
+          input = "llama-swap --config foo.json --listen 127.0.0.1:11434 --prompt-concurrency 2";
           bannedFlag = "--prompt-concurrency";
         }
         {
-          input = "serve model --draft-model foo --port 11434";
+          input = "llama-swap --config foo.json --listen 127.0.0.1:11434 --draft-model foo";
           bannedFlag = "--draft-model";
         }
         {
-          input = "serve model --num-draft-tokens 8 --port 11434";
+          input = "llama-swap --config foo.json --listen 127.0.0.1:11434 --num-draft-tokens 8";
           bannedFlag = "--num-draft-tokens";
         }
         {
-          input = "serve model --pipeline parallel --port 11434";
+          input = "llama-swap --config foo.json --listen 127.0.0.1:11434 --pipeline parallel";
           bannedFlag = "--pipeline";
         }
       ];

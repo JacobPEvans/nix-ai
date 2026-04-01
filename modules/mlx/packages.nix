@@ -20,6 +20,8 @@ let
     parakeetMlxVersion
     mlxVlmVersion
     apiUrl
+    launchAgentLabel
+    llamaSwapPkg
     ;
   vllmMlxPin = "vllm-mlx==${vllmMlxVersion}";
 in
@@ -35,6 +37,7 @@ in
         MLX_PORT = toString cfg.port;
         MLX_HOST = cfg.host;
         MLX_HF_HOME = cfg.huggingFaceHome;
+        MLX_LAUNCHD_LABEL = launchAgentLabel;
       };
 
       # ==========================================================================
@@ -54,22 +57,25 @@ in
           text = builtins.readFile ./scripts/mlx.sh;
         })
 
-        # mlx-switch — foreground model swap, auto-restores default on Ctrl-C
+        # mlx-switch — switch active model via llama-swap proxy
         (pkgs.writeShellApplication {
           name = "mlx-switch";
           runtimeInputs = with pkgs; [
-            lsof
-            vllmMlxPkg
+            curl
+            jq
           ];
           text = builtins.readFile ./scripts/mlx-switch.sh;
         })
 
-        # mlx-default — safety net to restore the default LaunchAgent
+        # mlx-default — restart llama-swap proxy (preloads default model)
         (pkgs.writeShellApplication {
           name = "mlx-default";
-          runtimeInputs = with pkgs; [ lsof ];
+          runtimeInputs = [ ];
           text = builtins.readFile ./scripts/mlx-default.sh;
         })
+
+        # llama-swap — proxy binary on PATH for direct invocation and mlx-default
+        llamaSwapPkg
 
         # mlx-status — show running model, memory, uptime, LaunchAgent state
         (pkgs.writeShellApplication {
