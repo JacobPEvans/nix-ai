@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.28.0](https://github.com/JacobPEvans/nix-ai/compare/v1.27.0...v1.28.0) (2026-04-02)
+
+
+### Features
+
+* **pal:** 100% reliability via auto mode, Doppler fallback, and global rules ([#394](https://github.com/JacobPEvans/nix-ai/issues/394)) ([486173a](https://github.com/JacobPEvans/nix-ai/commit/486173a996f895403e30a9af2e0e3dc628023ba8))
+
 ## [1.27.0](https://github.com/JacobPEvans/nix-ai/compare/v1.26.0...v1.27.0) (2026-04-01)
 
 
