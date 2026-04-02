@@ -13,8 +13,9 @@
 let
   inherit (mlxShared)
     cfg
-    vllmMlxPkg
     launchAgentLabel
+    llamaSwapPkg
+    llamaSwapConfigFile
     ;
 in
 {
@@ -22,62 +23,32 @@ in
     # ==========================================================================
     # LaunchAgent for Auto-Start
     # ==========================================================================
+    # llama-swap proxy listens on the API port and manages vllm-mlx child
+    # processes on ephemeral ports (startPort = 11436+). HardResourceLimits
+    # is omitted — it would only cap the proxy process, not the vllm-mlx
+    # children where the actual memory lives. As a result, programs.mlx.memoryHardLimitGb
+    # is not enforced under the llama-swap architecture; primary OOM protection
+    # is --cache-memory-mb on each vllm-mlx backend (set in the generated config).
     launchd.agents.vllm-mlx = {
       enable = true;
       config = {
         Label = launchAgentLabel;
         ProgramArguments = [
-          (lib.getExe vllmMlxPkg)
-          "serve"
-          cfg.defaultModel
-          "--port"
-          (toString cfg.port)
-          "--host"
-          cfg.host
-        ]
-        ++ lib.optionals (cfg.cacheMemoryMb != null) [
-          "--cache-memory-mb"
-          (toString cfg.cacheMemoryMb)
-        ]
-        ++ lib.optionals (cfg.prefillBatchSize != null) [
-          "--prefill-batch-size"
-          (toString cfg.prefillBatchSize)
-        ]
-        ++ lib.optionals cfg.continuousBatching [
-          "--continuous-batching"
-        ]
-        ++ lib.optionals (cfg.maxNumSeqs != null) [
-          "--max-num-seqs"
-          (toString cfg.maxNumSeqs)
-        ]
-        ++ lib.optionals (cfg.chunkedPrefillTokens != null) [
-          "--chunked-prefill-tokens"
-          (toString cfg.chunkedPrefillTokens)
-        ]
-        ++ lib.optionals (cfg.completionBatchSize != null) [
-          "--completion-batch-size"
-          (toString cfg.completionBatchSize)
-        ]
-        ++ lib.optionals cfg.enableAutoToolChoice [
-          "--enable-auto-tool-choice"
-        ]
-        ++ lib.optionals (cfg.enableAutoToolChoice && cfg.toolCallParser != null) [
-          "--tool-call-parser"
-          cfg.toolCallParser
-        ]
-        ++ lib.optionals (cfg.reasoningParser != null) [
-          "--reasoning-parser"
-          cfg.reasoningParser
+          (lib.getExe llamaSwapPkg)
+          "--config"
+          "${llamaSwapConfigFile}"
+          "--listen"
+          "${cfg.host}:${toString cfg.port}"
         ];
         RunAtLoad = true;
         KeepAlive = true;
         # 2 min throttle — 70GB model loads take 20-60s, prevents rapid crash-restart loops (closes #256)
         ThrottleInterval = 120;
-        # OOM prevention: Background = Jetsam-eligible; hard RSS ceiling enforced by kernel.
+        # Background = Jetsam-eligible (applies to proxy; vllm-mlx children inherit separately).
         ProcessType = "Background";
-        HardResourceLimits = {
-          ResidentSetSize = cfg.memoryHardLimitGb * 1073741824;
-        };
+        # Do not abandon the process group; ensure child vllm-mlx processes
+        # are terminated when launchd stops the proxy.
+        AbandonProcessGroup = false;
         EnvironmentVariables = {
           HF_HOME = cfg.huggingFaceHome;
         };
