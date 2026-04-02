@@ -175,8 +175,12 @@
       touch "$LOG_FILE" && chmod 600 "$LOG_FILE"
       # Log invocation for audit trail. No preflight — go straight to exec.
       # Auth failures are handled natively by `doppler run` (non-zero exit + stderr).
+      # --fallback: cache encrypted secrets locally; use cache if Doppler API is unreachable.
       echo "$(date -u +%FT%TZ) doppler-mcp starting: $(printf '%q ' "$@")" >> "$LOG_FILE"
-      exec ${pkgs.doppler}/bin/doppler run -p ai-ci-automation -c prd -- "$@"
+      FALLBACK="''${XDG_STATE_HOME:-$HOME/.local/state}/doppler-mcp-fallback.enc"
+      exec ${pkgs.doppler}/bin/doppler run -p ai-ci-automation -c prd \
+        --fallback "$FALLBACK" \
+        -- "$@"
     '')
 
     # sync-mlx-models moved to modules/claude/pal-models.nix
@@ -207,23 +211,26 @@
 
       echo ""
       echo "3. PAL secrets (ai-ci-automation/prd):"
-      required_secrets=(GEMINI_API_KEY OPENROUTER_API_KEY)
-      missing_any=0
-      for secret in "''${required_secrets[@]}"; do
+      # With DEFAULT_MODEL=auto, PAL works with ANY available provider.
+      # Warn about missing keys but only fail if NONE are available.
+      provider_secrets=(GEMINI_API_KEY OPENAI_API_KEY OPENROUTER_API_KEY)
+      available=0
+      for secret in "''${provider_secrets[@]}"; do
         if ${pkgs.doppler}/bin/doppler secrets get "$secret" \
              --project ai-ci-automation \
              --config prd \
              --plain >/dev/null 2>&1; then
           echo "   OK: $secret available"
+          available=$((available + 1))
         else
-          echo "   ERROR: $secret missing or unreadable"
-          missing_any=1
+          echo "   WARN: $secret missing (PAL auto mode will use other providers)"
         fi
       done
-      if [ "$missing_any" -ne 0 ]; then
-        echo "   One or more required PAL secrets are missing or inaccessible."
+      if [ "$available" -eq 0 ]; then
+        echo "   ERROR: No provider API keys found. PAL MCP will not work."
         exit 1
       fi
+      echo "   $available/''${#provider_secrets[@]} providers available"
 
       echo ""
       echo "4. Last doppler-mcp log entries (if any):"

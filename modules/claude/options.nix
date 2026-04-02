@@ -147,6 +147,18 @@ in
       };
     };
 
+    # Rules (global user rules, loaded every session regardless of project)
+    rules = {
+      fromFlakeInputs = lib.mkOption {
+        type = lib.types.listOf componentModule;
+        default = [ ];
+      };
+      local = lib.mkOption {
+        type = lib.types.attrsOf lib.types.path;
+        default = { };
+      };
+    };
+
     # Hooks - fully implemented in modules/claude/settings.nix
     # Generates executable scripts in ~/.claude/hooks/ via home.file.
     hooks = {

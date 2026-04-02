@@ -152,6 +152,11 @@ in
     (mkSourceEntries "${ai-assistant-instructions}/agentsmd/agents" aiAgents)
     ++ (mkSourceEntries "${claude-cookbooks}/.claude/agents" cbAgents);
 
+  # Global rules (loaded every session regardless of project)
+  rules.local = {
+    "pal-mcp-policy" = ./claude/rules/pal-mcp-policy.md;
+  };
+
   settings = {
     # Extended thinking enabled with token budget controlled via env vars
     alwaysThinkingEnabled = true;

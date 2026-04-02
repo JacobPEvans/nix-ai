@@ -41,7 +41,7 @@ fi
 
 # 3. Verify PAL secrets are accessible (only if Doppler authed)
 if [ "$_doppler_authed" -eq 1 ]; then
-  for secret in GEMINI_API_KEY OPENROUTER_API_KEY; do
+  for secret in GEMINI_API_KEY OPENAI_API_KEY OPENROUTER_API_KEY; do
     if "$DOPPLER" secrets get "$secret" \
          --project ai-ci-automation \
          --config prd \

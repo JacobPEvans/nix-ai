@@ -1,6 +1,6 @@
 # Claude Code Components
 #
-# Manages commands, agents, and skills from various sources:
+# Manages commands, agents, skills, and rules from various sources:
 # - Flake inputs (immutable, from Nix store)
 # - Local files (direct symlinks)
 # - Live repos (mkOutOfStoreSymlink for updates without rebuild)
@@ -67,6 +67,9 @@ in
       // mkLocalSymlinks "agent" cfg.agents.local
       # Skills
       // mkComponentFiles "skill" cfg.skills.fromFlakeInputs
-      // mkLocalSymlinks "skill" cfg.skills.local;
+      // mkLocalSymlinks "skill" cfg.skills.local
+      # Rules (global user rules, loaded every session)
+      // mkComponentFiles "rule" cfg.rules.fromFlakeInputs
+      // mkLocalSymlinks "rule" cfg.rules.local;
   };
 }
