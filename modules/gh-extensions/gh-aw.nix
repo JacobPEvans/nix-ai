@@ -6,7 +6,7 @@
 
 pkgs.buildGoModule rec {
   pname = "gh-aw";
-  # renovate: datasource=github-releases depName=github/gh-aw
+  # managed by: nix-update (deps-update-flake.yml)
   version = "0.65.4";
 
   src = fetchFromGitHub {

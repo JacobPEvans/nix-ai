@@ -10,7 +10,7 @@ name: Update custom packages
 
 on:
   schedule:
-    - cron: "0 12 * * 1"
+    - cron: "0 12 * * *"
   workflow_dispatch:
 
 jobs:
