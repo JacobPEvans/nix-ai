@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.29.0](https://github.com/JacobPEvans/nix-ai/compare/v1.28.0...v1.29.0) (2026-04-03)
+
+
+### Features
+
+* **mlx:** replace model switching with llama-swap proxy ([#396](https://github.com/JacobPEvans/nix-ai/issues/396)) ([2bc75e7](https://github.com/JacobPEvans/nix-ai/commit/2bc75e7fae44ea4a37f46d9ac700495069f2b089))
+
+
+### Bug Fixes
+
+* **deps:** update gh-aw hashes, switch to daily nix-update ([#401](https://github.com/JacobPEvans/nix-ai/issues/401)) ([e7ae532](https://github.com/JacobPEvans/nix-ai/commit/e7ae532cbc8af50da55c8d881e93fd0cfad491ac))
+
 ## [1.28.0](https://github.com/JacobPEvans/nix-ai/compare/v1.27.0...v1.28.0) (2026-04-02)
 
 
