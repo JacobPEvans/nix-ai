@@ -6,17 +6,17 @@
 
 pkgs.buildGoModule rec {
   pname = "gh-aw";
-  # renovate: datasource=github-releases depName=github/gh-aw
+  # managed by: nix-update (deps-update-flake.yml)
   version = "0.65.4";
 
   src = fetchFromGitHub {
     owner = "github";
     repo = "gh-aw";
     rev = "v${version}"; # Use commit SHA if no tags exist
-    hash = "sha256-uS4A1wey9ZIsuas0hDOpSsHDxSUXKzh/3zqCXyc2Y2w=";
+    hash = "sha256-4SKLtOCtnrF4Rv6tY0fMEa6lXkPNrfb0aOQjAspZPvk=";
   };
 
-  vendorHash = "sha256-6dC1CSl7T2a1gg3GKUwqfEh0SnbOf/XubmPJpXTu/Mo=";
+  vendorHash = "sha256-BSTblDCPpwHFO3RnyeKsb2oYiGh8gEsy3bdsO8yzHHM=";
 
   # Build from cmd/gh-aw directory
   subPackages = [ "cmd/gh-aw" ];
