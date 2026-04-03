@@ -132,17 +132,29 @@ jobs:
     if: always()
     uses: JacobPEvans/.github/.github/workflows/_osv-scan.yml@main
 
+  # Auto-fix Nix package hashes on Renovate PRs (version-only bumps break hashes)
+  nix-hash-autofix:
+    name: Nix Hash Auto-Fix
+    needs: changes
+    if: >-
+      needs.changes.outputs.nix == 'true' &&
+      needs.changes.outputs.is-deps-only == 'true'
+    uses: JacobPEvans/.github/.github/workflows/_nix-hash-autofix.yml@main
+    with:
+      packages: "gh-aw"
+    secrets: inherit
+
   # ==========================================================================
   # MERGE GATE - The ONLY required check in branch protection
   # ==========================================================================
   gate:
     name: Merge Gate
-    needs: [changes, nix-validate, markdown-lint, file-size, benchmark-validate, python-security, osv-scan]
+    needs: [changes, nix-validate, markdown-lint, file-size, benchmark-validate, python-security, osv-scan, nix-hash-autofix]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       - name: Check all results
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: nix-validate, markdown-lint, file-size, benchmark-validate, python-security
+          allowed-skips: nix-validate, markdown-lint, file-size, benchmark-validate, python-security, nix-hash-autofix
           jobs: ${{ toJSON(needs) }}
