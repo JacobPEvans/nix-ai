@@ -70,6 +70,12 @@
       "matchManagers": ["pep621"],
       "matchFileNames": ["orchestrator/**"],
       "groupName": "orchestrator-packages"
+    },
+    {
+      "description": "Disable Renovate for packages managed by nix-update workflow (deps-update-flake.yml handles version + hash updates)",
+      "matchManagers": ["custom.regex"],
+      "matchPackageNames": ["github/gh-aw"],
+      "enabled": false
     }
   ]
 }
