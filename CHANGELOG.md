@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.29.1](https://github.com/JacobPEvans/nix-ai/compare/v1.29.0...v1.29.1) (2026-04-04)
+
+
+### Bug Fixes
+
+* **deps:** fix Renovate regex for uv tool install packages ([#402](https://github.com/JacobPEvans/nix-ai/issues/402)) ([0d5d8b7](https://github.com/JacobPEvans/nix-ai/commit/0d5d8b767fbf5fe66e562914611674a69c4e9a68))
+
 ## [1.29.0](https://github.com/JacobPEvans/nix-ai/compare/v1.28.0...v1.29.0) (2026-04-03)
 
 
