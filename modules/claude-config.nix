@@ -155,6 +155,7 @@ in
   # Global rules (loaded every session regardless of project)
   rules.local = {
     "pal-mcp-policy" = ./claude/rules/pal-mcp-policy.md;
+    "retrospective-report-location" = ./claude/rules/retrospective-report-location.md;
   };
 
   settings = {
