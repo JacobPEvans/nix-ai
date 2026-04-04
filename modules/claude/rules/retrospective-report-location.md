@@ -1,6 +1,10 @@
 ---
-description: Override report output path when using the claude-retrospective retrospecting skill
+name: retrospective-report-location
+description: This rule should be applied when using the claude-retrospective plugin's "retrospecting" skill, running "/retrospecting", or generating retrospective reports. Overrides the default per-project report output path to use a centralized location.
 alwaysApply: false
+globs:
+  - "**/retrospecting/**"
+  - "**/.claude/skills/retrospecting/**"
 ---
 
 # Retrospective Report Location
