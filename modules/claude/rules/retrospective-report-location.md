@@ -1,3 +1,7 @@
+---
+description: Override report output path when using the claude-retrospective retrospecting skill
+---
+
 # Retrospective Report Location
 
 When using the claude-retrospective plugin's `retrospecting` skill, always write
