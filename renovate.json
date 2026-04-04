@@ -37,7 +37,7 @@
       "customType": "regex",
       "fileMatch": ["\\.nix$"],
       "matchStrings": [
-        "uv\\S*\\s+tool\\s+install\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\""
+        "\\buv\\S*\\s+tool\\s+install\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\""
       ],
       "datasourceTemplate": "pypi"
     }
