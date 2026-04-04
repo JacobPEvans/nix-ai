@@ -15,6 +15,7 @@
   browserUseMarketplace =
     let
       # Pinned to match uv-installed CLI version (modules/default.nix installBrowserUse)
+      # renovate: datasource=pypi depName=browser-use
       browserUseVersion = "0.12.5";
       manifestJson = builtins.toFile "marketplace.json" (
         builtins.toJSON {
