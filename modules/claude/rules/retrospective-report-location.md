@@ -1,5 +1,6 @@
 ---
 description: Override report output path when using the claude-retrospective retrospecting skill
+alwaysApply: false
 ---
 
 # Retrospective Report Location
