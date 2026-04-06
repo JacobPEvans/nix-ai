@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.29.2](https://github.com/JacobPEvans/nix-ai/compare/v1.29.1...v1.29.2) (2026-04-06)
+
+
+### Bug Fixes
+
+* **claude:** deploy retrospective report override as global rule ([#405](https://github.com/JacobPEvans/nix-ai/issues/405)) ([fd819b9](https://github.com/JacobPEvans/nix-ai/commit/fd819b966bc455c0897d5faa44d6678cbb920414))
+
 ## [1.29.1](https://github.com/JacobPEvans/nix-ai/compare/v1.29.0...v1.29.1) (2026-04-04)
 
 
