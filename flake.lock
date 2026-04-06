@@ -147,11 +147,11 @@
     "claude-code-plugins-plus": {
       "flake": false,
       "locked": {
-        "lastModified": 1775436722,
-        "narHash": "sha256-5eBMdEYBJMDmixwXlCWVgaPnFWSP8vvLXw65/4eofhY=",
+        "lastModified": 1775458184,
+        "narHash": "sha256-vqrRW51gd80SvozcXhFebTeMpOmnI9tWEkYoE0RJYf4=",
         "owner": "jeremylongshore",
         "repo": "claude-code-plugins-plus",
-        "rev": "1134eeab6e3f5738d37d31ea55708a6a75666b84",
+        "rev": "805deb25c2b699775ead88ad1ac6a087347cf5bd",
         "type": "github"
       },
       "original": {
@@ -264,11 +264,11 @@
     "lunar-claude": {
       "flake": false,
       "locked": {
-        "lastModified": 1775263350,
-        "narHash": "sha256-YAGAXus3Rs/Bis7bgApF2ErhiQb0xODf83V8w+R55+k=",
+        "lastModified": 1775454530,
+        "narHash": "sha256-lsUXjO5wq3qsVzbfM3uqsrJ3lghqOHwwl4osbs7/J0A=",
         "owner": "basher83",
         "repo": "lunar-claude",
-        "rev": "e82a75219b36d9e851d854b575dda274c11a6462",
+        "rev": "5e2797ac98a9500bf94b44008c8e7e1bd221bf0d",
         "type": "github"
       },
       "original": {
