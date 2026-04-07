@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.31.1](https://github.com/JacobPEvans/nix-ai/compare/v1.31.0...v1.31.1) (2026-04-07)
+
+
+### Bug Fixes
+
+* **models:** replace hardcoded model names with env var references (DRY) ([#423](https://github.com/JacobPEvans/nix-ai/issues/423)) ([16d3610](https://github.com/JacobPEvans/nix-ai/commit/16d3610e5d56d8d1a12f338e8eb3c7415c3d6973))
+
+## [1.31.0](https://github.com/JacobPEvans/nix-ai/compare/v1.30.0...v1.31.0) (2026-04-07)
+
+
+### Features
+
+* add AI merge gate ([#419](https://github.com/JacobPEvans/nix-ai/issues/419)) ([1791db9](https://github.com/JacobPEvans/nix-ai/commit/1791db99d7574dd7ee958507f12dad937c0a9d06))
+
+
+### Bug Fixes
+
+* replace deleted /init-worktree references with /refresh-repo ([#421](https://github.com/JacobPEvans/nix-ai/issues/421)) ([cb73b7f](https://github.com/JacobPEvans/nix-ai/commit/cb73b7f267b12ac175fd61057816ff7688357bca))
+
+## [1.30.0](https://github.com/JacobPEvans/nix-ai/compare/v1.29.3...v1.30.0) (2026-04-07)
+
+
+### Features
+
+* **claude:** auto-discover global rules from flake inputs ([#413](https://github.com/JacobPEvans/nix-ai/issues/413)) ([3d6b324](https://github.com/JacobPEvans/nix-ai/commit/3d6b3243320cb7f12618a34cc42f7bf9ff89b8a5))
+
 ## [1.29.3](https://github.com/JacobPEvans/nix-ai/compare/v1.29.2...v1.29.3) (2026-04-07)
 
 

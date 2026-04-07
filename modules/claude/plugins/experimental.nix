@@ -29,10 +29,10 @@ _:
     # WARNING: These plugins invoke external AI models (OpenAI, Google)
 
     # Codex: OpenAI GPT integration for high-reasoning coding tasks
-    # Auto-selects GPT-5.2-Codex for coding or GPT-5.2 for reasoning
+    # Auto-selects the latest available GPT model for coding or reasoning
     "codex@cc-dev-tools" = true;
 
-    # Gemini: Google Gemini 3 Pro integration for research and reasoning
+    # Gemini: Google Gemini integration for research and reasoning
     # Includes web search capabilities and session resumption
     "gemini@cc-dev-tools" = true;
 
