@@ -22,6 +22,8 @@ let
     apiUrl
     launchAgentLabel
     llamaSwapPkg
+    llamaSwapConfigFile
+    llamaSwapRuntimeConfigPath
     ;
   vllmMlxPin = "vllm-mlx==${vllmMlxVersion}";
 in
@@ -38,6 +40,8 @@ in
         MLX_HOST = cfg.host;
         MLX_HF_HOME = cfg.huggingFaceHome;
         MLX_LAUNCHD_LABEL = launchAgentLabel;
+        MLX_LLAMA_SWAP_CONFIG = llamaSwapRuntimeConfigPath;
+        MLX_LLAMA_SWAP_BASE_CONFIG = "${llamaSwapConfigFile}";
       };
 
       # ==========================================================================
@@ -135,6 +139,18 @@ in
             "$@"
         '')
 
+        # mlx-benchmark — orchestrate benchmark runs across models and suites
+        (pkgs.writeShellApplication {
+          name = "mlx-benchmark";
+          runtimeInputs = with pkgs; [
+            coreutils
+            curl
+            jq
+            uv
+          ];
+          text = builtins.readFile ./scripts/mlx-benchmark.sh;
+        })
+
         # ======================================================================
         # Health Check
         # ======================================================================
@@ -171,6 +187,16 @@ in
             jq
           ];
           text = builtins.readFile ./scripts/mlx-models.sh;
+        })
+
+        # mlx-discover — auto-discover downloaded models and register with llama-swap
+        (pkgs.writeShellApplication {
+          name = "mlx-discover";
+          runtimeInputs = with pkgs; [
+            coreutils
+            jq
+          ];
+          text = builtins.readFile ./scripts/mlx-discover.sh;
         })
 
         # ======================================================================

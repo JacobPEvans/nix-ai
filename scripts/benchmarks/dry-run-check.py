@@ -76,6 +76,17 @@ def main() -> None:
         print(f"ERROR: mock result failed schema validation: {e.message}", file=sys.stderr)
         sys.exit(1)
 
+    # Validate new suite/trigger values added for dynamic benchmarks
+    for suite, trigger in [("coding", "local"), ("reasoning", "local"), ("knowledge", "local")]:
+        variant = build_mock_result()
+        variant["suite"] = suite
+        variant["trigger"] = trigger
+        try:
+            jsonschema.validate(instance=variant, schema=schema)
+        except jsonschema.ValidationError as e:
+            print(f"ERROR: mock with suite={suite}, trigger={trigger} failed: {e.message}", file=sys.stderr)
+            sys.exit(1)
+
     print("OK: dry-run passed — imports healthy, mock result validates against schema")
 
 
