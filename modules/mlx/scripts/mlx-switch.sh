@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Switch the active MLX model via llama-swap proxy.
-# Usage: mlx-switch <model-id>
+# Usage: mlx-switch mlx-community/<model-id>
 
 model="${1:?Usage: mlx-switch <model>}"
 
