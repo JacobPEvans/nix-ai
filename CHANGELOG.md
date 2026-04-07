@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.31.1](https://github.com/JacobPEvans/nix-ai/compare/v1.31.0...v1.31.1) (2026-04-07)
+
+
+### Bug Fixes
+
+* **models:** replace hardcoded model names with env var references (DRY) ([#423](https://github.com/JacobPEvans/nix-ai/issues/423)) ([16d3610](https://github.com/JacobPEvans/nix-ai/commit/16d3610e5d56d8d1a12f338e8eb3c7415c3d6973))
+
 ## [1.31.0](https://github.com/JacobPEvans/nix-ai/compare/v1.30.0...v1.31.0) (2026-04-07)
 
 
