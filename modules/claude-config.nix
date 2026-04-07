@@ -33,6 +33,7 @@ let
   cbCommands = discoverMarkdownFiles "${claude-cookbooks}/.claude/commands";
   aiAgents = discoverMarkdownFiles "${ai-assistant-instructions}/agentsmd/agents";
   cbAgents = discoverMarkdownFiles "${claude-cookbooks}/.claude/agents";
+  aiRules = discoverMarkdownFiles "${ai-assistant-instructions}/agentsmd/rules";
 
   # Import modular plugin configuration
   # Plugin configuration moved to claude-plugins.nix and organized by category
@@ -153,11 +154,11 @@ in
     ++ (mkSourceEntries "${claude-cookbooks}/.claude/agents" cbAgents);
 
   # Global rules (loaded every session regardless of project)
+  rules.fromFlakeInputs = mkSourceEntries "${ai-assistant-instructions}/agentsmd/rules" aiRules;
+
   rules.local = {
     "pal-mcp-policy" = ./claude/rules/pal-mcp-policy.md;
     "retrospective-report-location" = ./claude/rules/retrospective-report-location.md;
-    "skill-execution-integrity" =
-      "${ai-assistant-instructions}/agentsmd/rules/skill-execution-integrity.md";
   };
 
   settings = {
