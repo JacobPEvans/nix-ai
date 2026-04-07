@@ -58,25 +58,25 @@ mlx-eval --tasks hellaswag --limit 100
 
 | Date | SHA | Test | Metric | Value | Unit |
 |------|-----|------|--------|-------|------|
-| 2026-04-06 04:56 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — | — |
+| 2026-04-06 04:56 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — |
 
 ### TTFT
 
 | Date | SHA | Test | Metric | Value | Unit |
 |------|-----|------|--------|-------|------|
-| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — | — |
+| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — |
 
 ### Tool Calling
 
 | Date | SHA | Test | Metric | Value | Unit |
 |------|-----|------|--------|-------|------|
-| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — | — |
+| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — |
 
 ### Code Accuracy
 
 | Date | SHA | Test | Metric | Value | Unit |
 |------|-----|------|--------|-------|------|
-| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — | — |
+| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — |
 
 ### Framework Benchmark
 
@@ -87,7 +87,7 @@ mlx-eval --tasks hellaswag --limit 100
 
 | Date | SHA | Category | Score | Claude Baseline | Gap |
 |------|-----|----------|-------|-----------------|-----|
-| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — | — |
+| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — |
 
 <!-- BENCHMARK-TABLE-END -->
 
@@ -283,14 +283,7 @@ System: macOS 26.3.0, vllm-mlx 0.2.6.
 
 ### Observations
 
-- **Long generation throughput is stable** at ~44 tok/s across both configs. The 16 GB
-  KV cache cap (down from 25.6 GB uncapped) has no measurable impact on single-request
-  throughput — the model is bandwidth-bound, not cache-bound.
-- **Short generation improved dramatically** (5.5 → 23.6 tok/s). The March 20 baseline
-  likely measured end-to-end latency including cold TTFT, inflating per-token cost. The
-  March 22 test measured on a warm server.
-- **TTFT improved** across both cold (2.0s → 1.13s) and warm (0.76s → 0.29s). Possible
-  causes: server warm-up state, prefix cache efficiency with smaller cache, or measurement
-  methodology differences.
-- **OOM guardrails have zero performance cost.** ProcessType=Background and
-  HardResourceLimits are metadata-only — no runtime overhead.
+- **Throughput stable** at ~44 tok/s — 16 GB KV cap has no impact (bandwidth-bound)
+- **Short gen improved** 5.5 → 23.6 tok/s (warm server vs cold TTFT in baseline)
+- **TTFT improved** cold 2.0s → 1.13s, warm 0.76s → 0.29s
+- **OOM guardrails zero cost** — ProcessType=Background is metadata-only
