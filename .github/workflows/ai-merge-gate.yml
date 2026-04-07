@@ -1,17 +1,6 @@
 name: AI Merge Gate
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-
-concurrency:
-  group: ai-merge-gate-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-permissions:
-  checks: read
-  contents: read
-  statuses: read
-
+on: pull_request
+permissions: read-all
 jobs:
   gate:
     uses: JacobPEvans/ai-workflows/.github/workflows/_ai-merge-gate.yml@main
