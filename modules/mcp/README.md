@@ -167,24 +167,26 @@ The last 6 are disabled upstream by default; `DISABLED_TOOLS = ""` enables all o
 
 ## PAL MLX Model Discovery
 
-PAL's model registry (`custom_models.json`) is generated automatically from the MLX
-vllm-mlx `/v1/models` endpoint during every `darwin-rebuild switch`. This keeps PAL's
-model list in sync with the running MLX model without manual configuration.
+PAL's model configs are fully managed by Nix. All provider model lists (Gemini, OpenAI,
+OpenRouter, Custom/MLX) are generated as static JSON in the Nix store and injected via
+env vars that override PAL's bundled `conf/*.json` files.
 
 ### How it works
 
-1. `claude/pal-models.nix` adds a `palCustomModels` activation script and injects
-   `CUSTOM_MODELS_CONFIG_PATH=~/.config/pal-mcp/custom_models.json` into the PAL server env.
-2. The activation script uses `mcp/scripts/pal-models-mlx.jq` (via `jq --from-file`) to
-   transform the MLX `/v1/models` JSON into a registry entry for each model.
-3. PAL reads the registry at startup. All MLX models appear under **Custom/Local API**.
-
-If MLX is not running at rebuild time the existing file is kept unchanged (no error).
+1. `claude/pal-models.nix` defines curated model lists as Nix attribute sets for each provider.
+2. These are serialized to JSON via `pkgs.writeText` and injected as env vars:
+   - `GEMINI_MODELS_CONFIG_PATH`, `OPENAI_MODELS_CONFIG_PATH`, `OPENROUTER_MODELS_CONFIG_PATH`
+   - `CUSTOM_MODELS_CONFIG_PATH` (MLX models from `programs.mlx.models` config)
+3. PAL's `CapabilityModelRegistry` reads env var paths first, ignoring bundled configs.
+4. All MLX models (default + on-demand) appear under **Custom/Local API** without
+   requiring the MLX server to be running at build time.
 
 ### Refreshing models
 
+After downloading a new MLX model without a rebuild:
+
 ```bash
-sync-mlx-models             # Regenerate registry (no rebuild required)
+sync-mlx-models             # Regenerate custom models from live MLX endpoint
 # Restart Claude Code to pick up the new models
 ```
 

@@ -385,7 +385,14 @@
           };
         }
       );
-      default = { };
+      default = {
+        "mlx-community/Llama-4-Scout-17B-16E-Instruct-4bit" = {
+          aliases = [
+            "llama-4-scout"
+            "scout"
+          ];
+        };
+      };
       description = "Additional models available for on-demand switching via llama-swap proxy. The defaultModel is always available with TTL 0.";
     };
 
