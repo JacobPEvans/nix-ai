@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.29.3](https://github.com/JacobPEvans/nix-ai/compare/v1.29.2...v1.29.3) (2026-04-07)
+
+
+### Bug Fixes
+
+* **claude:** switch auto-update channel from stable to latest ([#414](https://github.com/JacobPEvans/nix-ai/issues/414)) ([a76ae00](https://github.com/JacobPEvans/nix-ai/commit/a76ae0050631f48a2230c87eb5d5cb96636e64fa))
+
 ## [1.29.2](https://github.com/JacobPEvans/nix-ai/compare/v1.29.1...v1.29.2) (2026-04-06)
 
 
