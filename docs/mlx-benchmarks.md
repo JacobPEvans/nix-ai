@@ -21,27 +21,27 @@ terminal with the nix-ai home-manager profile active.
 mlx-status
 
 # Check model fits in memory before loading
-mlx-preflight mlx-community/Qwen3.5-122B-A10B-4bit
+mlx-preflight "$MLX_DEFAULT_MODEL"
 
 # List all downloaded models with memory fit status
 mlx-models
 
 # Throughput benchmark (raw MLX, bypasses vllm-mlx overhead)
-mlx-bench-raw --model mlx-community/Qwen3.5-122B-A10B-4bit --max-tokens 512
+mlx-bench-raw --model "$MLX_DEFAULT_MODEL" --max-tokens 512
 
 # Throughput benchmark (through vllm-mlx server)
-mlx-bench --model mlx-community/Qwen3.5-122B-A10B-4bit --max-tokens 512
+mlx-bench --model "$MLX_DEFAULT_MODEL" --max-tokens 512
 
 # Engine benchmark with cache/batching knobs
-mlx-bench-engine --model mlx-community/Qwen3.5-122B-A10B-4bit
+mlx-bench-engine --model "$MLX_DEFAULT_MODEL"
 
 # Quick API latency test (TTFT)
 # Run twice: first = cold TTFT, second = warm TTFT (prefix cache hit)
 curl -s http://127.0.0.1:11434/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -d '{"model":"mlx-community/Qwen3.5-122B-A10B-4bit",
-       "messages":[{"role":"user","content":"Hello"}],
-       "max_tokens":1,"temperature":0}' \
+  -d "{\"model\":\"$MLX_DEFAULT_MODEL\",
+       \"messages\":[{\"role\":\"user\",\"content\":\"Hello\"}],
+       \"max_tokens\":1,\"temperature\":0}" \
   -o /dev/null -w "TTFT: %{time_total}s\n"
 
 # Accuracy evaluation (lm-eval harness against live API)
