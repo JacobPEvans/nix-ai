@@ -113,7 +113,7 @@ for model_dir in "$hf_home/hub"/models--mlx-community--*; do
 
   # Generate command by substituting model ID into the template.
   # The template has the default model's ID after "serve " — replace it.
-  model_cmd=$(echo "$cmd_template" | sed "s|serve ${default_model}|serve ${model_id}|")
+  model_cmd="${cmd_template//serve $default_model/serve $model_id}"
 
   # Build model entry JSON
   entry=$(jq -n \

@@ -15,16 +15,18 @@ runtime_dir="$(dirname "$runtime")"
 
 mkdir -p "$runtime_dir"
 
+base_hash=$(shasum -a 256 "$base" | cut -d' ' -f1)
+marker_file="$runtime_dir/.base-config-hash"
+
 if [ ! -f "$runtime" ]; then
-  # First activation — seed from base
+  # First activation — seed from base and write hash marker
   cp "$base" "$runtime"
+  echo "$base_hash" > "$marker_file"
   echo "Seeded llama-swap runtime config from Nix store"
   exit 0
 fi
 
 # Check if base config changed (Nix store hash differs)
-base_hash=$(shasum -a 256 "$base" | cut -d' ' -f1)
-marker_file="$runtime_dir/.base-config-hash"
 prev_hash=""
 [ -f "$marker_file" ] && prev_hash=$(cat "$marker_file")
 

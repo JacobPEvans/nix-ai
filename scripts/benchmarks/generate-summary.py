@@ -142,8 +142,9 @@ def render_throughput_table(runs: list[dict]) -> str:
         for item in run.get("results", []):
             name = item.get("name", "")
             value = f"{item.get('value', 0):.1f}"
-            tokens = item.get("tags", {}).get("output_tokens", "—")
-            elapsed = item.get("tags", {}).get("elapsed_s", "—")
+            tags = item.get("tags", {})
+            tokens = tags.get("completion_tokens", tags.get("output_tokens", "—"))
+            elapsed = tags.get("elapsed_s", "—")
             lines.append(f"| {date} | {sha} | {model} | {name} | {value} | {tokens} | {elapsed} |")
 
     return "\n".join(lines) + "\n"
@@ -168,8 +169,9 @@ def render_ttft_table(runs: list[dict]) -> str:
         for item in run.get("results", []):
             name = item.get("name", "")
             value = f"{item.get('value', 0):.3f}"
-            temp = item.get("tags", {}).get("temperature", "—")
-            lines.append(f"| {date} | {sha} | {model} | {name} | {value} | {temp} |")
+            tags = item.get("tags", {})
+            result_type = tags.get("type", tags.get("temperature", "—"))
+            lines.append(f"| {date} | {sha} | {model} | {name} | {value} | {result_type} |")
 
     return "\n".join(lines) + "\n"
 
@@ -195,10 +197,20 @@ def render_accuracy_table(runs: list[dict]) -> str:
             value = item.get("value", 0)
             score = f"{value:.1%}" if value <= 1.0 else f"{value:.2f}"
             metric = item.get("metric", "")
-            samples = item.get("tags", {}).get("num_samples", "—")
+            samples = _get_sample_count(item)
             lines.append(f"| {date} | {sha} | {model} | {task} | {score} | {metric} | {samples} |")
 
     return "\n".join(lines) + "\n"
+
+
+def _get_sample_count(item: dict) -> str:
+    """Return the best available sample-count field for summary rendering."""
+    tags = item.get("tags", {})
+    for key in ("num_samples", "samples", "limit"):
+        value = tags.get(key)
+        if value not in (None, ""):
+            return str(value)
+    return "—"
 
 
 def _short_model(model: str) -> str:

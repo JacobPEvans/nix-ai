@@ -33,6 +33,7 @@ import re
 import subprocess
 import sys
 import time
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -85,7 +86,7 @@ def _curl_ttft(url: str, model: str, prompt: str, max_time: int = 30) -> float |
     })
     try:
         proc = subprocess.run(
-            ["curl", "-s", f"{url}/chat/completions",
+            ["curl", "-sf", f"{url}/chat/completions",
              "-H", "Content-Type: application/json",
              "-d", payload,
              "-o", "/dev/null",
@@ -721,7 +722,8 @@ def run_capability_suite() -> tuple[list[dict], list[str]]:
 # Suite dispatcher
 # ---------------------------------------------------------------------------
 
-SUITE_RUNNERS: dict[str, ...] = {
+SuiteRunner = Callable[[str], tuple[list[dict], list[str]]]
+SUITE_RUNNERS: dict[str, SuiteRunner] = {
     "throughput": lambda m: run_throughput_suite(m),
     "ttft": lambda m: run_ttft_suite(m),
     "tool-calling": lambda m: run_tool_calling_suite(m),
@@ -808,7 +810,7 @@ def main() -> None:
         runner = SUITE_RUNNERS[args.suite]
         suite_results, errors = runner(model)
 
-    # Build model slug for filename (replace / with -)
+    # Build model slug for filename using only the final path segment
     model_slug = model.rsplit("/", 1)[-1] if "/" in model else model
 
     result: dict = {

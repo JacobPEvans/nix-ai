@@ -21,7 +21,6 @@ model="${MLX_DEFAULT_MODEL:-}"
 all_models=false
 warmup=3
 dry_run=false
-output_dir=""
 repo_root=""
 
 # ──────────────────────────────────────────────────────────────────────
@@ -49,8 +48,8 @@ while [[ $# -gt 0 ]]; do
       dry_run=true
       shift
       ;;
-    --output-dir)
-      output_dir="${2:?--output-dir requires a value}"
+    --repo-root)
+      repo_root="${2:?--repo-root requires a value}"
       shift 2
       ;;
     -h|--help)
@@ -62,7 +61,7 @@ while [[ $# -gt 0 ]]; do
       echo "  --all-models        Benchmark every downloaded model that fits in memory"
       echo "  --warmup N          Warmup requests before benchmarking (default: 3)"
       echo "  --dry-run           Validate without running inference"
-      echo "  --output-dir DIR    Override result output directory"
+      echo "  --repo-root DIR    Override nix-ai repo root (auto-detected by default)"
       echo "  -h, --help          Show this help"
       echo ""
       echo "Suites: $all_suites"
@@ -88,20 +87,21 @@ find_repo_root() {
     fi
     dir="$(dirname "$dir")"
   done
-  # Fallback: check common locations
-  for candidate in "$HOME/git/nix-ai/main" "$HOME/git/nix-ai/feat/"*; do
-    if [ -d "$candidate/scripts/benchmarks" ]; then
-      echo "$candidate"
-      return 0
-    fi
-  done
+  # Fallback: use NIX_AI_REPO_ROOT if set
+  if [ -n "${NIX_AI_REPO_ROOT:-}" ] && [ -d "$NIX_AI_REPO_ROOT/scripts/benchmarks" ]; then
+    echo "$NIX_AI_REPO_ROOT"
+    return 0
+  fi
   return 1
 }
 
-repo_root="$(find_repo_root)" || {
-  echo "ERROR: Cannot find nix-ai repo root (need scripts/benchmarks/)" >&2
-  exit 1
-}
+if [ -z "$repo_root" ]; then
+  repo_root="$(find_repo_root)" || {
+    echo "ERROR: Cannot find nix-ai repo root (need scripts/benchmarks/)" >&2
+    echo "Set NIX_AI_REPO_ROOT or use --repo-root" >&2
+    exit 1
+  }
+fi
 
 collect_script="$repo_root/scripts/benchmarks/collect-results.py"
 summary_script="$repo_root/scripts/benchmarks/generate-summary.py"
@@ -128,7 +128,7 @@ if $all_models; then
   # Non-generative model patterns to skip
   skip_pattern="FLUX|whisper|OCR|Embedding|TTS|GGUF|clip|siglip|reranker|gte-|bge-"
 
-  for model_dir in "$hf_home/hub"/models--*; do
+  for model_dir in "$hf_home/hub"/models--mlx-community--*; do
     [ -d "$model_dir" ] || continue
     dir_name=$(basename "$model_dir")
     model_id="${dir_name#models--}"
@@ -226,9 +226,6 @@ for m in "${models[@]}"; do
     cmd=(uv run "$collect_script" --suite "$s" --model "$m")
     if $dry_run; then
       cmd+=(--dry-run)
-    fi
-    if [ -n "$output_dir" ]; then
-      cmd+=(--output-dir "$output_dir")
     fi
 
     if "${cmd[@]}" 2>&1 | tail -1; then
