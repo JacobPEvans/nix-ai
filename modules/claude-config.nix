@@ -156,7 +156,8 @@ in
   rules.local = {
     "pal-mcp-policy" = ./claude/rules/pal-mcp-policy.md;
     "retrospective-report-location" = ./claude/rules/retrospective-report-location.md;
-    "skill-execution-integrity" = "${ai-assistant-instructions}/agentsmd/rules/skill-execution-integrity.md";
+    "skill-execution-integrity" =
+      "${ai-assistant-instructions}/agentsmd/rules/skill-execution-integrity.md";
   };
 
   settings = {
