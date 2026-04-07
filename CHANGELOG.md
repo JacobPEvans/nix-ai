@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.32.0](https://github.com/JacobPEvans/nix-ai/compare/v1.31.1...v1.32.0) (2026-04-07)
+
+
+### Features
+
+* **mlx:** dynamic model discovery and comprehensive benchmark suite ([b9a277f](https://github.com/JacobPEvans/nix-ai/commit/b9a277f9fa159d09ab2b4c62dd8b1f201042be20)), closes [#294](https://github.com/JacobPEvans/nix-ai/issues/294)
+
 ## [1.31.1](https://github.com/JacobPEvans/nix-ai/compare/v1.31.0...v1.31.1) (2026-04-07)
 
 
