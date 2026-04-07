@@ -131,7 +131,7 @@ in
         {
           name = "autoUpdatesChannel";
           actual = cfg.autoUpdatesChannel;
-          expected = "stable";
+          expected = "latest";
         }
         {
           name = "teammateMode";

@@ -77,8 +77,8 @@ in
   # specified as it lacks a 1M context variant.
   # See: https://code.claude.com/docs/en/model-config
 
-  # Release channel: "stable" delays ~1 week to avoid regressions
-  autoUpdatesChannel = "stable";
+  # Release channel: "latest" gets newest releases immediately
+  autoUpdatesChannel = "latest";
 
   # Show turn duration in UI for performance visibility
   showTurnDuration = true;
