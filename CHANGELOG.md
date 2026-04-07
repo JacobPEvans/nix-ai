@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.30.0](https://github.com/JacobPEvans/nix-ai/compare/v1.29.3...v1.30.0) (2026-04-07)
+
+
+### Features
+
+* **claude:** auto-discover global rules from flake inputs ([#413](https://github.com/JacobPEvans/nix-ai/issues/413)) ([3d6b324](https://github.com/JacobPEvans/nix-ai/commit/3d6b3243320cb7f12618a34cc42f7bf9ff89b8a5))
+
 ## [1.29.3](https://github.com/JacobPEvans/nix-ai/compare/v1.29.2...v1.29.3) (2026-04-07)
 
 
