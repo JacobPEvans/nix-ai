@@ -7,6 +7,7 @@
 {
   config,
   lib,
+  pkgs,
   mlxShared,
   ...
 }:
@@ -78,7 +79,7 @@ in
     # from the Nix-generated base config. Preserves runtime-discovered models
     # by only overwriting when the base config has actually changed.
     home.activation.seedLlamaSwapConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      run ${./scripts/seed-llama-swap-config.sh} "${llamaSwapConfigFile}" "${llamaSwapRuntimeConfigPath}"
+      run ${pkgs.python3}/bin/python3 "${./seed-config.py}" "${llamaSwapConfigFile}" "${llamaSwapRuntimeConfigPath}"
     '';
 
     launchd.agents.vllm-mlx-logrotate = {

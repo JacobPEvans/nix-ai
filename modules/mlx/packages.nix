@@ -140,16 +140,9 @@ in
         '')
 
         # mlx-benchmark — orchestrate benchmark runs across models and suites
-        (pkgs.writeShellApplication {
-          name = "mlx-benchmark";
-          runtimeInputs = with pkgs; [
-            coreutils
-            curl
-            jq
-            uv
-          ];
-          text = builtins.readFile ./scripts/mlx-benchmark.sh;
-        })
+        (pkgs.writeShellScriptBin "mlx-benchmark" ''
+          exec ${pkgs.uv}/bin/uv run "${../../scripts/benchmarks/orchestrate.py}" "$@"
+        '')
 
         # ======================================================================
         # Health Check
@@ -190,14 +183,9 @@ in
         })
 
         # mlx-discover — auto-discover downloaded models and register with llama-swap
-        (pkgs.writeShellApplication {
-          name = "mlx-discover";
-          runtimeInputs = with pkgs; [
-            coreutils
-            jq
-          ];
-          text = builtins.readFile ./scripts/mlx-discover.sh;
-        })
+        (pkgs.writeShellScriptBin "mlx-discover" ''
+          exec ${pkgs.python3}/bin/python3 "${./discover-models.py}" "$@"
+        '')
 
         # ======================================================================
         # MLX Ecosystem — Ears & Eyes
