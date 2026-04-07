@@ -16,6 +16,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from orchestrator.common import load_yaml_file
 
+_DEFAULT_MODEL = os.environ.get("MLX_DEFAULT_MODEL", "default")
+
 
 class ModelSize(str, Enum):
     """Model size categories for resource planning."""
@@ -43,7 +45,7 @@ class ModelRequirement(BaseModel):
         description="OpenAI-compatible API endpoint URL",
     )
     model: str = Field(
-        default_factory=lambda: os.environ.get("MLX_DEFAULT_MODEL", "default"),
+        default=_DEFAULT_MODEL,
         description="Model identifier (HuggingFace ID for MLX models)",
     )
     size: ModelSize = Field(

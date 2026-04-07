@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 import pytest
 import yaml
@@ -14,6 +13,7 @@ from orchestrator.skill_schema import (
     OutputFormat,
     ResourceBudget,
     SkillDefinition,
+    _DEFAULT_MODEL,
     load_skill,
     load_skill_registry,
 )
@@ -67,7 +67,7 @@ class TestSkillDefinition:
         assert skill.name == "test-skill"
         assert skill.version == "1.0.0"
         assert skill.output_format == OutputFormat.TEXT
-        assert skill.model.model == os.environ.get("MLX_DEFAULT_MODEL", "default")
+        assert skill.model.model == _DEFAULT_MODEL
 
     def test_full_skill(self, sample_skill_data: dict):
         skill = SkillDefinition.model_validate(sample_skill_data)
@@ -80,7 +80,7 @@ class TestSkillDefinition:
     def test_model_defaults(self):
         model = ModelRequirement()
         assert model.endpoint == "http://127.0.0.1:11434/v1"
-        assert model.model == os.environ.get("MLX_DEFAULT_MODEL", "default")
+        assert model.model == _DEFAULT_MODEL
         assert model.temperature == 0.7
 
     def test_resource_defaults(self):
