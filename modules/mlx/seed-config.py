@@ -11,6 +11,7 @@ Arguments:
 """
 
 import hashlib
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -27,14 +28,21 @@ def main() -> None:
     runtime = Path(sys.argv[2])
     runtime.parent.mkdir(parents=True, exist_ok=True)
 
-    base_hash = hashlib.sha256(base.read_bytes()).hexdigest()
+    base_content = base.read_bytes()
+    base_hash = hashlib.sha256(base_content).hexdigest()
     marker = runtime.parent / ".base-config-hash"
 
-    if not runtime.exists():
-        shutil.copy2(base, runtime)
+    # Atomically create runtime config if it doesn't exist (avoids TOCTOU race
+    # with concurrent darwin-rebuild or LaunchAgent startup).
+    try:
+        fd = os.open(str(runtime), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        os.write(fd, base_content)
+        os.close(fd)
         marker.write_text(base_hash + "\n")
         print("Seeded llama-swap runtime config from Nix store")
         return
+    except FileExistsError:
+        pass
 
     prev_hash = marker.read_text().strip() if marker.exists() else ""
 

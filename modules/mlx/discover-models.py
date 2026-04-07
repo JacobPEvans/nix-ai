@@ -87,10 +87,16 @@ def main() -> None:
         print("Run darwin-rebuild switch to generate it.", file=sys.stderr)
         sys.exit(1)
 
-    # Seed runtime config from base if it doesn't exist
     if not config_path.is_file():
-        config_path.parent.mkdir(parents=True, exist_ok=True)
-        config_path.write_text(base_config_path.read_text())
+        print(
+            f"ERROR: Runtime config not found at {config_path}",
+            file=sys.stderr,
+        )
+        print(
+            "Run darwin-rebuild switch to seed it (seed-config.py).",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     current_config = json.loads(config_path.read_text())
 
@@ -152,7 +158,6 @@ def main() -> None:
             skipped += 1
             continue
 
-        # Generate command by substituting model ID into the template
         model_cmd = cmd_template.replace(
             f"serve {default_model}", f"serve {model_id}"
         )
@@ -182,7 +187,6 @@ def main() -> None:
             print(f"  {model_id}")
         sys.exit(0)
 
-    # Merge new models into config
     current_config.setdefault("models", {}).update(new_models)
     existing_members = (
         current_config.get("groups", {}).get("mlx-models", {}).get("members", [])

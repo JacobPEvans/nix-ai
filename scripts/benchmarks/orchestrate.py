@@ -14,8 +14,8 @@ Usage:
 """
 
 import argparse
+import json
 import os
-import re
 import subprocess
 import sys
 import time
@@ -32,11 +32,6 @@ ALL_SUITES = [
     "framework-eval",
     "capability-comparison",
 ]
-
-SKIP_PATTERN = re.compile(
-    r"FLUX|whisper|OCR|Embedding|TTS|GGUF|clip|siglip|reranker|gte-|bge-",
-    re.IGNORECASE,
-)
 
 
 def _find_repo_root() -> Path:
@@ -65,47 +60,24 @@ def _find_repo_root() -> Path:
 REPO_ROOT = _find_repo_root()
 
 
-def get_available_gb() -> int:
-    """Return available memory in GB (total - 20 GB reserved)."""
-    result = subprocess.run(
-        ["sysctl", "-n", "hw.memsize"], capture_output=True, text=True, check=True
-    )
-    total_gb = int(result.stdout.strip()) // (1024**3)
-    return total_gb - 20
-
-
-def dir_size_gb(path: Path) -> int:
-    """Return directory size in GB (rounded)."""
-    total = sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
-    return round(total / (1024**3))
-
-
 def discover_models() -> list[str]:
-    """Scan HF cache for fitting mlx-community models."""
-    hf_home = Path(os.environ.get("MLX_HF_HOME", "/Volumes/HuggingFace"))
-    hub = hf_home / "hub"
-    if not hub.is_dir():
+    """Register and list all fitting MLX models via mlx-discover and config."""
+    # mlx-discover scans the HF cache, applies memory preflight, and registers
+    # fitting models into the llama-swap config. We read the config afterward
+    # instead of re-scanning the filesystem.
+    result = subprocess.run(["mlx-discover", "--quiet"], capture_output=True)
+    if result.returncode != 0:
+        print(
+            "WARNING: mlx-discover failed — falling back to config-only models",
+            file=sys.stderr,
+        )
+
+    config_path = os.environ.get("MLX_LLAMA_SWAP_CONFIG")
+    if not config_path or not Path(config_path).is_file():
         return []
 
-    available_gb = get_available_gb()
-    models = []
-
-    # Run mlx-discover to ensure all models are registered
-    subprocess.run(["mlx-discover", "--quiet"], capture_output=True)
-
-    for model_dir in sorted(hub.glob("models--mlx-community--*")):
-        if not model_dir.is_dir():
-            continue
-        model_id = model_dir.name.removeprefix("models--").replace("--", "/")
-
-        if SKIP_PATTERN.search(model_id):
-            continue
-
-        est_gb = round(dir_size_gb(model_dir) * 1.3)
-        if est_gb <= available_gb:
-            models.append(model_id)
-
-    return models
+    config = json.loads(Path(config_path).read_text())
+    return sorted(config.get("models", {}).keys())
 
 
 def switch_model(model: str) -> bool:
