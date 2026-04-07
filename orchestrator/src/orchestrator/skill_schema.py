@@ -7,6 +7,7 @@ and output schemas that the orchestrator uses to route and execute requests.
 
 from __future__ import annotations
 
+import os
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -14,6 +15,8 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 
 from orchestrator.common import load_yaml_file
+
+_DEFAULT_MODEL = os.environ.get("MLX_DEFAULT_MODEL", "default")
 
 
 class ModelSize(str, Enum):
@@ -42,7 +45,7 @@ class ModelRequirement(BaseModel):
         description="OpenAI-compatible API endpoint URL",
     )
     model: str = Field(
-        default="mlx-community/Qwen3.5-27B-4bit",
+        default=_DEFAULT_MODEL,
         description="Model identifier (HuggingFace ID for MLX models)",
     )
     size: ModelSize = Field(

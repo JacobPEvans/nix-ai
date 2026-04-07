@@ -215,11 +215,11 @@ Two CLI tools work together for local MLX model workflows:
 
 ```bash
 # 1. Search for a model via HuggingFace MCP in Claude Code
-# 2. Download it
-hf download mlx-community/Qwen3-4B-4bit
+# 2. Download it (uses the default model from modules/mlx/options.nix)
+hf download "$MLX_DEFAULT_MODEL"
 
 # 3. Serve it locally (OpenAI-compatible endpoint at :8000)
-vllm-mlx serve mlx-community/Qwen3-4B-4bit
+vllm-mlx serve "$MLX_DEFAULT_MODEL"
 ```
 
 Both tools are `uvx` wrappers defined in `ai-tools.nix` — no separate installation needed.

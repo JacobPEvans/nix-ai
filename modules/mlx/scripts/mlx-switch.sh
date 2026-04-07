@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Switch the active MLX model via llama-swap proxy.
 # Auto-discovers and registers unregistered models before switching.
-# Usage: mlx-switch mlx-community/Qwen3-235B-A22B-4bit
+# Usage: mlx-switch <model-id>
 
 model="${1:?Usage: mlx-switch <model>}"
 

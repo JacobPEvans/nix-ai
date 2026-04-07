@@ -15,8 +15,8 @@ echo "The quick brown fox jumps over the lazy dog. This sentence contains every 
 
 echo "============================================================"
 echo "  Agent Framework Evaluation — $(date '+%Y-%m-%d %H:%M:%S')"
-echo "  Model: mlx-community/Qwen3.5-122B-A10B-4bit"
-echo "  Server: http://127.0.0.1:11434/v1"
+echo "  Model: ${MLX_DEFAULT_MODEL:?MLX_DEFAULT_MODEL not set}"
+echo "  Server: ${MLX_API_URL:-http://127.0.0.1:11434/v1}"
 echo "============================================================"
 
 echo ""
