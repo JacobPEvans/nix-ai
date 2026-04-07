@@ -314,7 +314,7 @@ When dispatching sub-agents, tell them to invoke the appropriate command:
 
 5. RESOLVE GITHUB ISSUE:
    Tell sub-agent: "Run /resolve-issues for Issue #X.
-   Use /refresh-repo first for clean workspace. Create focused PR (<200 lines).
+   Use /refresh-repo first, then create a worktree with mkdir -p + git worktree add. Create focused PR (<200 lines).
    After PR created, use /fix-pr-ci and /resolve-pr-review-thread as needed."
 
 6. CODE ANALYSIS/REVIEW:
