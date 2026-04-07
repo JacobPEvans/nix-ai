@@ -7,7 +7,7 @@ import time
 from openai import OpenAI
 
 API_URL = os.environ.get("MLX_API_URL", "http://127.0.0.1:11434/v1")
-MODEL = os.environ.get("MLX_DEFAULT_MODEL", "mlx-community/Qwen3.5-122B-A10B-4bit")
+MODEL = os.environ["MLX_DEFAULT_MODEL"]
 
 TOOLS = [
     {

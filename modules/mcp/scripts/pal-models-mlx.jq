@@ -4,7 +4,7 @@
 # Usage: curl -sf http://127.0.0.1:11434/v1/models | jq --from-file pal-models-mlx.jq
 #
 # Input format (OpenAI-compatible):
-#   { "data": [{ "id": "mlx-community/Qwen3.5-122B-A10B-4bit", ... }] }
+#   { "data": [{ "id": "<model-id>", ... }] }
 #
 # Output format (PAL custom_models.json):
 #   { "models": [{ "model_name": "...", "aliases": [...], ... }] }

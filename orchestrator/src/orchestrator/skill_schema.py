@@ -7,6 +7,7 @@ and output schemas that the orchestrator uses to route and execute requests.
 
 from __future__ import annotations
 
+import os
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -42,7 +43,7 @@ class ModelRequirement(BaseModel):
         description="OpenAI-compatible API endpoint URL",
     )
     model: str = Field(
-        default="mlx-community/Qwen3.5-27B-4bit",
+        default_factory=lambda: os.environ.get("MLX_DEFAULT_MODEL", "default"),
         description="Model identifier (HuggingFace ID for MLX models)",
     )
     size: ModelSize = Field(

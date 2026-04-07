@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 import pytest
 import yaml
@@ -66,7 +67,7 @@ class TestSkillDefinition:
         assert skill.name == "test-skill"
         assert skill.version == "1.0.0"
         assert skill.output_format == OutputFormat.TEXT
-        assert skill.model.model == "mlx-community/Qwen3.5-27B-4bit"
+        assert skill.model.model == os.environ.get("MLX_DEFAULT_MODEL", "default")
 
     def test_full_skill(self, sample_skill_data: dict):
         skill = SkillDefinition.model_validate(sample_skill_data)
@@ -79,7 +80,7 @@ class TestSkillDefinition:
     def test_model_defaults(self):
         model = ModelRequirement()
         assert model.endpoint == "http://127.0.0.1:11434/v1"
-        assert model.model == "mlx-community/Qwen3.5-27B-4bit"
+        assert model.model == os.environ.get("MLX_DEFAULT_MODEL", "default")
         assert model.temperature == 0.7
 
     def test_resource_defaults(self):

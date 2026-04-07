@@ -75,7 +75,7 @@ in
   #
   # API keys injected via Doppler (doppler-mcp wrapper):
   #   - GEMINI_API_KEY (Google Gemini — pro, flash models)
-  #   - OPENAI_API_KEY (OpenAI — o3, o4-mini, gpt-5, codex models)
+  #   - OPENAI_API_KEY (OpenAI — reasoning and chat/codex models)
   #   - OPENROUTER_API_KEY (OpenRouter — unified multi-model access)
   #
   # Non-secret config is set in env below (belongs in Nix, not Doppler).
@@ -91,8 +91,7 @@ in
       DISABLED_TOOLS = "";
       # 'auto' = PAL picks best available model per-task based on configured API keys.
       # Falls back across providers: OpenAI -> Gemini -> OpenRouter -> MLX.
-      # Other options: 'pro', 'flash', 'o3', 'o4-mini', 'gpt-5', 'gpt-5.1-codex',
-      # 'grok', 'opus-4.1', 'sonnet-4.1', or any DIAL/custom model name.
+      # Run PAL's `listmodels` tool for current aliases and providers.
       DEFAULT_MODEL = "auto";
       # Custom API endpoint — MLX inference server (vllm-mlx on port 11434)
       CUSTOM_API_URL = "http://127.0.0.1:11434/v1";

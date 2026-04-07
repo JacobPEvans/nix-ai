@@ -39,7 +39,7 @@ SCHEMA_PATH = REPO_ROOT / "data" / "benchmarks" / "schema.json"
 AGENT_SCRIPTS_DIR = REPO_ROOT / "orchestrator" / "examples" / "evaluations"
 BENCHMARKS_DIR = REPO_ROOT / "mlx-server" / "benchmarks"
 MLX_API_URL = os.environ.get("MLX_API_URL", "http://127.0.0.1:11434/v1")
-MLX_DEFAULT_MODEL = os.environ.get("MLX_DEFAULT_MODEL", "mlx-community/Qwen3.5-122B-A10B-4bit")
+MLX_DEFAULT_MODEL = os.environ["MLX_DEFAULT_MODEL"]
 SCHEMA_VERSION = "1"
 
 FRAMEWORK_SCRIPTS = [
