@@ -284,7 +284,7 @@ AVAILABLE COMMANDS (sub-agents should invoke these):
 │ /git-refresh                  │ Merge PRs, sync repos, cleanup worktrees       │
 │ /resolve-issues               │ Implement fixes for GitHub issues              │
 │ /shape-issues                 │ Convert raw ideas into actionable issues       │
-│ /init-worktree                │ Create clean worktree for new development      │
+│ /refresh-repo                 │ Sync repo, cleanup worktrees, check PR status  │
 │ /review-pr                    │ Comprehensive PR review with feedback          │
 │ /review-code                  │ Code review for quality, bugs, security        │
 │ /review-docs                  │ Documentation review for consistency           │
@@ -314,7 +314,7 @@ When dispatching sub-agents, tell them to invoke the appropriate command:
 
 5. RESOLVE GITHUB ISSUE:
    Tell sub-agent: "Run /resolve-issues for Issue #X.
-   Use /init-worktree first for clean workspace. Create focused PR (<200 lines).
+   Use /refresh-repo first for clean workspace. Create focused PR (<200 lines).
    After PR created, use /fix-pr-ci and /resolve-pr-review-thread as needed."
 
 6. CODE ANALYSIS/REVIEW:
