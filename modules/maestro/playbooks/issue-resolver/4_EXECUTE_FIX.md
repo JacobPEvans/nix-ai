@@ -16,7 +16,7 @@ Target repository: $MAESTRO_CURRENT_REPO
 
 - [ ] Read issue details from `selected-issue.json`
 - [ ] Extract issue number: `ISSUE_NUMBER=$(jq -r '.number' selected-issue.json)`
-- [ ] Create worktree: Run `/init-worktree` command with descriptive branch name
+- [ ] Create worktree: Run `/refresh-repo`, then `mkdir -p ~/git/<repo>/<type>` and `git worktree add ~/git/<repo>/<type>/<name> -b <type>/<name> main`
 - [ ] Analyze issue requirements thoroughly
 - [ ] Implement the fix following repository conventions
 - [ ] Add or update tests as appropriate
