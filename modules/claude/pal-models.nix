@@ -38,7 +38,7 @@ let
 
   # All configured MLX model names (default + on-demand) for PAL discovery.
   # Generated statically from Nix config — no runtime MLX server query needed.
-  allMlxModelNames = [ mlxCfg.defaultModel ] ++ builtins.attrNames mlxCfg.models;
+  allMlxModelNames = lib.unique ([ mlxCfg.defaultModel ] ++ builtins.attrNames mlxCfg.models);
   customModels = {
     models = builtins.map (
       id:
@@ -68,6 +68,11 @@ let
     ) allMlxModelNames;
   };
   customModelsConfigFile = pkgs.writeText "pal-custom-models.json" (builtins.toJSON customModels);
+
+  # Writable path for custom models — allows sync-mlx-models CLI to update between rebuilds.
+  # Activation seeds this from the static Nix store file; PAL reads from here at runtime.
+  customModelsDir = "${config.home.homeDirectory}/.config/pal-mcp";
+  customModelsPath = "${customModelsDir}/custom_models.json";
 in
 {
   config = lib.mkIf cfg.enable {
@@ -87,22 +92,29 @@ in
             pkgs.curl
             pkgs.jq
           ];
+          runtimeEnv = {
+            MLX_URL = "http://${mlxCfg.host}:${toString mlxCfg.port}/v1/models";
+          };
           text = builtins.readFile ../mcp/scripts/sync-mlx-models-cli.sh;
         })
       ];
 
       activation = {
-        # Ensure PAL log directory exists.
+        # Create dirs and seed custom_models.json from the Nix-generated static file.
         palDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          $DRY_RUN_CMD bash -c '(umask 077 && mkdir -p "${palLogDir}")'
+          $DRY_RUN_CMD bash -c '(umask 077 && mkdir -p "${palLogDir}" "${customModelsDir}")'
+          $DRY_RUN_CMD cp -f "${customModelsConfigFile}" "${customModelsPath}"
         '';
 
         # Non-blocking health check — surfaces PAL issues early.
+        # Skipped on dry-run to avoid Doppler network calls.
         palHealthCheck = lib.hm.dag.entryAfter [ "writeBoundary" "palDirs" ] ''
-          DOPPLER="${pkgs.doppler}/bin/doppler" \
-          PAL_MCP_BIN="${palPkg}/bin/pal-mcp-server" \
-          PAL_LOG_DIR="${palLogDir}" \
-          . ${../mcp/scripts/check-pal-health.sh}
+          if [ -z "''${DRY_RUN_CMD:-}" ]; then
+            DOPPLER="${pkgs.doppler}/bin/doppler" \
+            PAL_MCP_BIN="${palPkg}/bin/pal-mcp-server" \
+            PAL_LOG_DIR="${palLogDir}" \
+            . ${../mcp/scripts/check-pal-health.sh}
+          fi
         '';
       };
     };
@@ -111,8 +123,9 @@ in
     # Merges with the env block defined in mcp/default.nix (DISABLED_TOOLS, etc.).
     # Provider config overrides replace PAL's bundled conf/*.json with our curated lists.
     programs.claude.mcpServers.pal.env = {
-      # Custom/local models (MLX) — static, generated from Nix mlx.models config
-      CUSTOM_MODELS_CONFIG_PATH = "${customModelsConfigFile}";
+      # Custom/local models (MLX) — writable path seeded from Nix at activation,
+      # refreshable via sync-mlx-models CLI between rebuilds
+      CUSTOM_MODELS_CONFIG_PATH = customModelsPath;
       # Provider model configs — static, curated Nix store paths
       GEMINI_MODELS_CONFIG_PATH = "${geminiConfigFile}";
       OPENAI_MODELS_CONFIG_PATH = "${openaiConfigFile}";
