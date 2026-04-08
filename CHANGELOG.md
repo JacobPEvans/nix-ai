@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.32.1](https://github.com/JacobPEvans/nix-ai/compare/v1.32.0...v1.32.1) (2026-04-08)
+
+
+### Bug Fixes
+
+* update Copilot setup source to ai-workflows ([#426](https://github.com/JacobPEvans/nix-ai/issues/426)) ([c385804](https://github.com/JacobPEvans/nix-ai/commit/c3858046251c76da4affea92095401484f50aea3))
+
 ## [1.32.0](https://github.com/JacobPEvans/nix-ai/compare/v1.31.1...v1.32.0) (2026-04-07)
 
 
