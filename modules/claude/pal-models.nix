@@ -90,9 +90,12 @@ in
 
         # Generate cloud model configs from OpenRouter public API.
         # No auth required. Preserves previous files if API is unreachable.
+        # Skipped on dry-run because the sync script makes external network calls.
         palCloudModels = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           ${cloudSyncEnv}
-          . ${../mcp/scripts/sync-pal-cloud-models.sh}
+          if [ -z "''${DRY_RUN_CMD:-}" ]; then
+            . ${../mcp/scripts/sync-pal-cloud-models.sh}
+          fi
         '';
 
         # Non-blocking health check — runs after activation to surface PAL issues

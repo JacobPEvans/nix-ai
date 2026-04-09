@@ -19,7 +19,7 @@ OPENROUTER_API="https://openrouter.ai/api/v1/models"
 mkdir -p "$OUTPUT_DIR"
 
 # Single API call — reuse response for all 3 provider transforms
-api_json=$("$CURL" -sf --connect-timeout 10 --max-time 30 "$OPENROUTER_API" 2>/dev/null || echo "")
+api_json=$("$CURL" -sf --connect-timeout 10 --max-time 30 "$OPENROUTER_API" || echo "")
 
 if [ -z "$api_json" ]; then
   echo "  WARN: OpenRouter API unreachable — preserving previous model configs" >&2
@@ -33,8 +33,8 @@ _sync_provider() {
   _jq_file="$2"
   _output_file="${OUTPUT_DIR}/${_provider_name}_models.json"
 
-  _provider_json=$(echo "$api_json" | "$JQ" --from-file "$_jq_file" 2>/dev/null || echo '{"models": []}')
-  _model_count=$(echo "$_provider_json" | "$JQ" '.models | length' 2>/dev/null || echo "0")
+  _provider_json=$(echo "$api_json" | "$JQ" --from-file "$_jq_file" || echo '{"models": []}')
+  _model_count=$(echo "$_provider_json" | "$JQ" '.models | length' || echo "0")
 
   if [ "$_model_count" -gt 0 ] || [ ! -f "$_output_file" ]; then
     echo "$_provider_json" > "$_output_file"

@@ -36,7 +36,7 @@ def make_aliases:
     | select(.id | test("^openai/(gpt-[5-9]|o[4-9])"))
     | select(.id | test("image|deep-research") | not)  # exclude image-gen and research variants
     | (.id | family_score) as $score
-    | ([.supported_parameters[]? | select(. == "include_reasoning")] | length > 0) as $has_reasoning
+    | any(.supported_parameters[]?; . == "include_reasoning") as $has_reasoning
     | {
         model_name: (.id | strip_prefix),
         friendly_name: .name,
@@ -48,10 +48,10 @@ def make_aliases:
         supports_extended_thinking: $has_reasoning,
         supports_system_prompts: true,
         supports_streaming: true,
-        supports_function_calling: ([.supported_parameters[]? | select(. == "tools")] | length > 0),
-        supports_json_mode: ([.supported_parameters[]? | select(. == "structured_outputs")] | length > 0),
+        supports_function_calling: any(.supported_parameters[]?; . == "tools"),
+        supports_json_mode: any(.supported_parameters[]?; . == "structured_outputs"),
         supports_images: (.architecture.modality // "" | test("image")),
-        supports_temperature: ([.supported_parameters[]? | select(. == "temperature")] | length > 0),
+        supports_temperature: any(.supported_parameters[]?; . == "temperature"),
         use_openai_response_api: $has_reasoning,
         allow_code_generation: ($score >= 12)
       }

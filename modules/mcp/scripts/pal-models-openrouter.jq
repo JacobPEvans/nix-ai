@@ -9,7 +9,7 @@
 #   openai/(gpt-[5-9]|o[4-9])*  — current OpenAI
 #   anthropic/claude-(opus|sonnet)-[4-9]* — current Anthropic
 #   x-ai/grok-[4-9]*       — current Grok
-#   deepseek/*              — all DeepSeek (few models, all relevant)
+#   deepseek/deepseek-(r1|v3)* — current DeepSeek R1/V3 families
 #
 # Intelligence scoring uses family heuristics across all providers.
 
@@ -51,13 +51,13 @@ def make_aliases:
         description: .description,
         context_window: .context_length,
         max_output_tokens: (.top_provider.max_completion_tokens // 65536),
-        supports_extended_thinking: ([.supported_parameters[]? | select(. == "include_reasoning")] | length > 0),
+        supports_extended_thinking: any(.supported_parameters[]?; . == "include_reasoning"),
         supports_system_prompts: true,
         supports_streaming: true,
-        supports_json_mode: ([.supported_parameters[]? | select(. == "structured_outputs")] | length > 0),
-        supports_function_calling: ([.supported_parameters[]? | select(. == "tools")] | length > 0),
+        supports_json_mode: any(.supported_parameters[]?; . == "structured_outputs"),
+        supports_function_calling: any(.supported_parameters[]?; . == "tools"),
         supports_images: (.architecture.modality // "" | test("image")),
-        supports_temperature: ([.supported_parameters[]? | select(. == "temperature")] | length > 0),
+        supports_temperature: any(.supported_parameters[]?; . == "temperature"),
         allow_code_generation: ($score >= 14)
       }
   ]
