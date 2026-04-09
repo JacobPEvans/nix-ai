@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.32.3](https://github.com/JacobPEvans/nix-ai/compare/v1.32.2...v1.32.3) (2026-04-09)
+
+
+### Bug Fixes
+
+* **mlx:** correct mlx-eval base_url for lm-eval local-chat-completions ([#431](https://github.com/JacobPEvans/nix-ai/issues/431)) ([869948b](https://github.com/JacobPEvans/nix-ai/commit/869948b04d5342313349f818e245f8db99507327))
+* **pal:** dynamic model discovery via OpenRouter, kill stale defaults ([#434](https://github.com/JacobPEvans/nix-ai/issues/434)) ([3e8dea9](https://github.com/JacobPEvans/nix-ai/commit/3e8dea9ebb909043a7da6aeca805ebf9a39c0f5c))
+
 ## [1.32.2](https://github.com/JacobPEvans/nix-ai/compare/v1.32.1...v1.32.2) (2026-04-09)
 
 
