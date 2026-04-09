@@ -159,7 +159,6 @@ in
   rules.local = {
     "pal-mcp-policy" = ./claude/rules/pal-mcp-policy.md;
     "retrospective-report-location" = ./claude/rules/retrospective-report-location.md;
-    "nix-tool-policy" = ai-assistant-instructions + "/agentsmd/rules/nix-tool-policy.md";
   };
 
   settings = {
