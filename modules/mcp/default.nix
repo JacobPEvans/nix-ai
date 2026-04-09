@@ -31,22 +31,22 @@ in
   # ================================================================
 
   everything = official "everything" "2026.1.26";
-  fetch = archived "fetch"; # archived upstream — not on npm
+  fetch = archived "fetch";
   filesystem = official "filesystem" "2026.1.14";
-  git = archived "git"; # archived upstream — not on npm
+  git = archived "git";
   memory = official "memory" "2026.1.26";
   sequentialthinking = archived "sequentialthinking"; # npm name is "sequential-thinking"
-  time = archived "time"; # archived upstream — not on npm
-  docker = archived "docker"; # archived upstream — not on npm
+  time = archived "time";
+  docker = archived "docker";
   exa = archived "exa" // {
     disabled = true;
-  }; # archived upstream — not on npm. Requires: EXA_API_KEY
+  }; # Requires: EXA_API_KEY
   firecrawl = archived "firecrawl" // {
     disabled = true;
-  }; # archived upstream — not on npm. Requires: FIRECRAWL_API_KEY
+  }; # Requires: FIRECRAWL_API_KEY
   cloudflare = archived "cloudflare" // {
     disabled = true;
-  }; # archived upstream — not on npm. Requires: CLOUDFLARE_API_TOKEN
+  }; # Requires: CLOUDFLARE_API_TOKEN
   aws = official "aws-kb-retrieval" "0.6.2"; # Requires: AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
 
   # ================================================================
@@ -151,7 +151,7 @@ in
   };
   sqlite = archived "sqlite" // {
     disabled = true;
-  }; # archived upstream — not on npm
+  };
 
   # ================================================================
   # Additional (disabled - specialized use cases)
@@ -189,7 +189,7 @@ in
   };
   sentry = archived "sentry" // {
     disabled = true;
-  }; # archived upstream — not on npm
+  };
 
   # ================================================================
   # Cribl MCP - OrbStack kubernetes-monitoring stack
