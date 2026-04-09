@@ -42,20 +42,23 @@ def make_aliases:
         (.id | test("^deepseek/deepseek-(r1|v3)"))
       )
     | select(.id | test("image|deep-research|extended") | not)  # exclude niche variants
+    | (.id | family_score) as $score
     | {
         model_name: .id,
         friendly_name: .name,
         aliases: (.id | make_aliases),
-        intelligence_score: (.id | family_score),
+        intelligence_score: $score,
         description: .description,
         context_window: .context_length,
         max_output_tokens: (.top_provider.max_completion_tokens // 65536),
         supports_extended_thinking: ([.supported_parameters[]? | select(. == "include_reasoning")] | length > 0),
+        supports_system_prompts: true,
+        supports_streaming: true,
         supports_json_mode: ([.supported_parameters[]? | select(. == "structured_outputs")] | length > 0),
         supports_function_calling: ([.supported_parameters[]? | select(. == "tools")] | length > 0),
         supports_images: (.architecture.modality // "" | test("image")),
         supports_temperature: ([.supported_parameters[]? | select(. == "temperature")] | length > 0),
-        allow_code_generation: ((.id | family_score) >= 14)
+        allow_code_generation: ($score >= 14)
       }
   ]
 }

@@ -32,11 +32,12 @@ def make_aliases:
     .data[]
     | select(.id | test("^google/gemini-[3-9]"))
     | select(.id | test("image-preview$") | not)  # exclude image-gen variants
+    | (.id | family_score) as $score
     | {
         model_name: (.id | strip_prefix),
         friendly_name: .name,
         aliases: (.id | make_aliases),
-        intelligence_score: (.id | family_score),
+        intelligence_score: $score,
         description: .description,
         context_window: .context_length,
         max_output_tokens: (.top_provider.max_completion_tokens // 65536),
@@ -47,7 +48,7 @@ def make_aliases:
         supports_json_mode: ([.supported_parameters[]? | select(. == "structured_outputs")] | length > 0),
         supports_images: (.architecture.modality // "" | test("image")),
         supports_temperature: ([.supported_parameters[]? | select(. == "temperature")] | length > 0),
-        allow_code_generation: ((.id | family_score) >= 12)
+        allow_code_generation: ($score >= 12)
       }
   ]
 }

@@ -29,24 +29,27 @@ let
   palLogDir = "${config.home.homeDirectory}/.local/state/pal-mcp";
   palPkg = pkgs.callPackage ../mcp/pal-package.nix { inherit pal-mcp-server; };
 
-  # Shared environment for MLX sync (used by both CLI tool and activation)
-  mlxSyncEnv = ''
+  # Common env shared by both MLX and cloud sync scripts
+  commonSyncEnv = ''
     export CURL="${pkgs.curl}/bin/curl"
     export JQ="${pkgs.jq}/bin/jq"
+    export OUTPUT_DIR="${outputDir}"
+  '';
+
+  # MLX-specific sync env (used by both CLI tool and activation)
+  mlxSyncEnv = ''
+    ${commonSyncEnv}
     export MLX_JQ_FILE="${../mcp/scripts/pal-models-mlx.jq}"
     export MLX_URL="http://${mlxCfg.host}:${toString mlxCfg.port}/v1/models"
-    export OUTPUT_DIR="${outputDir}"
     export OUTPUT_FILE="${outputFile}"
   '';
 
-  # Shared environment for cloud model sync (OpenRouter public API, no auth)
+  # Cloud-specific sync env (OpenRouter public API, no auth)
   cloudSyncEnv = ''
-    export CURL="${pkgs.curl}/bin/curl"
-    export JQ="${pkgs.jq}/bin/jq"
+    ${commonSyncEnv}
     export GEMINI_JQ_FILE="${../mcp/scripts/pal-models-gemini.jq}"
     export OPENAI_JQ_FILE="${../mcp/scripts/pal-models-openai.jq}"
     export OPENROUTER_JQ_FILE="${../mcp/scripts/pal-models-openrouter.jq}"
-    export OUTPUT_DIR="${outputDir}"
   '';
 in
 {
