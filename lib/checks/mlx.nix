@@ -177,12 +177,14 @@ in
       # llama-swap proxy args that must always be present
       requiredSubstrings = [
         "--config"
+        "--watch-config"
         "--listen"
       ];
       missingRequired = builtins.filter (f: builtins.match ".*${f}.*" argsStr == null) requiredSubstrings;
 
-      # Verify the --config argument points to a store path (non-empty string after "--config").
-      # The config file is a pkgs.writeText derivation — its store path will contain "/nix/store/".
+      # Verify the --config argument has a following path argument.
+      # The path is a mutable runtime config (e.g. ~/.config/mlx/llama-swap.json)
+      # that llama-swap watches for changes via --watch-config.
       configArgIdx =
         let
           idxList = builtins.filter (i: builtins.elemAt args i == "--config") (
@@ -195,7 +197,7 @@ in
           builtins.elemAt args (configArgIdx + 1)
         else
           "";
-      configArgPresent = configFileArg != "" && builtins.match ".*/nix/store/.*" configFileArg != null;
+      configArgPresent = configFileArg != "";
     in
     assert
       presentBanned == [ ]
@@ -205,7 +207,7 @@ in
       || throw "Missing required llama-swap proxy flags in ProgramArguments: ${builtins.toJSON missingRequired}";
     assert configArgPresent || throw "ProgramArguments has --config but no following path argument";
     pkgs.runCommand "check-mlx-launchd" { } ''
-      echo "MLX LaunchAgent: llama-swap proxy args verified (--config ${configFileArg} --listen present)"
+      echo "MLX LaunchAgent: llama-swap proxy args verified (--config ${configFileArg} --watch-config --listen present)"
       touch $out
     '';
 

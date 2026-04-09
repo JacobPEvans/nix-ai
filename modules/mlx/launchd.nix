@@ -7,6 +7,7 @@
 {
   config,
   lib,
+  pkgs,
   mlxShared,
   ...
 }:
@@ -16,6 +17,7 @@ let
     launchAgentLabel
     llamaSwapPkg
     llamaSwapConfigFile
+    llamaSwapRuntimeConfigPath
     ;
 in
 {
@@ -36,7 +38,8 @@ in
         ProgramArguments = [
           (lib.getExe llamaSwapPkg)
           "--config"
-          "${llamaSwapConfigFile}"
+          llamaSwapRuntimeConfigPath
+          "--watch-config"
           "--listen"
           "${cfg.host}:${toString cfg.port}"
         ];
@@ -67,6 +70,16 @@ in
       # logfilename                                                                [owner:group]  mode  count  size  when  flags
       ${config.home.homeDirectory}/Library/Logs/vllm-mlx/vllm-mlx.error.log        :              644   3      10240 *     J
       ${config.home.homeDirectory}/Library/Logs/vllm-mlx/vllm-mlx.log              :              644   3      10240 *     J
+    '';
+
+    # ==========================================================================
+    # Runtime Config Seeding
+    # ==========================================================================
+    # On activation (darwin-rebuild switch), seed the mutable runtime config
+    # from the Nix-generated base config. Preserves runtime-discovered models
+    # by only overwriting when the base config has actually changed.
+    home.activation.seedLlamaSwapConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      run ${pkgs.python3}/bin/python3 "${./seed-config.py}" "${llamaSwapConfigFile}" "${llamaSwapRuntimeConfigPath}"
     '';
 
     launchd.agents.vllm-mlx-logrotate = {

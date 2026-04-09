@@ -53,6 +53,11 @@ let
   apiUrl = "http://${cfg.host}:${toString cfg.port}/v1";
   launchAgentLabel = "dev.vllm-mlx.server";
 
+  # Mutable runtime config path — llama-swap reads this with --watch-config.
+  # mlx-discover merges auto-discovered models into this file at runtime.
+  # The Nix-generated llamaSwapConfigFile seeds this on first activation.
+  llamaSwapRuntimeConfigPath = "${config.home.homeDirectory}/.config/mlx/llama-swap.json";
+
   # Build the vllm-mlx serve command string for a given model ID.
   # NOTE: \${PORT} is a llama-swap template macro — must be escaped to prevent
   # Nix string interpolation from consuming it before the config is written.
@@ -168,6 +173,7 @@ in
       llamaSwapPkg
       llamaSwapConfigFile
       llamaSwapConfigAttrs
+      llamaSwapRuntimeConfigPath
       ;
   };
 }
