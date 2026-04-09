@@ -12,7 +12,7 @@
 
     defaultModel = lib.mkOption {
       type = lib.types.str;
-      default = "mlx-community/Qwen3.5-27B-4bit";
+      default = "mlx-community/Qwen3.5-122B-A10B-4bit";
       description = "Default mlx-community/ HuggingFace model to serve via vllm-mlx";
     };
 
@@ -36,7 +36,7 @@
 
     # ---- vllm-mlx 0.2.6 PERFORMANCE TUNING ----
     # Benchmarked 2026-03-19 on M4 Max 128GB with Qwen3.5-122B-A10B-4bit (~65 GB).
-    # Memory budgets below reference the 122B model; the default is now 27B (~15 GB).
+    # Memory budgets below reference the 122B MoE model (10B active params, ~20 GB).
     # Baseline: 55-74 tok/s generation, no parallel request benefit (bandwidth-bound).
     #
     # vllm-mlx 0.2.6 replaced the old token-count KV cache (--max-kv-size) with a
