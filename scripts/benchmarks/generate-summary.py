@@ -32,6 +32,9 @@ SUITE_LABELS = {
     "code-accuracy": "Code Accuracy",
     "framework-eval": "Framework Benchmark",
     "capability-comparison": "Capability Comparison (vs Claude Opus 4.6)",
+    "coding": "Coding (HumanEval)",
+    "reasoning": "Reasoning (GSM8K / HellaSwag / ARC)",
+    "knowledge": "Knowledge (MMLU / IFEval)",
 }
 
 
@@ -120,6 +123,101 @@ def render_capability_table(runs: list[dict]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def render_throughput_table(runs: list[dict]) -> str:
+    """Throughput suite: show tok/s at different output lengths, grouped by model."""
+    if not runs:
+        return "_No results yet._\n"
+
+    lines = [
+        "| Date | SHA | Model | Test | tok/s | Tokens | Elapsed |",
+        "|------|-----|-------|------|-------|--------|---------|",
+    ]
+    for run in runs:
+        date = fmt_timestamp(run.get("timestamp", ""))
+        sha = run.get("git_sha", "")[:7]
+        model = _short_model(run.get("model", ""))
+        if run.get("skipped"):
+            lines.append(_skipped_row(date, sha, 7))
+            continue
+        for item in run.get("results", []):
+            name = item.get("name", "")
+            value = f"{item.get('value', 0):.1f}"
+            tags = item.get("tags", {})
+            tokens = tags.get("completion_tokens", tags.get("output_tokens", "—"))
+            elapsed = tags.get("elapsed_s", "—")
+            lines.append(f"| {date} | {sha} | {model} | {name} | {value} | {tokens} | {elapsed} |")
+
+    return "\n".join(lines) + "\n"
+
+
+def render_ttft_table(runs: list[dict]) -> str:
+    """TTFT suite: show cold/warm latency with cache speedup."""
+    if not runs:
+        return "_No results yet._\n"
+
+    lines = [
+        "| Date | SHA | Model | Test | Latency (s) | Type |",
+        "|------|-----|-------|------|-------------|------|",
+    ]
+    for run in runs:
+        date = fmt_timestamp(run.get("timestamp", ""))
+        sha = run.get("git_sha", "")[:7]
+        model = _short_model(run.get("model", ""))
+        if run.get("skipped"):
+            lines.append(_skipped_row(date, sha, 6))
+            continue
+        for item in run.get("results", []):
+            name = item.get("name", "")
+            value = f"{item.get('value', 0):.3f}"
+            tags = item.get("tags", {})
+            result_type = tags.get("type", tags.get("temperature", "—"))
+            lines.append(f"| {date} | {sha} | {model} | {name} | {value} | {result_type} |")
+
+    return "\n".join(lines) + "\n"
+
+
+def render_accuracy_table(runs: list[dict]) -> str:
+    """Accuracy-based suites (coding, reasoning, knowledge, tool-calling, code-accuracy)."""
+    if not runs:
+        return "_No results yet._\n"
+
+    lines = [
+        "| Date | SHA | Model | Task | Score | Metric | Samples |",
+        "|------|-----|-------|------|-------|--------|---------|",
+    ]
+    for run in runs:
+        date = fmt_timestamp(run.get("timestamp", ""))
+        sha = run.get("git_sha", "")[:7]
+        model = _short_model(run.get("model", ""))
+        if run.get("skipped"):
+            lines.append(_skipped_row(date, sha, 7))
+            continue
+        for item in run.get("results", []):
+            task = item.get("tags", {}).get("task", item.get("name", ""))
+            value = item.get("value", 0)
+            score = f"{value:.1%}" if value <= 1.0 else f"{value:.2f}"
+            metric = item.get("metric", "")
+            samples = _get_sample_count(item)
+            lines.append(f"| {date} | {sha} | {model} | {task} | {score} | {metric} | {samples} |")
+
+    return "\n".join(lines) + "\n"
+
+
+def _get_sample_count(item: dict) -> str:
+    """Return the best available sample-count field for summary rendering."""
+    tags = item.get("tags", {})
+    for key in ("num_samples", "samples", "limit"):
+        value = tags.get(key)
+        if value not in (None, ""):
+            return str(value)
+    return "—"
+
+
+def _short_model(model: str) -> str:
+    """Shorten model ID for table display (e.g. mlx-community/Qwen3.5-27B-4bit -> Qwen3.5-27B-4bit)."""
+    return model.split("/")[-1] if "/" in model else model
+
+
 def render_generic_table(runs: list[dict]) -> str:
     if not runs:
         return "_No results yet._\n"
@@ -147,13 +245,67 @@ def render_generic_table(runs: list[dict]) -> str:
 def render_suite(suite: str, runs: list[dict]) -> str:
     label = SUITE_LABELS.get(suite, suite)
     heading = f"### {label}\n\n"
+    accuracy_suites = {"coding", "reasoning", "knowledge", "tool-calling", "code-accuracy"}
     if suite == "framework-eval":
         body = render_framework_table(runs)
     elif suite == "capability-comparison":
         body = render_capability_table(runs)
+    elif suite == "throughput":
+        body = render_throughput_table(runs)
+    elif suite == "ttft":
+        body = render_ttft_table(runs)
+    elif suite in accuracy_suites:
+        body = render_accuracy_table(runs)
     else:
         body = render_generic_table(runs)
     return heading + body
+
+
+def render_model_comparison(grouped: dict[str, list[dict]]) -> str:
+    """Build a cross-model comparison matrix from the most recent run of each suite per model."""
+    # Collect latest score per (model, suite) pair
+    matrix: dict[str, dict[str, str]] = {}  # model -> {suite: score_str}
+    suites_seen: list[str] = []
+
+    for suite, runs in grouped.items():
+        if suite not in suites_seen:
+            suites_seen.append(suite)
+        for run in runs:
+            model = _short_model(run.get("model", "unknown"))
+            if model not in matrix:
+                matrix[model] = {}
+            if suite in matrix[model]:
+                continue  # already have the latest for this model+suite
+            if run.get("skipped"):
+                matrix[model][suite] = "—"
+                continue
+            results = run.get("results", [])
+            if not results:
+                matrix[model][suite] = "—"
+                continue
+            # Summarize: for single-result suites use the value; for multi-result, average
+            values = [r.get("value", 0) for r in results]
+            avg = sum(values) / len(values) if values else 0
+            unit = results[0].get("unit", "")
+            if unit == "tok/s":
+                matrix[model][suite] = f"{avg:.1f}"
+            elif unit in ("ratio", "bool") or avg <= 1.0:
+                matrix[model][suite] = f"{avg:.1%}"
+            else:
+                matrix[model][suite] = f"{avg:.2f}"
+
+    models = sorted(matrix.keys())
+    if len(models) < 2:
+        return ""
+
+    header = "| Model | " + " | ".join(SUITE_LABELS.get(s, s) for s in suites_seen) + " |"
+    sep = "|-------|" + "|".join("-" * (len(SUITE_LABELS.get(s, s)) + 2) for s in suites_seen) + "|"
+    rows = []
+    for model in models:
+        cells = [matrix[model].get(s, "—") for s in suites_seen]
+        rows.append(f"| {model} | " + " | ".join(cells) + " |")
+
+    return "### Model Comparison Matrix\n\n" + "\n".join([header, sep, *rows]) + "\n"
 
 
 def generate_table(grouped: dict[str, list[dict]]) -> str:
@@ -162,6 +314,7 @@ def generate_table(grouped: dict[str, list[dict]]) -> str:
     ]
     suite_order = [
         "throughput", "ttft", "tool-calling", "code-accuracy",
+        "coding", "reasoning", "knowledge",
         "framework-eval", "capability-comparison",
     ]
     rendered_suites: set[str] = set()
@@ -176,6 +329,12 @@ def generate_table(grouped: dict[str, list[dict]]) -> str:
         if suite not in rendered_suites:
             parts.append(render_suite(suite, runs))
             parts.append("\n")
+
+    # Multi-model comparison matrix (only when 2+ models have results)
+    comparison = render_model_comparison(grouped)
+    if comparison:
+        parts.append(comparison)
+        parts.append("\n")
 
     return "".join(parts).rstrip("\n")
 

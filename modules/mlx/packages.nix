@@ -22,6 +22,8 @@ let
     apiUrl
     launchAgentLabel
     llamaSwapPkg
+    llamaSwapConfigFile
+    llamaSwapRuntimeConfigPath
     ;
   vllmMlxPin = "vllm-mlx==${vllmMlxVersion}";
 in
@@ -38,6 +40,8 @@ in
         MLX_HOST = cfg.host;
         MLX_HF_HOME = cfg.huggingFaceHome;
         MLX_LAUNCHD_LABEL = launchAgentLabel;
+        MLX_LLAMA_SWAP_CONFIG = llamaSwapRuntimeConfigPath;
+        MLX_LLAMA_SWAP_BASE_CONFIG = "${llamaSwapConfigFile}";
       };
 
       # ==========================================================================
@@ -135,6 +139,11 @@ in
             "$@"
         '')
 
+        # mlx-benchmark — orchestrate benchmark runs across models and suites
+        (pkgs.writeShellScriptBin "mlx-benchmark" ''
+          exec ${pkgs.uv}/bin/uv run "${../../scripts/benchmarks/orchestrate.py}" "$@"
+        '')
+
         # ======================================================================
         # Health Check
         # ======================================================================
@@ -172,6 +181,11 @@ in
           ];
           text = builtins.readFile ./scripts/mlx-models.sh;
         })
+
+        # mlx-discover — auto-discover downloaded models and register with llama-swap
+        (pkgs.writeShellScriptBin "mlx-discover" ''
+          exec ${pkgs.python3}/bin/python3 "${./discover-models.py}" "$@"
+        '')
 
         # ======================================================================
         # MLX Ecosystem — Ears & Eyes

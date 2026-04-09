@@ -79,10 +79,12 @@ jobs:
           AUTHOR: ${{ github.event.pull_request.user.login }}
           COMMIT_MSG: ${{ github.event.pull_request.title }}
         run: |
-          # Skip nix-validate only if:
-          # 1. Author is jacobpevans-github-actions (Renovate bot, with or without [bot] suffix)
-          # 2. Commit message starts with "chore(deps)"
-          if [[ "$AUTHOR" == "jacobpevans-github-actions"* && "$COMMIT_MSG" == chore\(deps\)* ]]; then
+          # Skip nix-validate for dependency-only PRs:
+          # - Renovate: author starts with jacobpevans-github-actions + title starts with chore(deps)
+          #   (dual check because Renovate can be configured for non-dep tasks)
+          # - Dependabot: author check alone (it exclusively creates dependency PRs)
+          if [[ ("$AUTHOR" == "jacobpevans-github-actions"* && "$COMMIT_MSG" == chore\(deps\)*) || \
+                "$AUTHOR" == "dependabot[bot]" ]]; then
             echo "is-deps-only=true" >> "$GITHUB_OUTPUT"
           else
             echo "is-deps-only=false" >> "$GITHUB_OUTPUT"
@@ -96,7 +98,7 @@ jobs:
   nix-validate:
     name: Nix Validate
     needs: changes
-    if: needs.changes.outputs.nix == 'true'
+    if: needs.changes.outputs.nix == 'true' && needs.changes.outputs.is-deps-only != 'true'
     uses: JacobPEvans/.github/.github/workflows/_nix-validate.yml@main
 
   markdown-lint:

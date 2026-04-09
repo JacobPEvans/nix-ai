@@ -1,5 +1,7 @@
 name: AI Merge Gate
-on: pull_request
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
 permissions: read-all
 jobs:
   gate:

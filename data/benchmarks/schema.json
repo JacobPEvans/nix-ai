@@ -32,7 +32,7 @@
     },
     "trigger": {
       "type": "string",
-      "enum": ["schedule", "pr", "workflow_dispatch"],
+      "enum": ["schedule", "pr", "workflow_dispatch", "local"],
       "description": "What triggered this benchmark run"
     },
     "pr_number": {
@@ -47,7 +47,10 @@
         "tool-calling",
         "code-accuracy",
         "framework-eval",
-        "capability-comparison"
+        "capability-comparison",
+        "coding",
+        "reasoning",
+        "knowledge"
       ],
       "description": "Which benchmark suite was executed"
     },

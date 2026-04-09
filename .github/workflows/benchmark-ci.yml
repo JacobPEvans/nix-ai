@@ -20,8 +20,11 @@ on:
   workflow_dispatch:
     inputs:
       suites:
-        description: "Comma-separated suites or 'all' (throughput,ttft,tool-calling,code-accuracy,framework-eval,capability-comparison)"
+        description: "Comma-separated suites or 'all' (throughput,ttft,tool-calling,code-accuracy,coding,reasoning,knowledge,framework-eval,capability-comparison)"
         default: "all"
+      model:
+        description: "Model ID to benchmark (blank = default from vars)"
+        default: ""
       runner_label:
         description: "Runner label override (leave blank for macos-latest; use 'self-hosted' for M-series)"
         default: ""
@@ -80,6 +83,9 @@ jobs:
           - ttft
           - tool-calling
           - code-accuracy
+          - coding
+          - reasoning
+          - knowledge
           - framework-eval
           - capability-comparison
     steps:
@@ -113,12 +119,13 @@ jobs:
         if: steps.filter.outputs.run == 'true'
         env:
           MLX_API_URL: ${{ vars.MLX_API_URL || 'http://127.0.0.1:11434/v1' }}
-          MLX_DEFAULT_MODEL: ${{ vars.MLX_DEFAULT_MODEL }}
+          MLX_DEFAULT_MODEL: ${{ inputs.model || vars.MLX_DEFAULT_MODEL }}
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_REF: ${{ github.ref }}
           GITHUB_EVENT_NAME: ${{ github.event_name }}
           RUNNER_NAME: ${{ runner.name }}
-        run: uv run scripts/benchmarks/collect-results.py --suite ${{ matrix.suite }}
+          BENCH_SUITE: ${{ matrix.suite }}
+        run: uv run scripts/benchmarks/collect-results.py --suite "$BENCH_SUITE"
 
       - name: Skip suite (filtered out)
         if: steps.filter.outputs.run == 'false'

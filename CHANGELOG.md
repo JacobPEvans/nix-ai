@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.32.2](https://github.com/JacobPEvans/nix-ai/compare/v1.32.1...v1.32.2) (2026-04-09)
+
+
+### Bug Fixes
+
+* wire is-deps-only detection and narrow CI triggers ([#432](https://github.com/JacobPEvans/nix-ai/issues/432)) ([db82c5c](https://github.com/JacobPEvans/nix-ai/commit/db82c5ca7da0571944692a10e0f8678e864b3a13))
+
+## [1.32.1](https://github.com/JacobPEvans/nix-ai/compare/v1.32.0...v1.32.1) (2026-04-08)
+
+
+### Bug Fixes
+
+* update Copilot setup source to ai-workflows ([#426](https://github.com/JacobPEvans/nix-ai/issues/426)) ([c385804](https://github.com/JacobPEvans/nix-ai/commit/c3858046251c76da4affea92095401484f50aea3))
+
+## [1.32.0](https://github.com/JacobPEvans/nix-ai/compare/v1.31.1...v1.32.0) (2026-04-07)
+
+
+### Features
+
+* **mlx:** dynamic model discovery and comprehensive benchmark suite ([b9a277f](https://github.com/JacobPEvans/nix-ai/commit/b9a277f9fa159d09ab2b4c62dd8b1f201042be20)), closes [#294](https://github.com/JacobPEvans/nix-ai/issues/294)
+
 ## [1.31.1](https://github.com/JacobPEvans/nix-ai/compare/v1.31.0...v1.31.1) (2026-04-07)
 
 
