@@ -17,7 +17,7 @@
       "customType": "regex",
       "fileMatch": ["\\.nix$"],
       "matchStrings": [
-        "bunx\\s+--bun\\s+(?<depName>(?:@[^@/]+\\/)?[^@\\s]+)@(?<currentValue>[\\d][^\\s]*)"
+        "bunx\\s+--bun\\s+(?<depName>(?:@[^@/]+\\/)?[^@\\s]+)@(?<currentValue>[\\d][^\\s\"']*)"
       ],
       "datasourceTemplate": "npm"
     },
@@ -37,7 +37,7 @@
       "matchStrings": [
         "uvx\\s+--from\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\"",
         "uv\\s+run[^\"]*--with\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\"",
-        "\"--from\"\\n\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\""
+        "\"--from\"\\r?\\n\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\""
       ],
       "datasourceTemplate": "pypi"
     },
@@ -46,7 +46,7 @@
       "customType": "regex",
       "fileMatch": ["\\.nix$"],
       "matchStrings": [
-        "\"--with\"\\n\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\""
+        "\"--with\"\\r?\\n\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\""
       ],
       "datasourceTemplate": "pypi"
     },
