@@ -10,8 +10,16 @@
 # Use your secrets manager (Doppler, Keychain, etc.) to inject env vars.
 
 let
-  # Official MCP server via bunx (fast, auto-installs)
-  official = name: {
+  # Official MCP server via bunx — pinned versions for Renovate tracking.
+  # Servers NOT FOUND on npm are archived upstream (github.com/modelcontextprotocol/servers-archived).
+  # Archived servers use the unpinned helper until replacements are identified.
+  official = name: version: {
+    command = "bunx";
+    args = [ "@modelcontextprotocol/server-${name}@${version}" ];
+  };
+  # Archived/unpinned — packages no longer published to npm.
+  # TODO: audit each against MCP Registry for current replacements
+  archived = name: {
     command = "bunx";
     args = [ "@modelcontextprotocol/server-${name}" ];
   };
@@ -22,24 +30,24 @@ in
   # Official Anthropic MCP Servers (via bunx)
   # ================================================================
 
-  everything = official "everything";
-  fetch = official "fetch";
-  filesystem = official "filesystem";
-  git = official "git";
-  memory = official "memory";
-  sequentialthinking = official "sequentialthinking";
-  time = official "time";
-  docker = official "docker";
-  exa = official "exa" // {
+  everything = official "everything" "2026.1.26";
+  fetch = archived "fetch"; # archived upstream — not on npm
+  filesystem = official "filesystem" "2026.1.14";
+  git = archived "git"; # archived upstream — not on npm
+  memory = official "memory" "2026.1.26";
+  sequentialthinking = archived "sequentialthinking"; # npm name is "sequential-thinking"
+  time = archived "time"; # archived upstream — not on npm
+  docker = archived "docker"; # archived upstream — not on npm
+  exa = archived "exa" // {
     disabled = true;
-  }; # Requires: EXA_API_KEY
-  firecrawl = official "firecrawl" // {
+  }; # archived upstream — not on npm. Requires: EXA_API_KEY
+  firecrawl = archived "firecrawl" // {
     disabled = true;
-  }; # Requires: FIRECRAWL_API_KEY
-  cloudflare = official "cloudflare" // {
+  }; # archived upstream — not on npm. Requires: FIRECRAWL_API_KEY
+  cloudflare = archived "cloudflare" // {
     disabled = true;
-  }; # Requires: CLOUDFLARE_API_TOKEN
-  aws = official "aws-kb-retrieval"; # Requires: AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
+  }; # archived upstream — not on npm. Requires: CLOUDFLARE_API_TOKEN
+  aws = official "aws-kb-retrieval" "0.6.2"; # Requires: AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
 
   # ================================================================
   # Native nixpkgs packages (binary name, resolved via PATH)
@@ -116,6 +124,8 @@ in
     args = [
       "--from"
       "huggingface-mcp-server==0.1.0"
+      "--with"
+      "huggingface-hub==1.10.1"
       "huggingface-mcp-server"
     ];
   };
@@ -136,18 +146,18 @@ in
   # Database (disabled by default)
   # ================================================================
 
-  postgresql = official "postgres" // {
+  postgresql = official "postgres" "0.6.2" // {
     disabled = true;
   };
-  sqlite = official "sqlite" // {
+  sqlite = archived "sqlite" // {
     disabled = true;
-  };
+  }; # archived upstream — not on npm
 
   # ================================================================
   # Additional (disabled - specialized use cases)
   # ================================================================
 
-  brave-search = official "brave-search" // {
+  brave-search = official "brave-search" "0.6.2" // {
     disabled = true;
   };
   # Google Workspace - Gmail, Drive, Calendar integration
@@ -168,18 +178,18 @@ in
       "calendar"
     ];
   };
-  google-maps = official "google-maps" // {
+  google-maps = official "google-maps" "0.6.2" // {
     disabled = true;
   };
-  puppeteer = official "puppeteer" // {
+  puppeteer = official "puppeteer" "2025.5.12" // {
     disabled = true;
   };
-  slack = official "slack" // {
+  slack = official "slack" "2025.4.25" // {
     disabled = true;
   };
-  sentry = official "sentry" // {
+  sentry = archived "sentry" // {
     disabled = true;
-  };
+  }; # archived upstream — not on npm
 
   # ================================================================
   # Cribl MCP - OrbStack kubernetes-monitoring stack

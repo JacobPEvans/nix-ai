@@ -126,13 +126,15 @@ in
         '')
 
         # mlx-bench-raw — raw MLX prefill + decode (no vllm-mlx overhead)
+        # renovate: datasource=pypi depName=mlx-lm
         (pkgs.writeShellScriptBin "mlx-bench-raw" ''
-          exec ${pkgs.uv}/bin/uvx --from mlx-lm mlx_lm.benchmark "$@"
+          exec ${pkgs.uv}/bin/uvx --from "mlx-lm==0.31.2" mlx_lm.benchmark "$@"
         '')
 
         # mlx-eval — accuracy evaluation against the live vllm-mlx server API
+        # renovate: datasource=pypi depName=lm-eval
         (pkgs.writeShellScriptBin "mlx-eval" ''
-          exec ${pkgs.uv}/bin/uvx --from "lm-eval[api]" lm-eval run \
+          exec ${pkgs.uv}/bin/uvx --from "lm-eval[api]==0.4.11" lm-eval run \
             --model local-chat-completions \
             --model_args "base_url=''${MLX_API_URL:-${apiUrl}},model=''${MLX_DEFAULT_MODEL:-${cfg.defaultModel}},tokenizer_backend=None,tokenized_requests=False" \
             --apply_chat_template \

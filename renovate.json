@@ -13,11 +13,20 @@
   },
   "customManagers": [
     {
-      "description": "bunx wrapper npm packages pinned in Nix modules",
+      "description": "bunx wrapper npm packages pinned in Nix modules (shell scripts with --bun)",
       "customType": "regex",
       "fileMatch": ["\\.nix$"],
       "matchStrings": [
         "bunx\\s+--bun\\s+(?<depName>(?:@[^@/]+\\/)?[^@\\s]+)@(?<currentValue>[\\d][^\\s]*)"
+      ],
+      "datasourceTemplate": "npm"
+    },
+    {
+      "description": "npm packages pinned in Nix string literals (MCP server args)",
+      "customType": "regex",
+      "fileMatch": ["\\.nix$"],
+      "matchStrings": [
+        "\"(?<depName>@[a-zA-Z0-9-]+/[a-zA-Z0-9][a-zA-Z0-9._-]*)@(?<currentValue>[\\d][^\\s\"]*)\""
       ],
       "datasourceTemplate": "npm"
     },
@@ -29,6 +38,15 @@
         "uvx\\s+--from\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\"",
         "uv\\s+run[^\"]*--with\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\"",
         "\"--from\"\\n\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\""
+      ],
+      "datasourceTemplate": "pypi"
+    },
+    {
+      "description": "uvx --with PyPI transitive dependency pins in Nix modules",
+      "customType": "regex",
+      "fileMatch": ["\\.nix$"],
+      "matchStrings": [
+        "\"--with\"\\n\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\""
       ],
       "datasourceTemplate": "pypi"
     },
