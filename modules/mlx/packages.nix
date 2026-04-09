@@ -134,7 +134,7 @@ in
         (pkgs.writeShellScriptBin "mlx-eval" ''
           exec ${pkgs.uv}/bin/uvx --from "lm-eval[api]" lm-eval run \
             --model local-chat-completions \
-            --model_args "base_url=''${MLX_API_URL:-${apiUrl}},model=''${MLX_DEFAULT_MODEL:-${cfg.defaultModel}},tokenizer_backend=None,tokenized_requests=False" \
+            --model_args "base_url=''${MLX_API_URL:-${apiUrl}}/chat/completions,model=''${MLX_DEFAULT_MODEL:-${cfg.defaultModel}},tokenizer_backend=None,tokenized_requests=False,num_concurrent=1,max_retries=3" \
             --apply_chat_template \
             "$@"
         '')
