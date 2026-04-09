@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.32.2](https://github.com/JacobPEvans/nix-ai/compare/v1.32.1...v1.32.2) (2026-04-09)
+
+
+### Bug Fixes
+
+* wire is-deps-only detection and narrow CI triggers ([#432](https://github.com/JacobPEvans/nix-ai/issues/432)) ([db82c5c](https://github.com/JacobPEvans/nix-ai/commit/db82c5ca7da0571944692a10e0f8678e864b3a13))
+
 ## [1.32.1](https://github.com/JacobPEvans/nix-ai/compare/v1.32.0...v1.32.1) (2026-04-08)
 
 
