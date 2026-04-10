@@ -206,9 +206,14 @@ in
   # Multi-provider routing: OpenAI, Anthropic, Gemini, OpenRouter, local MLX.
   # OpenAI-compatible API at /v1, MCP server at /mcp.
   # Connection will fail when OrbStack k8s is not running — this is expected.
-  # See: ~/git/orbstack-kubernetes for the stack configuration.
   # Provider API keys are managed by the Doppler K8s Operator inside the cluster
   # (no doppler-mcp wrapper needed — secrets never reach the MCP client process).
+  #
+  # Diagnostics use native tools — no custom CLI exists or is needed:
+  #   claude mcp list | grep bifrost          # MCP connection state
+  #   make -C ~/git/orbstack-kubernetes/main status      # pod / service / sts state
+  #   make -C ~/git/orbstack-kubernetes/main test-smoke  # asserts /health, /v1/models, NodePort
+  #
   # See: https://github.com/maximhq/bifrost
   bifrost = {
     type = "http";
