@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.33.0](https://github.com/JacobPEvans/nix-ai/compare/v1.32.5...v1.33.0) (2026-04-10)
+
+
+### Features
+
+* **mcp:** add Bifrost AI gateway MCP server and check-bifrost CLI ([#456](https://github.com/JacobPEvans/nix-ai/issues/456)) ([efc4501](https://github.com/JacobPEvans/nix-ai/commit/efc4501a39ffba2a78ea0f63e1f1744a4ffd811f))
+
 ## [1.32.5](https://github.com/JacobPEvans/nix-ai/compare/v1.32.4...v1.32.5) (2026-04-10)
 
 
