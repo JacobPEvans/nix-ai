@@ -56,27 +56,71 @@ mlx-eval --tasks hellaswag --limit 100
 
 ### Throughput
 
-| Date | SHA | Test | Metric | Value | Unit |
-|------|-----|------|--------|-------|------|
-| 2026-04-06 04:56 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — |
+| Date | SHA | Model | Test | tok/s | Tokens | Elapsed |
+|------|-----|-------|------|-------|--------|---------|
+| 2026-04-10 03:05 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | short-50 | 19.2 | 50 | 2.60 |
+| 2026-04-10 03:05 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | medium-256 | 23.5 | 256 | 10.90 |
+| 2026-04-10 03:05 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | long-512 | 23.6 | 512 | 21.74 |
+| 2026-04-10 03:05 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | long-1024 | 24.3 | 1024 | 42.12 |
+| 2026-04-10 02:50 | 3b5d3ea | gemma-4-31b-it-4bit | short-50 | 6.4 | 50 | 7.75 |
+| 2026-04-10 02:50 | 3b5d3ea | gemma-4-31b-it-4bit | medium-256 | 5.4 | 256 | 47.68 |
+| 2026-04-10 02:50 | 3b5d3ea | gemma-4-31b-it-4bit | long-512 | 4.1 | 512 | 124.02 |
+| 2026-04-10 02:50 | 3b5d3ea | gemma-4-31b-it-4bit | long-1024 | 5.4 | 1024 | 190.17 |
+| 2026-04-10 01:48 | 3b5d3ea | Qwen3.5-27B-4bit | short-50 | 2.2 | 50 | 22.31 |
+| 2026-04-10 01:48 | 3b5d3ea | Qwen3.5-27B-4bit | medium-256 | 2.3 | 256 | 113.46 |
+| 2026-04-10 00:45 | 3b5d3ea | gemma-4-e4b-it-4bit | short-50 | 2.5 | 50 | 20.18 |
+| 2026-04-10 00:45 | 3b5d3ea | gemma-4-e4b-it-4bit | medium-256 | 2.5 | 256 | 101.09 |
+| 2026-04-10 00:45 | 3b5d3ea | gemma-4-e4b-it-4bit | long-512 | 3.3 | 512 | 156.47 |
+| 2026-04-10 00:45 | 3b5d3ea | gemma-4-e4b-it-4bit | long-1024 | 3.4 | 1024 | 297.27 |
+| 2026-04-06 04:56 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — | — | — |
 
 ### TTFT
 
-| Date | SHA | Test | Metric | Value | Unit |
-|------|-----|------|--------|-------|------|
-| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — |
+| Date | SHA | Model | Test | Latency (s) | Type |
+|------|-----|-------|------|-------------|------|
+| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | cold-avg | 0.742 | cold |
+| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | warm-avg | 0.738 | warm |
+| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | cache-speedup | 1.000 | — |
+| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | cold-avg | 1.438 | cold |
+| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | warm-avg | 1.575 | warm |
+| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | cache-speedup | 0.910 | — |
+| 2026-04-10 00:54 | 3b5d3ea | gemma-4-e4b-it-4bit | cold-avg | 1.565 | cold |
+| 2026-04-10 00:54 | 3b5d3ea | gemma-4-e4b-it-4bit | warm-avg | 1.423 | warm |
+| 2026-04-10 00:54 | 3b5d3ea | gemma-4-e4b-it-4bit | cache-speedup | 1.100 | — |
+| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — | — |
 
 ### Tool Calling
 
-| Date | SHA | Test | Metric | Value | Unit |
-|------|-----|------|--------|-------|------|
-| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — |
+| Date | SHA | Model | Task | Score | Metric | Samples |
+|------|-----|-------|------|-------|--------|---------|
+| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | should-call-tool | 100.0% | accuracy | — |
+| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | both-args | 100.0% | accuracy | — |
+| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | should-call-tool | 0.0% | accuracy | — |
+| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | both-args | 0.0% | accuracy | — |
+| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-10 02:13 | 3b5d3ea | Qwen3.5-27B-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-10 01:00 | 3b5d3ea | gemma-4-e4b-it-4bit | should-call-tool | 100.0% | accuracy | — |
+| 2026-04-10 01:00 | 3b5d3ea | gemma-4-e4b-it-4bit | both-args | 100.0% | accuracy | — |
+| 2026-04-10 01:00 | 3b5d3ea | gemma-4-e4b-it-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-10 01:00 | 3b5d3ea | gemma-4-e4b-it-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — | — | — |
 
 ### Code Accuracy
 
-| Date | SHA | Test | Metric | Value | Unit |
-|------|-----|------|--------|-------|------|
-| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — |
+| Date | SHA | Model | Task | Score | Metric | Samples |
+|------|-----|-------|------|-------|--------|---------|
+| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | bug-detection | 100.0% | accuracy | — |
+| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | code-planning | 33.0% | accuracy | — |
+| 2026-04-10 02:58 | 3b5d3ea | gemma-4-31b-it-4bit | bug-detection | 100.0% | accuracy | — |
+| 2026-04-10 02:58 | 3b5d3ea | gemma-4-31b-it-4bit | code-planning | 0.0% | accuracy | — |
+| 2026-04-10 02:44 | 3b5d3ea | Qwen3.5-27B-4bit | bug-detection | 100.0% | accuracy | — |
+| 2026-04-10 02:44 | 3b5d3ea | Qwen3.5-27B-4bit | code-planning | 0.0% | accuracy | — |
+| 2026-04-10 00:55 | 3b5d3ea | gemma-4-e4b-it-4bit | bug-detection | 100.0% | accuracy | — |
+| 2026-04-10 00:55 | 3b5d3ea | gemma-4-e4b-it-4bit | code-planning | 0.0% | accuracy | — |
+| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — | — | — |
 
 ### Framework Benchmark
 
@@ -87,7 +131,17 @@ mlx-eval --tasks hellaswag --limit 100
 
 | Date | SHA | Category | Score | Claude Baseline | Gap |
 |------|-----|----------|-------|-----------------|-----|
-| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — |
+| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — | — |
+
+### Model Comparison Matrix
+
+| Model | Code Accuracy | Tool Calling | TTFT | Throughput | Capability Comparison (vs Claude Opus 4.6) | Framework Benchmark |
+|-------|---------------|--------------|------|------------|--------------------------------------------|---------------------|
+| Qwen3.5-122B-A10B-4bit | — | — | — | — | — | — |
+| Qwen3.5-27B-4bit | 50.0% | 100.0% | — | 2.2 | — | — |
+| Qwen3.5-35B-A3B-4bit | 66.5% | 100.0% | 82.7% | 22.6 | — | — |
+| gemma-4-31b-it-4bit | 50.0% | 50.0% | 1.31 | 5.3 | — | — |
+| gemma-4-e4b-it-4bit | 50.0% | 100.0% | 1.36 | 2.9 | — | — |
 
 <!-- BENCHMARK-TABLE-END -->
 

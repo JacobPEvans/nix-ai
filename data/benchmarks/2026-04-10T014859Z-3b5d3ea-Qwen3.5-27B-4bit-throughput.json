@@ -1,0 +1,44 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-10T01:48:59Z",
+  "git_sha": "3b5d3ea",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "throughput",
+  "model": "mlx-community/Qwen3.5-27B-4bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [
+    {
+      "name": "short-50",
+      "metric": "throughput",
+      "value": 2.2,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "50",
+        "completion_tokens": "50",
+        "elapsed_s": "22.31"
+      }
+    },
+    {
+      "name": "medium-256",
+      "metric": "throughput",
+      "value": 2.3,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "256",
+        "completion_tokens": "256",
+        "elapsed_s": "113.46"
+      }
+    }
+  ],
+  "errors": [
+    "throughput/long-512: curl failed (exit 28)",
+    "throughput/long-1024: curl failed (exit 22)"
+  ]
+}

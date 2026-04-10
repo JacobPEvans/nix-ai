@@ -401,7 +401,7 @@ def run_tool_calling_suite(model: str) -> tuple[list[dict], list[str]]:
             continue
 
         message = choices[0].get("message", {})
-        tool_calls = message.get("tool_calls", [])
+        tool_calls = message.get("tool_calls") or []
         called_tool = len(tool_calls) > 0
 
         correct = called_tool == tc["expect_tool"]
