@@ -20,6 +20,12 @@ from orchestrator.skill_schema import (
     load_skill_registry,
 )
 
+# Test fixture constant: model name used in override tests. Kept as a
+# module-level constant so a single edit updates every assertion. This is
+# purely test data — the test doesn't actually load this model, it just
+# verifies ModelRequirement field assignment works.
+_TEST_LARGE_MODEL = "mlx-community/Qwen3.5-122B-A10B-4bit"
+
 
 @pytest.fixture
 def sample_skill_data() -> dict:
@@ -240,7 +246,7 @@ class TestLoadFabricPattern:
 
     def test_custom_model_override(self, fabric_patterns_dir: Path):
         custom_model = ModelRequirement(
-            model="mlx-community/Qwen3.5-122B-A10B-4bit",
+            model=_TEST_LARGE_MODEL,
             size=ModelSize.LARGE,
             temperature=0.3,
         )
@@ -248,7 +254,7 @@ class TestLoadFabricPattern:
             fabric_patterns_dir / "extract_wisdom",
             model=custom_model,
         )
-        assert skill.model.model == "mlx-community/Qwen3.5-122B-A10B-4bit"
+        assert skill.model.model == _TEST_LARGE_MODEL
         assert skill.model.size == ModelSize.LARGE
         assert skill.model.temperature == 0.3
 
