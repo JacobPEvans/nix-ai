@@ -132,11 +132,16 @@ in
         '')
 
         # mlx-eval — accuracy evaluation against the live vllm-mlx server API
+        # MLX_EVAL_CONCURRENT controls parallel requests (default 4). vllm-mlx
+        # handles concurrent decode via continuous batching, so raising this
+        # from the lm-eval default of 1 is the single biggest speedup lever
+        # for long-running suites like evalplus and math-hard.
         # renovate: datasource=pypi depName=lm-eval
         (pkgs.writeShellScriptBin "mlx-eval" ''
+          concurrent="''${MLX_EVAL_CONCURRENT:-4}"
           exec ${pkgs.uv}/bin/uvx --from "lm-eval[api]==0.4.11" lm-eval run \
             --model local-chat-completions \
-            --model_args "base_url=''${MLX_API_URL:-${apiUrl}}/chat/completions,model=''${MLX_DEFAULT_MODEL:-${cfg.defaultModel}},tokenizer_backend=None,tokenized_requests=False,num_concurrent=1,max_retries=3" \
+            --model_args "base_url=''${MLX_API_URL:-${apiUrl}}/chat/completions,model=''${MLX_DEFAULT_MODEL:-${cfg.defaultModel}},tokenizer_backend=None,tokenized_requests=False,num_concurrent=''${concurrent},max_retries=3" \
             --apply_chat_template \
             "$@"
         '')

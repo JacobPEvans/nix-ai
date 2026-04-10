@@ -624,20 +624,28 @@ def run_evalplus_suite(model: str) -> tuple[list[dict], list[str]]:
     These extend the original HumanEval/MBPP test sets with significantly more
     edge-case test cases — frontier models typically lose 5–15 percentage points
     going from the saturated original to the Plus variants.
+
+    Limits are intentionally short of the full sets. At ~30s/sample with
+    num_concurrent=4 on an M4 Max, the full suites (164 + 378 = 542 samples)
+    would take ~4.5 hours per model. The 60/60 subset still gives enough
+    discriminative signal to rank candidates with ~6 pp margin of error.
+    Bump to full sets for final head-to-head runs on the top 2 finishers.
     """
     return run_lm_eval_suite(model, [
-        ("humaneval_plus", 164),  # full HumanEval+ set
-        ("mbpp_plus", 378),       # full MBPP+ sanitized set
+        ("humaneval_plus", 60),
+        ("mbpp_plus", 60),
     ])
 
 
 def run_math_hard_suite(model: str) -> tuple[list[dict], list[str]]:
     """Competition math reasoning — proxy for structured multi-step thinking
     used in code review. Hendrycks MATH500 + leaderboard hard subset.
+
+    See run_evalplus_suite for the sample-limit rationale.
     """
     return run_lm_eval_suite(model, [
-        ("hendrycks_math500", 500),
-        ("leaderboard_math_hard", 200),
+        ("hendrycks_math500", 100),
+        ("leaderboard_math_hard", 80),
     ])
 
 
