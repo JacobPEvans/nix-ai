@@ -145,8 +145,10 @@ in
           flakeInput = jacobpevansMarketplace;
         };
         # Override flakeInput for synthetic fabric marketplace.
-        # Wraps ~30 curated fabric patterns from data/patterns/ into the
-        # .claude-plugin/ structure so they appear as skills in Claude Code.
+        # Wraps a curated subset of fabric patterns from data/patterns/ into
+        # the .claude-plugin/ structure so they appear as skills in Claude Code.
+        # Exact count is enforced by the fabric-marketplace-build check
+        # (lib/checks/fabric.nix) against modules/claude/fabric-curated-patterns.json.
         "fabric-patterns" = base."fabric-patterns" // {
           flakeInput = fabricMarketplace;
         };

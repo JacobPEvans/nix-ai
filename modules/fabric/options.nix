@@ -43,16 +43,10 @@
       '';
     };
 
-    patternsDir = lib.mkOption {
-      type = lib.types.str;
-      default = "${config.home.homeDirectory}/.config/fabric/patterns";
-      defaultText = lib.literalExpression ''"''${config.home.homeDirectory}/.config/fabric/patterns"'';
-      description = ''
-        Path where fabric's 252+ pattern directories are symlinked from the
-        fabric-src flake input. Each pattern is a directory containing system.md
-        (AI instructions) and user.md (human documentation).
-      '';
-    };
+    # patternsDir is intentionally NOT configurable — it is a computed constant
+    # that always matches the home.file symlink location in packages.nix. Making
+    # it user-overridable would let the FABRIC_PATTERNS_DIR env var diverge from
+    # the actual filesystem location. Custom patterns belong in customPatternsDir.
 
     customPatternsDir = lib.mkOption {
       type = lib.types.nullOr lib.types.str;

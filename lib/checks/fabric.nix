@@ -13,7 +13,9 @@ let
   cfg = hmConfig.config.programs.fabric;
 in
 {
-  # Verify all expected fabric option paths exist.
+  # Verify all expected fabric option paths exist. Note: patternsDir is NOT
+  # an option — it is a computed constant in packages.nix (see that file for
+  # rationale). This check also asserts patternsDir is NOT in the option set.
   fabric-options-regression =
     let
       expectedOptions = [
@@ -22,13 +24,16 @@ in
         "enable"
         "enableServer"
         "host"
-        "patternsDir"
         "port"
       ];
       actualOptions = builtins.attrNames cfg;
       missingOptions = builtins.filter (o: !(builtins.elem o actualOptions)) expectedOptions;
+      patternsDirIsOption = builtins.elem "patternsDir" actualOptions;
     in
     assert missingOptions == [ ] || throw "Missing fabric options: ${builtins.toJSON missingOptions}";
+    assert
+      !patternsDirIsOption
+      || throw "patternsDir must NOT be a configurable option (it is a computed constant — see modules/fabric/packages.nix)";
     pkgs.runCommand "check-fabric-options-regression" { } ''
       echo "Fabric option regression: ${toString (builtins.length expectedOptions)} options verified"
       touch $out
@@ -64,11 +69,14 @@ in
           actual = cfg.defaultModel;
           expected = "mlx-community/Qwen3.5-122B-A10B-4bit";
         }
-        # Environment variables
+        # Environment variables — FABRIC_PATTERNS_DIR is computed from
+        # config.home.homeDirectory + the fixed ".config/fabric/patterns"
+        # relative path (see modules/fabric/packages.nix). This check asserts
+        # the env var stays in sync with the home.file symlink location.
         {
           name = "fabric.env.FABRIC_PATTERNS_DIR";
           actual = hmConfig.config.home.sessionVariables.FABRIC_PATTERNS_DIR;
-          expected = cfg.patternsDir;
+          expected = "${hmConfig.config.home.homeDirectory}/.config/fabric/patterns";
         }
         {
           name = "fabric.env.FABRIC_DEFAULT_MODEL";

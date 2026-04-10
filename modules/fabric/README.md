@@ -69,8 +69,13 @@ credentials to per-host setup.
 | `host` | str | `"127.0.0.1"` | REST API server host |
 | `port` | port | `8180` | REST API server port |
 | `defaultModel` | str | `"mlx-community/Qwen3.5-122B-A10B-4bit"` | Default model for `fabric --pattern X` |
-| `patternsDir` | str | `~/.config/fabric/patterns` | Read-only Nix-managed patterns directory |
 | `customPatternsDir` | str or null | `~/.config/fabric/custom-patterns` | User-managed custom patterns directory |
+
+The read-only Nix-managed patterns directory always lives at
+`~/.config/fabric/patterns/` and is exported via `FABRIC_PATTERNS_DIR`. It
+is intentionally NOT a configurable option — the home-manager symlink key
+and the env var must stay in sync, and making this user-overridable would
+let them diverge silently. Custom patterns belong in `customPatternsDir`.
 
 ## Adding a custom pattern
 

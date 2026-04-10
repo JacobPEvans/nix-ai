@@ -5,6 +5,7 @@
 # fabric-src flake input, and sets session variables.
 #
 {
+  config,
   lib,
   fabric-src,
   fabricShared,
@@ -12,6 +13,13 @@
 }:
 let
   inherit (fabricShared) cfg fabricPkg;
+
+  # Single source of truth for the patterns symlink location. The relative
+  # path (patternsKey) is used as the home.file attribute key; the absolute
+  # path (patternsDir) is exported via FABRIC_PATTERNS_DIR. They are always
+  # in sync because both derive from the same constant.
+  patternsKey = ".config/fabric/patterns";
+  patternsDir = "${config.home.homeDirectory}/${patternsKey}";
 in
 {
   config = lib.mkIf cfg.enable {
@@ -35,12 +43,12 @@ in
     home = {
       packages = [ fabricPkg ];
 
-      file.".config/fabric/patterns" = {
+      file.${patternsKey} = {
         source = "${fabric-src}/data/patterns";
       };
 
       sessionVariables = {
-        FABRIC_PATTERNS_DIR = cfg.patternsDir;
+        FABRIC_PATTERNS_DIR = patternsDir;
         FABRIC_DEFAULT_MODEL = cfg.defaultModel;
       }
       // lib.optionalAttrs (cfg.customPatternsDir != null) {
