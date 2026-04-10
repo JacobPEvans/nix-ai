@@ -38,7 +38,7 @@ let
   # renovate: datasource=pypi depName=parakeet-mlx
   parakeetMlxVersion = "0.5.1";
   # renovate: datasource=pypi depName=mlx-vlm
-  mlxVlmVersion = "0.4.3";
+  mlxVlmVersion = "0.4.4";
 
   # Central vllm-mlx wrapper — single source of truth for the pinned version.
   # The LaunchAgent needs a Nix store path (not a PATH lookup), so the
