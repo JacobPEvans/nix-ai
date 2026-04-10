@@ -10,36 +10,38 @@
 # Use your secrets manager (Doppler, Keychain, etc.) to inject env vars.
 
 let
-  # Official MCP server via bunx (fast, auto-installs)
-  official = name: {
+  # bunx helper — command only, args set inline per server so Renovate's
+  # regex manager can match literal "@scope/pkg@version" strings in the source.
+  bunx = args: {
     command = "bunx";
-    args = [ "@modelcontextprotocol/server-${name}" ];
+    inherit args;
   };
-
 in
 {
   # ================================================================
   # Official Anthropic MCP Servers (via bunx)
   # ================================================================
+  # Versions pinned as literal strings for Renovate regex tracking.
+  # Archived servers (no longer on npm) are unpinned until replacements identified.
 
-  everything = official "everything";
-  fetch = official "fetch";
-  filesystem = official "filesystem";
-  git = official "git";
-  memory = official "memory";
-  sequentialthinking = official "sequentialthinking";
-  time = official "time";
-  docker = official "docker";
-  exa = official "exa" // {
+  everything = bunx [ "@modelcontextprotocol/server-everything@2026.1.26" ];
+  fetch = bunx [ "@modelcontextprotocol/server-fetch" ]; # archived
+  filesystem = bunx [ "@modelcontextprotocol/server-filesystem@2026.1.14" ];
+  git = bunx [ "@modelcontextprotocol/server-git" ]; # archived
+  memory = bunx [ "@modelcontextprotocol/server-memory@2026.1.26" ];
+  sequentialthinking = bunx [ "@modelcontextprotocol/server-sequential-thinking" ]; # archived
+  time = bunx [ "@modelcontextprotocol/server-time" ]; # archived
+  docker = bunx [ "@modelcontextprotocol/server-docker" ]; # archived
+  exa = bunx [ "@modelcontextprotocol/server-exa" ] // {
     disabled = true;
-  }; # Requires: EXA_API_KEY
-  firecrawl = official "firecrawl" // {
+  }; # archived; Requires: EXA_API_KEY
+  firecrawl = bunx [ "@modelcontextprotocol/server-firecrawl" ] // {
     disabled = true;
-  }; # Requires: FIRECRAWL_API_KEY
-  cloudflare = official "cloudflare" // {
+  }; # archived; Requires: FIRECRAWL_API_KEY
+  cloudflare = bunx [ "@modelcontextprotocol/server-cloudflare" ] // {
     disabled = true;
-  }; # Requires: CLOUDFLARE_API_TOKEN
-  aws = official "aws-kb-retrieval"; # Requires: AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
+  }; # archived; Requires: CLOUDFLARE_API_TOKEN
+  aws = bunx [ "@modelcontextprotocol/server-aws-kb-retrieval@0.6.2" ]; # Requires: AWS credentials
 
   # ================================================================
   # Native nixpkgs packages (binary name, resolved via PATH)
@@ -116,6 +118,8 @@ in
     args = [
       "--from"
       "huggingface-mcp-server==0.1.0"
+      "--with"
+      "huggingface-hub==1.10.1"
       "huggingface-mcp-server"
     ];
   };
@@ -136,18 +140,18 @@ in
   # Database (disabled by default)
   # ================================================================
 
-  postgresql = official "postgres" // {
+  postgresql = bunx [ "@modelcontextprotocol/server-postgres@0.6.2" ] // {
     disabled = true;
   };
-  sqlite = official "sqlite" // {
+  sqlite = bunx [ "@modelcontextprotocol/server-sqlite" ] // {
     disabled = true;
-  };
+  }; # archived
 
   # ================================================================
   # Additional (disabled - specialized use cases)
   # ================================================================
 
-  brave-search = official "brave-search" // {
+  brave-search = bunx [ "@modelcontextprotocol/server-brave-search@0.6.2" ] // {
     disabled = true;
   };
   # Google Workspace - Gmail, Drive, Calendar integration
@@ -168,18 +172,18 @@ in
       "calendar"
     ];
   };
-  google-maps = official "google-maps" // {
+  google-maps = bunx [ "@modelcontextprotocol/server-google-maps@0.6.2" ] // {
     disabled = true;
   };
-  puppeteer = official "puppeteer" // {
+  puppeteer = bunx [ "@modelcontextprotocol/server-puppeteer@2025.5.12" ] // {
     disabled = true;
   };
-  slack = official "slack" // {
+  slack = bunx [ "@modelcontextprotocol/server-slack@2025.4.25" ] // {
     disabled = true;
   };
-  sentry = official "sentry" // {
+  sentry = bunx [ "@modelcontextprotocol/server-sentry" ] // {
     disabled = true;
-  };
+  }; # archived
 
   # ================================================================
   # Cribl MCP - OrbStack kubernetes-monitoring stack

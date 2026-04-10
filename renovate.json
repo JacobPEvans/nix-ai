@@ -11,54 +11,7 @@
     "enabled": true,
     "schedule": ["before 7am on Monday"]
   },
-  "customManagers": [
-    {
-      "description": "bunx wrapper npm packages pinned in Nix modules",
-      "customType": "regex",
-      "fileMatch": ["\\.nix$"],
-      "matchStrings": [
-        "bunx\\s+--bun\\s+(?<depName>(?:@[^@/]+\\/)?[^@\\s]+)@(?<currentValue>[\\d][^\\s]*)"
-      ],
-      "datasourceTemplate": "npm"
-    },
-    {
-      "description": "uv/uvx wrapper PyPI packages pinned in Nix modules",
-      "customType": "regex",
-      "fileMatch": ["\\.nix$"],
-      "matchStrings": [
-        "uvx\\s+--from\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\"",
-        "uv\\s+run[^\"]*--with\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\"",
-        "\"--from\"\\n\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\""
-      ],
-      "datasourceTemplate": "pypi"
-    },
-    {
-      "description": "uv tool install PyPI packages pinned in Nix modules",
-      "customType": "regex",
-      "fileMatch": ["\\.nix$"],
-      "matchStrings": [
-        "\\buv\\S*\\s+tool\\s+install\\s+\"(?<depName>[a-zA-Z0-9][a-zA-Z0-9._-]*)(?:\\[[^\\]]+\\])?==(?<currentValue>[\\d][^\\s\"]*)\""
-      ],
-      "datasourceTemplate": "pypi"
-    }
-  ],
   "packageRules": [
-    {
-      "description": "Bunx wrapper npm packages - weekly updates",
-      "matchDatasources": ["npm"],
-      "matchManagers": ["custom.regex"],
-      "groupName": "npm-wrappers",
-      "schedule": ["after 7am on Monday"],
-      "minimumReleaseAge": "3 days"
-    },
-    {
-      "description": "uv/uvx wrapper PyPI packages - weekly updates",
-      "matchDatasources": ["pypi"],
-      "matchManagers": ["custom.regex"],
-      "groupName": "pypi-wrappers",
-      "schedule": ["after 7am on Monday"],
-      "minimumReleaseAge": "3 days"
-    },
     {
       "description": "Group MLX Python packages into a single PR",
       "matchManagers": ["pep621"],
