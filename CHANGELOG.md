@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.32.5](https://github.com/JacobPEvans/nix-ai/compare/v1.32.4...v1.32.5) (2026-04-10)
+
+
+### Bug Fixes
+
+* add missing words to cspell dictionary ([#437](https://github.com/JacobPEvans/nix-ai/issues/437)) ([4a6fc0e](https://github.com/JacobPEvans/nix-ai/commit/4a6fc0e1c9ed31a3b8222611375d5cf16e53714b))
+
 ## [1.32.4](https://github.com/JacobPEvans/nix-ai/compare/v1.32.3...v1.32.4) (2026-04-10)
 
 
