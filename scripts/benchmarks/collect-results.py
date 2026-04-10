@@ -19,6 +19,8 @@ Suites:
   coding                Code generation (HumanEval via lm-eval)
   reasoning             Math and logical reasoning (GSM8K, HellaSwag, ARC)
   knowledge             Knowledge breadth and instruction following (MMLU, IFEval)
+  evalplus              Rigorous code generation (HumanEval+/MBPP+ instruct via EvalPlus)
+  math-hard             Competition math reasoning (Hendrycks MATH500 + leaderboard hard)
 
 Output:
   Writes data/benchmarks/{timestamp}-{sha7}-{suite}.json and prints JSON to stdout.
@@ -50,11 +52,13 @@ ALL_SUITES = [
     "throughput", "ttft", "tool-calling", "code-accuracy",
     "framework-eval", "capability-comparison",
     "coding", "reasoning", "knowledge",
+    "evalplus", "math-hard",
 ]
 
 INFERENCE_SUITES = {
     "throughput", "ttft", "tool-calling", "code-accuracy",
     "coding", "reasoning", "knowledge",
+    "evalplus", "math-hard",
 }
 
 FRAMEWORK_SCRIPTS = [
@@ -602,6 +606,29 @@ def run_knowledge_suite(model: str) -> tuple[list[dict], list[str]]:
     ])
 
 
+def run_evalplus_suite(model: str) -> tuple[list[dict], list[str]]:
+    """Rigorous code generation: HumanEval+ and MBPP+ from EvalPlus.
+
+    These extend the original HumanEval/MBPP test sets with significantly more
+    edge-case test cases — frontier models typically lose 5–15 percentage points
+    going from the saturated original to the Plus variants.
+    """
+    return run_lm_eval_suite(model, [
+        ("humaneval_plus", 164),  # full HumanEval+ set
+        ("mbpp_plus", 378),       # full MBPP+ sanitized set
+    ])
+
+
+def run_math_hard_suite(model: str) -> tuple[list[dict], list[str]]:
+    """Competition math reasoning — proxy for structured multi-step thinking
+    used in code review. Hendrycks MATH500 + leaderboard hard subset.
+    """
+    return run_lm_eval_suite(model, [
+        ("hendrycks_math500", 500),
+        ("leaderboard_math_hard", 200),
+    ])
+
+
 def run_framework_suite() -> tuple[list[dict], list[str]]:
     """Run 4 agent framework benchmark scripts and normalise their JSON output."""
     results = []
@@ -733,6 +760,8 @@ SUITE_RUNNERS: dict[str, SuiteRunner] = {
     "coding": lambda m: run_coding_suite(m),
     "reasoning": lambda m: run_reasoning_suite(m),
     "knowledge": lambda m: run_knowledge_suite(m),
+    "evalplus": lambda m: run_evalplus_suite(m),
+    "math-hard": lambda m: run_math_hard_suite(m),
     "framework-eval": lambda _m: run_framework_suite(),
     "capability-comparison": lambda _m: run_capability_suite(),
 }

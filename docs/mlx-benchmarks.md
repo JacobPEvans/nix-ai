@@ -1,4 +1,4 @@
-<!-- cspell:words TTFT hellaswag parameterize keyerror safetensor safetensors -->
+<!-- cspell:words TTFT hellaswag parameterize keyerror safetensor safetensors evalplus MBPP Hendrycks -->
 # MLX Benchmark Results
 
 Performance tracking for the vllm-mlx inference server across configuration changes.
@@ -47,6 +47,22 @@ curl -s http://127.0.0.1:11434/v1/chat/completions \
 # Accuracy evaluation (lm-eval harness against live API)
 mlx-eval --tasks hellaswag --limit 100
 ```
+
+## Suite Reference
+
+| Suite | What it measures | Backend |
+|-------|------------------|---------|
+| `throughput` | Tokens/second at 50/256/512/1024 output lengths | curl + vllm-mlx |
+| `ttft` | Cold + warm time-to-first-token, prefix-cache speedup | curl + vllm-mlx |
+| `tool-calling` | Function-call selection accuracy across 4 fixtures | curl + vllm-mlx |
+| `code-accuracy` | Toy regex-scored bug-detection / code-planning (legacy) | curl + vllm-mlx |
+| `coding` | HumanEval pass@1 (saturated; mostly historical) | lm-eval |
+| `reasoning` | GSM8K + HellaSwag + ARC-Challenge | lm-eval |
+| `knowledge` | MMLU + IFEval | lm-eval |
+| `evalplus` | **HumanEval+ + MBPP+** — EvalPlus extended test cases catch 5–15 pp more failures than HumanEval; not saturated by current frontier models | lm-eval |
+| `math-hard` | **Hendrycks MATH500 + leaderboard MATH hard** — competition math, structured multi-step reasoning proxy for code review; Opus-class models sit at 55–75% | lm-eval |
+| `framework-eval` | Agent framework comparison (LangGraph, Qwen-Agent, smolagents, google-adk) | uv scripts |
+| `capability-comparison` | Full suite vs hardcoded Claude Opus baselines | run_all.sh |
 
 ## Results
 

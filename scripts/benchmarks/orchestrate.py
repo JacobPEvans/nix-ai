@@ -29,6 +29,8 @@ ALL_SUITES = [
     "coding",
     "reasoning",
     "knowledge",
+    "evalplus",
+    "math-hard",
     "framework-eval",
     "capability-comparison",
 ]

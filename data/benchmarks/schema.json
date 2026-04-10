@@ -50,7 +50,9 @@
         "capability-comparison",
         "coding",
         "reasoning",
-        "knowledge"
+        "knowledge",
+        "evalplus",
+        "math-hard"
       ],
       "description": "Which benchmark suite was executed"
     },
