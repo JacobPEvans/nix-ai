@@ -49,11 +49,12 @@ def lookup_rating($name):
     // null;
 
 # Convert an Elo rating to PAL's 1-20 intelligence scale.
+# Uses half-up rounding so 1499 → 20 (not 19 with floor).
 # Returns null if rating is null. Callers must filter null results out.
 def rating_to_score($rating):
   if $rating == null then null
   else
-    ((($rating - 800) / 700 * 19 + 1) | floor) as $raw
+    ((($rating - 800) / 700 * 19 + 1 + 0.5) | floor) as $raw
     | if $raw < 1 then 1
       elif $raw > 20 then 20
       else $raw
