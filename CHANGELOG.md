@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.33.1](https://github.com/JacobPEvans/nix-ai/compare/v1.33.0...v1.33.1) (2026-04-10)
+
+
+### Bug Fixes
+
+* **pal:** radically simplify cloud model discovery ([37f7afe](https://github.com/JacobPEvans/nix-ai/commit/37f7afeed9983ef69cbcddcc5292320c8aaffae9))
+
 ## [1.33.0](https://github.com/JacobPEvans/nix-ai/compare/v1.32.5...v1.33.0) (2026-04-10)
 
 
