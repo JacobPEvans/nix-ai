@@ -534,10 +534,22 @@ def run_lm_eval_suite(model: str, tasks: list[tuple[str, int]]) -> tuple[list[di
                  "--tasks", task_name,
                  "--limit", str(limit),
                  "--log_samples",
+                 # evalplus tasks (humaneval_plus, mbpp_plus) are flagged
+                 # "unsafe" by lm-eval because their code_eval metric executes
+                 # model-generated Python. The flag is a no-op for other tasks.
+                 "--confirm_run_unsafe_code",
                  "--output_path", f"/tmp/mlx-eval-{task_name}"],
                 capture_output=True, text=True,
                 timeout=1800,  # 30 min per task
-                env={**os.environ, "MLX_DEFAULT_MODEL": model},
+                env={
+                    **os.environ,
+                    "MLX_DEFAULT_MODEL": model,
+                    # evalplus code_eval metric executes model-generated Python
+                    # to score pass@1. Required opt-in sanctions this; we're
+                    # running against trusted mlx-community checkpoints on a
+                    # dev machine, so enabling is appropriate here.
+                    "HF_ALLOW_CODE_EVAL": "1",
+                },
             )
         except subprocess.TimeoutExpired:
             errors_list.append(f"lm-eval/{task_name}: timed out after 30 min")
