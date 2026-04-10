@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.34.0](https://github.com/JacobPEvans/nix-ai/compare/v1.33.1...v1.34.0) (2026-04-10)
+
+
+### Features
+
+* **pal:** score models from real LMSYS Chatbot Arena Elo ratings ([#463](https://github.com/JacobPEvans/nix-ai/issues/463)) ([2e5f35a](https://github.com/JacobPEvans/nix-ai/commit/2e5f35ae966c7d6b5ad389b98e661d86a7707cd0))
+
 ## [1.33.1](https://github.com/JacobPEvans/nix-ai/compare/v1.33.0...v1.33.1) (2026-04-10)
 
 
