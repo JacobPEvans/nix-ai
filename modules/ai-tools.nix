@@ -260,6 +260,28 @@
     '')
 
     # ==========================================================================
+    # Bifrost AI Gateway Health Check
+    # ==========================================================================
+    # Verifies the Bifrost AI gateway running in the OrbStack monitoring stack:
+    #   - K8s pod is Running and Ready
+    #   - /health endpoint reachable via NodePort :30080
+    #   - /v1/models endpoint responds (data on success, error on missing keys)
+    #   - DopplerSecret status (sync from Doppler -> bifrost-provider-keys)
+    #   - Claude Code MCP server registration
+    # See: ~/git/orbstack-kubernetes for the cluster configuration.
+    (pkgs.writeShellApplication {
+      name = "check-bifrost";
+      runtimeInputs = with pkgs; [
+        kubectl
+        curl
+        jq
+        gawk
+        coreutils
+      ];
+      text = builtins.readFile ./mcp/scripts/check-bifrost.sh;
+    })
+
+    # ==========================================================================
     # Splunk MCP Connect Wrapper
     # ==========================================================================
     # Wraps the Splunk MCP Server App connection via mcp-remote stdio proxy.
