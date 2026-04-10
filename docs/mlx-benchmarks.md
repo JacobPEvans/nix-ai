@@ -85,14 +85,6 @@ mlx-eval --tasks hellaswag --limit 100
 | 2026-04-10 10:53 | 5572dde | gpt-oss-120b-4bit | medium-256 | 17.1 | 256 | 14.94 |
 | 2026-04-10 10:53 | 5572dde | gpt-oss-120b-4bit | long-512 | 16.5 | 512 | 31.01 |
 | 2026-04-10 10:53 | 5572dde | gpt-oss-120b-4bit | long-1024 | 18.9 | 1024 | 54.05 |
-| 2026-04-10 10:46 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | short-50 | 7.7 | 50 | 6.47 |
-| 2026-04-10 10:46 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | medium-256 | 11.1 | 256 | 23.08 |
-| 2026-04-10 10:46 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | long-512 | 10.5 | 511 | 48.82 |
-| 2026-04-10 10:46 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | long-1024 | 11.0 | 1024 | 93.13 |
-| 2026-04-10 03:05 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | short-50 | 19.2 | 50 | 2.60 |
-| 2026-04-10 03:05 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | medium-256 | 23.5 | 256 | 10.90 |
-| 2026-04-10 03:05 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | long-512 | 23.6 | 512 | 21.74 |
-| 2026-04-10 03:05 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | long-1024 | 24.3 | 1024 | 42.12 |
 
 ### TTFT
 
@@ -105,12 +97,6 @@ mlx-eval --tasks hellaswag --limit 100
 | 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | cold-avg | 1.245 | cold |
 | 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | warm-avg | 1.314 | warm |
 | 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | cache-speedup | 0.950 | — |
-| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | cold-avg | 0.694 | cold |
-| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | warm-avg | 0.671 | warm |
-| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | cache-speedup | 1.030 | — |
-| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | cold-avg | 0.742 | cold |
-| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | warm-avg | 0.738 | warm |
-| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | cache-speedup | 1.000 | — |
 
 ### Tool Calling
 
@@ -127,14 +113,6 @@ mlx-eval --tasks hellaswag --limit 100
 | 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | both-args | 0.0% | accuracy | — |
 | 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | no-tool-needed | 100.0% | accuracy | — |
 | 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
-| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | should-call-tool | 0.0% | accuracy | — |
-| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | both-args | 0.0% | accuracy | — |
-| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | no-tool-needed | 100.0% | accuracy | — |
-| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | ambiguous-no-tool | 100.0% | accuracy | — |
-| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | should-call-tool | 100.0% | accuracy | — |
-| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | both-args | 100.0% | accuracy | — |
-| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | no-tool-needed | 100.0% | accuracy | — |
-| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
 
 ### Code Accuracy
 
@@ -145,10 +123,6 @@ mlx-eval --tasks hellaswag --limit 100
 | 2026-04-10 11:03 | 5572dde | Qwen3.5-122B-A10B-4bit | code-planning | 33.0% | accuracy | — |
 | 2026-04-10 10:56 | 5572dde | gpt-oss-120b-4bit | bug-detection | 67.0% | accuracy | — |
 | 2026-04-10 10:56 | 5572dde | gpt-oss-120b-4bit | code-planning | 0.0% | accuracy | — |
-| 2026-04-10 10:50 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | bug-detection | 100.0% | accuracy | — |
-| 2026-04-10 10:50 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | code-planning | 0.0% | accuracy | — |
-| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | bug-detection | 100.0% | accuracy | — |
-| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | code-planning | 33.0% | accuracy | — |
 
 ### Framework Benchmark
 
@@ -166,9 +140,7 @@ mlx-eval --tasks hellaswag --limit 100
 | Model | Code Accuracy | Tool Calling | TTFT | Throughput | Capability Comparison (vs Claude Opus 4.6) | Framework Benchmark |
 |-------|---------------|--------------|------|------------|--------------------------------------------|---------------------|
 | Devstral-2-123B-Instruct-2512-4bit | 0% (0/2) | 25% (1/4) | — | 2.5 tok/s | — | — |
-| GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | 50% | 50% | 0.69s | 11.1 tok/s | — | — |
 | Qwen3.5-122B-A10B-4bit | 66% | 100% | 16.50s | 14.6 tok/s | — | — |
-| Qwen3.5-35B-A3B-4bit | 66% | 100% | 0.74s | 24.3 tok/s | — | — |
 | gpt-oss-120b-4bit | 34% | 50% | 1.24s | 18.9 tok/s | — | — |
 
 <!-- BENCHMARK-TABLE-END -->
