@@ -53,5 +53,28 @@
         (AI instructions) and user.md (human documentation).
       '';
     };
+
+    customPatternsDir = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = "${config.home.homeDirectory}/.config/fabric/custom-patterns";
+      defaultText = lib.literalExpression ''"''${config.home.homeDirectory}/.config/fabric/custom-patterns"'';
+      description = ''
+        User-managed directory for custom fabric patterns alongside the
+        Nix-managed read-only patterns at programs.fabric.patternsDir.
+
+        Set to null to disable custom pattern support entirely. When set,
+        the directory is created on activation and FABRIC_CUSTOM_PATTERNS_DIR
+        is exported into the user shell so fabric discovers patterns dropped
+        here without writing to the read-only Nix store.
+
+        Pattern directory layout matches upstream fabric:
+          <customPatternsDir>/
+            my_pattern_name/
+              system.md   # required
+              user.md     # optional, ignored by fabric
+
+        Discoverable via `fabric -l | grep my_pattern_name`.
+      '';
+    };
   };
 }

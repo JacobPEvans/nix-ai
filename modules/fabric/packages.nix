@@ -16,7 +16,8 @@ in
 {
   config = lib.mkIf cfg.enable {
     # The `home.*` attribute set groups the fabric CLI binary, pattern symlinks,
-    # and session variables into a single merged key. Example CLI usage:
+    # session variables, and custom patterns directory activation into a single
+    # merged key. Example CLI usage:
     #   echo "content" | fabric --pattern summarize
     #   fabric -y "https://youtube.com/watch?v=..." --pattern extract_wisdom
     #   git diff | fabric --pattern create_git_diff_commit
@@ -27,6 +28,10 @@ in
     #
     # Session variables point fabric at the local MLX stack by default; users
     # can override per-invocation with --model or --url flags.
+    #
+    # When customPatternsDir is set (default ~/.config/fabric/custom-patterns)
+    # the directory is created on activation and FABRIC_CUSTOM_PATTERNS_DIR is
+    # exported so users can drop their own patterns alongside the read-only ones.
     home = {
       packages = [ fabricPkg ];
 
@@ -37,6 +42,15 @@ in
       sessionVariables = {
         FABRIC_PATTERNS_DIR = cfg.patternsDir;
         FABRIC_DEFAULT_MODEL = cfg.defaultModel;
+      }
+      // lib.optionalAttrs (cfg.customPatternsDir != null) {
+        FABRIC_CUSTOM_PATTERNS_DIR = cfg.customPatternsDir;
+      };
+
+      activation = lib.optionalAttrs (cfg.customPatternsDir != null) {
+        fabricCustomPatternsDir = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          $DRY_RUN_CMD mkdir -p ${cfg.customPatternsDir}
+        '';
       };
     };
   };
