@@ -1,0 +1,63 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-10T03:07:09Z",
+  "git_sha": "3b5d3ea",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "tool-calling",
+  "model": "mlx-community/Qwen3.5-35B-A3B-4bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [
+    {
+      "name": "should-call-tool",
+      "metric": "accuracy",
+      "value": 1.0,
+      "unit": "bool",
+      "tags": {
+        "expect_tool": "True",
+        "called_tool": "True",
+        "elapsed_s": "5.51"
+      }
+    },
+    {
+      "name": "both-args",
+      "metric": "accuracy",
+      "value": 1.0,
+      "unit": "bool",
+      "tags": {
+        "expect_tool": "True",
+        "called_tool": "True",
+        "elapsed_s": "4.62"
+      }
+    },
+    {
+      "name": "no-tool-needed",
+      "metric": "accuracy",
+      "value": 1.0,
+      "unit": "bool",
+      "tags": {
+        "expect_tool": "False",
+        "called_tool": "False",
+        "elapsed_s": "4.27"
+      }
+    },
+    {
+      "name": "ambiguous-no-tool",
+      "metric": "accuracy",
+      "value": 1.0,
+      "unit": "bool",
+      "tags": {
+        "expect_tool": "False",
+        "called_tool": "False",
+        "elapsed_s": "11.24"
+      }
+    }
+  ],
+  "errors": []
+}

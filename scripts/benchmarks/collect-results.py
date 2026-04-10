@@ -400,8 +400,10 @@ def run_tool_calling_suite(model: str) -> tuple[list[dict], list[str]]:
             errors.append(f"tool-calling/{tc['name']}: no choices in response")
             continue
 
-        message = choices[0].get("message", {})
-        tool_calls = message.get("tool_calls", [])
+        # OpenAI-compatible servers may return explicit null for both message and
+        # message.tool_calls, so use `or {}` / `or []` rather than dict .get defaults.
+        message = choices[0].get("message") or {}
+        tool_calls = message.get("tool_calls") or []
         called_tool = len(tool_calls) > 0
 
         correct = called_tool == tc["expect_tool"]

@@ -70,7 +70,8 @@ def fmt_timestamp(ts: str) -> str:
 
 
 def _skipped_row(date: str, sha: str, ncols: int) -> str:
-    cells = ["—"] * (ncols - 2)
+    # Row already contains 3 cells: date, sha, the "(skipped ...)" label.
+    cells = ["—"] * (ncols - 3)
     return f"| {date} | {sha} | _(skipped — no MLX hardware)_ | " + " | ".join(cells) + " |"
 
 
@@ -261,9 +262,59 @@ def render_suite(suite: str, runs: list[dict]) -> str:
     return heading + body
 
 
+def _summarize_run(suite: str, run: dict) -> str:
+    """Produce a single cell for the model-comparison matrix from one run."""
+    if run.get("skipped"):
+        return "—"
+    results = run.get("results", [])
+    errors = run.get("errors", [])
+    if not results and not errors:
+        return "—"
+
+    if suite == "throughput":
+        # Peak sustained tok/s across the sweep is the headline number.
+        tok_s = [r.get("value", 0) for r in results if r.get("unit") == "tok/s"]
+        return f"{max(tok_s):.1f} tok/s" if tok_s else "—"
+
+    if suite == "ttft":
+        # Cold latency is the user-facing metric; warm/cache-speedup are diagnostics.
+        for r in results:
+            if r.get("name") == "cold-avg" or r.get("tags", {}).get("type") == "cold":
+                return f"{r.get('value', 0):.2f}s"
+        return "—"
+
+    if suite in {"tool-calling", "code-accuracy", "coding", "reasoning", "knowledge"}:
+        # Accuracy suites: average success, but flag partial runs caused by errors.
+        # Accept any accuracy-style unit (bool, ratio, percent, or unspecified).
+        acc_results = [
+            r for r in results if r.get("unit") in ("bool", "ratio", "percent", "")
+        ]
+        if not acc_results:
+            return "—"
+        values = [r.get("value", 0) for r in acc_results]
+        avg = sum(values) / len(values)
+        total_attempts = len(values) + len(errors)
+        if errors and total_attempts > len(values):
+            # Re-base on attempts so partial runs are never flattered by errors.
+            avg = sum(values) / total_attempts
+            return f"{avg:.0%} ({len(values)}/{total_attempts})"
+        return f"{avg:.0%}"
+
+    if suite == "capability-comparison":
+        values = [r.get("value", 0) for r in results]
+        if not values:
+            return "—"
+        return f"{sum(values) / len(values):.2f}"
+
+    # Framework / generic fallback.
+    values = [r.get("value", 0) for r in results]
+    if not values:
+        return "—"
+    return f"{sum(values) / len(values):.2f}"
+
+
 def render_model_comparison(grouped: dict[str, list[dict]]) -> str:
     """Build a cross-model comparison matrix from the most recent run of each suite per model."""
-    # Collect latest score per (model, suite) pair
     matrix: dict[str, dict[str, str]] = {}  # model -> {suite: score_str}
     suites_seen: list[str] = []
 
@@ -276,23 +327,7 @@ def render_model_comparison(grouped: dict[str, list[dict]]) -> str:
                 matrix[model] = {}
             if suite in matrix[model]:
                 continue  # already have the latest for this model+suite
-            if run.get("skipped"):
-                matrix[model][suite] = "—"
-                continue
-            results = run.get("results", [])
-            if not results:
-                matrix[model][suite] = "—"
-                continue
-            # Summarize: for single-result suites use the value; for multi-result, average
-            values = [r.get("value", 0) for r in results]
-            avg = sum(values) / len(values) if values else 0
-            unit = results[0].get("unit", "")
-            if unit == "tok/s":
-                matrix[model][suite] = f"{avg:.1f}"
-            elif unit in ("ratio", "bool") or avg <= 1.0:
-                matrix[model][suite] = f"{avg:.1%}"
-            else:
-                matrix[model][suite] = f"{avg:.2f}"
+            matrix[model][suite] = _summarize_run(suite, run)
 
     models = sorted(matrix.keys())
     if len(models) < 2:

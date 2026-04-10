@@ -1,0 +1,63 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-10T02:50:19Z",
+  "git_sha": "3b5d3ea",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "throughput",
+  "model": "mlx-community/gemma-4-31b-it-4bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [
+    {
+      "name": "short-50",
+      "metric": "throughput",
+      "value": 6.4,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "50",
+        "completion_tokens": "50",
+        "elapsed_s": "7.75"
+      }
+    },
+    {
+      "name": "medium-256",
+      "metric": "throughput",
+      "value": 5.4,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "256",
+        "completion_tokens": "256",
+        "elapsed_s": "47.68"
+      }
+    },
+    {
+      "name": "long-512",
+      "metric": "throughput",
+      "value": 4.1,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "512",
+        "completion_tokens": "512",
+        "elapsed_s": "124.02"
+      }
+    },
+    {
+      "name": "long-1024",
+      "metric": "throughput",
+      "value": 5.4,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "1024",
+        "completion_tokens": "1024",
+        "elapsed_s": "190.17"
+      }
+    }
+  ],
+  "errors": []
+}
