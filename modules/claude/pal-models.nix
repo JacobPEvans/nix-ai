@@ -1,12 +1,15 @@
 # PAL MCP — Dynamic Model Discovery
 #
 # Generates PAL model configs from runtime API queries:
-#   - custom_models.json   — from MLX vllm-mlx /v1/models (local)
-#   - gemini_models.json   — from OpenRouter public API (no auth)
-#   - openai_models.json   — from OpenRouter public API (no auth)
+#   - custom_models.json     — from MLX vllm-mlx /v1/models (local)
 #   - openrouter_models.json — from OpenRouter public API (no auth)
 #
-# All configs are rebuilt at activation time (darwin-rebuild switch) and can be
+# All cloud models route through OpenRouter — single source of truth.
+# Models are filtered by recency (last 90 days) and scored by price.
+# PAL's bundled native provider configs (Gemini/OpenAI/xAI) remain stale
+# but unused — OpenRouter handles all cloud routing.
+#
+# Configs rebuild at activation time (darwin-rebuild switch) and can be
 # refreshed between rebuilds with: sync-mlx-models / sync-pal-cloud-models
 #
 # PAL is built as a Nix derivation (modules/mcp/pal-package.nix) and installed
@@ -47,8 +50,6 @@ let
   # Cloud-specific sync env (OpenRouter public API, no auth)
   cloudSyncEnv = ''
     ${commonSyncEnv}
-    export GEMINI_JQ_FILE="${../mcp/scripts/pal-models-gemini.jq}"
-    export OPENAI_JQ_FILE="${../mcp/scripts/pal-models-openai.jq}"
     export OPENROUTER_JQ_FILE="${../mcp/scripts/pal-models-openrouter.jq}"
   '';
 in
@@ -69,8 +70,8 @@ in
           echo "PAL custom models updated. Restart Claude Code to pick up changes."
         '')
 
-        # Refresh cloud model configs between darwin-rebuild switches.
-        # Queries OpenRouter public API (no auth needed) for Gemini, OpenAI, OpenRouter models.
+        # Refresh cloud model config between darwin-rebuild switches.
+        # Queries OpenRouter public API (no auth) — single source of truth for all cloud models.
         (pkgs.writeShellScriptBin "sync-pal-cloud-models" ''
           set -euo pipefail
           ${cloudSyncEnv}
@@ -119,9 +120,7 @@ in
       CUSTOM_MODELS_CONFIG_PATH = outputFile;
       # Override PAL's hardcoded llama3.2 default — dynamically tracks programs.mlx.defaultModel.
       CUSTOM_MODEL_NAME = mlxCfg.defaultModel;
-      # Cloud model configs generated from OpenRouter public API at activation time.
-      GEMINI_MODELS_CONFIG_PATH = "${outputDir}/gemini_models.json";
-      OPENAI_MODELS_CONFIG_PATH = "${outputDir}/openai_models.json";
+      # Cloud models — single source of truth via OpenRouter public API.
       OPENROUTER_MODELS_CONFIG_PATH = "${outputDir}/openrouter_models.json";
       # Point PAL logs to a writable location (default tries to write inside the
       # read-only Nix store, producing "Permission denied: logs/" warnings).

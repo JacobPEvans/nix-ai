@@ -14,4 +14,17 @@ in
     echo "PAL package: binary exists and is executable"
     touch $out
   '';
+
+  # Shellcheck the cloud model sync script.
+  # Catches quoting issues, undefined variables, and POSIX compliance problems.
+  pal-cloud-sync-shellcheck =
+    pkgs.runCommand "check-pal-cloud-sync"
+      {
+        nativeBuildInputs = [ pkgs.shellcheck ];
+      }
+      ''
+        shellcheck ${../../modules/mcp/scripts/sync-pal-cloud-models.sh}
+        echo "PAL cloud sync: shellcheck passed"
+        touch $out
+      '';
 }
