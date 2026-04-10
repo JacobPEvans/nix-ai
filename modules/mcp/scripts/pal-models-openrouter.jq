@@ -1,64 +1,40 @@
 # pal-models-openrouter.jq
 #
 # Transforms OpenRouter /api/v1/models → PAL openrouter_models.json format.
-# Keeps provider prefixes (OpenRouter format). Selects top models across providers.
-# Usage: curl -sf https://openrouter.ai/api/v1/models | jq --from-file pal-models-openrouter.jq
+# Single source of truth for ALL cloud models, regardless of native provider.
 #
-# Provider filters (version-aware, future-proof):
-#   google/gemini-[3-9]*    — current Gemini
-#   openai/(gpt-[5-9]|o[4-9])*  — current OpenAI
-#   anthropic/claude-(opus|sonnet)-[4-9]* — current Anthropic
-#   x-ai/grok-[4-9]*       — current Grok
-#   deepseek/deepseek-(r1|v3)* — current DeepSeek R1/V3 families
+# Filtering: created in last 90 days AND not deprecated.
+#   - New models appear automatically when OpenRouter indexes them
+#   - Old models age out automatically
+#   - Deprecated models are excluded via expiration_date
 #
-# Intelligence scoring uses family heuristics across all providers.
-
-# Helper: derive intelligence score from model family
-def family_score:
-  if test("opus") then 19
-  elif test("pro|codex") then 18
-  elif test("sonnet|grok-[4-9]") then 15
-  elif test("flash-lite|lite|nano") then 8
-  elif test("flash|mini|chat") then 12
-  elif test("deepseek-r1") then 17
-  else 14
-  end;
-
-# Helper: short alias from full OpenRouter ID
-def make_aliases:
-  [
-    (. | split("/") | last),
-    (. | split("/") | last | gsub("-preview$"; ""))
-  ] | unique;
+# Scoring: derived from prompt token price.
+#   Pricing tracks capability more reliably than name heuristics —
+#   providers price flagship models higher than mid-tier and cheap variants.
 
 {
   models: [
     .data[]
-    | select(
-        (.id | test("^google/gemini-[3-9]")) or
-        (.id | test("^openai/(gpt-[5-9]|o[4-9])")) or
-        (.id | test("^anthropic/claude-(opus|sonnet)-[4-9]")) or
-        (.id | test("^x-ai/grok-[4-9]")) or
-        (.id | test("^deepseek/deepseek-(r1|v3)"))
-      )
-    | select(.id | test("image|deep-research|extended") | not)  # exclude niche variants
-    | (.id | family_score) as $score
+    | select(.created > (now - 7776000))   # last 90 days
+    | select(.expiration_date == null)     # not deprecated
+    | (.pricing.prompt | tonumber) as $p
     | {
         model_name: .id,
-        friendly_name: .name,
-        aliases: (.id | make_aliases),
-        intelligence_score: $score,
-        description: .description,
-        context_window: .context_length,
-        max_output_tokens: (.top_provider.max_completion_tokens // 65536),
-        supports_extended_thinking: any(.supported_parameters[]?; . == "include_reasoning"),
-        supports_system_prompts: true,
-        supports_streaming: true,
-        supports_json_mode: any(.supported_parameters[]?; . == "structured_outputs"),
-        supports_function_calling: any(.supported_parameters[]?; . == "tools"),
-        supports_images: (.architecture.modality // "" | test("image")),
-        supports_temperature: any(.supported_parameters[]?; . == "temperature"),
-        allow_code_generation: ($score >= 14)
+        aliases: [.id | split("/") | last],
+        context_window: (.context_length // 8192),
+        max_output_tokens: (.top_provider.max_completion_tokens // 8192),
+        supports_function_calling: ((.supported_parameters // []) | index("tools") != null),
+        supports_extended_thinking: ((.supported_parameters // []) | index("include_reasoning") != null),
+        supports_json_mode: ((.supported_parameters // []) | index("structured_outputs") != null),
+        supports_images: ((.architecture.modality // "") | test("image")),
+        intelligence_score: (
+          if   $p > 0.000004  then 19   # >$4/M    flagship (Opus, GPT-pro)
+          elif $p > 0.0000015 then 16   # >$1.5/M  mid (Sonnet, GPT-5, Gemini Pro, Grok)
+          elif $p > 0.0000005 then 13   # >$0.5/M  capable (codex, GLM, mini)
+          elif $p > 0         then 9    # >$0      cheap (mini-mini, nano)
+          else 7                        # free
+          end
+        )
       }
   ]
 }
