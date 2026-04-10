@@ -297,7 +297,7 @@ def _summarize_run(suite: str, run: dict) -> str:
         if errors and total_attempts > len(values):
             # Re-base on attempts so partial runs are never flattered by errors.
             avg = sum(values) / total_attempts
-            return f"{avg:.0%} ({len(values)}/{total_attempts})"
+            return f"{avg:.0%} ({sum(values):.0f}/{total_attempts})"
         return f"{avg:.0%}"
 
     if suite == "capability-comparison":

@@ -39,8 +39,8 @@ def get_memory_budget_gb() -> int:
     return total_gb - 20
 
 
-def dir_size_gb(path: Path) -> int:
-    """Return directory size in GB (rounded).
+def dir_size_gb(path: Path) -> float:
+    """Return directory size in GB.
 
     HuggingFace cache layout stores real files under ``blobs/`` and exposes
     them through ``snapshots/<revision>/`` trees of symlinks pointing back to
@@ -55,7 +55,7 @@ def dir_size_gb(path: Path) -> int:
             continue
         if f.is_file():
             total += f.stat().st_size
-    return round(total / (1024**3))
+    return total / (1024**3)
 
 
 def scan_models(hf_home: Path) -> list[tuple[str, Path]]:

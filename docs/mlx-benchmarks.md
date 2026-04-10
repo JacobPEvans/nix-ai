@@ -6,7 +6,7 @@ Performance tracking for the vllm-mlx inference server across configuration chan
 ## System
 
 - **Hardware**: Apple M4 Max, 128 GB unified memory
-- **OS**: macOS 26.3.1 (Tahoe)
+- **OS**: macOS 26.4 (Tahoe)
 - **Server**: vllm-mlx 0.2.6 (OpenAI-compatible API on port 11434)
 - **Client**: `curl` for API latency tests, custom bash script with `footprint`/`vm_stat` for memory-tracked sweeps
 - **Model**: mlx-community/Qwen3.5-35B-A3B-4bit (~20 GB on disk; default as of 2026-04-10)
@@ -149,7 +149,7 @@ mlx-eval --tasks hellaswag --limit 100
 
 | Model | Code Accuracy | Tool Calling | TTFT | Throughput | Capability Comparison (vs Claude Opus 4.6) | Framework Benchmark |
 |-------|---------------|--------------|------|------------|--------------------------------------------|---------------------|
-| Devstral-2-123B-Instruct-2512-4bit | 0% (1/2) | 25% (3/4) | — | 2.5 tok/s | — | — |
+| Devstral-2-123B-Instruct-2512-4bit | 0% (0/2) | 25% (1/4) | — | 2.5 tok/s | — | — |
 | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | 50% | 50% | 0.69s | 11.1 tok/s | — | — |
 | Qwen3.5-122B-A10B-4bit | 66% | 100% | 16.50s | 14.6 tok/s | — | — |
 | Qwen3.5-35B-A3B-4bit | 66% | 100% | 0.74s | 24.3 tok/s | — | — |
