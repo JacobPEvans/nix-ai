@@ -1,0 +1,34 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-10T11:18:02Z",
+  "git_sha": "5572dde",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "ttft",
+  "model": "mlx-community/Devstral-2-123B-Instruct-2512-4bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [
+    {
+      "name": "warm-avg",
+      "metric": "ttft",
+      "value": 14.1557,
+      "unit": "seconds",
+      "tags": {
+        "type": "warm",
+        "samples": "2"
+      }
+    }
+  ],
+  "errors": [
+    "ttft/cold: failed for prompt 'What is the capital of France?...'",
+    "ttft/cold: failed for prompt 'Explain quantum entanglement b...'",
+    "ttft/cold: failed for prompt 'List three benefits of exercis...'",
+    "ttft/warm: failed"
+  ]
+}

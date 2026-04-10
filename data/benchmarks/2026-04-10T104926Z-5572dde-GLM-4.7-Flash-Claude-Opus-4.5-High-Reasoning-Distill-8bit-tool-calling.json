@@ -1,0 +1,63 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-10T10:49:26Z",
+  "git_sha": "5572dde",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "tool-calling",
+  "model": "mlx-community/GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [
+    {
+      "name": "should-call-tool",
+      "metric": "accuracy",
+      "value": 0.0,
+      "unit": "bool",
+      "tags": {
+        "expect_tool": "True",
+        "called_tool": "False",
+        "elapsed_s": "23.62"
+      }
+    },
+    {
+      "name": "both-args",
+      "metric": "accuracy",
+      "value": 0.0,
+      "unit": "bool",
+      "tags": {
+        "expect_tool": "True",
+        "called_tool": "False",
+        "elapsed_s": "23.95"
+      }
+    },
+    {
+      "name": "no-tool-needed",
+      "metric": "accuracy",
+      "value": 1.0,
+      "unit": "bool",
+      "tags": {
+        "expect_tool": "False",
+        "called_tool": "False",
+        "elapsed_s": "21.41"
+      }
+    },
+    {
+      "name": "ambiguous-no-tool",
+      "metric": "accuracy",
+      "value": 1.0,
+      "unit": "bool",
+      "tags": {
+        "expect_tool": "False",
+        "called_tool": "False",
+        "elapsed_s": "7.57"
+      }
+    }
+  ],
+  "errors": []
+}

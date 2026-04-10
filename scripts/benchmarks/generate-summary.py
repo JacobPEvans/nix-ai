@@ -5,8 +5,8 @@
 """Regenerate the auto-generated summary table in docs/mlx-benchmarks.md.
 
 Reads all JSON result files from data/benchmarks/, groups by suite, formats
-markdown tables (last 5 runs per suite), and replaces the content between
-BENCHMARK-TABLE-START and BENCHMARK-TABLE-END sentinels in the docs file.
+markdown tables (last 3 runs per suite by default), and replaces the content
+between BENCHMARK-TABLE-START and BENCHMARK-TABLE-END sentinels in the docs file.
 
 Usage:
   uv run scripts/benchmarks/generate-summary.py
@@ -297,7 +297,7 @@ def _summarize_run(suite: str, run: dict) -> str:
         if errors and total_attempts > len(values):
             # Re-base on attempts so partial runs are never flattered by errors.
             avg = sum(values) / total_attempts
-            return f"{avg:.0%} ({len(values)}/{total_attempts})"
+            return f"{avg:.0%} ({sum(values):.0f}/{total_attempts})"
         return f"{avg:.0%}"
 
     if suite == "capability-comparison":
@@ -392,7 +392,15 @@ def update_docs(table: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Regenerate benchmark summary in docs")
-    parser.add_argument("--limit", type=int, default=5, help="Max runs per suite (default: 5)")
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=3,
+        help=(
+            "Max runs per suite (default: 3). Chosen so the regenerated doc "
+            "stays under the 12288-byte file-size limit as new suites are added."
+        ),
+    )
     args = parser.parse_args()
 
     grouped = load_results(args.limit)

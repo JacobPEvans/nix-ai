@@ -1,0 +1,53 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-10T11:00:41Z",
+  "git_sha": "5572dde",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "ttft",
+  "model": "mlx-community/Qwen3.5-122B-A10B-4bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [
+    {
+      "name": "cold-avg",
+      "metric": "ttft",
+      "value": 16.4997,
+      "unit": "seconds",
+      "tags": {
+        "type": "cold",
+        "samples": "1"
+      }
+    },
+    {
+      "name": "warm-avg",
+      "metric": "ttft",
+      "value": 11.952,
+      "unit": "seconds",
+      "tags": {
+        "type": "warm",
+        "samples": "2"
+      }
+    },
+    {
+      "name": "cache-speedup",
+      "metric": "ratio",
+      "value": 1.38,
+      "unit": "x",
+      "tags": {
+        "cold_avg": "16.4997",
+        "warm_avg": "11.9520"
+      }
+    }
+  ],
+  "errors": [
+    "ttft/cold: failed for prompt 'What is the capital of France?...'",
+    "ttft/cold: failed for prompt 'List three benefits of exercis...'",
+    "ttft/warm: failed"
+  ]
+}

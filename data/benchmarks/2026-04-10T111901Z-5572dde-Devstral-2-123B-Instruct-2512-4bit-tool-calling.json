@@ -1,0 +1,54 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-10T11:19:01Z",
+  "git_sha": "5572dde",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "tool-calling",
+  "model": "mlx-community/Devstral-2-123B-Instruct-2512-4bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [
+    {
+      "name": "should-call-tool",
+      "metric": "accuracy",
+      "value": 0.0,
+      "unit": "bool",
+      "tags": {
+        "expect_tool": "True",
+        "called_tool": "False",
+        "elapsed_s": "10.78"
+      }
+    },
+    {
+      "name": "both-args",
+      "metric": "accuracy",
+      "value": 0.0,
+      "unit": "bool",
+      "tags": {
+        "expect_tool": "True",
+        "called_tool": "False",
+        "elapsed_s": "14.08"
+      }
+    },
+    {
+      "name": "no-tool-needed",
+      "metric": "accuracy",
+      "value": 1.0,
+      "unit": "bool",
+      "tags": {
+        "expect_tool": "False",
+        "called_tool": "False",
+        "elapsed_s": "9.24"
+      }
+    }
+  ],
+  "errors": [
+    "tool-calling/ambiguous-no-tool: request failed"
+  ]
+}

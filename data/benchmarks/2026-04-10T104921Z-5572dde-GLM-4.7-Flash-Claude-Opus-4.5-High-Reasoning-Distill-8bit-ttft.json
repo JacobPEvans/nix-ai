@@ -1,0 +1,49 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-10T10:49:21Z",
+  "git_sha": "5572dde",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "ttft",
+  "model": "mlx-community/GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [
+    {
+      "name": "cold-avg",
+      "metric": "ttft",
+      "value": 0.6938,
+      "unit": "seconds",
+      "tags": {
+        "type": "cold",
+        "samples": "3"
+      }
+    },
+    {
+      "name": "warm-avg",
+      "metric": "ttft",
+      "value": 0.6712,
+      "unit": "seconds",
+      "tags": {
+        "type": "warm",
+        "samples": "3"
+      }
+    },
+    {
+      "name": "cache-speedup",
+      "metric": "ratio",
+      "value": 1.03,
+      "unit": "x",
+      "tags": {
+        "cold_avg": "0.6938",
+        "warm_avg": "0.6712"
+      }
+    }
+  ],
+  "errors": []
+}
