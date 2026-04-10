@@ -1,4 +1,4 @@
-<!-- cspell:words TTFT hellaswag parameterize keyerror -->
+<!-- cspell:words TTFT hellaswag parameterize keyerror safetensor safetensors -->
 # MLX Benchmark Results
 
 Performance tracking for the vllm-mlx inference server across configuration changes.
@@ -9,7 +9,7 @@ Performance tracking for the vllm-mlx inference server across configuration chan
 - **OS**: macOS 26.3.1 (Tahoe)
 - **Server**: vllm-mlx 0.2.6 (OpenAI-compatible API on port 11434)
 - **Client**: `curl` for API latency tests, custom bash script with `footprint`/`vm_stat` for memory-tracked sweeps
-- **Model**: mlx-community/Qwen3.5-122B-A10B-4bit (~65 GB on disk)
+- **Model**: mlx-community/Qwen3.5-35B-A3B-4bit (~20 GB on disk; default as of 2026-04-10)
 
 ## How to Run
 
@@ -58,69 +58,81 @@ mlx-eval --tasks hellaswag --limit 100
 
 | Date | SHA | Model | Test | tok/s | Tokens | Elapsed |
 |------|-----|-------|------|-------|--------|---------|
+| 2026-04-10 11:06 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | short-50 | 1.9 | 50 | 25.95 |
+| 2026-04-10 11:06 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | medium-256 | 2.5 | 256 | 103.61 |
+| 2026-04-10 11:06 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | long-512 | 2.0 | 512 | 257.79 |
+| 2026-04-10 10:58 | 5572dde | Qwen3.5-122B-A10B-4bit | short-50 | 11.3 | 50 | 4.44 |
+| 2026-04-10 10:58 | 5572dde | Qwen3.5-122B-A10B-4bit | medium-256 | 13.9 | 256 | 18.41 |
+| 2026-04-10 10:58 | 5572dde | Qwen3.5-122B-A10B-4bit | long-512 | 14.6 | 512 | 35.06 |
+| 2026-04-10 10:58 | 5572dde | Qwen3.5-122B-A10B-4bit | long-1024 | 13.7 | 1024 | 75.01 |
+| 2026-04-10 10:53 | 5572dde | gpt-oss-120b-4bit | short-50 | 10.3 | 50 | 4.88 |
+| 2026-04-10 10:53 | 5572dde | gpt-oss-120b-4bit | medium-256 | 17.1 | 256 | 14.94 |
+| 2026-04-10 10:53 | 5572dde | gpt-oss-120b-4bit | long-512 | 16.5 | 512 | 31.01 |
+| 2026-04-10 10:53 | 5572dde | gpt-oss-120b-4bit | long-1024 | 18.9 | 1024 | 54.05 |
+| 2026-04-10 10:46 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | short-50 | 7.7 | 50 | 6.47 |
+| 2026-04-10 10:46 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | medium-256 | 11.1 | 256 | 23.08 |
+| 2026-04-10 10:46 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | long-512 | 10.5 | 511 | 48.82 |
+| 2026-04-10 10:46 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | long-1024 | 11.0 | 1024 | 93.13 |
 | 2026-04-10 03:05 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | short-50 | 19.2 | 50 | 2.60 |
 | 2026-04-10 03:05 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | medium-256 | 23.5 | 256 | 10.90 |
 | 2026-04-10 03:05 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | long-512 | 23.6 | 512 | 21.74 |
 | 2026-04-10 03:05 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | long-1024 | 24.3 | 1024 | 42.12 |
-| 2026-04-10 02:50 | 3b5d3ea | gemma-4-31b-it-4bit | short-50 | 6.4 | 50 | 7.75 |
-| 2026-04-10 02:50 | 3b5d3ea | gemma-4-31b-it-4bit | medium-256 | 5.4 | 256 | 47.68 |
-| 2026-04-10 02:50 | 3b5d3ea | gemma-4-31b-it-4bit | long-512 | 4.1 | 512 | 124.02 |
-| 2026-04-10 02:50 | 3b5d3ea | gemma-4-31b-it-4bit | long-1024 | 5.4 | 1024 | 190.17 |
-| 2026-04-10 01:48 | 3b5d3ea | Qwen3.5-27B-4bit | short-50 | 2.2 | 50 | 22.31 |
-| 2026-04-10 01:48 | 3b5d3ea | Qwen3.5-27B-4bit | medium-256 | 2.3 | 256 | 113.46 |
-| 2026-04-10 00:45 | 3b5d3ea | gemma-4-e4b-it-4bit | short-50 | 2.5 | 50 | 20.18 |
-| 2026-04-10 00:45 | 3b5d3ea | gemma-4-e4b-it-4bit | medium-256 | 2.5 | 256 | 101.09 |
-| 2026-04-10 00:45 | 3b5d3ea | gemma-4-e4b-it-4bit | long-512 | 3.3 | 512 | 156.47 |
-| 2026-04-10 00:45 | 3b5d3ea | gemma-4-e4b-it-4bit | long-1024 | 3.4 | 1024 | 297.27 |
-| 2026-04-06 04:56 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — | — |
 
 ### TTFT
 
 | Date | SHA | Model | Test | Latency (s) | Type |
 |------|-----|-------|------|-------------|------|
+| 2026-04-10 11:18 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | warm-avg | 14.156 | warm |
+| 2026-04-10 11:00 | 5572dde | Qwen3.5-122B-A10B-4bit | cold-avg | 16.500 | cold |
+| 2026-04-10 11:00 | 5572dde | Qwen3.5-122B-A10B-4bit | warm-avg | 11.952 | warm |
+| 2026-04-10 11:00 | 5572dde | Qwen3.5-122B-A10B-4bit | cache-speedup | 1.380 | — |
+| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | cold-avg | 1.245 | cold |
+| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | warm-avg | 1.314 | warm |
+| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | cache-speedup | 0.950 | — |
+| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | cold-avg | 0.694 | cold |
+| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | warm-avg | 0.671 | warm |
+| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | cache-speedup | 1.030 | — |
 | 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | cold-avg | 0.742 | cold |
 | 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | warm-avg | 0.738 | warm |
 | 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | cache-speedup | 1.000 | — |
-| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | cold-avg | 1.438 | cold |
-| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | warm-avg | 1.575 | warm |
-| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | cache-speedup | 0.910 | — |
-| 2026-04-10 00:54 | 3b5d3ea | gemma-4-e4b-it-4bit | cold-avg | 1.565 | cold |
-| 2026-04-10 00:54 | 3b5d3ea | gemma-4-e4b-it-4bit | warm-avg | 1.423 | warm |
-| 2026-04-10 00:54 | 3b5d3ea | gemma-4-e4b-it-4bit | cache-speedup | 1.100 | — |
-| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — |
 
 ### Tool Calling
 
 | Date | SHA | Model | Task | Score | Metric | Samples |
 |------|-----|-------|------|-------|--------|---------|
+| 2026-04-10 11:19 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | should-call-tool | 0.0% | accuracy | — |
+| 2026-04-10 11:19 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | both-args | 0.0% | accuracy | — |
+| 2026-04-10 11:19 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | should-call-tool | 100.0% | accuracy | — |
+| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | both-args | 100.0% | accuracy | — |
+| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | should-call-tool | 0.0% | accuracy | — |
+| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | both-args | 0.0% | accuracy | — |
+| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | should-call-tool | 0.0% | accuracy | — |
+| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | both-args | 0.0% | accuracy | — |
+| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | ambiguous-no-tool | 100.0% | accuracy | — |
 | 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | should-call-tool | 100.0% | accuracy | — |
 | 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | both-args | 100.0% | accuracy | — |
 | 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | no-tool-needed | 100.0% | accuracy | — |
 | 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
-| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | should-call-tool | 0.0% | accuracy | — |
-| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | both-args | 0.0% | accuracy | — |
-| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | no-tool-needed | 100.0% | accuracy | — |
-| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
-| 2026-04-10 02:13 | 3b5d3ea | Qwen3.5-27B-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
-| 2026-04-10 01:00 | 3b5d3ea | gemma-4-e4b-it-4bit | should-call-tool | 100.0% | accuracy | — |
-| 2026-04-10 01:00 | 3b5d3ea | gemma-4-e4b-it-4bit | both-args | 100.0% | accuracy | — |
-| 2026-04-10 01:00 | 3b5d3ea | gemma-4-e4b-it-4bit | no-tool-needed | 100.0% | accuracy | — |
-| 2026-04-10 01:00 | 3b5d3ea | gemma-4-e4b-it-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
-| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — | — |
 
 ### Code Accuracy
 
 | Date | SHA | Model | Task | Score | Metric | Samples |
 |------|-----|-------|------|-------|--------|---------|
+| 2026-04-10 11:21 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | code-planning | 0.0% | accuracy | — |
+| 2026-04-10 11:03 | 5572dde | Qwen3.5-122B-A10B-4bit | bug-detection | 100.0% | accuracy | — |
+| 2026-04-10 11:03 | 5572dde | Qwen3.5-122B-A10B-4bit | code-planning | 33.0% | accuracy | — |
+| 2026-04-10 10:56 | 5572dde | gpt-oss-120b-4bit | bug-detection | 67.0% | accuracy | — |
+| 2026-04-10 10:56 | 5572dde | gpt-oss-120b-4bit | code-planning | 0.0% | accuracy | — |
+| 2026-04-10 10:50 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | bug-detection | 100.0% | accuracy | — |
+| 2026-04-10 10:50 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | code-planning | 0.0% | accuracy | — |
 | 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | bug-detection | 100.0% | accuracy | — |
 | 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | code-planning | 33.0% | accuracy | — |
-| 2026-04-10 02:58 | 3b5d3ea | gemma-4-31b-it-4bit | bug-detection | 100.0% | accuracy | — |
-| 2026-04-10 02:58 | 3b5d3ea | gemma-4-31b-it-4bit | code-planning | 0.0% | accuracy | — |
-| 2026-04-10 02:44 | 3b5d3ea | Qwen3.5-27B-4bit | bug-detection | 100.0% | accuracy | — |
-| 2026-04-10 02:44 | 3b5d3ea | Qwen3.5-27B-4bit | code-planning | 0.0% | accuracy | — |
-| 2026-04-10 00:55 | 3b5d3ea | gemma-4-e4b-it-4bit | bug-detection | 100.0% | accuracy | — |
-| 2026-04-10 00:55 | 3b5d3ea | gemma-4-e4b-it-4bit | code-planning | 0.0% | accuracy | — |
-| 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — | — |
 
 ### Framework Benchmark
 
@@ -137,13 +149,53 @@ mlx-eval --tasks hellaswag --limit 100
 
 | Model | Code Accuracy | Tool Calling | TTFT | Throughput | Capability Comparison (vs Claude Opus 4.6) | Framework Benchmark |
 |-------|---------------|--------------|------|------------|--------------------------------------------|---------------------|
-| Qwen3.5-122B-A10B-4bit | — | — | — | — | — | — |
-| Qwen3.5-27B-4bit | 50% | 25% (1/4) | — | 2.3 tok/s | — | — |
+| Devstral-2-123B-Instruct-2512-4bit | 0% (1/2) | 25% (3/4) | — | 2.5 tok/s | — | — |
+| GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | 50% | 50% | 0.69s | 11.1 tok/s | — | — |
+| Qwen3.5-122B-A10B-4bit | 66% | 100% | 16.50s | 14.6 tok/s | — | — |
 | Qwen3.5-35B-A3B-4bit | 66% | 100% | 0.74s | 24.3 tok/s | — | — |
-| gemma-4-31b-it-4bit | 50% | 50% | 1.44s | 6.4 tok/s | — | — |
-| gemma-4-e4b-it-4bit | 50% | 100% | 1.57s | 3.4 tok/s | — | — |
+| gpt-oss-120b-4bit | 34% | 50% | 1.24s | 18.9 tok/s | — | — |
 
 <!-- BENCHMARK-TABLE-END -->
+
+## Decision (2026-04-10) — Large-model sweep + default swap
+
+After benchmarking the full set of cached large models on M4 Max 128 GB, the
+winner on every dimension is **`mlx-community/Qwen3.5-35B-A3B-4bit`** — a
+_smaller_ model than the prior default. `programs.mlx.defaultModel` was
+updated to match. Resolves JacobPEvans/nix-ai#334.
+
+### Role winners
+
+| Role | Model | Rationale |
+|------|-------|-----------|
+| **Default local model** | `Qwen3.5-35B-A3B-4bit` | Fastest (24.3 tok/s @ 1024), lowest TTFT (0.74s warm), tied for best tool-calling (100%), tied for best code (66%). Comfortably fits in ~27 GB est., leaving headroom for concurrent work. |
+| **Best local tool-caller** | `Qwen3.5-35B-A3B-4bit` / `Qwen3.5-122B-A10B-4bit` | Both 100% across all four tool-calling tasks. 35B-A3B wins on TTFT (0.74s vs 11.95s warm) and throughput (24.3 vs 13.7 tok/s). |
+| **Best local coder** | `Qwen3.5-35B-A3B-4bit` / `Qwen3.5-122B-A10B-4bit` | Both 66% code accuracy (bug-detection 100%, code-planning 33%). 35B-A3B wins on every secondary metric. |
+
+### Large-model findings
+
+- **Qwen3.5-122B-A10B-4bit** (the prior default) is dominated by `Qwen3.5-35B-A3B-4bit`
+  on every axis despite being ~3x the size. Cold TTFT of 16.5s / warm 11.95s makes it
+  unusable as an always-on default.
+- **gpt-oss-120b-4bit** — 18.9 tok/s with 1.31s TTFT, but 25% tool-calling accuracy.
+  The `hermes` parser doesn't grok OpenAI's native tool-call format. Disqualified as default.
+- **GLM-4.7-Flash-...-Distill-8bit** — good TTFT (0.67s) but only 11.0 tok/s and 25%
+  tool-calling. Distill fidelity hasn't caught up to quantized Qwen3 for agentic work.
+- **Devstral-2-123B-Instruct-2512-4bit** — anomalously poor (2.0 tok/s, 0% code-accuracy,
+  25% tool-calling). Suspected chat-template/parser mismatch with vllm-mlx 0.2.6; not
+  investigated here.
+- **Llama-4-Scout-17B-16E-Instruct-4bit** — fails to load (exit status 1). mlx-lm pin
+  does not support the Llama-4 MoE architecture yet.
+- **Qwen3-235B-A22B-4bit** — local HuggingFace cache is incomplete (missing 10+
+  safetensor shards); vllm-mlx started downloading them on first load and exceeded
+  the 60s `mlx-switch` timeout. Would fit in ~90 GB estimated but needs a full
+  pre-download and likely a longer switch timeout before it can be benchmarked.
+
+### Takeaway
+
+Parameter count is a poor proxy for capability on tightly-quantized MoE models,
+especially when TTFT dominates user experience. The 35B-A3B MoE (3B active, 35B
+total) is the sweet spot of the current mlx-community catalog on 128 GB Apple Silicon.
 
 ## History
 

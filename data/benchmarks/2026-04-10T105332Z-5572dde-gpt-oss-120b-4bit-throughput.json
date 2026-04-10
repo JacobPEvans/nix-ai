@@ -1,0 +1,63 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-10T10:53:32Z",
+  "git_sha": "5572dde",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "throughput",
+  "model": "mlx-community/gpt-oss-120b-4bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [
+    {
+      "name": "short-50",
+      "metric": "throughput",
+      "value": 10.3,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "50",
+        "completion_tokens": "50",
+        "elapsed_s": "4.88"
+      }
+    },
+    {
+      "name": "medium-256",
+      "metric": "throughput",
+      "value": 17.1,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "256",
+        "completion_tokens": "256",
+        "elapsed_s": "14.94"
+      }
+    },
+    {
+      "name": "long-512",
+      "metric": "throughput",
+      "value": 16.5,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "512",
+        "completion_tokens": "512",
+        "elapsed_s": "31.01"
+      }
+    },
+    {
+      "name": "long-1024",
+      "metric": "throughput",
+      "value": 18.9,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "1024",
+        "completion_tokens": "1024",
+        "elapsed_s": "54.05"
+      }
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,49 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-10T10:55:17Z",
+  "git_sha": "5572dde",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "ttft",
+  "model": "mlx-community/gpt-oss-120b-4bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [
+    {
+      "name": "cold-avg",
+      "metric": "ttft",
+      "value": 1.2449,
+      "unit": "seconds",
+      "tags": {
+        "type": "cold",
+        "samples": "3"
+      }
+    },
+    {
+      "name": "warm-avg",
+      "metric": "ttft",
+      "value": 1.314,
+      "unit": "seconds",
+      "tags": {
+        "type": "warm",
+        "samples": "3"
+      }
+    },
+    {
+      "name": "cache-speedup",
+      "metric": "ratio",
+      "value": 0.95,
+      "unit": "x",
+      "tags": {
+        "cold_avg": "1.2449",
+        "warm_avg": "1.3140"
+      }
+    }
+  ],
+  "errors": []
+}
