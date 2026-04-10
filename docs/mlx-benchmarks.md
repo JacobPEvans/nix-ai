@@ -159,43 +159,40 @@ mlx-eval --tasks hellaswag --limit 100
 
 ## Decision (2026-04-10) — Large-model sweep + default swap
 
-After benchmarking the full set of cached large models on M4 Max 128 GB, the
-winner on every dimension is **`mlx-community/Qwen3.5-35B-A3B-4bit`** — a
-_smaller_ model than the prior default. `programs.mlx.defaultModel` was
-updated to match. Resolves JacobPEvans/nix-ai#334.
+After benchmarking cached large models on M4 Max 128 GB, the winner on every
+dimension is **`mlx-community/Qwen3.5-35B-A3B-4bit`** — _smaller_ than the
+prior default. `programs.mlx.defaultModel` updated to match. Resolves #334.
 
 ### Role winners
 
 | Role | Model | Rationale |
 |------|-------|-----------|
-| **Default local model** | `Qwen3.5-35B-A3B-4bit` | Fastest (24.3 tok/s @ 1024), lowest TTFT (0.74s warm), tied for best tool-calling (100%), tied for best code (66%). Comfortably fits in ~27 GB est., leaving headroom for concurrent work. |
-| **Best local tool-caller** | `Qwen3.5-35B-A3B-4bit` / `Qwen3.5-122B-A10B-4bit` | Both 100% across all four tool-calling tasks. 35B-A3B wins on TTFT (0.74s vs 11.95s warm) and throughput (24.3 vs 13.7 tok/s). |
-| **Best local coder** | `Qwen3.5-35B-A3B-4bit` / `Qwen3.5-122B-A10B-4bit` | Both 66% code accuracy (bug-detection 100%, code-planning 33%). 35B-A3B wins on every secondary metric. |
+| **Default** | `Qwen3.5-35B-A3B-4bit` | Fastest (24.3 tok/s @ 1024), lowest TTFT (0.74s warm), 100% tool-calling, 66% code. Fits in ~27 GB with headroom. |
+| **Best tool-caller** | `Qwen3.5-35B-A3B-4bit` / `Qwen3.5-122B-A10B-4bit` | Both 100% across four tool-calling tasks. 35B-A3B wins TTFT (0.74s vs 11.95s) and throughput (24.3 vs 13.7 tok/s). |
+| **Best coder** | `Qwen3.5-35B-A3B-4bit` / `Qwen3.5-122B-A10B-4bit` | Both 66% (bug-detection 100%, code-planning 33%). 35B-A3B wins every secondary metric. |
 
 ### Large-model findings
 
-- **Qwen3.5-122B-A10B-4bit** (the prior default) is dominated by `Qwen3.5-35B-A3B-4bit`
-  on every axis despite being ~3x the size. Cold TTFT of 16.5s / warm 11.95s makes it
+- **Qwen3.5-122B-A10B-4bit** (prior default) — dominated by 35B-A3B on every
+  axis despite being ~3x the size. Cold TTFT 16.5s / warm 11.95s makes it
   unusable as an always-on default.
-- **gpt-oss-120b-4bit** — 18.9 tok/s with 1.31s TTFT, but 25% tool-calling accuracy.
-  The `hermes` parser doesn't grok OpenAI's native tool-call format. Disqualified as default.
-- **GLM-4.7-Flash-...-Distill-8bit** — good TTFT (0.67s) but only 11.0 tok/s and 25%
-  tool-calling. Distill fidelity hasn't caught up to quantized Qwen3 for agentic work.
-- **Devstral-2-123B-Instruct-2512-4bit** — anomalously poor (2.0 tok/s, 0% code-accuracy,
-  25% tool-calling). Suspected chat-template/parser mismatch with vllm-mlx 0.2.6; not
-  investigated here.
-- **Llama-4-Scout-17B-16E-Instruct-4bit** — fails to load (exit status 1). mlx-lm pin
-  does not support the Llama-4 MoE architecture yet.
-- **Qwen3-235B-A22B-4bit** — local HuggingFace cache is incomplete (missing 10+
-  safetensor shards); vllm-mlx started downloading them on first load and exceeded
-  the 60s `mlx-switch` timeout. Would fit in ~90 GB estimated but needs a full
-  pre-download and likely a longer switch timeout before it can be benchmarked.
+- **gpt-oss-120b-4bit** — 18.9 tok/s, 1.31s TTFT, but 25% tool-calling. The
+  `hermes` parser doesn't grok OpenAI's native tool-call format.
+- **GLM-4.7-Flash-...-Distill-8bit** — good TTFT (0.67s), only 11.0 tok/s and
+  25% tool-calling. Distill fidelity trails quantized Qwen3 for agentic work.
+- **Devstral-2-123B-Instruct-2512-4bit** — anomalous (2.0 tok/s, 0% code, 25%
+  tool-calling). Suspected chat-template mismatch with vllm-mlx 0.2.6.
+- **Llama-4-Scout-17B-16E-Instruct-4bit** — fails to load (exit 1). mlx-lm pin
+  lacks Llama-4 MoE architecture support.
+- **Qwen3-235B-A22B-4bit** — local HF cache incomplete (10+ missing shards);
+  vllm-mlx started downloading on first load and exceeded the 60s
+  `mlx-switch` timeout. Needs pre-download + longer timeout before benchmarking.
 
 ### Takeaway
 
-Parameter count is a poor proxy for capability on tightly-quantized MoE models,
-especially when TTFT dominates user experience. The 35B-A3B MoE (3B active, 35B
-total) is the sweet spot of the current mlx-community catalog on 128 GB Apple Silicon.
+Parameter count is a poor proxy for capability on tightly-quantized MoE models
+when TTFT dominates UX. 35B-A3B (3B active) is the sweet spot of the
+mlx-community catalog on 128 GB Apple Silicon.
 
 ## History
 
