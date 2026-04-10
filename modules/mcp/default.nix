@@ -198,4 +198,25 @@ in
     type = "http";
     url = "http://localhost:30030/mcp";
   };
+
+  # ================================================================
+  # Bifrost AI Gateway - OrbStack kubernetes monitoring stack
+  # ================================================================
+  # Bifrost AI gateway running in OrbStack k8s cluster (NodePort :30080).
+  # Multi-provider routing: OpenAI, Anthropic, Gemini, OpenRouter, local MLX.
+  # OpenAI-compatible API at /v1, MCP server at /mcp.
+  # Connection will fail when OrbStack k8s is not running — this is expected.
+  # Provider API keys are managed by the Doppler K8s Operator inside the cluster
+  # (no doppler-mcp wrapper needed — secrets never reach the MCP client process).
+  #
+  # Diagnostics use native tools — no custom CLI exists or is needed:
+  #   claude mcp list | grep bifrost          # MCP connection state
+  #   make -C ~/git/orbstack-kubernetes/main status      # pod / service / sts state
+  #   make -C ~/git/orbstack-kubernetes/main test-smoke  # asserts /health, /v1/models, NodePort
+  #
+  # See: https://github.com/maximhq/bifrost
+  bifrost = {
+    type = "http";
+    url = "http://localhost:30080/mcp";
+  };
 }
