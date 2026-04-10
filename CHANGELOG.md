@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.32.4](https://github.com/JacobPEvans/nix-ai/compare/v1.32.3...v1.32.4) (2026-04-10)
+
+
+### Bug Fixes
+
+* **deps:** pin all packages for Renovate auto-update coverage ([#435](https://github.com/JacobPEvans/nix-ai/issues/435)) ([016f5ab](https://github.com/JacobPEvans/nix-ai/commit/016f5abe52ac3b0c6a5c53ce7439af7bbec3710d))
+
 ## [1.32.3](https://github.com/JacobPEvans/nix-ai/compare/v1.32.2...v1.32.3) (2026-04-09)
 
 
