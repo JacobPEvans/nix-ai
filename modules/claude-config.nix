@@ -9,6 +9,7 @@
   ai-assistant-instructions,
   marketplaceInputs,
   claude-cookbooks,
+  fabric-src,
   ...
 }:
 
@@ -47,9 +48,18 @@ let
 
   # Marketplace derivation overrides (synthetic wrappers, auto-generated manifests)
   marketplaceOverrides = import ./claude/marketplace-overrides.nix {
-    inherit pkgs lib marketplaceInputs;
+    inherit
+      pkgs
+      lib
+      marketplaceInputs
+      fabric-src
+      ;
   };
-  inherit (marketplaceOverrides) browserUseMarketplace jacobpevansMarketplace;
+  inherit (marketplaceOverrides)
+    browserUseMarketplace
+    jacobpevansMarketplace
+    fabricMarketplace
+    ;
 
   # Helper to build command/agent entries from discovered names
   mkSourceEntries =
@@ -133,6 +143,12 @@ in
         # Override flakeInput with auto-generated marketplace manifest
         "jacobpevans-cc-plugins" = base."jacobpevans-cc-plugins" // {
           flakeInput = jacobpevansMarketplace;
+        };
+        # Override flakeInput for synthetic fabric marketplace.
+        # Wraps ~30 curated fabric patterns from data/patterns/ into the
+        # .claude-plugin/ structure so they appear as skills in Claude Code.
+        "fabric-patterns" = base."fabric-patterns" // {
+          flakeInput = fabricMarketplace;
         };
       };
 

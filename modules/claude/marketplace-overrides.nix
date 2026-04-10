@@ -7,6 +7,7 @@
   pkgs,
   lib,
   marketplaceInputs,
+  fabric-src,
   ...
 }:
 
@@ -64,6 +65,89 @@
       cp ${manifestJson} $out/.claude-plugin/marketplace.json
       cp ${pluginJson} $out/browser-use/.claude-plugin/plugin.json
       ln -s ${marketplaceInputs.browser-use-skills}/skills $out/browser-use/skills
+    '';
+
+  # Synthetic marketplace wrapper for Daniel Miessler's Fabric patterns.
+  #
+  # Wraps a curated subset of fabric patterns (defined in
+  # ./fabric-curated-patterns.json) into a Claude Code .claude-plugin/ layout
+  # so each pattern appears as a Claude Code skill.
+  #
+  # The pattern list lives in JSON instead of inline Nix attrs to keep this
+  # file lean and let the SKILL.md frontmatter generation stay pure Nix.
+  fabricMarketplace =
+    let
+      curated = builtins.fromJSON (builtins.readFile ./fabric-curated-patterns.json);
+      fabricVersion = curated.version;
+      curatedPatterns = curated.patterns;
+
+      # Build each SKILL.md as a pure Nix string (frontmatter + upstream system.md).
+      mkSkillFile =
+        p:
+        let
+          systemMd = builtins.readFile "${fabric-src}/data/patterns/${p.name}/system.md";
+          skillContent = ''
+            ---
+            name: ${p.name}
+            description: ${p.description}
+            ---
+
+            ${systemMd}
+          '';
+        in
+        {
+          inherit (p) name;
+          path = builtins.toFile "SKILL-${p.name}.md" skillContent;
+        };
+
+      skillFiles = map mkSkillFile curatedPatterns;
+
+      # One install line per skill — no shell control flow, no loops.
+      copySkillCommands = lib.concatMapStringsSep "\n" (sf: ''
+        install -D -m 644 ${sf.path} $out/fabric-patterns/skills/${sf.name}/SKILL.md
+      '') skillFiles;
+
+      marketplaceJson = builtins.toFile "marketplace.json" (
+        builtins.toJSON {
+          name = "fabric-patterns";
+          metadata = {
+            description = "Curated subset of Daniel Miessler's Fabric AI prompt patterns wrapped as Claude Code skills";
+            version = fabricVersion;
+          };
+          owner = {
+            name = "Daniel Miessler";
+            url = "https://github.com/danielmiessler/fabric";
+          };
+          plugins = [
+            {
+              name = "fabric-patterns";
+              source = "./fabric-patterns";
+              description = "Curated Fabric AI prompt patterns: extraction, analysis, creation, summarization, writing, review.";
+              version = fabricVersion;
+              author = {
+                name = "Daniel Miessler";
+              };
+            }
+          ];
+        }
+      );
+
+      pluginJson = builtins.toFile "plugin.json" (
+        builtins.toJSON {
+          name = "fabric-patterns";
+          version = fabricVersion;
+          description = "Curated Fabric AI prompt patterns wrapped as Claude Code skills.";
+          author = {
+            name = "Daniel Miessler";
+          };
+          skills = map (p: "./skills/${p.name}") curatedPatterns;
+        }
+      );
+    in
+    pkgs.runCommand "fabric-patterns-marketplace" { } ''
+      install -D -m 644 ${marketplaceJson} $out/.claude-plugin/marketplace.json
+      install -D -m 644 ${pluginJson} $out/fabric-patterns/.claude-plugin/plugin.json
+      ${copySkillCommands}
     '';
 
   # Auto-generated marketplace manifest for jacobpevans-cc-plugins

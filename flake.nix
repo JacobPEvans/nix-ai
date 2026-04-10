@@ -103,6 +103,14 @@
       url = "github:BeehiveInnovations/pal-mcp-server";
       flake = false;
     };
+
+    # Fabric - Daniel Miessler's 252+ AI prompt pattern framework (Go CLI).
+    # Source of both the fabric binary and the pattern library. Pinned to a
+    # release tag; Renovate bumps via the annotation in modules/fabric/package.nix.
+    fabric-src = {
+      url = "github:danielmiessler/fabric/v1.4.444";
+      flake = false;
+    };
   };
 
   outputs =
@@ -131,6 +139,7 @@
       wakatime,
       browser-use-skills,
       pal-mcp-server,
+      fabric-src,
       ...
     }:
     let
@@ -175,6 +184,7 @@
               claude-code-plugins
               claude-cookbooks
               pal-mcp-server
+              fabric-src
               ;
           };
         };
@@ -259,6 +269,7 @@
         {
           gh-aw = pkgs.callPackage ./modules/gh-extensions/gh-aw.nix { };
           pal-mcp-server = pkgs.callPackage ./modules/mcp/pal-package.nix { inherit pal-mcp-server; };
+          fabric-ai = pkgs.callPackage ./modules/fabric/package.nix { inherit fabric-src; };
         }
       );
 

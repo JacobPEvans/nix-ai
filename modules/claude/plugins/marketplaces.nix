@@ -219,6 +219,17 @@ let
         url = "browser-use/browser-use";
       };
     };
+
+    # Fabric patterns — Daniel Miessler's 252+ AI prompt patterns.
+    # The upstream repo has no .claude-plugin/ structure, so we wrap a curated
+    # subset into a synthetic marketplace (see fabricMarketplace in
+    # marketplace-overrides.nix). Patterns become individual Claude Code skills.
+    "fabric-patterns" = {
+      source = {
+        type = "github";
+        url = "danielmiessler/fabric";
+      };
+    };
   };
 
   # Validate all marketplaces at evaluation time

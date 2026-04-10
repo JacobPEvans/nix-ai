@@ -224,6 +224,23 @@
         "type": "github"
       }
     },
+    "fabric-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775769065,
+        "narHash": "sha256-986ny/DRchsu+MkZFnmGrWaCPaw+SFYJzY768ZEPtfQ=",
+        "owner": "danielmiessler",
+        "repo": "fabric",
+        "rev": "42311fe04b552f63503667b35f26b9b2ad537f95",
+        "type": "github"
+      },
+      "original": {
+        "owner": "danielmiessler",
+        "ref": "v1.4.444",
+        "repo": "fabric",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -341,6 +358,7 @@
         "claude-cookbooks": "claude-cookbooks",
         "claude-plugins-official": "claude-plugins-official",
         "claude-skills": "claude-skills",
+        "fabric-src": "fabric-src",
         "home-manager": "home-manager",
         "jacobpevans-cc-plugins": "jacobpevans-cc-plugins",
         "lunar-claude": "lunar-claude",

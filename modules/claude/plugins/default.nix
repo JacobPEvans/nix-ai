@@ -32,6 +32,7 @@ let
   developmentModule = import ./development.nix { inherit lib jacobpevans-cc-plugins; };
   monitoringModule = import ./monitoring.nix { };
   experimentalModule = import ./experimental.nix { };
+  fabricModule = import ./fabric.nix { };
 
   # Merge all enabled plugins from category modules
   enabledPlugins =
@@ -41,7 +42,8 @@ let
     // infrastructureModule.enabledPlugins
     // developmentModule.enabledPlugins
     // monitoringModule.enabledPlugins
-    // experimentalModule.enabledPlugins;
+    // experimentalModule.enabledPlugins
+    // fabricModule.enabledPlugins;
 in
 {
   # Return the complete plugin configuration

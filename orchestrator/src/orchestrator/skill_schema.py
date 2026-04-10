@@ -194,3 +194,94 @@ def load_skill_registry(directory: Path) -> dict[str, SkillDefinition]:
         skills[skill.name] = skill
 
     return skills
+
+
+def load_fabric_pattern(
+    pattern_dir: Path,
+    *,
+    description: str | None = None,
+    model: ModelRequirement | None = None,
+) -> SkillDefinition:
+    """Load a single Fabric pattern as an orchestrator SkillDefinition.
+
+    Fabric patterns (https://github.com/danielmiessler/fabric/tree/main/data/patterns)
+    are directories containing a `system.md` file with the AI instructions and
+    optionally a `user.md` or `README.md` for human documentation.
+
+    The pattern directory name becomes the skill name (with hyphens replacing
+    underscores for kebab-case consistency). The `system.md` content becomes
+    the skill's system_prompt. Default model is taken from MLX_DEFAULT_MODEL,
+    with markdown output and a generous resource budget appropriate for
+    fabric's prompt-in/prompt-out workflow.
+    """
+    if not pattern_dir.is_dir():
+        msg = f"Fabric pattern directory not found: {pattern_dir}"
+        raise FileNotFoundError(msg)
+
+    system_md = pattern_dir / "system.md"
+    if not system_md.is_file():
+        msg = f"Fabric pattern missing system.md: {system_md}"
+        raise FileNotFoundError(msg)
+
+    pattern_name = pattern_dir.name
+    skill_name = pattern_name.replace("_", "-")
+    system_prompt = system_md.read_text()
+
+    return SkillDefinition(
+        name=skill_name,
+        description=description or f"Fabric pattern: {pattern_name}",
+        version="1.0.0",
+        tags=["fabric", "pattern", pattern_name.split("_", 1)[0]],
+        model=model or ModelRequirement(),
+        system_prompt=system_prompt,
+        output_format=OutputFormat.MARKDOWN,
+        resources=ResourceBudget(
+            max_memory_gb=20.0,
+            max_duration_seconds=300,
+            max_input_tokens=32768,
+        ),
+        examples=[],
+    )
+
+
+def load_fabric_pattern_registry(
+    patterns_dir: Path,
+    *,
+    only: list[str] | None = None,
+    descriptions: dict[str, str] | None = None,
+) -> dict[str, SkillDefinition]:
+    """Load Fabric patterns as a registry of SkillDefinition objects.
+
+    Args:
+        patterns_dir: Path to the fabric data/patterns/ directory.
+        only: Optional whitelist of pattern names to load. When None, loads
+              all patterns under patterns_dir.
+        descriptions: Optional mapping from pattern name to a hand-written
+                      description. Patterns not in the mapping get a generic
+                      description derived from the pattern name.
+
+    Returns:
+        A dict keyed by skill name (kebab-case version of the pattern name).
+    """
+    if not patterns_dir.is_dir():
+        msg = f"Fabric patterns directory not found: {patterns_dir}"
+        raise FileNotFoundError(msg)
+
+    descriptions = descriptions or {}
+    skills: dict[str, SkillDefinition] = {}
+
+    for pattern_dir in sorted(patterns_dir.iterdir()):
+        if not pattern_dir.is_dir():
+            continue
+        pattern_name = pattern_dir.name
+        if only is not None and pattern_name not in only:
+            continue
+        if not (pattern_dir / "system.md").is_file():
+            continue
+        skill = load_fabric_pattern(
+            pattern_dir,
+            description=descriptions.get(pattern_name),
+        )
+        skills[skill.name] = skill
+
+    return skills
