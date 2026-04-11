@@ -301,7 +301,7 @@
     # PyPI: huggingface-hub (provides `hf` entry point)
     # Requires: HF_TOKEN env var (from macOS Keychain via nix-darwin shell init)
     (writeShellScriptBin "hf" ''
-      exec ${uv}/bin/uvx --from "huggingface-hub==1.9.0" hf "$@"
+      exec ${uv}/bin/uvx --from "huggingface-hub==1.10.1" hf "$@"
     '')
 
     # ==========================================================================
