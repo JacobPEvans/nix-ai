@@ -1,6 +1,7 @@
 # Per-repo file-size config for JacobPEvans/.github/_file-size.yml
 # options.nix: vllm-mlx parameter reference (active + commented-out options)
 # ai-tools: multi-tool AI package definitions
+# mlx-benchmarks: full dated decision history + post-mortems for MLX model sweeps
 extended:
   limit: 20480
-  files: [options, ai-tools]
+  files: [options, ai-tools, mlx-benchmarks]
