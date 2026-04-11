@@ -11,7 +11,7 @@ Performance tracking for the vllm-mlx inference server across configuration chan
 - **OS**: macOS 26.4 (Tahoe)
 - **Server**: vllm-mlx 0.2.6 (OpenAI-compatible API on port 11434)
 - **Client**: `curl` for API latency tests, custom bash script with `footprint`/`vm_stat` for memory-tracked sweeps
-- **Model**: mlx-community/Qwen3.5-35B-A3B-4bit (~20 GB on disk; default as of 2026-04-10)
+- **Model**: mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit (~16 GB on disk; default as of 2026-04-11)
 
 ## How to Run
 
@@ -154,11 +154,18 @@ mlx-eval --tasks hellaswag --limit 100
 
 <!-- BENCHMARK-TABLE-END -->
 
-## Decision (2026-04-10) — Large-model sweep + default swap
+## Decision (2026-04-10) — Large-model sweep + default swap [SUPERSEDED]
+
+> ⚠️ **Superseded on 2026-04-11** — the winner below
+> (`mlx-community/Qwen3.5-35B-A3B-4bit`) was silently republished by HF upstream
+> as a multimodal variant (`Qwen3_5MoeForConditionalGeneration`,
+> `pipeline_tag: image-text-to-text`, sha `1e20fd8d42056f870933bf98ca6211024744f7ec`)
+> on 2026-02-24. vllm-mlx 0.2.6 cannot load it. See the 2026-04-11 decision
+> block below for the rescue swap.
 
 After benchmarking cached large models on M4 Max 128 GB, the winner on every
-dimension is **`mlx-community/Qwen3.5-35B-A3B-4bit`** — _smaller_ than the
-prior default. `programs.mlx.defaultModel` updated to match. Resolves #334.
+dimension was **`mlx-community/Qwen3.5-35B-A3B-4bit`** — _smaller_ than the
+prior default. `programs.mlx.defaultModel` was updated to match.
 
 ### Role winners
 
