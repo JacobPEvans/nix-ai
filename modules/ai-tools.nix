@@ -28,17 +28,18 @@
 #    - Benefits: Simple, minimal code, easy version updates
 #    - Pattern: writeShellScriptBin with bunx --bun
 #
-# 4. **pipx** (for Python packages not in nixpkgs)
+# 4. **uvx** (for Python packages not in nixpkgs or version-lagging)
 #    - Standard solution for Python CLI tools
-#    - Installed separately via: pipx install <package>
-#    - Benefits: Isolated environments, easy updates
+#    - Run on-demand: uvx <package>
+#    - Benefits: Isolated environments, always-latest, no global pollution
+#    - Replaced pipx (pipx removed from nix-home — antipattern in Nix env)
 #
 # ============================================================================
 # CURRENT STATUS
 # ============================================================================
 #
 # NIXPKGS PACKAGES (from nixpkgs, available on stable 25.11):
-#   github-mcp-server, terraform-mcp-server
+#   github-mcp-server, terraform-mcp-server, whisper-cpp, openai-whisper
 #
 # HOMEBREW PACKAGES (from modules/darwin/homebrew.nix):
 #   codex: OpenAI Codex CLI (moved from nixpkgs to match claude/gemini pattern)
@@ -56,8 +57,9 @@
 #   hf: huggingface-hub CLI (model downloads, used with HuggingFace MCP)
 #   vllm-mlx: defined in modules/mlx.nix (owns the wrapper + LaunchAgent)
 #
-# PIPX PACKAGES (Python, installed separately):
-#   aider: aider-chat (AI pair programming)
+# UVX ON-DEMAND (documented here; users run uvx <pkg> manually):
+#   aider-chat: AI pair programming (nixpkgs has 0.86.1 but lags upstream;
+#               uvx keeps latest. Run: uvx aider-chat)
 #
 # NOTE: These are home-manager packages, not system packages.
 # Imported in hosts/macbook-m4/home.nix via home.packages.
@@ -79,6 +81,15 @@
   #
   # See CURRENT STATUS section at the top of this file for package details.
   packages = with pkgs; [
+    # ==========================================================================
+    # Speech-to-Text / Audio AI
+    # ==========================================================================
+    # Moved from nix-darwin environment.systemPackages — these are AI tools,
+    # not system bootstrapping. sox/portaudio remain in nix-darwin (general C libs).
+
+    whisper-cpp # Local speech-to-text (OpenAI Whisper C++ port, CoreML/Metal)
+    openai-whisper # Original OpenAI Whisper (Python, GPU/CPU, broader model support)
+
     # ==========================================================================
     # Claude Code Ecosystem
     # ==========================================================================
@@ -296,12 +307,14 @@
     # ==========================================================================
     # Aider - AI pair programming in the terminal
     # ==========================================================================
-    # Not available in nixpkgs - python package, use pip/pipx
+    # Available in nixpkgs as `aider-chat` but version lags upstream (0.86.1 as of
+    # 2026-04). We intentionally do NOT package it here — users run `uvx aider-chat`
+    # to always get the latest release. Migrating to the nixpkgs package would
+    # trade "always-latest" for "reproducible pin", which is the opposite of our
+    # preference for AI tooling that ships fixes weekly.
     # Source: https://github.com/paul-gauthier/aider
     # PyPI: aider-chat
-    # Note: Using python3.withPackages pipx from common/packages.nix
-    # Install: pipx install aider-chat
-    # This creates a marker comment so users know aider is via pipx
+    # Run: uvx aider-chat
 
   ];
 }
