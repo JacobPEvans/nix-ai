@@ -1,4 +1,4 @@
-<!-- cspell:words TTFT hellaswag parameterize keyerror safetensor safetensors evalplus MBPP Hendrycks -->
+<!-- cspell:words TTFT hellaswag parameterize keyerror safetensor safetensors evalplus MBPP Hendrycks humaneval mbpp sympy minerva RLIMIT bigcode -->
 # MLX Benchmark Results
 
 Performance tracking for the vllm-mlx inference server across configuration changes.
@@ -59,8 +59,8 @@ mlx-eval --tasks hellaswag --limit 100
 | `coding` | HumanEval pass@1 (saturated; mostly historical) | lm-eval |
 | `reasoning` | GSM8K + HellaSwag + ARC-Challenge | lm-eval |
 | `knowledge` | MMLU + IFEval | lm-eval |
-| `evalplus` | **HumanEval+ + MBPP+** — EvalPlus extended test cases catch 5–15 pp more failures than HumanEval; not saturated by current frontier models | lm-eval |
-| `math-hard` | **Hendrycks MATH500 + leaderboard MATH hard** — competition math, structured multi-step reasoning proxy for code review; Opus-class models sit at 55–75% | lm-eval |
+| `evalplus` | **STUBBED on macOS** — both lm-eval's `*_instruct` tasks and the standalone `evalplus` Python package are broken for chat models on Darwin as of 2026-04-10. lm-eval can't parse markdown code blocks; `evalplus.evaluate`'s `reliability_guard` hits a macOS `RLIMIT_AS` bug. Tracked in follow-up issues (Docker sandbox, bigcode-eval-harness). | stubbed |
+| `math-hard` | **minerva_math500 + leaderboard_math_hard** — chain-of-thought competition math with sympy answer verification. Chat-template-aware. Structured-reasoning proxy for code review. Opus-class sits at 55–75%. | lm-eval |
 | `framework-eval` | Agent framework comparison (LangGraph, Qwen-Agent, smolagents, google-adk) | uv scripts |
 | `capability-comparison` | Full suite vs hardcoded Claude Opus baselines | run_all.sh |
 
