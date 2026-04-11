@@ -80,6 +80,15 @@
   # See CURRENT STATUS section at the top of this file for package details.
   packages = with pkgs; [
     # ==========================================================================
+    # Speech-to-Text / Audio AI
+    # ==========================================================================
+    # Moved from nix-darwin environment.systemPackages — these are AI tools,
+    # not system bootstrapping. sox/portaudio remain in nix-darwin (general C libs).
+
+    whisper-cpp # Local speech-to-text (OpenAI Whisper C++ port, CoreML/Metal)
+    openai-whisper # Original OpenAI Whisper (Python, GPU/CPU, broader model support)
+
+    # ==========================================================================
     # Claude Code Ecosystem
     # ==========================================================================
 
@@ -296,12 +305,11 @@
     # ==========================================================================
     # Aider - AI pair programming in the terminal
     # ==========================================================================
-    # Not available in nixpkgs - python package, use pip/pipx
+    # Not available in nixpkgs - python package
     # Source: https://github.com/paul-gauthier/aider
     # PyPI: aider-chat
-    # Note: Using python3.withPackages pipx from common/packages.nix
-    # Install: pipx install aider-chat
-    # This creates a marker comment so users know aider is via pipx
+    # Install: uvx aider-chat  (pipx removed from nix-home — use uvx or nix run instead)
+    # This creates a marker comment so users know aider is via uvx
 
   ];
 }

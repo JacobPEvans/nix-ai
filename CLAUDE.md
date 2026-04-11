@@ -60,10 +60,8 @@ inputs.nix-ai.inputs.home-manager.follows = "home-manager";
 
 ### Package placement
 
-- `home.packages` (this repo): AI tools, MCP servers, AI-specific CLI wrappers
-- `programs.gh.extensions` (this repo): AI GitHub CLI extensions only
-- `home.file` (this repo): AI tool configuration files (`.claude/`, `.gemini/`, etc.)
-- `environment.systemPackages` (nix-darwin): AI/ML system libs requiring system-level install (whisper-cpp, openai-whisper)
+See the `nix-package-placement` rule — auto-loads for `.nix` files, contains the full
+decision matrix for all four repos including homebrew constraints and on-demand patterns.
 
 ## Key Files
 
