@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.35.0](https://github.com/JacobPEvans/nix-ai/compare/v1.34.0...v1.35.0) (2026-04-11)
+
+
+### Features
+
+* **mcp:** route PAL through Bifrost AI gateway ([#466](https://github.com/JacobPEvans/nix-ai/issues/466)) ([5b18711](https://github.com/JacobPEvans/nix-ai/commit/5b187116b4a177f2ba6abbd2b59a8e9302b62cee))
+
 ## [1.34.0](https://github.com/JacobPEvans/nix-ai/compare/v1.33.1...v1.34.0) (2026-04-10)
 
 
