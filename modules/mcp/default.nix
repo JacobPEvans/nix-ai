@@ -89,8 +89,16 @@ in
     command = "doppler-mcp";
     args = [ "pal-mcp-server" ];
     env = {
-      # Enable ALL PAL tools (default disables: analyze,refactor,testgen,secaudit,docgen,tracer)
-      DISABLED_TOOLS = "";
+      # Phase 5 of the PAL → Bifrost migration (JacobPEvans/nix-ai#450):
+      # disable the 15 PAL tools that have native Claude Code / Bifrost
+      # equivalents, plus drop `version` (no functional value). Only `clink`
+      # (parallel multi-model) and `consensus` (multi-model voting) remain
+      # enabled — neither has a Bifrost equivalent.
+      #
+      # Audit matrix (15 REPLACE / 2 KEEP / 1 DROP) posted as a comment on
+      # nix-ai#450. See also modules/claude/rules/pal-mcp-policy.md for the
+      # scoped availability-check protocol.
+      DISABLED_TOOLS = "chat,thinkdeep,planner,listmodels,codereview,precommit,debug,analyze,tracer,refactor,testgen,secaudit,docgen,apilookup,challenge,version";
       # 'auto' = PAL picks a model alias per-task; Bifrost then routes the
       # resulting request to the right provider based on the model name.
       # Run PAL's `listmodels` (or curl http://localhost:30080/v1/models)
