@@ -540,7 +540,7 @@ def run_lm_eval_suite(model: str, tasks: list[tuple[str, int]]) -> tuple[list[di
                  "--confirm_run_unsafe_code",
                  "--output_path", f"/tmp/mlx-eval-{task_name}"],
                 capture_output=True, text=True,
-                timeout=1800,  # 30 min per task
+                timeout=7200,  # 2 h per task (minerva_math500 @ 100 is ~18 min)
                 env={
                     **os.environ,
                     "MLX_DEFAULT_MODEL": model,
@@ -562,9 +562,11 @@ def run_lm_eval_suite(model: str, tasks: list[tuple[str, int]]) -> tuple[list[di
             errors_list.append(f"lm-eval/{task_name}: exited {proc.returncode}: {proc.stderr[:200]}")
             continue
 
-        # Parse lm-eval output from results JSON
+        # Parse lm-eval output from results JSON.
+        # lm-eval writes to <output_path>/<model_name>/results_<timestamp>.json
+        # (not bare results.json), so the glob must match the timestamped form.
         results_dir = Path(f"/tmp/mlx-eval-{task_name}")
-        result_files = sorted(results_dir.glob("**/results.json")) if results_dir.exists() else []
+        result_files = sorted(results_dir.glob("**/results_*.json")) if results_dir.exists() else []
 
         if not result_files:
             # Try parsing from stdout — lm-eval prints a summary table
@@ -681,18 +683,20 @@ def run_math_hard_suite(model: str) -> tuple[list[dict], list[str]]:
     used in code review.
 
     Uses minerva_math500 (chain-of-thought variant designed for chat models)
-    instead of hendrycks_math500 (loglikelihood variant designed for base
-    models). Both cover the same MATH500 test set; minerva adds CoT prompting
-    and a sympy-based answer extractor that works with chat templates.
+    with sympy-based math_verify scoring. Covers 500 Hendrycks MATH problems
+    across algebra, geometry, number theory, etc.
 
-    leaderboard_math_hard is a group of 7 subject-specific hard subtasks that
-    already uses generate_until + CoT, so it works fine with chat models.
+    leaderboard_math_hard was originally included but removed on 2026-04-10:
+    it's a task group that applies --limit PER subtask, expanding 80 into
+    7 × 80 = 560 samples and blowing past the 30-min per-task timeout. The
+    minerva_math500 task alone is a sufficient discriminator (47% on
+    Qwen3-Coder-30B, not saturated) and completes in ~18 min/model.
 
-    See run_evalplus_suite for the sample-limit rationale.
+    Verified on 2026-04-10 with Qwen3-Coder-30B-A3B-Instruct-4bit:
+      minerva_math500 @ 100 samples, math_verify: 0.47 (47%), wall: 17m48s
     """
     return run_lm_eval_suite(model, [
         ("minerva_math500", 100),
-        ("leaderboard_math_hard", 80),
     ])
 
 
