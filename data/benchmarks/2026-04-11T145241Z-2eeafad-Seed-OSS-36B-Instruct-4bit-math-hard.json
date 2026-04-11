@@ -1,0 +1,20 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-11T14:52:41Z",
+  "git_sha": "2eeafad",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "math-hard",
+  "model": "mlx-community/Seed-OSS-36B-Instruct-4bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [],
+  "errors": [
+    "lm-eval/minerva_math500: exited 1: 2026-04-11:10:52:42 WARNING  [config.evaluate_config:281] --limit SHOULD ONLY BE USED FOR TESTING. REAL METRICS SHOULD NOT BE COMPUTED USING LIMIT.\n2026-04-11:10:52:42 INFO     [config.evaluate_config"
+  ]
+}

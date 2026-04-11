@@ -540,7 +540,7 @@ def run_lm_eval_suite(model: str, tasks: list[tuple[str, int]]) -> tuple[list[di
                  "--confirm_run_unsafe_code",
                  "--output_path", f"/tmp/mlx-eval-{task_name}"],
                 capture_output=True, text=True,
-                timeout=1800,  # 30 min per task
+                timeout=7200,  # 2 h per task (minerva_math500 @ 100 is ~18 min)
                 env={
                     **os.environ,
                     "MLX_DEFAULT_MODEL": model,
@@ -562,9 +562,11 @@ def run_lm_eval_suite(model: str, tasks: list[tuple[str, int]]) -> tuple[list[di
             errors_list.append(f"lm-eval/{task_name}: exited {proc.returncode}: {proc.stderr[:200]}")
             continue
 
-        # Parse lm-eval output from results JSON
+        # Parse lm-eval output from results JSON.
+        # lm-eval writes to <output_path>/<model_name>/results_<timestamp>.json
+        # (not bare results.json), so the glob must match the timestamped form.
         results_dir = Path(f"/tmp/mlx-eval-{task_name}")
-        result_files = sorted(results_dir.glob("**/results.json")) if results_dir.exists() else []
+        result_files = sorted(results_dir.glob("**/results_*.json")) if results_dir.exists() else []
 
         if not result_files:
             # Try parsing from stdout — lm-eval prints a summary table
@@ -575,20 +577,37 @@ def run_lm_eval_suite(model: str, tasks: list[tuple[str, int]]) -> tuple[list[di
             result_data = json.loads(result_files[-1].read_text())
             task_results = result_data.get("results", {})
 
+            # lm-eval emits metric keys as "<metric>,<filter>" where filter is
+            # task-specific (none, create_test, extract_code, ...). Priority
+            # order below picks the most informative metric regardless of filter.
+            # math_verify (sympy-based equivalence checker) is preferred over
+            # exact_match for minerva_math500 since it handles mathematically
+            # equivalent answer forms (e.g. 1/2 vs 0.5).
+            metric_priority = (
+                "pass@1", "pass_at_1", "acc_norm", "acc",
+                "math_verify", "exact_match", "exact_match_strict",
+            )
             for task_key, metrics in task_results.items():
-                # lm-eval uses various metric names: acc, acc_norm, exact_match, pass@1, etc.
-                for metric_name in ("acc,none", "acc_norm,none", "exact_match,none",
-                                    "pass@1,none", "acc", "acc_norm", "exact_match"):
-                    if metric_name in metrics:
-                        score = metrics[metric_name]
-                        results.append({
-                            "name": task_key,
-                            "metric": metric_name.split(",")[0],
-                            "value": round(float(score), 4),
-                            "unit": "ratio",
-                            "tags": {"task": task_name, "limit": str(limit)},
-                        })
+                picked = None
+                for metric_prefix in metric_priority:
+                    for full_key in metrics:
+                        if full_key == metric_prefix or full_key.startswith(f"{metric_prefix},"):
+                            # Skip stderr twins
+                            if "_stderr" in full_key:
+                                continue
+                            picked = (metric_prefix, metrics[full_key])
+                            break
+                    if picked:
                         break
+                if picked:
+                    metric_prefix, score = picked
+                    results.append({
+                        "name": task_key,
+                        "metric": metric_prefix,
+                        "value": round(float(score), 4),
+                        "unit": "ratio",
+                        "tags": {"task": task_name, "limit": str(limit)},
+                    })
 
         except (json.JSONDecodeError, OSError) as e:
             errors_list.append(f"lm-eval/{task_name}: could not parse results: {e}")
@@ -619,25 +638,65 @@ def run_knowledge_suite(model: str) -> tuple[list[dict], list[str]]:
 
 
 def run_evalplus_suite(model: str) -> tuple[list[dict], list[str]]:
-    """Rigorous code generation: HumanEval+ and MBPP+ from EvalPlus.
+    """EvalPlus coding suite — STUBBED on 2026-04-10 pending a working harness.
 
-    These extend the original HumanEval/MBPP test sets with significantly more
-    edge-case test cases — frontier models typically lose 5–15 percentage points
-    going from the saturated original to the Plus variants.
+    Two attempted backends both failed on macOS with chat models:
+
+    1. lm-eval's humaneval_instruct / mbpp_plus_instruct tasks: max_length fix
+       lets generations complete, but the extractors can't parse markdown code
+       blocks from chat-model responses. Every response is narrative + ```python
+       block + more narrative, and the extractor returns the function signature
+       concatenated with prose. Every score comes back 0.
+
+    2. Standalone `evalplus` Python package (evalplus.codegen + evalplus.evaluate):
+       codegen works and produces clean code via the OpenAI backend against
+       vllm-mlx, but evalplus.evaluate's reliability_guard calls
+       resource.setrlimit(RLIMIT_AS, ...) which is broken on macOS — every
+       sample errors out during sandbox setup, every score is 0.
+
+    Follow-up issues track (a) running evalplus.evaluate in a Docker container,
+    (b) evaluating bigcode-evaluation-harness which has native chat-model
+    support, and (c) vendoring a humaneval_plus_instruct YAML into lm-eval.
+
+    Until one of those ships, this suite returns a single skip record so
+    downstream tooling (generate-summary.py, schema validation) doesn't
+    fall over, and the suite name stays registered in the enum.
     """
-    return run_lm_eval_suite(model, [
-        ("humaneval_plus", 164),  # full HumanEval+ set
-        ("mbpp_plus", 378),       # full MBPP+ sanitized set
-    ])
+    return [{
+        "name": "evalplus",
+        "metric": "skipped",
+        "value": 0,
+        "unit": "ratio",
+        "tags": {
+            "task": "evalplus",
+            "status": "skipped",
+            "reason": "lm-eval extractor broken on markdown code blocks; "
+                      "evalplus.evaluate broken on macOS RLIMIT_AS; "
+                      "tracked in follow-up issues",
+            "model": model,
+        },
+    }], []
 
 
 def run_math_hard_suite(model: str) -> tuple[list[dict], list[str]]:
     """Competition math reasoning — proxy for structured multi-step thinking
-    used in code review. Hendrycks MATH500 + leaderboard hard subset.
+    used in code review.
+
+    Uses minerva_math500 (chain-of-thought variant designed for chat models)
+    with sympy-based math_verify scoring. Covers 500 Hendrycks MATH problems
+    across algebra, geometry, number theory, etc.
+
+    leaderboard_math_hard was originally included but removed on 2026-04-10:
+    it's a task group that applies --limit PER subtask, expanding 80 into
+    7 × 80 = 560 samples and blowing past the 30-min per-task timeout. The
+    minerva_math500 task alone is a sufficient discriminator (47% on
+    Qwen3-Coder-30B, not saturated) and completes in ~18 min/model.
+
+    Verified on 2026-04-10 with Qwen3-Coder-30B-A3B-Instruct-4bit:
+      minerva_math500 @ 100 samples, math_verify: 0.47 (47%), wall: 17m48s
     """
     return run_lm_eval_suite(model, [
-        ("hendrycks_math500", 500),
-        ("leaderboard_math_hard", 200),
+        ("minerva_math500", 100),
     ])
 
 

@@ -1,4 +1,6 @@
-<!-- cspell:words TTFT hellaswag parameterize keyerror safetensor safetensors evalplus MBPP Hendrycks -->
+<!-- cspell:words TTFT hellaswag parameterize keyerror safetensor safetensors -->
+<!-- cspell:words evalplus MBPP Hendrycks humaneval mbpp sympy minerva RLIMIT -->
+<!-- cspell:words bigcode multimodal unloadable codegen setrlimit antlr -->
 # MLX Benchmark Results
 
 Performance tracking for the vllm-mlx inference server across configuration changes.
@@ -9,7 +11,7 @@ Performance tracking for the vllm-mlx inference server across configuration chan
 - **OS**: macOS 26.4 (Tahoe)
 - **Server**: vllm-mlx 0.2.6 (OpenAI-compatible API on port 11434)
 - **Client**: `curl` for API latency tests, custom bash script with `footprint`/`vm_stat` for memory-tracked sweeps
-- **Model**: mlx-community/Qwen3.5-35B-A3B-4bit (~20 GB on disk; default as of 2026-04-10)
+- **Model**: mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit (~16 GB on disk; default as of 2026-04-11)
 
 ## How to Run
 
@@ -59,8 +61,8 @@ mlx-eval --tasks hellaswag --limit 100
 | `coding` | HumanEval pass@1 (saturated; mostly historical) | lm-eval |
 | `reasoning` | GSM8K + HellaSwag + ARC-Challenge | lm-eval |
 | `knowledge` | MMLU + IFEval | lm-eval |
-| `evalplus` | **HumanEval+ + MBPP+** — EvalPlus extended test cases catch 5–15 pp more failures than HumanEval; not saturated by current frontier models | lm-eval |
-| `math-hard` | **Hendrycks MATH500 + leaderboard MATH hard** — competition math, structured multi-step reasoning proxy for code review; Opus-class models sit at 55–75% | lm-eval |
+| `evalplus` | **STUBBED on macOS** — both lm-eval's `*_instruct` tasks and the standalone `evalplus` Python package are broken for chat models on Darwin as of 2026-04-10. lm-eval can't parse markdown code blocks; `evalplus.evaluate`'s `reliability_guard` hits a macOS `RLIMIT_AS` bug. Tracked in follow-up issues (Docker sandbox, bigcode-eval-harness). | stubbed |
+| `math-hard` | **minerva_math500 @ 100** — chain-of-thought competition math with sympy answer verification. Chat-template-aware. Structured-reasoning proxy for code review. Opus-class sits at 55–75%. | lm-eval |
 | `framework-eval` | Agent framework comparison (LangGraph, Qwen-Agent, smolagents, google-adk) | uv scripts |
 | `capability-comparison` | Full suite vs hardcoded Claude Opus baselines | run_all.sh |
 
@@ -102,17 +104,18 @@ mlx-eval --tasks hellaswag --limit 100
 
 | Date | SHA | Model | Task | Score | Metric | Samples |
 |------|-----|-------|------|-------|--------|---------|
-| 2026-04-10 11:19 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | should-call-tool | 0.0% | accuracy | — |
-| 2026-04-10 11:19 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | both-args | 0.0% | accuracy | — |
-| 2026-04-10 11:19 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | no-tool-needed | 100.0% | accuracy | — |
-| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | should-call-tool | 100.0% | accuracy | — |
-| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | both-args | 100.0% | accuracy | — |
-| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | no-tool-needed | 100.0% | accuracy | — |
-| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
-| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | should-call-tool | 0.0% | accuracy | — |
-| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | both-args | 0.0% | accuracy | — |
-| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | no-tool-needed | 100.0% | accuracy | — |
-| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-11 19:16 | 2eeafad | Qwen3-Next-80B-A3B-Instruct-8bit | should-call-tool | 100.0% | accuracy | — |
+| 2026-04-11 19:16 | 2eeafad | Qwen3-Next-80B-A3B-Instruct-8bit | both-args | 100.0% | accuracy | — |
+| 2026-04-11 19:16 | 2eeafad | Qwen3-Next-80B-A3B-Instruct-8bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-11 19:16 | 2eeafad | Qwen3-Next-80B-A3B-Instruct-8bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-11 19:13 | 2eeafad | GLM-4.5-Air-4bit | should-call-tool | 0.0% | accuracy | — |
+| 2026-04-11 19:13 | 2eeafad | GLM-4.5-Air-4bit | both-args | 0.0% | accuracy | — |
+| 2026-04-11 19:13 | 2eeafad | GLM-4.5-Air-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-11 19:13 | 2eeafad | GLM-4.5-Air-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-11 19:10 | 2eeafad | Qwen3-Next-80B-A3B-Thinking-4bit | should-call-tool | 0.0% | accuracy | — |
+| 2026-04-11 19:10 | 2eeafad | Qwen3-Next-80B-A3B-Thinking-4bit | both-args | 100.0% | accuracy | — |
+| 2026-04-11 19:10 | 2eeafad | Qwen3-Next-80B-A3B-Thinking-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-11 19:10 | 2eeafad | Qwen3-Next-80B-A3B-Thinking-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
 
 ### Code Accuracy
 
@@ -135,21 +138,39 @@ mlx-eval --tasks hellaswag --limit 100
 |------|-----|----------|-------|-----------------|-----|
 | 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — |
 
+### Math-Hard (minerva_math500)
+
+| Date | SHA | Test | Metric | Value | Unit |
+|------|-----|------|--------|-------|------|
+| 2026-04-11 17:12 | 2eeafad | minerva_math500 | math_verify | 0.42 | ratio |
+| 2026-04-11 16:55 | 2eeafad | minerva_math500 | math_verify | 0.42 | ratio |
+| 2026-04-11 16:30 | 2eeafad | minerva_math500 | math_verify | 0.08 | ratio |
+
 ### Model Comparison Matrix
 
-| Model | Code Accuracy | Tool Calling | TTFT | Throughput | Capability Comparison (vs Claude Opus 4.6) | Framework Benchmark |
-|-------|---------------|--------------|------|------------|--------------------------------------------|---------------------|
-| Devstral-2-123B-Instruct-2512-4bit | 0% (0/2) | 25% (1/4) | — | 2.5 tok/s | — | — |
-| Qwen3.5-122B-A10B-4bit | 66% | 100% | 16.50s | 14.6 tok/s | — | — |
-| gpt-oss-120b-4bit | 34% | 50% | 1.24s | 18.9 tok/s | — | — |
+| Model | Tool Calling | Math-Hard (minerva_math500) | Code Accuracy | TTFT | Throughput | Capability Comparison (vs Claude Opus 4.6) | Framework Benchmark |
+|-------|--------------|-----------------------------|---------------|------|------------|--------------------------------------------|---------------------|
+| Devstral-2-123B-Instruct-2512-4bit | — | 0.42 | 0% (0/2) | — | 2.5 tok/s | — | — |
+| GLM-4.5-Air-4bit | 50% | — | — | — | — | — | — |
+| Qwen3-Next-80B-A3B-Instruct-8bit | 100% | — | — | — | — | — | — |
+| Qwen3-Next-80B-A3B-Thinking-4bit | 75% | — | — | — | — | — | — |
+| Qwen3.5-122B-A10B-4bit | — | 0.08 | 66% | 16.50s | 14.6 tok/s | — | — |
+| gpt-oss-120b-4bit | — | 0.42 | 34% | 1.24s | 18.9 tok/s | — | — |
 
 <!-- BENCHMARK-TABLE-END -->
 
-## Decision (2026-04-10) — Large-model sweep + default swap
+## Decision (2026-04-10) — Large-model sweep + default swap [SUPERSEDED]
+
+> ⚠️ **Superseded on 2026-04-11** — the winner below
+> (`mlx-community/Qwen3.5-35B-A3B-4bit`) was silently republished by HF upstream
+> as a multimodal variant (`Qwen3_5MoeForConditionalGeneration`,
+> `pipeline_tag: image-text-to-text`, sha `1e20fd8d42056f870933bf98ca6211024744f7ec`)
+> on 2026-02-24. vllm-mlx 0.2.6 cannot load it. See the 2026-04-11 decision
+> block below for the rescue swap.
 
 After benchmarking cached large models on M4 Max 128 GB, the winner on every
-dimension is **`mlx-community/Qwen3.5-35B-A3B-4bit`** — _smaller_ than the
-prior default. `programs.mlx.defaultModel` updated to match. Resolves #334.
+dimension was **`mlx-community/Qwen3.5-35B-A3B-4bit`** — _smaller_ than the
+prior default. `programs.mlx.defaultModel` was updated to match.
 
 ### Role winners
 
@@ -181,6 +202,57 @@ prior default. `programs.mlx.defaultModel` updated to match. Resolves #334.
 Parameter count is a poor proxy for capability on tightly-quantized MoE models
 when TTFT dominates UX. 35B-A3B (3B active) is the sweet spot of the
 mlx-community catalog on 128 GB Apple Silicon.
+
+## Decision (2026-04-11) — multimodal incident + math-hard sweep
+
+Two forcing events drove this decision:
+
+1. **The 2026-04-10 default is now broken.** On 2026-02-24 HF upstream silently
+   republished `mlx-community/Qwen3.5-35B-A3B-4bit` as a multimodal variant
+   (`Qwen3_5MoeForConditionalGeneration`, `pipeline_tag: image-text-to-text`,
+   sha `1e20fd8d42056f870933bf98ca6211024744f7ec`). vllm-mlx cannot load it.
+   Every fresh Claude Code session on main raised a TypeError from
+   `load_model_with_fallback`. A replacement default was mandatory regardless
+   of benchmark outcomes.
+2. **The prior `code-accuracy` suite didn't discriminate.** PR #465 benchmarked
+   six large candidates and found none beat the 35B-A3B baseline, but the
+   suite was a regex-scored toy with zero signal. Real benchmarks were needed.
+
+The Phase B sweep replaces `code-accuracy` with `math-hard` (minerva_math500
+@ 100 samples, chain-of-thought sympy-verified competition math) as the
+structured-reasoning proxy for code review, and stubs the `evalplus` coding
+suite because both lm-eval task variants AND the standalone evalplus Python
+package are broken for chat models on macOS (see follow-up issues for details).
+
+### Role winners (2026-04-11)
+
+<!-- Results row will be finalized after full sweep completes. -->
+
+| Role | Model | Rationale |
+|------|-------|-----------|
+| **Default (rescue)** | `Qwen3-Coder-30B-A3B-Instruct-4bit` | Confirmed loading on vllm-mlx 0.2.6, same Qwen3 MoE family as prior default, 47% math_verify on minerva_math500 @ 100 samples, 21 GB RAM. Replaces the unloadable multimodal variant. |
+| **Best math-hard** | _(TBD — top Phase B finisher)_ | Final ranking depends on sweep completion. |
+
+### Benchmark infrastructure fixes (2026-04-11)
+
+Four blockers discovered while exercising the new suites:
+
+1. `lm-eval`'s `local-chat-completions` backend defaults `max_length=2048`,
+   truncating chat-wrapped prompts mid-word. Fixed: `max_length=32768` in
+   wrapper `model_args`.
+2. `humaneval_plus` / `mbpp_plus` / `humaneval_instruct` / `mbpp_plus_instruct`
+   all score 0% on chat models because their extractors can't parse markdown
+   code blocks. No clean lm-eval path exists.
+3. Standalone `evalplus` Python package: `evalplus.codegen` works via the
+   OpenAI backend, but `evalplus.evaluate`'s `reliability_guard` calls
+   `resource.setrlimit(RLIMIT_AS, ...)` which is broken on macOS — every
+   sample errors during sandbox setup.
+4. `minerva_math500` requires `lm-eval[math]` extras
+   (`sympy`, `math_verify`, `antlr4-python3-runtime==4.11`).
+
+Follow-up issues track a Docker-based EvalPlus scorer,
+bigcode-evaluation-harness evaluation, and a
+`humaneval_plus_instruct` task vendoring effort.
 
 ## History
 

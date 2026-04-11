@@ -35,6 +35,8 @@ SUITE_LABELS = {
     "coding": "Coding (HumanEval)",
     "reasoning": "Reasoning (GSM8K / HellaSwag / ARC)",
     "knowledge": "Knowledge (MMLU / IFEval)",
+    "evalplus": "EvalPlus (stubbed)",
+    "math-hard": "Math-Hard (minerva_math500)",
 }
 
 
@@ -270,6 +272,11 @@ def _summarize_run(suite: str, run: dict) -> str:
     errors = run.get("errors", [])
     if not results and not errors:
         return "—"
+    # Suite-level skip sentinel: a single record with metric=="skipped" means
+    # the suite is intentionally not run (see run_evalplus_suite for the
+    # macOS/chat-model incompatibility reason).
+    if len(results) == 1 and results[0].get("metric") == "skipped":
+        return "skipped"
 
     if suite == "throughput":
         # Peak sustained tok/s across the sweep is the headline number.

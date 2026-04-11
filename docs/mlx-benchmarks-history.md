@@ -1,10 +1,122 @@
-<!-- cspell:words TTFT hellaswag parameterize keyerror -->
+<!-- cspell:words TTFT hellaswag parameterize keyerror multimodal Hendrycks -->
+<!-- cspell:words evalplus humaneval mbpp sympy minerva bigcode codegen toks -->
+<!-- cspell:words setrlimit RLIMIT antlr unloadable vllm mlx -->
 # MLX Benchmark History
 
 Archived narratives for prior benchmark sessions. The current summary lives in
 [`mlx-benchmarks.md`](mlx-benchmarks.md); auto-generated tables there always show
 the latest 5 runs per suite. Entries here are kept as human-readable context for
 configuration decisions and multi-model baselines.
+
+## 2026-04-11 — Phase B sweep, multimodal incident, benchmark pivot
+
+### The multimodal incident
+
+On 2026-02-24, HuggingFace upstream silently republished
+`mlx-community/Qwen3.5-35B-A3B-4bit` as a multimodal variant
+(`Qwen3_5MoeForConditionalGeneration`, `pipeline_tag: image-text-to-text`,
+sha `1e20fd8d42056f870933bf98ca6211024744f7ec`). The prior PR 465 default
+pointed at this model. Any fresh Claude Code session on main after that date
+raised a `TypeError: cannot unpack non-iterable NoneType object` from
+`vllm-mlx` `load_model_with_fallback`. Swapping the default was mandatory
+regardless of benchmark outcomes.
+
+Detection happened during Phase B smoke testing when a fresh Claude Code
+session could not load the default. HF API inspection via
+`curl .../api/models/<id>` showed the drift. Follow-up issue 3
+(HF pipeline_tag drift guard in `nix flake check`) was filed so this class
+of bug is caught automatically on future darwin-rebuilds.
+
+### Benchmark infrastructure: four blockers, one pivot
+
+The Phase A infrastructure commits (61cda7f, 939535e, 2c59f0d from the
+post-PR-465 work) wired up two new suites: `evalplus` (rigorous code gen via
+HumanEval+ / MBPP+) and `math-hard` (structured reasoning via
+Hendrycks MATH500 + leaderboard hard). Exercising them surfaced four
+independent bugs:
+
+1. **`max_length=2048` default** in lm-eval's `local-chat-completions`
+   backend. Combined with `max_gen_toks=1024`, only ~1023 tokens remain for
+   the prompt. Chat-wrapped HumanEval prompts blow through it and responses
+   get truncated mid-word (observed: `"Tru"` instead of `"True"`, `"goa"`
+   instead of `"goal"`). Fix: `max_length=32768` in the `mlx-eval` wrapper
+   `model_args`.
+
+2. **Completion-style tasks fail on chat models.** `humaneval_plus`,
+   `mbpp_plus`, and `humaneval` are raw-continuation tasks that expect a base
+   model to pick up from a function signature. Chat models wrap code in
+   markdown blocks with narrative prose and score 0% — the extractors only
+   prepend the signature to the prose prefix and lose the actual code. The
+   `_instruct` variants (`humaneval_instruct`, `mbpp_plus_instruct`) have
+   different extractors but the same fundamental issue with markdown code
+   blocks.
+
+3. **Standalone evalplus package RLIMIT on macOS.** `evalplus.codegen` works
+   cleanly via the OpenAI backend against vllm-mlx (generations are perfect),
+   but `evalplus.evaluate`'s `reliability_guard` calls
+   `resource.setrlimit(RLIMIT_AS, ...)` which raises
+   `ValueError: current limit exceeds maximum limit` on Darwin. Every sample
+   errors during sandbox setup, every score is 0. `--i_just_wanna_run` does
+   not bypass this.
+
+4. **`lm-eval[math]` extras required** for `minerva_math*` tasks (sympy,
+   math_verify, antlr4-python3-runtime).
+
+### The pivot
+
+Dropped the `evalplus` coding suite from this PR. The suite is stubbed with
+an informative skip record (`collect-results.py::run_evalplus_suite`) so
+`generate-summary.py` and schema validation keep working and the suite name
+stays registered. Follow-up issues track proper coding benchmark paths:
+
+- Issue 1: Docker-based EvalPlus scorer (bypass macOS RLIMIT_AS)
+- Issue 6: Vendor `humaneval_plus_instruct` task YAML for lm-eval
+- Issue 8: bigcode-evaluation-harness evaluation spike
+
+`math-hard` simplified to `minerva_math500 @ 100` only. `leaderboard_math_hard`
+was removed because it's a task group that multiplies `--limit` across 7
+subtasks (560 samples total) and blows past the 30-min per-task timeout.
+`minerva_math500` alone is a sufficient discriminator: Qwen3-Coder-30B scored
+47% math_verify, not saturated.
+
+### Sweep results (Phase B, 2026-04-11)
+
+Hardware: M4 Max 128 GB. Configuration: `lm-eval[api,math]==0.4.11`,
+`max_length=32768`, `num_concurrent=4`, `minerva_math500` @ 100 samples.
+vllm-mlx 0.2.6.
+
+Results table will be populated by `analyze-and-draft-decision.sh` once the
+full 11-model sweep completes.
+
+### Default swap rationale
+
+Swapping from the broken multimodal variant to
+`mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit`:
+
+- Loads on vllm-mlx 0.2.6 (confirmed via smoke test)
+- 21 GB RAM, well within the 108 GB budget
+- Qwen3 MoE architecture family — same family as the prior default
+- 47% math_verify on minerva_math500 baseline measurement
+- Dedicated coder tuning — the Coder variant of Qwen3-30B-A3B Instruct,
+  designed for software engineering tasks
+
+If any candidate in the sweep beat this score by ≥ 3 pp, the default would
+swap to the winner. Otherwise this is the rescue baseline.
+
+### Takeaway
+
+The `evalplus` + HumanEval family was designed in 2021 for GPT-3-style base
+models. The 2023-2025 chat-instruct tuning revolution broke their implicit
+output-format assumptions. For coding benchmarks on chat models, reach for
+purpose-built harnesses (evalplus standalone, bigcode-evaluation-harness) —
+not the decade-old lm-eval task definitions. Math benchmarks are more
+forgiving because CoT prompting is the natural output format.
+
+mlx-community is "best-effort community quants", not a stable artifact
+repository. Capture `sha` in every benchmark result and verify `pipeline_tag`
+via the HF API before trusting a cached checkpoint.
+
+---
 
 ## 2026-03-22 — Full Suite with Tool Calling & Code Accuracy
 
