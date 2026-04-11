@@ -33,14 +33,19 @@ failure mode this rule exists to prevent.
 Three-step escalation. All three steps MUST be followed before declaring
 `clink` or `consensus` unavailable.
 
-### Step 1: ToolSearch
+### Step 1: ToolSearch (target the specific tool you need)
+
+Search directly for the tool you're about to use rather than relying on a
+generic `mcp__pal` prefix — PAL exposes ~18 tools and a low `max_results`
+will truncate the list before `consensus`/`clink` appear.
 
 ```text
-ToolSearch("mcp__pal", max_results=5)
+ToolSearch("select:mcp__pal__clink", max_results=5)
+ToolSearch("select:mcp__pal__consensus", max_results=5)
 ```
 
-If `mcp__pal__clink` or `mcp__pal__consensus` appears → proceed.
-If empty → **DO NOT STOP. Go to Step 2.** (deferred tools may not be populated yet)
+If the target tool appears → proceed directly to using it.
+If not found → **DO NOT STOP. Go to Step 2.** (deferred tools may not be populated yet)
 
 ### Step 2: Check server status
 
@@ -50,7 +55,7 @@ claude mcp list 2>/dev/null | grep "^pal:"
 
 | Status | Action |
 | ------ | ------ |
-| `✓ Connected` | ToolSearch again: `select:mcp__pal__clink` |
+| `✓ Connected` | ToolSearch again for whichever tool is missing: `select:mcp__pal__clink` or `select:mcp__pal__consensus` |
 | `✗ Failed` | Go to Step 3 |
 | Not listed | Tell user: "PAL not registered. Run `check-pal-mcp` to diagnose." |
 
