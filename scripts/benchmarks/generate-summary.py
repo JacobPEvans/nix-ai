@@ -35,6 +35,8 @@ SUITE_LABELS = {
     "coding": "Coding (HumanEval)",
     "reasoning": "Reasoning (GSM8K / HellaSwag / ARC)",
     "knowledge": "Knowledge (MMLU / IFEval)",
+    "evalplus": "EvalPlus (stubbed)",
+    "math-hard": "Math-Hard (minerva_math500)",
 }
 
 

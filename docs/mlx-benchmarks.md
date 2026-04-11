@@ -137,7 +137,7 @@ mlx-eval --tasks hellaswag --limit 100
 |------|-----|----------|-------|-----------------|-----|
 | 2026-04-06 04:55 | fd819b9 | _(skipped — no MLX hardware)_ | — | — | — |
 
-### math-hard
+### Math-Hard (minerva_math500)
 
 | Date | SHA | Test | Metric | Value | Unit |
 |------|-----|------|--------|-------|------|
@@ -145,8 +145,8 @@ mlx-eval --tasks hellaswag --limit 100
 
 ### Model Comparison Matrix
 
-| Model | math-hard | Code Accuracy | Tool Calling | TTFT | Throughput | Capability Comparison (vs Claude Opus 4.6) | Framework Benchmark |
-|-------|-----------|---------------|--------------|------|------------|--------------------------------------------|---------------------|
+| Model | Math-Hard (minerva_math500) | Code Accuracy | Tool Calling | TTFT | Throughput | Capability Comparison (vs Claude Opus 4.6) | Framework Benchmark |
+|-------|-----------------------------|---------------|--------------|------|------------|--------------------------------------------|---------------------|
 | Devstral-2-123B-Instruct-2512-4bit | — | 0% (0/2) | 25% (1/4) | — | 2.5 tok/s | — | — |
 | Qwen3-Coder-30B-A3B-Instruct-4bit | 0.47 | — | — | — | — | — | — |
 | Qwen3.5-122B-A10B-4bit | — | 66% | 100% | 16.50s | 14.6 tok/s | — | — |
