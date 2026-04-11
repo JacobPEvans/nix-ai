@@ -1,4 +1,6 @@
-<!-- cspell:words TTFT hellaswag parameterize keyerror safetensor safetensors evalplus MBPP Hendrycks humaneval mbpp sympy minerva RLIMIT bigcode -->
+<!-- cspell:words TTFT hellaswag parameterize keyerror safetensor safetensors -->
+<!-- cspell:words evalplus MBPP Hendrycks humaneval mbpp sympy minerva RLIMIT -->
+<!-- cspell:words bigcode multimodal unloadable codegen setrlimit antlr -->
 # MLX Benchmark Results
 
 Performance tracking for the vllm-mlx inference server across configuration changes.
@@ -188,6 +190,57 @@ prior default. `programs.mlx.defaultModel` updated to match. Resolves #334.
 Parameter count is a poor proxy for capability on tightly-quantized MoE models
 when TTFT dominates UX. 35B-A3B (3B active) is the sweet spot of the
 mlx-community catalog on 128 GB Apple Silicon.
+
+## Decision (2026-04-11) — multimodal incident + math-hard sweep
+
+Two forcing events drove this decision:
+
+1. **The 2026-04-10 default is now broken.** On 2026-02-24 HF upstream silently
+   republished `mlx-community/Qwen3.5-35B-A3B-4bit` as a multimodal variant
+   (`Qwen3_5MoeForConditionalGeneration`, `pipeline_tag: image-text-to-text`,
+   sha `1e20fd8d42056f870933bf98ca6211024744f7ec`). vllm-mlx cannot load it.
+   Every fresh Claude Code session on main raised a TypeError from
+   `load_model_with_fallback`. A replacement default was mandatory regardless
+   of benchmark outcomes.
+2. **The prior `code-accuracy` suite didn't discriminate.** PR #465 benchmarked
+   six large candidates and found none beat the 35B-A3B baseline, but the
+   suite was a regex-scored toy with zero signal. Real benchmarks were needed.
+
+The Phase B sweep replaces `code-accuracy` with `math-hard` (minerva_math500
+@ 100 samples, chain-of-thought sympy-verified competition math) as the
+structured-reasoning proxy for code review, and stubs the `evalplus` coding
+suite because both lm-eval task variants AND the standalone evalplus Python
+package are broken for chat models on macOS (see follow-up issues for details).
+
+### Role winners (2026-04-11)
+
+<!-- Results row will be finalized after full sweep completes. -->
+
+| Role | Model | Rationale |
+|------|-------|-----------|
+| **Default (rescue)** | `Qwen3-Coder-30B-A3B-Instruct-4bit` | Confirmed loading on vllm-mlx 0.2.6, same Qwen3 MoE family as prior default, 47% math_verify on minerva_math500 @ 100 samples, 21 GB RAM. Replaces the unloadable multimodal variant. |
+| **Best math-hard** | _(TBD — top Phase B finisher)_ | Final ranking depends on sweep completion. |
+
+### Benchmark infrastructure fixes (2026-04-11)
+
+Four blockers discovered while exercising the new suites:
+
+1. `lm-eval`'s `local-chat-completions` backend defaults `max_length=2048`,
+   truncating chat-wrapped prompts mid-word. Fixed: `max_length=32768` in
+   wrapper `model_args`.
+2. `humaneval_plus` / `mbpp_plus` / `humaneval_instruct` / `mbpp_plus_instruct`
+   all score 0% on chat models because their extractors can't parse markdown
+   code blocks. No clean lm-eval path exists.
+3. Standalone `evalplus` Python package: `evalplus.codegen` works via the
+   OpenAI backend, but `evalplus.evaluate`'s `reliability_guard` calls
+   `resource.setrlimit(RLIMIT_AS, ...)` which is broken on macOS — every
+   sample errors during sandbox setup.
+4. `minerva_math500` requires `lm-eval[math]` extras
+   (`sympy`, `math_verify`, `antlr4-python3-runtime==4.11`).
+
+Follow-up issues track a Docker-based EvalPlus scorer,
+bigcode-evaluation-harness evaluation, and a
+`humaneval_plus_instruct` task vendoring effort.
 
 ## History
 
