@@ -4,4 +4,4 @@
 # mlx-benchmarks: full dated decision history + post-mortems for MLX model sweeps
 extended:
   limit: 20480
-  files: [options, ai-tools, mlx-benchmarks]
+  files: [options, ai-tools, mlx-benchmarks, mlx-benchmarks-history]
