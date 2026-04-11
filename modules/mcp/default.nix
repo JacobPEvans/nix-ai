@@ -96,7 +96,10 @@ in
       # Run PAL's `listmodels` tool for current aliases and providers.
       DEFAULT_MODEL = "auto";
       # Custom API endpoint — MLX inference server (vllm-mlx on port 11434)
-      CUSTOM_API_URL = "http://127.0.0.1:11434/v1";
+      # Route PAL through Bifrost AI gateway (localhost:30080) instead of
+      # vllm-mlx directly. Bifrost fans out to OpenAI/Gemini/OpenRouter/MLX
+      # based on model name. Tracked: JacobPEvans/nix-ai#450
+      CUSTOM_API_URL = "http://localhost:30080/v1";
       # MLX timeout tuning (PAL reads from providers/openai_compatible.py)
       CUSTOM_CONNECT_TIMEOUT = "30"; # 30s for localhost MLX (catches stalled server)
       CUSTOM_READ_TIMEOUT = "300"; # 5min for large model inference
