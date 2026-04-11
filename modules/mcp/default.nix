@@ -89,12 +89,36 @@ in
     command = "doppler-mcp";
     args = [ "pal-mcp-server" ];
     env = {
-      # Enable ALL PAL tools (default disables: analyze,refactor,testgen,secaudit,docgen,tracer)
-      DISABLED_TOOLS = "";
+      # Disable PAL tools that have native Claude Code / Bifrost equivalents,
+      # plus drop `version` (no functional value). Only `clink` (parallel
+      # multi-model) and `consensus` (multi-model voting) remain enabled —
+      # neither has a Bifrost equivalent, and the canonical
+      # `modules/claude/rules/pal-mcp-policy.md` rule scopes PAL's
+      # availability-check protocol to exactly those two tools. The
+      # audit matrix that decided this split was posted as a comment on
+      # JacobPEvans/nix-ai#450.
+      DISABLED_TOOLS = builtins.concatStringsSep "," [
+        "chat"
+        "thinkdeep"
+        "planner"
+        "listmodels"
+        "codereview"
+        "precommit"
+        "debug"
+        "analyze"
+        "tracer"
+        "refactor"
+        "testgen"
+        "secaudit"
+        "docgen"
+        "apilookup"
+        "challenge"
+        "version"
+      ];
       # 'auto' = PAL picks a model alias per-task; Bifrost then routes the
       # resulting request to the right provider based on the model name.
-      # Run PAL's `listmodels` (or curl http://localhost:30080/v1/models)
-      # for current aliases and providers.
+      # `listmodels` is disabled (see above) — query available models via
+      # `curl http://localhost:30080/v1/models` instead.
       DEFAULT_MODEL = "auto";
       # Route PAL through Bifrost AI gateway (localhost:30080) instead of
       # vllm-mlx directly. Bifrost fans out to OpenAI/Gemini/OpenRouter/MLX
