@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.37.0](https://github.com/JacobPEvans/nix-ai/compare/v1.36.0...v1.37.0) (2026-04-11)
+
+
+### Features
+
+* **ai-tools:** add whisper-cpp and openai-whisper moved from nix-darwin ([#482](https://github.com/JacobPEvans/nix-ai/issues/482)) ([0077a28](https://github.com/JacobPEvans/nix-ai/commit/0077a287366daa7107e16cdfe2ca7280c023a8e7))
+
+
+### Bug Fixes
+
+* **ai-tools:** bump huggingface-hub pin 1.9.0 -&gt; 1.10.1 ([#486](https://github.com/JacobPEvans/nix-ai/issues/486)) ([0a193d3](https://github.com/JacobPEvans/nix-ai/commit/0a193d3ab981455ceeef9beb4d37865469c53def))
+
 ## [1.36.0](https://github.com/JacobPEvans/nix-ai/compare/v1.35.0...v1.36.0) (2026-04-11)
 
 
