@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.36.0](https://github.com/JacobPEvans/nix-ai/compare/v1.35.0...v1.36.0) (2026-04-11)
+
+
+### Features
+
+* **pal:** Phase 5 — disable tools with native/Bifrost equivalents ([#481](https://github.com/JacobPEvans/nix-ai/issues/481)) ([64fc4c1](https://github.com/JacobPEvans/nix-ai/commit/64fc4c1bdd209866e532c5d39d0abfd8a0dc5642))
+
 ## [1.35.0](https://github.com/JacobPEvans/nix-ai/compare/v1.34.0...v1.35.0) (2026-04-11)
 
 
