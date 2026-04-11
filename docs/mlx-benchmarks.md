@@ -104,17 +104,18 @@ mlx-eval --tasks hellaswag --limit 100
 
 | Date | SHA | Model | Task | Score | Metric | Samples |
 |------|-----|-------|------|-------|--------|---------|
-| 2026-04-10 11:19 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | should-call-tool | 0.0% | accuracy | — |
-| 2026-04-10 11:19 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | both-args | 0.0% | accuracy | — |
-| 2026-04-10 11:19 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | no-tool-needed | 100.0% | accuracy | — |
-| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | should-call-tool | 100.0% | accuracy | — |
-| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | both-args | 100.0% | accuracy | — |
-| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | no-tool-needed | 100.0% | accuracy | — |
-| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
-| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | should-call-tool | 0.0% | accuracy | — |
-| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | both-args | 0.0% | accuracy | — |
-| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | no-tool-needed | 100.0% | accuracy | — |
-| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-11 19:16 | 2eeafad | Qwen3-Next-80B-A3B-Instruct-8bit | should-call-tool | 100.0% | accuracy | — |
+| 2026-04-11 19:16 | 2eeafad | Qwen3-Next-80B-A3B-Instruct-8bit | both-args | 100.0% | accuracy | — |
+| 2026-04-11 19:16 | 2eeafad | Qwen3-Next-80B-A3B-Instruct-8bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-11 19:16 | 2eeafad | Qwen3-Next-80B-A3B-Instruct-8bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-11 19:13 | 2eeafad | GLM-4.5-Air-4bit | should-call-tool | 0.0% | accuracy | — |
+| 2026-04-11 19:13 | 2eeafad | GLM-4.5-Air-4bit | both-args | 0.0% | accuracy | — |
+| 2026-04-11 19:13 | 2eeafad | GLM-4.5-Air-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-11 19:13 | 2eeafad | GLM-4.5-Air-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-11 19:10 | 2eeafad | Qwen3-Next-80B-A3B-Thinking-4bit | should-call-tool | 0.0% | accuracy | — |
+| 2026-04-11 19:10 | 2eeafad | Qwen3-Next-80B-A3B-Thinking-4bit | both-args | 100.0% | accuracy | — |
+| 2026-04-11 19:10 | 2eeafad | Qwen3-Next-80B-A3B-Thinking-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-11 19:10 | 2eeafad | Qwen3-Next-80B-A3B-Thinking-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
 
 ### Code Accuracy
 
@@ -141,16 +142,20 @@ mlx-eval --tasks hellaswag --limit 100
 
 | Date | SHA | Test | Metric | Value | Unit |
 |------|-----|------|--------|-------|------|
-| 2026-04-11 02:19 | ff66999 | minerva_math500 | math_verify | 0.47 | ratio |
+| 2026-04-11 17:12 | 2eeafad | minerva_math500 | math_verify | 0.42 | ratio |
+| 2026-04-11 16:55 | 2eeafad | minerva_math500 | math_verify | 0.42 | ratio |
+| 2026-04-11 16:30 | 2eeafad | minerva_math500 | math_verify | 0.08 | ratio |
 
 ### Model Comparison Matrix
 
-| Model | Math-Hard (minerva_math500) | Code Accuracy | Tool Calling | TTFT | Throughput | Capability Comparison (vs Claude Opus 4.6) | Framework Benchmark |
-|-------|-----------------------------|---------------|--------------|------|------------|--------------------------------------------|---------------------|
-| Devstral-2-123B-Instruct-2512-4bit | — | 0% (0/2) | 25% (1/4) | — | 2.5 tok/s | — | — |
-| Qwen3-Coder-30B-A3B-Instruct-4bit | 0.47 | — | — | — | — | — | — |
-| Qwen3.5-122B-A10B-4bit | — | 66% | 100% | 16.50s | 14.6 tok/s | — | — |
-| gpt-oss-120b-4bit | — | 34% | 50% | 1.24s | 18.9 tok/s | — | — |
+| Model | Tool Calling | Math-Hard (minerva_math500) | Code Accuracy | TTFT | Throughput | Capability Comparison (vs Claude Opus 4.6) | Framework Benchmark |
+|-------|--------------|-----------------------------|---------------|------|------------|--------------------------------------------|---------------------|
+| Devstral-2-123B-Instruct-2512-4bit | — | 0.42 | 0% (0/2) | — | 2.5 tok/s | — | — |
+| GLM-4.5-Air-4bit | 50% | — | — | — | — | — | — |
+| Qwen3-Next-80B-A3B-Instruct-8bit | 100% | — | — | — | — | — | — |
+| Qwen3-Next-80B-A3B-Thinking-4bit | 75% | — | — | — | — | — | — |
+| Qwen3.5-122B-A10B-4bit | — | 0.08 | 66% | 16.50s | 14.6 tok/s | — | — |
+| gpt-oss-120b-4bit | — | 0.42 | 34% | 1.24s | 18.9 tok/s | — | — |
 
 <!-- BENCHMARK-TABLE-END -->
 
