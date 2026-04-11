@@ -91,15 +91,19 @@ in
     env = {
       # Enable ALL PAL tools (default disables: analyze,refactor,testgen,secaudit,docgen,tracer)
       DISABLED_TOOLS = "";
-      # 'auto' = PAL picks best available model per-task based on configured API keys.
-      # Falls back across providers: OpenAI -> Gemini -> OpenRouter -> MLX.
-      # Run PAL's `listmodels` tool for current aliases and providers.
+      # 'auto' = PAL picks a model alias per-task; Bifrost then routes the
+      # resulting request to the right provider based on the model name.
+      # Run PAL's `listmodels` (or curl http://localhost:30080/v1/models)
+      # for current aliases and providers.
       DEFAULT_MODEL = "auto";
-      # Custom API endpoint — MLX inference server (vllm-mlx on port 11434)
-      CUSTOM_API_URL = "http://127.0.0.1:11434/v1";
-      # MLX timeout tuning (PAL reads from providers/openai_compatible.py)
-      CUSTOM_CONNECT_TIMEOUT = "30"; # 30s for localhost MLX (catches stalled server)
-      CUSTOM_READ_TIMEOUT = "300"; # 5min for large model inference
+      # Route PAL through Bifrost AI gateway (localhost:30080) instead of
+      # vllm-mlx directly. Bifrost fans out to OpenAI/Gemini/OpenRouter/MLX
+      # based on model name. Tracked: JacobPEvans/nix-ai#450
+      CUSTOM_API_URL = "http://localhost:30080/v1";
+      # OpenAI-compatible client timeouts — applies to whichever backend
+      # CUSTOM_API_URL points at (Bifrost in this config).
+      CUSTOM_CONNECT_TIMEOUT = "30"; # 30s connect — catches stalled upstream
+      CUSTOM_READ_TIMEOUT = "300"; # 5min read — accommodates large model inference
       # Conversation limits
       CONVERSATION_TIMEOUT_HOURS = "6";
       MAX_CONVERSATION_TURNS = "50";
