@@ -1,0 +1,49 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-11T21:06:03Z",
+  "git_sha": "874efc4",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "ttft",
+  "model": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-8bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [
+    {
+      "name": "cold-avg",
+      "metric": "ttft",
+      "value": 0.3757,
+      "unit": "seconds",
+      "tags": {
+        "type": "cold",
+        "samples": "3"
+      }
+    },
+    {
+      "name": "warm-avg",
+      "metric": "ttft",
+      "value": 0.3774,
+      "unit": "seconds",
+      "tags": {
+        "type": "warm",
+        "samples": "3"
+      }
+    },
+    {
+      "name": "cache-speedup",
+      "metric": "ratio",
+      "value": 1.0,
+      "unit": "x",
+      "tags": {
+        "cold_avg": "0.3757",
+        "warm_avg": "0.3774"
+      }
+    }
+  ],
+  "errors": []
+}

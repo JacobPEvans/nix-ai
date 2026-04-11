@@ -76,29 +76,32 @@ mlx-eval --tasks hellaswag --limit 100
 
 | Date | SHA | Model | Test | tok/s | Tokens | Elapsed |
 |------|-----|-------|------|-------|--------|---------|
-| 2026-04-10 11:06 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | short-50 | 1.9 | 50 | 25.95 |
-| 2026-04-10 11:06 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | medium-256 | 2.5 | 256 | 103.61 |
-| 2026-04-10 11:06 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | long-512 | 2.0 | 512 | 257.79 |
-| 2026-04-10 10:58 | 5572dde | Qwen3.5-122B-A10B-4bit | short-50 | 11.3 | 50 | 4.44 |
-| 2026-04-10 10:58 | 5572dde | Qwen3.5-122B-A10B-4bit | medium-256 | 13.9 | 256 | 18.41 |
-| 2026-04-10 10:58 | 5572dde | Qwen3.5-122B-A10B-4bit | long-512 | 14.6 | 512 | 35.06 |
-| 2026-04-10 10:58 | 5572dde | Qwen3.5-122B-A10B-4bit | long-1024 | 13.7 | 1024 | 75.01 |
-| 2026-04-10 10:53 | 5572dde | gpt-oss-120b-4bit | short-50 | 10.3 | 50 | 4.88 |
-| 2026-04-10 10:53 | 5572dde | gpt-oss-120b-4bit | medium-256 | 17.1 | 256 | 14.94 |
-| 2026-04-10 10:53 | 5572dde | gpt-oss-120b-4bit | long-512 | 16.5 | 512 | 31.01 |
-| 2026-04-10 10:53 | 5572dde | gpt-oss-120b-4bit | long-1024 | 18.9 | 1024 | 54.05 |
+| 2026-04-11 22:09 | 0077a28 | gpt-oss-120b-4bit | short-50 | 26.0 | 50 | 1.92 |
+| 2026-04-11 22:09 | 0077a28 | gpt-oss-120b-4bit | medium-256 | 36.1 | 256 | 7.09 |
+| 2026-04-11 22:09 | 0077a28 | gpt-oss-120b-4bit | long-512 | 41.8 | 512 | 12.24 |
+| 2026-04-11 22:09 | 0077a28 | gpt-oss-120b-4bit | long-1024 | 44.9 | 1024 | 22.82 |
+| 2026-04-11 22:04 | 0077a28 | gemma-4-e4b-it-4bit | short-50 | 39.6 | 50 | 1.26 |
+| 2026-04-11 22:04 | 0077a28 | gemma-4-e4b-it-4bit | medium-256 | 51.3 | 256 | 4.99 |
+| 2026-04-11 22:04 | 0077a28 | gemma-4-e4b-it-4bit | long-512 | 56.0 | 512 | 9.14 |
+| 2026-04-11 22:04 | 0077a28 | gemma-4-e4b-it-4bit | long-1024 | 59.9 | 1024 | 17.09 |
+| 2026-04-11 21:59 | 0077a28 | gemma-4-31b-it-4bit | short-50 | 12.7 | 50 | 3.93 |
+| 2026-04-11 21:59 | 0077a28 | gemma-4-31b-it-4bit | medium-256 | 13.6 | 256 | 18.88 |
+| 2026-04-11 21:59 | 0077a28 | gemma-4-31b-it-4bit | long-512 | 18.4 | 512 | 27.81 |
+| 2026-04-11 21:59 | 0077a28 | gemma-4-31b-it-4bit | long-1024 | 17.5 | 1024 | 58.38 |
 
 ### TTFT
 
 | Date | SHA | Model | Test | Latency (s) | Type |
 |------|-----|-------|------|-------------|------|
-| 2026-04-10 11:18 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | warm-avg | 14.156 | warm |
-| 2026-04-10 11:00 | 5572dde | Qwen3.5-122B-A10B-4bit | cold-avg | 16.500 | cold |
-| 2026-04-10 11:00 | 5572dde | Qwen3.5-122B-A10B-4bit | warm-avg | 11.952 | warm |
-| 2026-04-10 11:00 | 5572dde | Qwen3.5-122B-A10B-4bit | cache-speedup | 1.380 | — |
-| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | cold-avg | 1.245 | cold |
-| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | warm-avg | 1.314 | warm |
-| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | cache-speedup | 0.950 | — |
+| 2026-04-11 22:10 | 0077a28 | gpt-oss-120b-4bit | cold-avg | 0.727 | cold |
+| 2026-04-11 22:10 | 0077a28 | gpt-oss-120b-4bit | warm-avg | 0.659 | warm |
+| 2026-04-11 22:10 | 0077a28 | gpt-oss-120b-4bit | cache-speedup | 1.100 | — |
+| 2026-04-11 22:05 | 0077a28 | gemma-4-e4b-it-4bit | cold-avg | 0.693 | cold |
+| 2026-04-11 22:05 | 0077a28 | gemma-4-e4b-it-4bit | warm-avg | 0.673 | warm |
+| 2026-04-11 22:05 | 0077a28 | gemma-4-e4b-it-4bit | cache-speedup | 1.030 | — |
+| 2026-04-11 22:00 | 0077a28 | gemma-4-31b-it-4bit | cold-avg | 1.079 | cold |
+| 2026-04-11 22:00 | 0077a28 | gemma-4-31b-it-4bit | warm-avg | 0.999 | warm |
+| 2026-04-11 22:00 | 0077a28 | gemma-4-31b-it-4bit | cache-speedup | 1.080 | — |
 
 ### Tool Calling
 
@@ -148,14 +151,16 @@ mlx-eval --tasks hellaswag --limit 100
 
 ### Model Comparison Matrix
 
-| Model | Tool Calling | Math-Hard (minerva_math500) | Code Accuracy | TTFT | Throughput | Capability Comparison (vs Claude Opus 4.6) | Framework Benchmark |
-|-------|--------------|-----------------------------|---------------|------|------------|--------------------------------------------|---------------------|
-| Devstral-2-123B-Instruct-2512-4bit | — | 0.42 | 0% (0/2) | — | 2.5 tok/s | — | — |
-| GLM-4.5-Air-4bit | 50% | — | — | — | — | — | — |
-| Qwen3-Next-80B-A3B-Instruct-8bit | 100% | — | — | — | — | — | — |
-| Qwen3-Next-80B-A3B-Thinking-4bit | 75% | — | — | — | — | — | — |
-| Qwen3.5-122B-A10B-4bit | — | 0.08 | 66% | 16.50s | 14.6 tok/s | — | — |
-| gpt-oss-120b-4bit | — | 0.42 | 34% | 1.24s | 18.9 tok/s | — | — |
+| Model | TTFT | Throughput | Tool Calling | Math-Hard (minerva_math500) | Code Accuracy | Capability Comparison (vs Claude Opus 4.6) | Framework Benchmark |
+|-------|------|------------|--------------|-----------------------------|---------------|--------------------------------------------|---------------------|
+| Devstral-2-123B-Instruct-2512-4bit | — | — | — | 0.42 | 0% (0/2) | — | — |
+| GLM-4.5-Air-4bit | — | — | 50% | — | — | — | — |
+| Qwen3-Next-80B-A3B-Instruct-8bit | — | — | 100% | — | — | — | — |
+| Qwen3-Next-80B-A3B-Thinking-4bit | — | — | 75% | — | — | — | — |
+| Qwen3.5-122B-A10B-4bit | — | — | — | 0.08 | 66% | — | — |
+| gemma-4-31b-it-4bit | 1.08s | 18.4 tok/s | — | — | — | — | — |
+| gemma-4-e4b-it-4bit | 0.69s | 59.9 tok/s | — | — | — | — | — |
+| gpt-oss-120b-4bit | 0.73s | 44.9 tok/s | — | 0.42 | 34% | — | — |
 
 <!-- BENCHMARK-TABLE-END -->
 
