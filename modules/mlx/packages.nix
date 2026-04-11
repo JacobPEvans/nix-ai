@@ -145,7 +145,7 @@ in
         # 2026-04-10 with Qwen3-Coder-30B). 32k is a comfortable ceiling.
         #
         # The [api,math] extras bring in sympy + math_verify + antlr4 for
-        # minerva_math500 and leaderboard_math_hard used by the math-hard suite.
+        # minerva_math500, which is the math-hard suite task currently run.
         #
         # renovate: datasource=pypi depName=lm-eval
         (pkgs.writeShellScriptBin "mlx-eval" ''

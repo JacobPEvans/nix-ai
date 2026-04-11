@@ -15,14 +15,9 @@
       default = "mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit";
       description = ''
         Default mlx-community/ HuggingFace model to serve via vllm-mlx.
-
-        Swapped from Qwen3.5-35B-A3B-4bit on 2026-04-11 after HF upstream
-        silently republished that model as a multimodal variant
-        (pipeline_tag: image-text-to-text, sha 1e20fd8d...) that vllm-mlx
-        cannot load. Qwen3-Coder-30B-A3B-Instruct-4bit is the same Qwen3 MoE
-        architecture family, 21 GB estimated RAM, confirmed loading on
-        vllm-mlx 0.2.6, and scored 47% math_verify on minerva_math500
-        (100-sample subset) in the Phase B benchmark sweep.
+        See `docs/mlx-benchmarks.md` for the current benchmark-driven
+        rationale and `docs/mlx-benchmarks-history.md` for historical
+        default-swap context.
       '';
     };
 
