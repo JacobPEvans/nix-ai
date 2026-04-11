@@ -1,7 +1,24 @@
-<!-- cspell:words mistralai ttft jsonc -->
+<!-- cspell:words mistralai ttft jsonc decom -->
 # Bifrost AI Gateway — Live Benchmark Session
 
 **Date:** 2026-04-10 · **Umbrella:** [JacobPEvans/nix-ai#450](https://github.com/JacobPEvans/nix-ai/issues/450)
+
+> **HISTORICAL — DO NOT COPY MODEL IDENTIFIERS FROM THIS REPORT.**
+>
+> This report references `gemini-2.5-flash` in Bench H, Bench H2, and
+> Finding #2. **Gemini 2.5 Flash is a decommissioned model and must not
+> be used in new code or configuration.** The benchmark data is retained
+> here for historical validation of Bifrost gateway routing behavior and
+> the Gemini thinking-model reasoning-token pattern (which is stable
+> across all current Gemini thinking-model variants). Any new work should
+> target the current supported Gemini models (e.g. `gemini-3-pro-preview`,
+> current flash variants).
+>
+> The general `max_tokens >= 100` rule-of-thumb from Finding #2 **is still
+> valid** for all Gemini thinking models — the rule concerns the
+> reasoning-token API surface, not a specific model version. See
+> `JacobPEvans/ai-assistant-instructions#553` for the model-agnostic
+> guidance now in the canonical Model Routing Rules.
 
 Post-activation validation of Bifrost after the PAL → Bifrost migration.
 Stress tests against local MLX + cloud providers. All local tests ran on
