@@ -14,6 +14,7 @@
   marketplaceInputs,
   claude-cookbooks,
   claude-code-plugins,
+  fabric-src,
   userConfig ? {
     ai.claudeSchemaUrl = "https://json.schemastore.org/claude-code-settings.json";
   },
@@ -30,6 +31,7 @@ let
       ai-assistant-instructions
       marketplaceInputs
       claude-cookbooks
+      fabric-src
       ;
   };
 
@@ -90,6 +92,7 @@ in
 {
   imports = [
     ./claude
+    ./fabric
     ./maestro
     ./mlx
     ./open-webui.nix
@@ -139,6 +142,10 @@ in
 
       # MLX inference server (vllm-mlx on port 11434)
       mlx.enable = true;
+
+      # Fabric — 252+ AI prompt patterns + CLI (defaults to MLX backend)
+      # REST API server is opt-in via programs.fabric.enableServer
+      fabric.enable = true;
 
       # GitHub CLI extension for AI workflows
       gh.extensions = [ ghExtensions.gh-aw ];

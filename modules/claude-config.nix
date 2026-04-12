@@ -9,6 +9,7 @@
   ai-assistant-instructions,
   marketplaceInputs,
   claude-cookbooks,
+  fabric-src,
   ...
 }:
 
@@ -45,11 +46,24 @@ let
   # Extract enabled plugins from modular configuration
   inherit (claudePlugins.pluginConfig) enabledPlugins;
 
+  # Derive fabric version from the package (single source of truth — Renovate-managed)
+  fabricVersion = (pkgs.callPackage ./fabric/package.nix { inherit fabric-src; }).version;
+
   # Marketplace derivation overrides (synthetic wrappers, auto-generated manifests)
   marketplaceOverrides = import ./claude/marketplace-overrides.nix {
-    inherit pkgs lib marketplaceInputs;
+    inherit
+      pkgs
+      lib
+      marketplaceInputs
+      fabric-src
+      fabricVersion
+      ;
   };
-  inherit (marketplaceOverrides) browserUseMarketplace jacobpevansMarketplace;
+  inherit (marketplaceOverrides)
+    browserUseMarketplace
+    jacobpevansMarketplace
+    fabricMarketplace
+    ;
 
   # Helper to build command/agent entries from discovered names
   mkSourceEntries =
@@ -133,6 +147,14 @@ in
         # Override flakeInput with auto-generated marketplace manifest
         "jacobpevans-cc-plugins" = base."jacobpevans-cc-plugins" // {
           flakeInput = jacobpevansMarketplace;
+        };
+        # Override flakeInput for synthetic fabric marketplace.
+        # Wraps a curated subset of fabric patterns from data/patterns/ into
+        # the .claude-plugin/ structure so they appear as skills in Claude Code.
+        # Exact count is enforced by the fabric-marketplace-build check
+        # (lib/checks/fabric.nix) against modules/claude/fabric-curated-patterns.json.
+        "fabric-patterns" = base."fabric-patterns" // {
+          flakeInput = fabricMarketplace;
         };
       };
 

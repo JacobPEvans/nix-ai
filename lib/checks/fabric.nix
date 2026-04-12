@@ -1,0 +1,179 @@
+# Fabric module regression tests
+#
+# Mirrors lib/checks/mlx.nix patterns. Catches silent option/default drift
+# and validates the synthetic fabric-patterns marketplace builds correctly.
+{
+  pkgs,
+  hmConfig,
+  hmConfigFabricServer,
+  fabric-src,
+  src,
+}:
+let
+  cfg = hmConfig.config.programs.fabric;
+in
+{
+  # Verify all expected fabric option paths exist. Note: patternsDir is NOT
+  # an option — it is a computed constant in packages.nix (see that file for
+  # rationale). This check also asserts patternsDir is NOT in the option set.
+  fabric-options-regression =
+    let
+      expectedOptions = [
+        "customPatternsDir"
+        "defaultModel"
+        "enable"
+        "enableServer"
+        "host"
+        "port"
+      ];
+      actualOptions = builtins.attrNames cfg;
+      missingOptions = builtins.filter (o: !(builtins.elem o actualOptions)) expectedOptions;
+      patternsDirIsOption = builtins.elem "patternsDir" actualOptions;
+    in
+    assert missingOptions == [ ] || throw "Missing fabric options: ${builtins.toJSON missingOptions}";
+    assert
+      !patternsDirIsOption
+      || throw "patternsDir must NOT be a configurable option (it is a computed constant — see modules/fabric/packages.nix)";
+    pkgs.runCommand "check-fabric-options-regression" { } ''
+      echo "Fabric option regression: ${toString (builtins.length expectedOptions)} options verified"
+      touch $out
+    '';
+
+  # Verify fabric evaluated config values match expected defaults.
+  # Pinning these so accidental drift breaks the build (port collisions, etc.).
+  fabric-defaults-regression =
+    let
+      checks = [
+        {
+          name = "fabric.enable";
+          actual = cfg.enable;
+          expected = true;
+        }
+        {
+          name = "fabric.enableServer";
+          actual = cfg.enableServer;
+          expected = false;
+        }
+        {
+          name = "fabric.host";
+          actual = cfg.host;
+          expected = "127.0.0.1";
+        }
+        {
+          name = "fabric.port";
+          actual = cfg.port;
+          expected = 8180;
+        }
+        {
+          name = "fabric.defaultModel";
+          actual = cfg.defaultModel;
+          expected = "mlx-community/Qwen3.5-122B-A10B-4bit";
+        }
+        # Environment variables — FABRIC_PATTERNS_DIR is computed from
+        # config.home.homeDirectory + the fixed ".config/fabric/patterns"
+        # relative path (see modules/fabric/packages.nix). This check asserts
+        # the env var stays in sync with the home.file symlink location.
+        {
+          name = "fabric.env.FABRIC_PATTERNS_DIR";
+          actual = hmConfig.config.home.sessionVariables.FABRIC_PATTERNS_DIR;
+          expected = "${hmConfig.config.home.homeDirectory}/.config/fabric/patterns";
+        }
+        {
+          name = "fabric.env.FABRIC_DEFAULT_MODEL";
+          actual = hmConfig.config.home.sessionVariables.FABRIC_DEFAULT_MODEL;
+          expected = cfg.defaultModel;
+        }
+      ];
+      failures = builtins.filter (c: c.actual != c.expected) checks;
+      failureMsg = builtins.concatStringsSep "\n" (
+        map (
+          c: "  ${c.name}: expected ${builtins.toJSON c.expected}, got ${builtins.toJSON c.actual}"
+        ) failures
+      );
+    in
+    assert failures == [ ] || throw "Fabric default value regression:\n${failureMsg}";
+    pkgs.runCommand "check-fabric-defaults-regression" { } ''
+      echo "Fabric defaults regression: ${toString (builtins.length checks)} critical defaults verified"
+      touch $out
+    '';
+
+  # Validate the fabric LaunchAgent (positive case): when enableServer = true,
+  # ProgramArguments must contain --serve and the configured host:port.
+  fabric-launchd =
+    let
+      serverCfg = hmConfigFabricServer.config.programs.fabric;
+      agent = hmConfigFabricServer.config.launchd.agents.fabric.config;
+      args = agent.ProgramArguments;
+      argsStr = builtins.concatStringsSep " " args;
+      expectedAddress = "${serverCfg.host}:${toString serverCfg.port}";
+      hasServeFlag = builtins.elem "--serve" args;
+      hasAddressFlag = builtins.elem "--address" args;
+      hasAddress = builtins.elem expectedAddress args;
+      hasKeepAlive = agent.KeepAlive or false;
+      hasRunAtLoad = agent.RunAtLoad or false;
+      hasBackgroundType = (agent.ProcessType or "") == "Background";
+    in
+    assert
+      hasServeFlag || throw "Fabric LaunchAgent missing --serve flag in ProgramArguments: ${argsStr}";
+    assert
+      hasAddressFlag || throw "Fabric LaunchAgent missing --address flag in ProgramArguments: ${argsStr}";
+    assert
+      hasAddress
+      || throw "Fabric LaunchAgent missing expected address ${expectedAddress} in ProgramArguments: ${argsStr}";
+    assert hasKeepAlive || throw "Fabric LaunchAgent must have KeepAlive = true";
+    assert hasRunAtLoad || throw "Fabric LaunchAgent must have RunAtLoad = true";
+    assert hasBackgroundType || throw "Fabric LaunchAgent must have ProcessType = \"Background\"";
+    pkgs.runCommand "check-fabric-launchd" { } ''
+      echo "Fabric LaunchAgent (enableServer=true): --serve --address ${expectedAddress} verified"
+      touch $out
+    '';
+
+  # Validate the fabric LaunchAgent (negative case): when enableServer = false
+  # (the default), no launchd.agents.fabric entry should exist.
+  fabric-launchd-negative =
+    let
+      hasAgent = hmConfig.config.launchd.agents ? fabric;
+    in
+    assert
+      !hasAgent || throw "Fabric LaunchAgent must NOT be defined when enableServer = false (default)";
+    pkgs.runCommand "check-fabric-launchd-negative" { } ''
+      echo "Fabric LaunchAgent negative: launchd.agents.fabric correctly absent when enableServer = false"
+      touch $out
+    '';
+
+  # Build the synthetic fabric-patterns marketplace and assert the SKILL.md
+  # count matches the curated JSON entry count. Catches silent JSON edits.
+  fabric-marketplace-build =
+    let
+      curated = builtins.fromJSON (
+        builtins.readFile "${src}/modules/claude/fabric-curated-patterns.json"
+      );
+      expectedCount = builtins.length curated.patterns;
+      # Derive version from the package (same source of truth as claude-config.nix)
+      fabricVersion =
+        (pkgs.callPackage "${src}/modules/fabric/package.nix" {
+          inherit fabric-src;
+        }).version;
+      overrides = import "${src}/modules/claude/marketplace-overrides.nix" {
+        inherit pkgs fabric-src fabricVersion;
+        inherit (pkgs) lib;
+        # The browser-use and jacobpevans wrappers also live in this file but
+        # are unused by the fabric check — pass nulls to satisfy module args.
+        marketplaceInputs = {
+          browser-use-skills = null;
+          jacobpevans-cc-plugins = null;
+        };
+      };
+      mp = overrides.fabricMarketplace;
+    in
+    pkgs.runCommand "check-fabric-marketplace-build" { } ''
+      actual_count=$(find ${mp}/fabric-patterns/skills -name SKILL.md | wc -l | tr -d ' ')
+      expected_count=${toString expectedCount}
+      if [ "$actual_count" != "$expected_count" ]; then
+        echo "Fabric marketplace SKILL.md count mismatch: actual=$actual_count expected=$expected_count" >&2
+        exit 1
+      fi
+      echo "Fabric marketplace build: $actual_count SKILL.md files (matches curated JSON)"
+      touch $out
+    '';
+}

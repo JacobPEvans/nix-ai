@@ -117,6 +117,15 @@
     terraform-mcp-server
 
     # ==========================================================================
+    # yt-dlp — YouTube/multimedia content extraction
+    # ==========================================================================
+    # Used by fabric for YouTube transcript processing (`fabric -y URL --pattern X`).
+    # Also generally useful for pipeline content extraction into fabric patterns
+    # or the researcher agent workflow.
+    # Source: https://github.com/yt-dlp/yt-dlp
+    yt-dlp
+
+    # ==========================================================================
     # GitHub Copilot CLI
     # ==========================================================================
     # Source: https://github.com/github/gh-copilot

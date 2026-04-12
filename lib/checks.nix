@@ -1,14 +1,15 @@
 # Nix quality checks - thin aggregator
-# Individual check groups live in lib/checks/{lint,claude,mlx}.nix
+# Individual check groups live in lib/checks/{lint,claude,mlx,pal,fabric}.nix
 {
   pkgs,
   src,
   home-manager,
   aiModule,
   pal-mcp-server,
+  fabric-src,
 }:
 let
-  # Shared test module configuration — used by claude and mlx regression checks
+  # Shared test module configuration — used by claude, mlx, and fabric regression checks
   hmConfig = home-manager.lib.homeManagerConfiguration {
     inherit pkgs;
     modules = [
@@ -25,8 +26,37 @@ let
       }
     ];
   };
+
+  # Second evaluation with fabric REST API LaunchAgent enabled — used by the
+  # fabric-launchd positive check (default eval has enableServer = false).
+  hmConfigFabricServer = home-manager.lib.homeManagerConfiguration {
+    inherit pkgs;
+    modules = [
+      aiModule
+      {
+        _module.args.userConfig = {
+          ai.claudeSchemaUrl = "https://json.schemastore.org/claude-code-settings.json";
+        };
+        home = {
+          username = "test-user";
+          homeDirectory = "/home/test-user";
+          stateVersion = "25.11";
+        };
+        programs.fabric.enableServer = true;
+      }
+    ];
+  };
 in
 (import ./checks/lint.nix { inherit pkgs src; })
 // (import ./checks/claude.nix { inherit pkgs hmConfig; })
 // (import ./checks/mlx.nix { inherit pkgs hmConfig; })
 // (import ./checks/pal.nix { inherit pkgs pal-mcp-server; })
+// (import ./checks/fabric.nix {
+  inherit
+    pkgs
+    hmConfig
+    hmConfigFabricServer
+    fabric-src
+    src
+    ;
+})

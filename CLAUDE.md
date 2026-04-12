@@ -155,6 +155,7 @@ new ports to avoid collisions (e.g., the 11434/11435/11436 fragmentation during 
 | 11434 | llama-swap proxy (routes to vllm-mlx) | HTTP (OpenAI-compatible) | `modules/mlx/` |
 | 11436 | vllm-mlx backend (internal, managed by llama-swap) | HTTP | `modules/mlx/` |
 | 8080 | Open WebUI | HTTP | `modules/open-webui.nix` |
+| 8180 | Fabric REST API (opt-in LaunchAgent) | HTTP + Swagger UI | `modules/fabric/` |
 
 **Reserved/conflicting ports to avoid:**
 

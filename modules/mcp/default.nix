@@ -152,6 +152,20 @@ in
     ];
   };
 
+  # Fabric MCP — community-maintained (ksylvan/fabric-mcp), exposes fabric
+  # patterns as MCP tools. Requires fabric CLI setup (see modules/fabric/).
+  # renovate: datasource=pypi depName=fabric-mcp
+  fabric = {
+    command = "uvx";
+    args = [
+      "--from"
+      "fabric-mcp==1.1.0"
+      "fabric-mcp"
+      "--transport"
+      "stdio"
+    ];
+  };
+
   # ================================================================
   # Obsidian - Integrated via Claude Code Plugin (not MCP)
   # ================================================================

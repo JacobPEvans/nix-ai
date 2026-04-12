@@ -18,7 +18,6 @@ from orchestrator.skill_schema import (
     load_skill_registry,
 )
 
-
 @pytest.fixture
 def sample_skill_data() -> dict:
     return {
