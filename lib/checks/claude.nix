@@ -141,7 +141,17 @@ in
         {
           name = "showTurnDuration";
           actual = cfg.showTurnDuration;
-          expected = true;
+          expected = false;
+        }
+        {
+          name = "model";
+          actual = cfg.model;
+          expected = "opusplan";
+        }
+        {
+          name = "effortLevel";
+          actual = cfg.effortLevel;
+          expected = "medium";
         }
         {
           name = "sandbox.enabled";
