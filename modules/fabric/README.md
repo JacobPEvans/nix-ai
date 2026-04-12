@@ -39,8 +39,7 @@ What it does NOT manage:
 | YouTube/multimedia extraction | `yt-dlp` added to `home.packages` |
 | Optional REST API server (LaunchAgent) | `programs.fabric.enableServer = true` (port 8180) |
 | 32 curated patterns as Claude Code skills | Synthetic marketplace at `modules/claude/marketplace-overrides.nix` |
-| Fabric MCP server in Claude Code | `modules/mcp/default.nix` (disabled by default — see #442) |
-| Orchestrator bridge | `load_fabric_pattern_registry()` in `orchestrator/skill_schema.py` |
+| Fabric MCP server in Claude Code | `modules/mcp/default.nix` (community-maintained, disabled by default) |
 
 ## One-time runtime setup
 
@@ -148,41 +147,23 @@ the SKILL.md count matches the JSON entry count after the next `nix flake check`
 ### Path B: As MCP tools (explicit invocation)
 
 The `fabric` MCP server in `modules/mcp/default.nix` exposes patterns as MCP tools using
-ksylvan/fabric-mcp via uvx. Currently disabled (see #442 for enablement steps and live
-verification procedure).
-
-## Integration with the orchestrator
-
-```python
-from pathlib import Path
-from orchestrator.skill_schema import load_fabric_pattern_registry
-
-registry = load_fabric_pattern_registry(
-    Path("~/.config/fabric/patterns").expanduser(),
-    only=["extract_wisdom", "summarize", "review_code"],
-    descriptions={"extract_wisdom": "Custom description for routing"},
-)
-
-for skill in registry.values():
-    print(f"{skill.name}: {skill.description}")
-```
-
-See `orchestrator/examples/skills/fabric-bridge.py` for a runnable example that loads
-all 251 patterns from disk.
+[ksylvan/fabric-mcp](https://github.com/ksylvan/fabric-mcp) via uvx. This is a
+**community-maintained** package (not official danielmiessler) — if it becomes
+unmaintained, an alternative MCP wrapper will be needed. Currently disabled by default.
 
 ## Version bumps
 
-The fabric version is pinned in two places that MUST stay in sync:
+The fabric version is pinned in three places that MUST stay in sync:
 
 1. `flake.nix` input pin: `url = "github:danielmiessler/fabric/v1.4.444";`
 2. `modules/fabric/package.nix` version constant: `version = "1.4.444";`
+3. `modules/claude/fabric-curated-patterns.json` version field: `"version": "1.4.444"`
 
 Renovate manages bumps via the `# managed by: renovate` annotation in `package.nix`.
-If they ever drift, the next `nix build` fails with a `vendorHash` mismatch (which is
-the desired safety behavior — you'll know immediately).
+The CI guard `scripts/check-fabric-version-sync.sh` asserts all three stay in sync.
 
-To bump manually: edit both values to the new version, run `nix build .#fabric-ai`, copy
-the new `vendorHash` from the error message, paste it into `package.nix`, and re-build.
+To bump manually: edit all three values to the new version, run `nix build .#fabric-ai`,
+copy the new `vendorHash` from the error message, paste it into `package.nix`, and re-build.
 
 See #454 for the verification status of the Renovate configuration.
 
