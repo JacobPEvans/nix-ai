@@ -19,6 +19,7 @@
 {
   lib,
   buildGoModule,
+  installShellFiles,
   fabric-src,
 }:
 
@@ -42,8 +43,16 @@ buildGoModule rec {
     "-w"
   ];
 
+  nativeBuildInputs = [ installShellFiles ];
+
   # Skip tests during build — they require network access to AI providers
   doCheck = false;
+
+  # Fabric uses go-flags (no built-in completion generator). Install a hand-
+  # written zsh completion that uses --shell-complete-list for dynamic values.
+  postInstall = ''
+    installShellCompletion --zsh --name _fabric ${./completions/_fabric}
+  '';
 
   # Prevent Go from downloading a different toolchain version
   env.GOTOOLCHAIN = "local";
