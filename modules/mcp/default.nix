@@ -164,6 +164,17 @@ in
   # If MCP is desired later: bunx [ "mcp-obsidian-cli@1.2.0" ] (stonematt)
 
   # ================================================================
+  # Codex CLI — OpenAI coding agent MCP server
+  # ================================================================
+  # Native `codex mcp-server` (stdio). Structured MCP tool access to Codex.
+  # The codex@openai-codex plugin provides skill-based /codex commands.
+  # Installed via Homebrew cask (see nix-darwin modules/darwin/homebrew.nix).
+  codex = {
+    command = "codex";
+    args = [ "mcp-server" ];
+  };
+
+  # ================================================================
   # Database (disabled by default)
   # ================================================================
 

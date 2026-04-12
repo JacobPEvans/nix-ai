@@ -28,9 +28,16 @@ _:
     # ========================================================================
     # WARNING: These plugins invoke external AI models (OpenAI, Google)
 
-    # Codex: OpenAI GPT integration for high-reasoning coding tasks
+    # Codex (Community): OpenAI GPT integration for high-reasoning coding tasks
     # Auto-selects the latest available GPT model for coding or reasoning
     "codex@cc-dev-tools" = true;
+
+    # ========================================================================
+    # Official OpenAI Codex Plugin
+    # ========================================================================
+    # Codex (Official): code review, adversarial review, task delegation
+    # Provides: /codex:review, /codex:adversarial-review, /codex:rescue, /codex:setup
+    "codex@openai-codex" = true;
 
     # Gemini: Google Gemini integration for research and reasoning
     # Includes web search capabilities and session resumption
