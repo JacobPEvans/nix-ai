@@ -222,6 +222,7 @@ in
       OTEL_EXPORTER_OTLP_PROTOCOL = "grpc";
       OTEL_METRICS_EXPORTER = "otlp";
       OTEL_LOGS_EXPORTER = "otlp";
+      OTEL_TRACES_EXPORTER = "none"; # Only metrics + logs; no trace overhead
     };
 
     # Permissions from unified ai-assistant-instructions system
