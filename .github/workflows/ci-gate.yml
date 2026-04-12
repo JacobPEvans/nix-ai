@@ -48,7 +48,6 @@ jobs:
     outputs:
       nix: ${{ steps.filter.outputs.nix }}
       markdown: ${{ steps.filter.outputs.markdown }}
-      benchmark: ${{ steps.filter.outputs.benchmark }}
       python: ${{ steps.filter.outputs.python }}
       is-deps-only: ${{ steps.detect-deps.outputs.is-deps-only }}
     steps:
@@ -66,9 +65,6 @@ jobs:
             markdown:
               - '**.md'
               - '.markdownlint*'
-            benchmark:
-              - 'scripts/benchmarks/**'
-              - 'data/benchmarks/schema.json'
             python:
               - 'mlx-server/**'
               - 'orchestrator/**'
@@ -113,12 +109,6 @@ jobs:
     if: needs.changes.outputs.nix == 'true' || needs.changes.outputs.markdown == 'true'
     uses: JacobPEvans/.github/.github/workflows/_file-size.yml@main
 
-  benchmark-validate:
-    name: Benchmark Validate
-    needs: changes
-    if: needs.changes.outputs.benchmark == 'true'
-    uses: ./.github/workflows/_benchmark-validate.yml
-
   python-security:
     name: Python Security
     needs: changes
@@ -139,12 +129,12 @@ jobs:
   # ==========================================================================
   gate:
     name: Merge Gate
-    needs: [changes, nix-validate, markdown-lint, file-size, benchmark-validate, python-security, osv-scan]
+    needs: [changes, nix-validate, markdown-lint, file-size, python-security, osv-scan]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       - name: Check all results
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: nix-validate, markdown-lint, file-size, benchmark-validate, python-security
+          allowed-skips: nix-validate, markdown-lint, file-size, python-security
           jobs: ${{ toJSON(needs) }}
