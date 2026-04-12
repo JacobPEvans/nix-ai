@@ -60,11 +60,11 @@ inputs.nix-ai.inputs.home-manager.follows = "home-manager";
 
 ### Package placement
 
-See the `nix-package-placement` rule — lives in
+The `nix-package-placement` rule lives in
 [ai-assistant-instructions/agentsmd/rules/nix-package-placement.md](https://github.com/JacobPEvans/ai-assistant-instructions/blob/main/agentsmd/rules/nix-package-placement.md)
 and auto-loads via path-scoping when `.nix` / `flake.*` files are in context.
-Contains the full decision matrix for all four repos including homebrew constraints
-and on-demand patterns.
+It contains the full decision matrix for the nix repos, including homebrew
+constraints and on-demand patterns.
 
 ## Key Files
 
@@ -142,7 +142,7 @@ graph TD
 ### Version management
 
 - **Version constants**: `modules/mlx/default.nix` — single source of truth with Renovate annotations
-- **uvx wrappers**: `modules/mlx/packages.nix` — declarative Nix derivations for all three tools
+- **uvx wrappers**: `modules/mlx/packages.nix` — declarative Nix derivations for the MLX tools
 - **Auto-update**: Renovate annotation-based manager bumps version constants, weekly schedule
 
 ## Port Allocation
@@ -161,11 +161,11 @@ new ports to avoid collisions (e.g., the 11434/11435/11436 fragmentation during 
 
 - 11435: reserved — external macOS app conflict (see PR #230)
 
-## Part of a Quartet
+## Related Repos
 
 | Repo | Purpose |
 | ---- | ------- |
 | **nix-ai** (this repo) | AI coding tools |
 | [nix-devenv](https://github.com/JacobPEvans/nix-devenv) | Reusable dev shells (Terraform, Ansible, K8s, AI/ML) |
 | [nix-home](https://github.com/JacobPEvans/nix-home) | Dev environment (git, zsh, VS Code, tmux) |
-| [nix-darwin](https://github.com/JacobPEvans/nix-darwin) | macOS system config (consumes all three) |
+| [nix-darwin](https://github.com/JacobPEvans/nix-darwin) | macOS system config (consumes the others) |
