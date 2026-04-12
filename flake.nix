@@ -75,6 +75,10 @@
       url = "github:kepano/obsidian-skills";
       flake = false;
     };
+    openai-codex = {
+      url = "github:openai/codex-plugin-cc";
+      flake = false;
+    };
     axton-obsidian-visual-skills = {
       url = "github:axtonliu/axton-obsidian-visual-skills";
       flake = false;
@@ -125,6 +129,7 @@
       jacobpevans-cc-plugins,
       lunar-claude,
       obsidian-skills,
+      openai-codex,
       axton-obsidian-visual-skills,
       superpowers-marketplace,
       visual-explainer-marketplace,
@@ -155,6 +160,7 @@
           jacobpevans-cc-plugins
           lunar-claude
           obsidian-skills
+          openai-codex
           axton-obsidian-visual-skills
           superpowers-marketplace
           visual-explainer-marketplace

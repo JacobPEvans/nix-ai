@@ -201,6 +201,15 @@ let
       };
     };
 
+    # --- Official OpenAI ---
+    # OpenAI Codex plugin: code review, adversarial review, task delegation
+    "openai-codex" = {
+      source = {
+        type = "github";
+        url = "openai/codex-plugin-cc";
+      };
+    };
+
     # --- Enterprise / Well-Known ---
     # Bitwarden AI plugins: session retrospective, config validation, code review
     "bitwarden-marketplace" = {
