@@ -41,12 +41,19 @@ SUITE_LABELS = {
 
 
 def load_results(limit: int) -> dict[str, list[dict]]:
-    """Load and group result files by suite, sorted newest-first, capped at limit."""
+    """Load the latest result per (suite, model) pair, capped at `limit` models per suite.
+
+    Files are sorted newest-first by filename, so the first file encountered for
+    a given (suite, model) pair is the most recent run. This keeps the summary
+    showing one row per model per suite — comprehensive across the catalog —
+    rather than the last N runs overall, which truncates large benchmark sweeps.
+    """
     all_files = sorted(
         BENCHMARKS_DIR.glob("*.json"),
         key=lambda p: p.name,
         reverse=True,
     )
+    seen: set[tuple[str, str]] = set()
     grouped: dict[str, list[dict]] = {}
     for path in all_files:
         if path.name in {"schema.json"}:
@@ -56,6 +63,11 @@ def load_results(limit: int) -> dict[str, list[dict]]:
         except (json.JSONDecodeError, OSError):
             continue
         suite = data.get("suite", "unknown")
+        model = data.get("model", "")
+        key = (suite, model)
+        if key in seen:
+            continue
+        seen.add(key)
         grouped.setdefault(suite, [])
         if len(grouped[suite]) < limit:
             grouped[suite].append(data)
@@ -402,10 +414,15 @@ def main() -> None:
     parser.add_argument(
         "--limit",
         type=int,
-        default=3,
+        default=15,
         help=(
-            "Max runs per suite (default: 3). Chosen so the regenerated doc "
-            "stays under the 12288-byte file-size limit as new suites are added."
+            "Max distinct models per suite (default: 15). Each file groups by "
+            "(suite, model); the newest run per pair is kept, then the suite "
+            "is capped at this many models. Chosen so the regenerated doc "
+            "stays under the 32768-byte extended file-size limit for "
+            "`mlx-benchmarks` defined in `.file-size.yml`. Bump that limit "
+            "together with this default if the catalog outgrows 15 models "
+            "per suite."
         ),
     )
     args = parser.parse_args()
