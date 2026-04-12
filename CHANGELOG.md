@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.37.1](https://github.com/JacobPEvans/nix-ai/compare/v1.37.0...v1.37.1) (2026-04-12)
+
+
+### Bug Fixes
+
+* **mcp:** document Obsidian CLI integration, remove REST API port ([#493](https://github.com/JacobPEvans/nix-ai/issues/493)) ([171d946](https://github.com/JacobPEvans/nix-ai/commit/171d9469d94c27b1f4df6979f0c051c393d06d59))
+* **mlx:** restore Qwen3.5-35B-A3B-4bit as defaultModel — fabricated incident ([#489](https://github.com/JacobPEvans/nix-ai/issues/489)) ([e6ccc03](https://github.com/JacobPEvans/nix-ai/commit/e6ccc032db50a6e0d5dbff0d1328cf7d5fc8c36c))
+
 ## [1.37.0](https://github.com/JacobPEvans/nix-ai/compare/v1.36.0...v1.37.0) (2026-04-11)
 
 
