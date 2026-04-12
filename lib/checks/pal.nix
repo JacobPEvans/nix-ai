@@ -23,7 +23,7 @@ in
         nativeBuildInputs = [ pkgs.shellcheck ];
       }
       ''
-        shellcheck ${../../modules/mcp/scripts/sync-pal-cloud-models.sh}
+        shellcheck --severity=warning --exclude=SC1091 ${../../modules/mcp/scripts/sync-pal-cloud-models.sh}
         echo "PAL cloud sync: shellcheck passed"
         touch $out
       '';

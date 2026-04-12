@@ -89,17 +89,45 @@ in
     command = "doppler-mcp";
     args = [ "pal-mcp-server" ];
     env = {
-      # Enable ALL PAL tools (default disables: analyze,refactor,testgen,secaudit,docgen,tracer)
-      DISABLED_TOOLS = "";
-      # 'auto' = PAL picks best available model per-task based on configured API keys.
-      # Falls back across providers: OpenAI -> Gemini -> OpenRouter -> MLX.
-      # Run PAL's `listmodels` tool for current aliases and providers.
+      # Disable PAL tools that have native Claude Code / Bifrost equivalents,
+      # plus drop `version` (no functional value). Only `clink` (parallel
+      # multi-model) and `consensus` (multi-model voting) remain enabled —
+      # neither has a Bifrost equivalent, and the canonical
+      # `modules/claude/rules/pal-mcp-policy.md` rule scopes PAL's
+      # availability-check protocol to exactly those two tools. The
+      # audit matrix that decided this split was posted as a comment on
+      # JacobPEvans/nix-ai#450.
+      DISABLED_TOOLS = builtins.concatStringsSep "," [
+        "chat"
+        "thinkdeep"
+        "planner"
+        "listmodels"
+        "codereview"
+        "precommit"
+        "debug"
+        "analyze"
+        "tracer"
+        "refactor"
+        "testgen"
+        "secaudit"
+        "docgen"
+        "apilookup"
+        "challenge"
+        "version"
+      ];
+      # 'auto' = PAL picks a model alias per-task; Bifrost then routes the
+      # resulting request to the right provider based on the model name.
+      # `listmodels` is disabled (see above) — query available models via
+      # `curl http://localhost:30080/v1/models` instead.
       DEFAULT_MODEL = "auto";
-      # Custom API endpoint — MLX inference server (vllm-mlx on port 11434)
-      CUSTOM_API_URL = "http://127.0.0.1:11434/v1";
-      # MLX timeout tuning (PAL reads from providers/openai_compatible.py)
-      CUSTOM_CONNECT_TIMEOUT = "30"; # 30s for localhost MLX (catches stalled server)
-      CUSTOM_READ_TIMEOUT = "300"; # 5min for large model inference
+      # Route PAL through Bifrost AI gateway (localhost:30080) instead of
+      # vllm-mlx directly. Bifrost fans out to OpenAI/Gemini/OpenRouter/MLX
+      # based on model name. Tracked: JacobPEvans/nix-ai#450
+      CUSTOM_API_URL = "http://localhost:30080/v1";
+      # OpenAI-compatible client timeouts — applies to whichever backend
+      # CUSTOM_API_URL points at (Bifrost in this config).
+      CUSTOM_CONNECT_TIMEOUT = "30"; # 30s connect — catches stalled upstream
+      CUSTOM_READ_TIMEOUT = "300"; # 5min read — accommodates large model inference
       # Conversation limits
       CONVERSATION_TIMEOUT_HOURS = "6";
       MAX_CONVERSATION_TURNS = "50";
@@ -152,16 +180,15 @@ in
   };
 
   # ================================================================
-  # Obsidian - NOT IMPLEMENTED
+  # Obsidian - Integrated via Claude Code Plugin (not MCP)
   # ================================================================
-  # Decision: Not moving forward with REST API approach since official Obsidian CLI will be released soon.
-  # Using Claude Skills plugins for Obsidian integration instead (see plugins/community.nix).
+  # The official Obsidian CLI (v1.8+, ships in Obsidian.app) provides 80+
+  # commands. Integration uses the kepano/obsidian-skills Claude Code plugin
+  # which teaches Claude to invoke the CLI via Bash (auto-approved in
+  # ai-assistant-instructions permissions). No MCP server needed — the skill
+  # provides equivalent structured access without an additional layer.
   #
-  # If revisited in the future:
-  # - Use `uvx mcp-obsidian` (PyPI package)
-  # - Requires Obsidian REST API plugin: https://github.com/coddingtonbear/obsidian-local-rest-api
-  # - IMPORTANT: Inject OBSIDIAN_API_KEY via secrets manager at runtime (never in Nix store)
-  # - Non-secret defaults: OBSIDIAN_HOST=127.0.0.1, OBSIDIAN_PORT=27124
+  # If MCP is desired later: bunx [ "mcp-obsidian-cli@1.2.0" ] (stonematt)
 
   # ================================================================
   # Database (disabled by default)

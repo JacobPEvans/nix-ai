@@ -1,0 +1,63 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-11T21:05:15Z",
+  "git_sha": "874efc4",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "throughput",
+  "model": "mlx-community/Qwen3-Coder-30B-A3B-Instruct-8bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [
+    {
+      "name": "short-50",
+      "metric": "throughput",
+      "value": 29.0,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "50",
+        "completion_tokens": "50",
+        "elapsed_s": "1.73"
+      }
+    },
+    {
+      "name": "medium-256",
+      "metric": "throughput",
+      "value": 38.5,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "256",
+        "completion_tokens": "256",
+        "elapsed_s": "6.65"
+      }
+    },
+    {
+      "name": "long-512",
+      "metric": "throughput",
+      "value": 36.7,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "512",
+        "completion_tokens": "512",
+        "elapsed_s": "13.94"
+      }
+    },
+    {
+      "name": "long-1024",
+      "metric": "throughput",
+      "value": 41.2,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "1024",
+        "completion_tokens": "1024",
+        "elapsed_s": "24.87"
+      }
+    }
+  ],
+  "errors": []
+}

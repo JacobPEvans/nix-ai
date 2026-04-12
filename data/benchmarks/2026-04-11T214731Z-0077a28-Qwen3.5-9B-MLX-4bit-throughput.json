@@ -1,0 +1,63 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-11T21:47:31Z",
+  "git_sha": "0077a28",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "throughput",
+  "model": "mlx-community/Qwen3.5-9B-MLX-4bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [
+    {
+      "name": "short-50",
+      "metric": "throughput",
+      "value": 39.4,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "50",
+        "completion_tokens": "50",
+        "elapsed_s": "1.27"
+      }
+    },
+    {
+      "name": "medium-256",
+      "metric": "throughput",
+      "value": 55.7,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "256",
+        "completion_tokens": "256",
+        "elapsed_s": "4.59"
+      }
+    },
+    {
+      "name": "long-512",
+      "metric": "throughput",
+      "value": 63.4,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "512",
+        "completion_tokens": "512",
+        "elapsed_s": "8.08"
+      }
+    },
+    {
+      "name": "long-1024",
+      "metric": "throughput",
+      "value": 68.5,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "1024",
+        "completion_tokens": "1024",
+        "elapsed_s": "14.95"
+      }
+    }
+  ],
+  "errors": []
+}

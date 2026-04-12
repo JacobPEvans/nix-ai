@@ -2,8 +2,12 @@
 # MLX Module — CLI Tools, Environment & Ecosystem
 #
 # All home.packages and home.sessionVariables for the MLX module.
-# Includes: vllm-mlx wrapper, mlx CLI tools, benchmark suite, health check,
+# Includes: vllm-mlx wrapper, mlx CLI tools (including upstream mlx-bench /
+# mlx-bench-engine / mlx-bench-raw for ad-hoc measurement), health check,
 # and ecosystem uvx wrappers (parakeet-mlx, mlx-vlm).
+#
+# Orchestrated sweep runs live in the companion repo JacobPEvans/mlx-benchmarks;
+# results are published to https://huggingface.co/datasets/JacobPEvans/mlx-benchmarks
 #
 {
   config,
@@ -132,18 +136,29 @@ in
         '')
 
         # mlx-eval — accuracy evaluation against the live vllm-mlx server API
+        #
+        # MLX_EVAL_CONCURRENT controls parallel requests (default 4). vllm-mlx
+        # handles concurrent decode via continuous batching, so raising this
+        # from the lm-eval default of 1 is the single biggest speedup lever
+        # for long-running suites like evalplus and math-hard.
+        #
+        # max_length=32768 is critical: lm-eval's local-chat-completions backend
+        # defaults max_length to 2048, leaving only ~1023 tokens for the prompt
+        # after max_gen_toks. Chat-wrapped HumanEval/MBPP prompts blow through
+        # that instantly and responses get truncated mid-word (observed
+        # 2026-04-10 with Qwen3-Coder-30B). 32k is a comfortable ceiling.
+        #
+        # The [api,math] extras bring in sympy + math_verify + antlr4 for
+        # minerva_math500, which is the math-hard suite task currently run.
+        #
         # renovate: datasource=pypi depName=lm-eval
         (pkgs.writeShellScriptBin "mlx-eval" ''
-          exec ${pkgs.uv}/bin/uvx --from "lm-eval[api]==0.4.11" lm-eval run \
+          concurrent="''${MLX_EVAL_CONCURRENT:-4}"
+          exec ${pkgs.uv}/bin/uvx --from "lm-eval[api,math]==0.4.11" lm-eval run \
             --model local-chat-completions \
-            --model_args "base_url=''${MLX_API_URL:-${apiUrl}}/chat/completions,model=''${MLX_DEFAULT_MODEL:-${cfg.defaultModel}},tokenizer_backend=None,tokenized_requests=False,num_concurrent=1,max_retries=3" \
+            --model_args "base_url=''${MLX_API_URL:-${apiUrl}}/chat/completions,model=''${MLX_DEFAULT_MODEL:-${cfg.defaultModel}},tokenizer_backend=None,tokenized_requests=False,num_concurrent=''${concurrent},max_retries=3,max_length=32768" \
             --apply_chat_template \
             "$@"
-        '')
-
-        # mlx-benchmark — orchestrate benchmark runs across models and suites
-        (pkgs.writeShellScriptBin "mlx-benchmark" ''
-          exec ${pkgs.uv}/bin/uv run "${../../scripts/benchmarks/orchestrate.py}" "$@"
         '')
 
         # ======================================================================

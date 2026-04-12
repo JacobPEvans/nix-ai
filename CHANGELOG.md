@@ -1,5 +1,47 @@
 # Changelog
 
+## [1.37.1](https://github.com/JacobPEvans/nix-ai/compare/v1.37.0...v1.37.1) (2026-04-12)
+
+
+### Bug Fixes
+
+* **docs:** drop "quartet" and numeric group words from CLAUDE.md ([#488](https://github.com/JacobPEvans/nix-ai/issues/488)) ([a48d8f3](https://github.com/JacobPEvans/nix-ai/commit/a48d8f3d80e132e890c72976e6ac19bc1fc38611))
+* **mcp:** document Obsidian CLI integration, remove REST API port ([#493](https://github.com/JacobPEvans/nix-ai/issues/493)) ([171d946](https://github.com/JacobPEvans/nix-ai/commit/171d9469d94c27b1f4df6979f0c051c393d06d59))
+* **mlx:** restore Qwen3.5-35B-A3B-4bit as defaultModel — fabricated incident ([#489](https://github.com/JacobPEvans/nix-ai/issues/489)) ([e6ccc03](https://github.com/JacobPEvans/nix-ai/commit/e6ccc032db50a6e0d5dbff0d1328cf7d5fc8c36c))
+
+## [1.37.0](https://github.com/JacobPEvans/nix-ai/compare/v1.36.0...v1.37.0) (2026-04-11)
+
+
+### Features
+
+* **ai-tools:** add whisper-cpp and openai-whisper moved from nix-darwin ([#482](https://github.com/JacobPEvans/nix-ai/issues/482)) ([0077a28](https://github.com/JacobPEvans/nix-ai/commit/0077a287366daa7107e16cdfe2ca7280c023a8e7))
+
+
+### Bug Fixes
+
+* **ai-tools:** bump huggingface-hub pin 1.9.0 -&gt; 1.10.1 ([#486](https://github.com/JacobPEvans/nix-ai/issues/486)) ([0a193d3](https://github.com/JacobPEvans/nix-ai/commit/0a193d3ab981455ceeef9beb4d37865469c53def))
+
+## [1.36.0](https://github.com/JacobPEvans/nix-ai/compare/v1.35.0...v1.36.0) (2026-04-11)
+
+
+### Features
+
+* **pal:** Phase 5 — disable tools with native/Bifrost equivalents ([#481](https://github.com/JacobPEvans/nix-ai/issues/481)) ([64fc4c1](https://github.com/JacobPEvans/nix-ai/commit/64fc4c1bdd209866e532c5d39d0abfd8a0dc5642))
+
+## [1.35.0](https://github.com/JacobPEvans/nix-ai/compare/v1.34.0...v1.35.0) (2026-04-11)
+
+
+### Features
+
+* **mcp:** route PAL through Bifrost AI gateway ([#466](https://github.com/JacobPEvans/nix-ai/issues/466)) ([5b18711](https://github.com/JacobPEvans/nix-ai/commit/5b187116b4a177f2ba6abbd2b59a8e9302b62cee))
+
+## [1.34.0](https://github.com/JacobPEvans/nix-ai/compare/v1.33.1...v1.34.0) (2026-04-10)
+
+
+### Features
+
+* **pal:** score models from real LMSYS Chatbot Arena Elo ratings ([#463](https://github.com/JacobPEvans/nix-ai/issues/463)) ([2e5f35a](https://github.com/JacobPEvans/nix-ai/commit/2e5f35ae966c7d6b5ad389b98e661d86a7707cd0))
+
 ## [1.33.1](https://github.com/JacobPEvans/nix-ai/compare/v1.33.0...v1.33.1) (2026-04-10)
 
 

@@ -32,17 +32,21 @@ let
   palLogDir = "${config.home.homeDirectory}/.local/state/pal-mcp";
   palPkg = pkgs.callPackage ../mcp/pal-package.nix { inherit pal-mcp-server; };
 
-  # Common env shared by both MLX and cloud sync scripts
+  # Scripts directory holds pal-models-shared.jq, used by jq -L for `include`.
+  scriptsDir = ../mcp/scripts;
+
+  # Common env shared by all sync scripts
   commonSyncEnv = ''
     export CURL="${pkgs.curl}/bin/curl"
     export JQ="${pkgs.jq}/bin/jq"
     export OUTPUT_DIR="${outputDir}"
+    export SCRIPTS_DIR="${scriptsDir}"
   '';
 
   # MLX-specific sync env (used by both CLI tool and activation)
   mlxSyncEnv = ''
     ${commonSyncEnv}
-    export MLX_JQ_FILE="${../mcp/scripts/pal-models-mlx.jq}"
+    export MLX_JQ_FILE="${scriptsDir}/pal-models-mlx.jq"
     export MLX_URL="http://${mlxCfg.host}:${toString mlxCfg.port}/v1/models"
     export OUTPUT_FILE="${outputFile}"
   '';
@@ -50,7 +54,7 @@ let
   # Cloud-specific sync env (OpenRouter public API, no auth)
   cloudSyncEnv = ''
     ${commonSyncEnv}
-    export OPENROUTER_JQ_FILE="${../mcp/scripts/pal-models-openrouter.jq}"
+    export OPENROUTER_JQ_FILE="${scriptsDir}/pal-models-openrouter.jq"
   '';
 in
 {
