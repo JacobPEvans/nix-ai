@@ -1,6 +1,6 @@
-# nix-ai - AI Agent Instructions
+# nix-ai-claude - AI Agent Instructions
 
-AI CLI ecosystem for Claude, Gemini, Copilot, MCP servers via Nix home-manager modules.
+Standalone Claude-specific AI CLI ecosystem extracted from nix-ai.
 
 ## Critical Constraints
 
@@ -22,7 +22,7 @@ nix fmt            # Fix formatting
 
 ```bash
 sudo darwin-rebuild switch --flake "$HOME/git/nix-darwin/main" \
-  --override-input nix-ai "$HOME/git/nix-ai/<worktree>"
+  --override-input nix-ai-claude "$HOME/git/nix-ai-claude/<worktree>"
 ```
 
 Then verify in a live Claude Code session — static checks validate Nix
@@ -31,11 +31,10 @@ feature loads without errors before claiming done.
 
 ## Architecture
 
-This repo exports home-manager modules consumed by nix-darwin:
+This repo exports home-manager modules consumed by nix-darwin or by nix-ai:
 
-- `homeManagerModules.default` — Full AI stack
+- `homeManagerModules.default` — Claude module stack for standalone use
 - `homeManagerModules.claude` — Claude Code only
-- `homeManagerModules.maestro` — Maestro orchestration only
 - `lib.ci.claudeSettingsJson` — Pure JSON for CI validation
 
 ### Self-contained design
@@ -43,20 +42,17 @@ This repo exports home-manager modules consumed by nix-darwin:
 Modules inject their own dependencies via `_module.args`. Consumers only need:
 
 ```nix
-inputs.nix-ai.inputs.nixpkgs.follows = "nixpkgs";
-inputs.nix-ai.inputs.home-manager.follows = "home-manager";
+inputs.nix-ai-claude.inputs.nixpkgs.follows = "nixpkgs";
+inputs.nix-ai-claude.inputs.home-manager.follows = "home-manager";
 ```
 
 ## Separation Guidelines
 
-### What belongs here (nix-ai)
+### What belongs here (nix-ai-claude)
 
-- AI CLI tools (Claude Code, Gemini, Copilot, Codex, block-goose)
-- MCP servers and wrappers (github-mcp-server, terraform-mcp-server, doppler-mcp, etc.)
-- AI-specific GitHub CLI extensions (gh-aw)
-- AI tool configuration files (`.claude/`, `.gemini/`, `.copilot/`)
-- MLX inference server (vllm-mlx LaunchAgent + wrappers)
-- AI-specific shell utilities (sync-mlx-models, check-pal-mcp, hf CLI wrapper)
+- Claude Code settings, plugins, statusline, auto-claude
+- Supporting MCP/pal/fabric integration needed by Claude
+- Shared permissions/formatter helpers needed by Claude config
 
 ### Package placement
 
@@ -68,17 +64,14 @@ constraints and on-demand patterns.
 
 ## Key Files
 
-- `modules/default.nix` — Module entry point (imports all AI modules)
+- `modules/default.nix` — Standalone module entry point
+- `modules/embedded.nix` — Embedded entrypoint consumed by nix-ai
 - `modules/claude/` — Claude Code settings, plugins, statusline, auto-claude
-- `modules/mcp/` — MCP server definitions
-- `modules/mlx/` — MLX inference server (vllm-mlx LaunchAgent, CLI tools, perf tuning)
+- `modules/mcp/` — PAL / model sync support used by Claude
 - `modules/common/` — Shared permission engine and formatters
-- `lib/claude-settings.nix` — Pure settings generator (CI-only; deployment uses modules/claude/settings.nix)
+- `lib/claude-settings.nix` — Pure settings generator (CI-only)
 - `lib/claude-registry.nix` — Marketplace format functions
-- `lib/checks.nix` — Check aggregator (imports lib/checks/{lint,claude,mlx}.nix)
-- `lib/checks/lint.nix` — Formatting, statix, deadnix, shellcheck
-- `lib/checks/claude.nix` — Claude module regression tests, settings-json, maestro-script
-- `lib/checks/mlx.nix` — MLX option/defaults regression, LaunchAgent flag validation
+- `lib/checks/fabric.nix` — Fabric regression checks
 
 ## MLX Ecosystem Stack
 

@@ -40,8 +40,9 @@ if [[ -f "$TARGET" ]] && [[ ! -L "$TARGET" ]]; then
     chmod 600 "$TARGET"
     exit 0
   }
-  printf '%s\n' "$MERGED" > "${TARGET}.tmp"
-  mv "${TARGET}.tmp" "$TARGET"
+  TMP_FILE=$(mktemp "${TARGET}.tmp.XXXXXX")
+  printf '%s\n' "$MERGED" > "$TMP_FILE"
+  mv "$TMP_FILE" "$TARGET"
   chmod 600 "$TARGET"
   echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Merged ${TARGET_NAME} (preserved runtime state)"
 elif [[ -L "$TARGET" ]]; then

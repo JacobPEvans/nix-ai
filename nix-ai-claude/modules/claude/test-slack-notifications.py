@@ -171,7 +171,7 @@ def main():
     print()
     print("6. Keychain Slack channels found:")
     try:
-        result = subprocess.run(["security", "dump-keychain"], capture_output=True, text=True)
+        result = subprocess.run(["security", "dump-keychain"], capture_output=True, text=True, check=True)
         for line in result.stdout.splitlines():
             if "SLACK_CHANNEL_ID" in line and "svce" in line:
                 # Extract service name

@@ -25,7 +25,14 @@ fi
 # - .question (single question)
 # - .questions[0].question (multiple questions)
 # - .prompt (alternative field name)
-QUESTION=$(echo "${TOOL_INPUT:-{}}" | jq -r '.question // .questions[0].question // .prompt // "User input needed"' 2>/dev/null || echo "User input needed")
+QUESTION="User input needed"
+if command -v jq >/dev/null 2>&1; then
+  QUESTION=$(
+    printf '%s' "${TOOL_INPUT:-{}}" |
+      jq -r '.question // .questions[0].question // .prompt // "User input needed"' 2>/dev/null ||
+      printf '%s' "User input needed"
+  )
+fi
 
 # Get current working directory and repo name
 REPO_NAME=$(basename "$(pwd)")
@@ -33,16 +40,30 @@ SESSION_INFO="${REPO_NAME}"
 
 # Add session context if available
 if [[ -n "${CLAUDE_SESSION_DIR:-}" ]]; then
-  SESSION_BRANCH=$(git -C "$(pwd)" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+  SESSION_BRANCH="unknown"
+  if command -v git >/dev/null 2>&1; then
+    SESSION_BRANCH=$(git -C "$(pwd)" rev-parse --abbrev-ref HEAD 2>/dev/null || printf '%s' "unknown")
+  fi
   SESSION_INFO="${REPO_NAME} @ ${SESSION_BRANCH}"
 fi
 
 # Get Slack channel from environment or keychain
 SLACK_CHANNEL="${SLACK_CHANNEL:-}"
 if [[ -z "$SLACK_CHANNEL" ]]; then
-  # Try to get from keychain (format: SLACK_CHANNEL_<REPO>)
-  KEYCHAIN_KEY="SLACK_CHANNEL_$(echo "$REPO_NAME" | tr '[:lower:]' '[:upper:]' | tr '-' '_')"
-  SLACK_CHANNEL=$(security find-generic-password -a "$USER" -s "$KEYCHAIN_KEY" -w 2>/dev/null || echo "")
+  # Try to get from keychain (format: SLACK_CHANNEL_ID_<REPO>)
+  KEYCHAIN_KEY="SLACK_CHANNEL_ID_$(echo "$REPO_NAME" | tr '[:lower:]' '[:upper:]' | tr '-.' '__')"
+  KEYCHAIN_ACCOUNT="${BWS_KEYCHAIN_ACCOUNT:-$USER}"
+  if [[ -f "${HOME}/.config/bws/.env" ]] && [[ -z "${BWS_KEYCHAIN_ACCOUNT:-}" ]]; then
+    KEYCHAIN_ACCOUNT=$(
+      grep -E '^(export )?BWS_KEYCHAIN_ACCOUNT=' "${HOME}/.config/bws/.env" 2>/dev/null |
+        tail -n 1 |
+        sed -E "s/^(export )?BWS_KEYCHAIN_ACCOUNT=//; s/^['\"]//; s/['\"]$//"
+    )
+    KEYCHAIN_ACCOUNT="${KEYCHAIN_ACCOUNT:-$USER}"
+  fi
+  if command -v security >/dev/null 2>&1; then
+    SLACK_CHANNEL=$(security find-generic-password -a "$KEYCHAIN_ACCOUNT" -s "$KEYCHAIN_KEY" -w 2>/dev/null || echo "")
+  fi
 fi
 
 # If still no channel, use default or skip notification

@@ -1,7 +1,7 @@
 # Auto-Claude Reporting: Twice-Daily Digest and Real-Time Monitoring
 #
 # Scheduled reports and anomaly detection for auto-claude runs.
-# Sends 8am and 5pm EST Slack reports with efficiency metrics.
+# Sends 8am and 5pm local-time Slack reports with efficiency metrics.
 # Alerts on anomalies: context exhaustion, stuck loops, failures.
 {
   config,
@@ -30,22 +30,18 @@ let
   # Check if reporting is enabled
   reportingEnabled = cfg.autoClaude.reporting.enable;
 
-  # Convert EST report times from config to UTC for launchd StartCalendarInterval
-  # NOTE: This assumes EST is always UTC-5 and does NOT account for Daylight Saving Time (EDT).
-  # During EDT (March-November), EST is actually UTC-4, so reports will be 1 hour off.
-  # If you need DST-aware scheduling, consider using fixed UTC times or a more complex conversion.
-  utcReportTimes = map (
+  # launchd interprets StartCalendarInterval in the local timezone, so keep
+  # the configured times in local time instead of converting them.
+  reportTimes = map (
     timeStr:
     let
       # Parse time string with regex to extract hour and minute
       match = builtins.match "0*([0-9]+):0*([0-9]+)" timeStr;
       hour = lib.toInt (builtins.elemAt match 0);
       minute = lib.toInt (builtins.elemAt match 1);
-      # Assume EST = UTC-5 (not accounting for EDT which is UTC-4)
-      utcHour = lib.mod (hour + 5) 24;
     in
     {
-      Hour = utcHour;
+      Hour = hour;
       Minute = minute;
     }
   ) cfg.autoClaude.reporting.scheduledReports.times;
@@ -66,7 +62,7 @@ in
               "08:00"
               "17:00"
             ];
-            description = "Times for scheduled reports in EST (HH:MM format). Default: 8am and 5pm EST.";
+            description = "Times for scheduled reports in local time (HH:MM format). Default: 8am and 5pm.";
             example = [
               "08:00"
               "17:00"
@@ -142,7 +138,7 @@ in
     };
 
     # Launchd agent for scheduled digest reports
-    # Runs at specified times each day (default: 8am and 5pm EST)
+    # Runs at specified times each day (default: 8am and 5pm local time)
     launchd.agents."com.claude.auto-claude-digest" = {
       enable = true;
       config = {
@@ -155,8 +151,8 @@ in
           cfg.autoClaude.reporting.scheduledReports.slackChannel
         ];
 
-        # Run at configured times (UTC)
-        StartCalendarInterval = utcReportTimes;
+        # Run at configured local times
+        StartCalendarInterval = reportTimes;
 
         # Standard launchd settings
         StandardOutPath = "${logDir}/launchd-digest.log";
