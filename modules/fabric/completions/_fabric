@@ -1,0 +1,63 @@
+#compdef fabric
+
+# Zsh completion for Daniel Miessler's Fabric CLI.
+# Dynamic completions use --shell-complete-list for patterns and models.
+
+_fabric_patterns() {
+  local -a patterns
+  patterns=("${(@f)$(fabric --listpatterns --shell-complete-list 2>/dev/null)}")
+  _describe 'pattern' patterns
+}
+
+_fabric_models() {
+  local -a models
+  models=("${(@f)$(fabric --listmodels --shell-complete-list 2>/dev/null)}")
+  _describe 'model' models
+}
+
+_fabric_contexts() {
+  local -a contexts
+  contexts=("${(@f)$(fabric --listcontexts --shell-complete-list 2>/dev/null)}")
+  _describe 'context' contexts
+}
+
+_fabric_sessions() {
+  local -a sessions
+  sessions=("${(@f)$(fabric --listsessions --shell-complete-list 2>/dev/null)}")
+  _describe 'session' sessions
+}
+
+_fabric() {
+  _arguments \
+    '(-p --pattern)'{-p,--pattern}'[Choose a pattern]:pattern:_fabric_patterns' \
+    '(-m --model)'{-m,--model}'[Choose model]:model:_fabric_models' \
+    '(-C --context)'{-C,--context}'[Choose context]:context:_fabric_contexts' \
+    '--session[Choose session]:session:_fabric_sessions' \
+    '(-a --attachment)'{-a,--attachment}'[Attachment path or URL]:file:_files' \
+    '(-s --stream)'{-s,--stream}'[Stream output]' \
+    '(-c --copy)'{-c,--copy}'[Copy to clipboard]' \
+    '(-o --output)'{-o,--output}'[Output to file]:file:_files' \
+    '(-l --listpatterns)'{-l,--listpatterns}'[List all patterns]' \
+    '(-L --listmodels)'{-L,--listmodels}'[List all models]' \
+    '(-x --listcontexts)'{-x,--listcontexts}'[List all contexts]' \
+    '(-X --listsessions)'{-X,--listsessions}'[List all sessions]' \
+    '(-U --updatepatterns)'{-U,--updatepatterns}'[Update patterns]' \
+    '(-y --youtube)'{-y,--youtube}'[YouTube URL]:url:' \
+    '(-u --scrape_url)'{-u,--scrape_url}'[Scrape URL to markdown]:url:' \
+    '(-t --temperature)'{-t,--temperature}'[Set temperature]:temp:' \
+    '(-T --topp)'{-T,--topp}'[Set top P]:topp:' \
+    '(-S --setup)'{-S,--setup}'[Run setup]' \
+    '(-d --changeDefaultModel)'{-d,--changeDefaultModel}'[Change default model]' \
+    '--serve[Start REST API server]' \
+    '--address[REST API bind address]:address:' \
+    '--version[Print version]' \
+    '--dry-run[Show what would be sent]' \
+    '--readability[Convert HTML to readable view]' \
+    '--search[Enable web search]' \
+    '(-r --raw)'{-r,--raw}'[Use model defaults]' \
+    '(-g --language)'{-g,--language}'[Language code]:lang:' \
+    '(-h --help)'{-h,--help}'[Show help]' \
+    '*:input:_files'
+}
+
+_fabric "$@"

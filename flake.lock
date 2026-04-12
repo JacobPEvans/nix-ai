@@ -326,6 +326,22 @@
         "type": "github"
       }
     },
+    "openai-codex": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775684930,
+        "narHash": "sha256-4kqtfdHlcg3YXWX1og9b5JuLgnB/3Nj5dFMe4Ryt7No=",
+        "owner": "openai",
+        "repo": "codex-plugin-cc",
+        "rev": "6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167",
+        "type": "github"
+      },
+      "original": {
+        "owner": "openai",
+        "repo": "codex-plugin-cc",
+        "type": "github"
+      }
+    },
     "pal-mcp-server": {
       "flake": false,
       "locked": {
@@ -364,6 +380,7 @@
         "lunar-claude": "lunar-claude",
         "nixpkgs": "nixpkgs",
         "obsidian-skills": "obsidian-skills",
+        "openai-codex": "openai-codex",
         "pal-mcp-server": "pal-mcp-server",
         "superpowers-marketplace": "superpowers-marketplace",
         "visual-explainer-marketplace": "visual-explainer-marketplace",
