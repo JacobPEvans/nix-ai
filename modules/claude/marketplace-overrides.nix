@@ -8,6 +8,7 @@
   lib,
   marketplaceInputs,
   fabric-src,
+  fabricVersion,
   ...
 }:
 
@@ -78,7 +79,6 @@
   fabricMarketplace =
     let
       curated = builtins.fromJSON (builtins.readFile ./fabric-curated-patterns.json);
-      fabricVersion = curated.version;
       curatedPatterns = curated.patterns;
 
       # Build each SKILL.md as a pure Nix string (frontmatter + upstream system.md).

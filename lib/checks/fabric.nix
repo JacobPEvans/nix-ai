@@ -149,8 +149,13 @@ in
         builtins.readFile "${src}/modules/claude/fabric-curated-patterns.json"
       );
       expectedCount = builtins.length curated.patterns;
+      # Derive version from the package (same source of truth as claude-config.nix)
+      fabricVersion =
+        (pkgs.callPackage "${src}/modules/fabric/package.nix" {
+          inherit fabric-src;
+        }).version;
       overrides = import "${src}/modules/claude/marketplace-overrides.nix" {
-        inherit pkgs fabric-src;
+        inherit pkgs fabric-src fabricVersion;
         inherit (pkgs) lib;
         # The browser-use and jacobpevans wrappers also live in this file but
         # are unused by the fabric check — pass nulls to satisfy module args.

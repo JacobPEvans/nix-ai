@@ -46,6 +46,9 @@ let
   # Extract enabled plugins from modular configuration
   inherit (claudePlugins.pluginConfig) enabledPlugins;
 
+  # Derive fabric version from the package (single source of truth — Renovate-managed)
+  fabricVersion = (pkgs.callPackage ./fabric/package.nix { inherit fabric-src; }).version;
+
   # Marketplace derivation overrides (synthetic wrappers, auto-generated manifests)
   marketplaceOverrides = import ./claude/marketplace-overrides.nix {
     inherit
@@ -53,6 +56,7 @@ let
       lib
       marketplaceInputs
       fabric-src
+      fabricVersion
       ;
   };
   inherit (marketplaceOverrides)
