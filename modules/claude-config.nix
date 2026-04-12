@@ -85,18 +85,19 @@ in
     # scriptPath default: .local/bin/claude-api-key-helper
   };
 
-  # Agent teams display mode (direct settings.json property)
-  teammateMode = "auto";
+  # teammateMode — using upstream default: "auto" (options.nix)
+  # "auto" splits panes in tmux, in-process otherwise.
 
-  # Model: use account-tier default. The 'opusplan' model is no longer
-  # specified as it lacks a 1M context variant.
-  # See: https://code.claude.com/docs/en/model-config
+  # Model: opusplan — Opus 4.6 for planning, Sonnet 4.6 for execution (1M context).
+  model = "opusplan";
 
-  # Release channel: "latest" gets newest releases immediately
-  autoUpdatesChannel = "latest";
+  # Effort: medium — matches upstream Max/Team default (v2.1.68+).
+  # Must be explicit to override runtime "high" value (merge script preserves runtime keys).
+  # Override per-session via /model effort slider or "ultrathink" keyword.
+  effortLevel = "medium";
 
-  # Show turn duration in UI for performance visibility
-  showTurnDuration = true;
+  # autoUpdatesChannel — using upstream default: "latest" (options.nix)
+  # showTurnDuration — using upstream default: false (options.nix)
 
   # Enable Remote Control for all sessions (Feb 2026 feature).
   # Writes remoteControlAtStartup = true into ~/.claude.json via home.activation.
@@ -108,11 +109,6 @@ in
   # Generates hasClaudeMdExternalIncludesApproved = true entries in ~/.claude.json
   # for each ~/git/<repo>/main path found at home-manager activation time (runtime) via claude-json-merge.sh.
   trustedProjectDirs = [ "~/git" ];
-
-  # effortLevel = "medium";
-  # Claude Code v2.1.68+ defaults to medium effort for Max/Team subscribers.
-  # Use /model effort slider or "ultrathink" keyword to override per-session.
-  # Uncomment to pin a specific effort level.
 
   # Minimal commit attribution — replaces verbose Co-Authored-By trailer
   # Claude Code appends this string to every commit message automatically
@@ -187,16 +183,13 @@ in
     # Extended thinking enabled with token budget controlled via env vars
     alwaysThinkingEnabled = true;
 
-    # Session cleanup: explicitly set to 30 days (upstream Claude default).
-    # Keeping this explicit to document the intentional choice and prevent
-    # accidental drift if the module option default ever changes.
-    cleanupPeriodDays = 30;
+    # cleanupPeriodDays — using upstream default: 30 (options.nix)
 
     # Environment variables for model config and token optimization
     # See: https://code.claude.com/docs/en/settings
     # See: https://code.claude.com/docs/en/model-config
     env = {
-      # Model: uses account-tier default (no override set above).
+      # Model: opusplan set above. Env var overrides available if needed.
       # Auto-claude background jobs use their own CLAUDE_MODEL env var (haiku).
       # ANTHROPIC_MODEL = "sonnet"; # Uncomment to override default model via env var
       # CLAUDE_CODE_SUBAGENT_MODEL = "claude-haiku-4-5-20251001"; # Cost control for subagents
@@ -235,6 +228,12 @@ in
       # Effort level via env var (alternative to settings.json key)
       # CLAUDE_CODE_EFFORT_LEVEL = "medium";
 
+      # Force plugin auto-update on startup (skips staleness check)
+      FORCE_AUTOUPDATE_PLUGINS = "1";
+
+      # Auto-compact threshold — using upstream default (~95% of context window)
+      # CLAUDE_AUTOCOMPACT_PCT_OVERRIDE = "95";
+
       # ===== OpenTelemetry — OrbStack k8s OTEL Collector =====
       # Pipeline: Claude Code → OTEL Collector (:30317) → Cribl Stream (:4317) → Splunk HEC
       # Requires: OrbStack k8s running with OTEL collector deployed.
@@ -268,7 +267,7 @@ in
     # Currently disabled - enable when reviewing external code or untrusted repos.
     sandbox = {
       enabled = false;
-      autoAllowBashIfSandboxed = true; # Safe because sandbox prevents destructive ops
+      # autoAllowBashIfSandboxed — using upstream default: true (options.nix)
       excludedCommands = [
         "git"
         "nix"
