@@ -17,7 +17,7 @@ let
   packageVersion = if cfg.package != null then lib.getVersion cfg.package else "0.2.0";
   isTomlConfig = lib.versionAtLeast packageVersion "0.2.0";
   useXdgDirectories = config.home.preferXdgDirectories && isTomlConfig;
-  xdgConfigHome = lib.removePrefix homeDir config.xdg.configHome;
+  xdgConfigHome = lib.removePrefix "${homeDir}/" config.xdg.configHome;
   configDir = if useXdgDirectories then "${xdgConfigHome}/codex" else ".codex";
 
   writableRoots = lib.unique (
@@ -25,8 +25,7 @@ let
   );
 
   trustedProjects = lib.unique (
-    (permissions.directories.development or [ ])
-    ++ lib.filter (path: path == "${homeDir}/.config/nix") (permissions.directories.config or [ ])
+    (permissions.directories.development or [ ]) ++ (permissions.directories.config or [ ])
   );
 
   excludedMcpServers = [
