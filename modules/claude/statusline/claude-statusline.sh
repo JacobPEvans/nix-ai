@@ -88,7 +88,7 @@ out=""
 out+="${blue}${model_name}${reset}"
 
 # Current working directory
-cwd=$(echo "$input" | jq -r '.cwd // .workspace.current_dir // empty')
+cwd=$(printf '%s' "$input" | jq -r '.cwd // .workspace.current_dir // empty')
 if [ -n "$cwd" ]; then
     # Show last 2 path components (e.g., nix-ai/main) instead of just basename
     display_dir="$(basename "$(dirname "$cwd")")/$(basename "$cwd")"
