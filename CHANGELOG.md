@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.38.0](https://github.com/JacobPEvans/nix-ai/compare/v1.37.1...v1.38.0) (2026-04-12)
+
+
+### Features
+
+* **claude:** enable OTEL telemetry to OrbStack collector ([#496](https://github.com/JacobPEvans/nix-ai/issues/496)) ([b9129f2](https://github.com/JacobPEvans/nix-ai/commit/b9129f2d0c56d339dcd9c2152b50e203ef0931e4))
+* **codex:** add official OpenAI Codex plugin + MCP server ([#497](https://github.com/JacobPEvans/nix-ai/issues/497)) ([3ea8d5c](https://github.com/JacobPEvans/nix-ai/commit/3ea8d5c55cec87713ea754311df3935dcf63f8e6))
+* **fabric:** integrate Daniel Miessler's Fabric framework ([d361940](https://github.com/JacobPEvans/nix-ai/commit/d361940c7a30ef2cc5ce03264d6a5005bea0059c))
+
 ## [1.37.1](https://github.com/JacobPEvans/nix-ai/compare/v1.37.0...v1.37.1) (2026-04-12)
 
 
