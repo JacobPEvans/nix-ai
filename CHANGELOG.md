@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.38.1](https://github.com/JacobPEvans/nix-ai/compare/v1.38.0...v1.38.1) (2026-04-12)
+
+
+### Bug Fixes
+
+* **cspell:** migrate to shared org-wide dictionary hierarchy ([#498](https://github.com/JacobPEvans/nix-ai/issues/498)) ([a93300b](https://github.com/JacobPEvans/nix-ai/commit/a93300b5e4f505d99a9f0461a4ddab2932efd338))
+
 ## [1.38.0](https://github.com/JacobPEvans/nix-ai/compare/v1.37.1...v1.38.0) (2026-04-12)
 
 
