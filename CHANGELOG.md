@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.41.0](https://github.com/JacobPEvans/nix-ai/compare/v1.40.0...v1.41.0) (2026-04-12)
+
+
+### Features
+
+* **codex,gemini:** expand modules to Claude-level feature parity ([72168b3](https://github.com/JacobPEvans/nix-ai/commit/72168b31b00836b196bbfd8a981caf633fb35097))
+
 ## [1.40.0](https://github.com/JacobPEvans/nix-ai/compare/v1.39.0...v1.40.0) (2026-04-12)
 
 
