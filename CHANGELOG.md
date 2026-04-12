@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.42.1](https://github.com/JacobPEvans/nix-ai/compare/v1.42.0...v1.42.1) (2026-04-12)
+
+
+### Bug Fixes
+
+* **claude:** clean up config defaults, set model/effort explicitly ([#495](https://github.com/JacobPEvans/nix-ai/issues/495)) ([b99e227](https://github.com/JacobPEvans/nix-ai/commit/b99e227eb489ef9cfe6fadb8067282465f4c80b2))
+
 ## [1.42.0](https://github.com/JacobPEvans/nix-ai/compare/v1.41.0...v1.42.0) (2026-04-12)
 
 
