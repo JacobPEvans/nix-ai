@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Deep-merge Nix-generated TOML settings with existing runtime state.
+# Same merge strategy as merge-json-settings.sh but for TOML.
+#
+# Preserves runtime-only keys while updating Nix-managed settings.
+# Merge strategy: existing runtime file as base, Nix config overlaid on top.
+# Nix-managed keys always win, but runtime-only keys (e.g. projects) are preserved.
+#
+# Arguments:
+#   $1 - Path to Nix-generated settings TOML (in /nix/store)
+#   $2 - Path to target settings file
+#
+# jq and yj must be on PATH (callers ensure this via PATH export).
+
+set -euo pipefail
+
+if [[ $# -ne 2 ]]; then
+  echo "Usage: merge-toml-settings <nix-settings-path> <target-path>" >&2
+  exit 1
+fi
+
+NIX_TOML="$1"
+TARGET="$2"
+
+TARGET_NAME=$(basename "$TARGET")
+TARGET_DIR=$(dirname "$TARGET")
+mkdir -p "$TARGET_DIR"
+
+if [[ -f "$TARGET" ]] && [[ ! -L "$TARGET" ]]; then
+  # File exists and is a real file (not symlink) - merge
+  # Convert both TOML files to JSON, deep-merge, convert result back to TOML
+  EXISTING_JSON=$(yj -tj < "$TARGET") || {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to parse existing ${TARGET_NAME}, using Nix config" >&2
+    cp "$NIX_TOML" "$TARGET"
+    chmod 600 "$TARGET"
+    exit 0
+  }
+  NIX_JSON=$(yj -tj < "$NIX_TOML") || {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to parse Nix ${TARGET_NAME}, keeping existing" >&2
+    exit 0
+  }
+  MERGED_JSON=$(printf '%s\n%s\n' "$EXISTING_JSON" "$NIX_JSON" | jq -s '.[0] * .[1]') || {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to merge ${TARGET_NAME}, using Nix config" >&2
+    cp "$NIX_TOML" "$TARGET"
+    chmod 600 "$TARGET"
+    exit 0
+  }
+  printf '%s\n' "$MERGED_JSON" | yj -jt > "${TARGET}.tmp" || {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to convert merged ${TARGET_NAME} to TOML, using Nix config" >&2
+    cp "$NIX_TOML" "$TARGET"
+    chmod 600 "$TARGET"
+    exit 0
+  }
+  mv "${TARGET}.tmp" "$TARGET"
+  chmod 600 "$TARGET"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Merged ${TARGET_NAME} (preserved runtime state)"
+elif [[ -L "$TARGET" ]]; then
+  # It's a symlink (old Nix-managed) - remove and create real file
+  rm "$TARGET"
+  cp "$NIX_TOML" "$TARGET"
+  chmod 600 "$TARGET"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Replaced Nix symlink with writable ${TARGET_NAME}"
+else
+  # No existing file - just copy
+  cp "$NIX_TOML" "$TARGET"
+  chmod 600 "$TARGET"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] Created initial ${TARGET_NAME}"
+fi

@@ -1,4 +1,5 @@
 {
+  pkgs,
   config,
   lib,
   ai-assistant-instructions,
@@ -14,6 +15,8 @@ let
   };
   inherit (aiCommon) permissions formatters;
 
+  # NOTE: These path variables mirror the upstream home-manager programs.codex module.
+  # If upstream changes its config path logic, update here too so rules/config.toml stay co-located.
   packageVersion = if cfg.package != null then lib.getVersion cfg.package else "0.2.0";
   isTomlConfig = lib.versionAtLeast packageVersion "0.2.0";
   useXdgDirectories = config.home.preferXdgDirectories && isTomlConfig;
@@ -30,7 +33,6 @@ let
 
   excludedMcpServers = [
     "cloudflare"
-    "codex"
     "cribl"
     "docker"
     "everything"
@@ -87,6 +89,39 @@ let
       ) sharedServers
     );
 
+  # Nix-managed defaults for config.toml.
+  # NOTE: config.toml is NOT managed as a read-only symlink. Codex writes to this file
+  # at runtime (project trust levels, approval policy changes). Instead we use an
+  # activation script that deep-merges these defaults with existing runtime state,
+  # preserving Codex's runtime writes across rebuilds. Same pattern as Claude's
+  # settings.json and Gemini's settings.json.
+  configAttrs = {
+    approval_policy = "untrusted";
+    personality = "pragmatic";
+    project_doc_fallback_filenames = [
+      "AGENTS.md"
+      "CLAUDE.md"
+      "GEMINI.md"
+    ];
+    projects = lib.listToAttrs (
+      map (path: {
+        name = path;
+        value.trust_level = "trusted";
+      }) trustedProjects
+    );
+    sandbox_mode = "workspace-write";
+    sandbox_workspace_write = {
+      network_access = false;
+      writable_roots = writableRoots;
+    };
+    mcp_servers = mcpServers;
+  };
+
+  configJson = pkgs.writeText "codex-config.json" (builtins.toJSON configAttrs);
+  configToml = pkgs.runCommand "codex-config.toml" { nativeBuildInputs = [ pkgs.yj ]; } ''
+    yj -jt < ${configJson} > $out
+  '';
+
 in
 {
   config = lib.mkIf cfg.enable {
@@ -95,32 +130,21 @@ in
         # nix-darwin installs Codex via Homebrew for stable TCC paths.
         package = lib.mkDefault null;
         custom-instructions = lib.mkDefault (builtins.readFile "${ai-assistant-instructions}/AGENTS.md");
-        settings = {
-          approval_policy = lib.mkDefault "untrusted";
-          personality = lib.mkDefault "pragmatic";
-          project_doc_fallback_filenames = lib.mkDefault [
-            "AGENTS.md"
-            "CLAUDE.md"
-            "GEMINI.md"
-          ];
-          projects = lib.mkDefault (
-            lib.listToAttrs (
-              map (path: {
-                name = path;
-                value.trust_level = "trusted";
-              }) trustedProjects
-            )
-          );
-          sandbox_mode = lib.mkDefault "workspace-write";
-          sandbox_workspace_write = {
-            network_access = lib.mkDefault false;
-            writable_roots = lib.mkDefault writableRoots;
-          };
-          mcp_servers = lib.mkDefault mcpServers;
-        };
+        # config.toml is managed via home.activation below — do NOT set settings here.
+        # The upstream home-manager module writes settings via home.file (read-only symlink),
+        # which breaks Codex's runtime writes. We handle config.toml generation ourselves.
       };
     };
 
-    home.file."${configDir}/rules/default.rules".text = formatters.codex.formatRulesFile permissions;
+    home = {
+      activation.codexConfigMerge = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        export PATH="${pkgs.jq}/bin:${pkgs.yj}/bin:$PATH"
+        $DRY_RUN_CMD ${./scripts/merge-toml-settings.sh} \
+          "${configToml}" \
+          "${homeDir}/.codex/config.toml"
+      '';
+
+      file."${configDir}/rules/default.rules".text = formatters.codex.formatRulesFile permissions;
+    };
   };
 }
