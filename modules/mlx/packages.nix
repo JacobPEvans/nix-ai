@@ -7,7 +7,7 @@
 # and ecosystem uvx wrappers (parakeet-mlx, mlx-vlm).
 #
 # Orchestrated sweep runs live in the companion repo JacobPEvans/mlx-benchmarks;
-# results are published to hf.co/datasets/JacobPEvans/mlx-benchmarks.
+# results are published to https://huggingface.co/datasets/JacobPEvans/mlx-benchmarks
 #
 {
   config,

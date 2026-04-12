@@ -16,8 +16,8 @@
       description = ''
         Default mlx-community/ HuggingFace model to serve via vllm-mlx.
         Benchmark-driven rationale and historical default-swap context live
-        on the companion dataset at
-        https://huggingface.co/datasets/JacobPEvans/mlx-benchmarks.
+        on the companion dataset:
+        https://huggingface.co/datasets/JacobPEvans/mlx-benchmarks
       '';
     };
 
