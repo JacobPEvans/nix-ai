@@ -11,10 +11,16 @@ imports:
 
 permissions:
   contents: read
-  issues: write
+  issues: read
   pull-requests: read
   actions: read
   security-events: read
+
+safe-outputs:
+  create-issue:
+    labels: [repo-health]
+  add-comment:
+  update-issue:
 
 timeout-minutes: 15
 ---
