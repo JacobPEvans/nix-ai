@@ -1,14 +1,13 @@
 # Gemini Settings Generation
 #
-# Generates settings.json and manages the activation merge.
+# Generates settings.json and a Policy Engine TOML file.
 # settings.json is NOT a read-only symlink — Gemini writes auth tokens
 # and runtime state to this file.
 #
-# CRITICAL - tools.allowed vs tools.core:
-# Per the official Gemini CLI schema:
-# - tools.allowed = "Tool names that bypass the confirmation dialog" (AUTO-APPROVE)
-# - tools.core = "Allowlist to RESTRICT built-in tools to a specific set" (LIMITS usage!)
-# Always use tools.allowed for auto-approval, NEVER tools.core!
+# POLICY ENGINE (Gemini CLI v0.36+):
+# Replaces deprecated tools.allowed and tools.exclude with TOML policy rules.
+# Rules use commandPrefix for shell commands and toolName for built-in tools.
+# Docs: https://github.com/google-gemini/gemini-cli/blob/main/docs/reference/policy-engine.md
 {
   pkgs,
   config,
@@ -61,9 +60,25 @@ let
       ) sharedServers
     );
 
+  # Policy Engine: generate TOML rules from shared permissions
+  policyRules =
+    formatters.gemini.formatAllowRules permissions
+    ++ formatters.gemini.formatDenyRules permissions
+    ++ formatters.gemini.formatAskRules permissions;
+
+  policyToml = (pkgs.formats.toml { }).generate "gemini-policy.toml" {
+    rule = policyRules;
+  };
+
+  # Path where the policy file will be deployed (must be absolute for policyPaths)
+  policyPath = "${homeDir}/.gemini/policies/nix-managed.toml";
+
   settings = {
     "$schema" =
       "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json";
+
+    # Policy Engine: reference the Nix-managed TOML policy file
+    policyPaths = [ policyPath ];
 
     general = {
       previewFeatures = true;
@@ -84,9 +99,8 @@ let
       };
     };
 
+    # Sandbox only — no more tools.allowed or tools.exclude (deprecated)
     tools = {
-      allowed = formatters.gemini.formatAllowedTools permissions;
-      exclude = formatters.gemini.formatExcludeTools permissions;
       sandbox = true;
     };
 
@@ -106,11 +120,18 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
-    home.activation.mergeGeminiSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      export PATH="${pkgs.jq}/bin:$PATH"
-      $DRY_RUN_CMD ${../scripts/merge-json-settings.sh} \
-        "${settingsJson}" \
-        "${homeDir}/.gemini/settings.json"
-    '';
+    home = {
+      # Deploy the Policy Engine TOML file (read-only is fine — Gemini only reads it)
+      file."${lib.removePrefix "${homeDir}/" policyPath}".source = policyToml;
+
+      activation.mergeGeminiSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        export PATH="${pkgs.jq}/bin:$PATH"
+        $DRY_RUN_CMD ${../scripts/merge-json-settings.sh} \
+          "${settingsJson}" \
+          "${homeDir}/.gemini/settings.json"
+        $DRY_RUN_CMD ${../scripts/strip-deprecated-gemini-keys.sh} \
+          "${homeDir}/.gemini/settings.json"
+      '';
+    };
   };
 }

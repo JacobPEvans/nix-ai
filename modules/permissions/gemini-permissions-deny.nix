@@ -1,18 +1,10 @@
-# Gemini CLI Permanently Blocked Commands (DENY List / excludeTools)
+# Gemini CLI Permanently Blocked Commands (DENY Rules)
 #
 # Uses unified permission definitions from ai-cli/common/permissions.nix
 # with Gemini-specific formatting via formatters.nix.
 #
-# FORMAT: ShellTool(cmd) for blocked shell commands
-#
-# SINGLE SOURCE OF TRUTH:
-# Command definitions are in ai-cli/common/permissions.nix
-# This file only applies Gemini-specific formatting.
-#
-# SECURITY PHILOSOPHY:
-# - These are truly catastrophic operations (system destruction, data exfiltration)
-# - No user confirmation can override these blocks
-# - If a legitimate use case arises, edit ai-cli/common/permissions.nix
+# Policy Engine: Exports rule attrsets with decision="deny" for policyPaths TOML.
+# Legacy: Exports ShellTool(cmd) lists for backward compatibility in tests.
 
 {
   config,
@@ -22,12 +14,13 @@
 }:
 
 let
-  # Import unified permissions and formatters
   aiCommon = import ../common { inherit lib config ai-assistant-instructions; };
   inherit (aiCommon) permissions formatters;
-
 in
 {
-  # Export excludeTools (permanently blocked commands)
+  # Policy Engine rules (primary)
+  denyRules = formatters.gemini.formatDenyRules permissions;
+
+  # Legacy format (kept for CI lib output and regression tests)
   excludeTools = formatters.gemini.formatExcludeTools permissions;
 }

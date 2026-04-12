@@ -130,8 +130,9 @@ in
         fi
 
         # Deny rules must appear before allow rules (line numbers)
-        FIRST_DENY=$(grep -n '"forbidden"' "$rulesPath" | head -1 | cut -d: -f1)
-        FIRST_ALLOW=$(grep -n '"allow"' "$rulesPath" | head -1 | cut -d: -f1)
+        # Use grep -m1 instead of grep | head -1 to avoid SIGPIPE on Linux
+        FIRST_DENY=$(grep -m1 -n '"forbidden"' "$rulesPath" | cut -d: -f1)
+        FIRST_ALLOW=$(grep -m1 -n '"allow"' "$rulesPath" | cut -d: -f1)
         if [ "$FIRST_DENY" -gt "$FIRST_ALLOW" ]; then
           echo "FAIL: deny rules should appear before allow rules"
           exit 1
