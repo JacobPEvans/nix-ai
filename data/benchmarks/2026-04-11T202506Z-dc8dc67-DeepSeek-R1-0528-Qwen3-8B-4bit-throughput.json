@@ -1,0 +1,63 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-11T20:25:06Z",
+  "git_sha": "dc8dc67",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "throughput",
+  "model": "mlx-community/DeepSeek-R1-0528-Qwen3-8B-4bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [
+    {
+      "name": "short-50",
+      "metric": "throughput",
+      "value": 38.4,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "50",
+        "completion_tokens": "50",
+        "elapsed_s": "1.30"
+      }
+    },
+    {
+      "name": "medium-256",
+      "metric": "throughput",
+      "value": 45.3,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "256",
+        "completion_tokens": "256",
+        "elapsed_s": "5.65"
+      }
+    },
+    {
+      "name": "long-512",
+      "metric": "throughput",
+      "value": 50.8,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "512",
+        "completion_tokens": "512",
+        "elapsed_s": "10.07"
+      }
+    },
+    {
+      "name": "long-1024",
+      "metric": "throughput",
+      "value": 58.7,
+      "unit": "tok/s",
+      "tags": {
+        "max_tokens": "1024",
+        "completion_tokens": "1024",
+        "elapsed_s": "17.44"
+      }
+    }
+  ],
+  "errors": []
+}

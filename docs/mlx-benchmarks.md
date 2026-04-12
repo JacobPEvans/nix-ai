@@ -76,29 +76,113 @@ mlx-eval --tasks hellaswag --limit 100
 
 | Date | SHA | Model | Test | tok/s | Tokens | Elapsed |
 |------|-----|-------|------|-------|--------|---------|
+| 2026-04-11 22:09 | 0077a28 | gpt-oss-120b-4bit | short-50 | 26.0 | 50 | 1.92 |
+| 2026-04-11 22:09 | 0077a28 | gpt-oss-120b-4bit | medium-256 | 36.1 | 256 | 7.09 |
+| 2026-04-11 22:09 | 0077a28 | gpt-oss-120b-4bit | long-512 | 41.8 | 512 | 12.24 |
+| 2026-04-11 22:09 | 0077a28 | gpt-oss-120b-4bit | long-1024 | 44.9 | 1024 | 22.82 |
+| 2026-04-11 22:04 | 0077a28 | gemma-4-e4b-it-4bit | short-50 | 39.6 | 50 | 1.26 |
+| 2026-04-11 22:04 | 0077a28 | gemma-4-e4b-it-4bit | medium-256 | 51.3 | 256 | 4.99 |
+| 2026-04-11 22:04 | 0077a28 | gemma-4-e4b-it-4bit | long-512 | 56.0 | 512 | 9.14 |
+| 2026-04-11 22:04 | 0077a28 | gemma-4-e4b-it-4bit | long-1024 | 59.9 | 1024 | 17.09 |
+| 2026-04-11 21:59 | 0077a28 | gemma-4-31b-it-4bit | short-50 | 12.7 | 50 | 3.93 |
+| 2026-04-11 21:59 | 0077a28 | gemma-4-31b-it-4bit | medium-256 | 13.6 | 256 | 18.88 |
+| 2026-04-11 21:59 | 0077a28 | gemma-4-31b-it-4bit | long-512 | 18.4 | 512 | 27.81 |
+| 2026-04-11 21:59 | 0077a28 | gemma-4-31b-it-4bit | long-1024 | 17.5 | 1024 | 58.38 |
+| 2026-04-11 21:52 | 0077a28 | Seed-OSS-36B-Instruct-4bit | short-50 | 16.2 | 50 | 3.08 |
+| 2026-04-11 21:52 | 0077a28 | Seed-OSS-36B-Instruct-4bit | medium-256 | 18.6 | 256 | 13.73 |
+| 2026-04-11 21:52 | 0077a28 | Seed-OSS-36B-Instruct-4bit | long-512 | 15.8 | 512 | 32.49 |
+| 2026-04-11 21:52 | 0077a28 | Seed-OSS-36B-Instruct-4bit | long-1024 | 7.7 | 1024 | 132.32 |
+| 2026-04-11 21:47 | 0077a28 | Qwen3.5-9B-MLX-4bit | short-50 | 39.4 | 50 | 1.27 |
+| 2026-04-11 21:47 | 0077a28 | Qwen3.5-9B-MLX-4bit | medium-256 | 55.7 | 256 | 4.59 |
+| 2026-04-11 21:47 | 0077a28 | Qwen3.5-9B-MLX-4bit | long-512 | 63.4 | 512 | 8.08 |
+| 2026-04-11 21:47 | 0077a28 | Qwen3.5-9B-MLX-4bit | long-1024 | 68.5 | 1024 | 14.95 |
+| 2026-04-11 21:40 | 0077a28 | Qwen3.5-35B-A3B-4bit | short-50 | 31.1 | 50 | 1.61 |
+| 2026-04-11 21:40 | 0077a28 | Qwen3.5-35B-A3B-4bit | medium-256 | 32.9 | 256 | 7.79 |
+| 2026-04-11 21:40 | 0077a28 | Qwen3.5-35B-A3B-4bit | long-512 | 3.6 | 512 | 142.34 |
+| 2026-04-11 21:40 | 0077a28 | Qwen3.5-35B-A3B-4bit | long-1024 | 29.0 | 1024 | 35.26 |
+| 2026-04-11 21:35 | 0077a28 | Qwen3.5-27B-Claude-4.6-Opus-Distilled-MLX-4bit | short-50 | 17.1 | 50 | 2.93 |
+| 2026-04-11 21:35 | 0077a28 | Qwen3.5-27B-Claude-4.6-Opus-Distilled-MLX-4bit | medium-256 | 22.6 | 256 | 11.34 |
+| 2026-04-11 21:35 | 0077a28 | Qwen3.5-27B-Claude-4.6-Opus-Distilled-MLX-4bit | long-512 | 22.9 | 512 | 22.32 |
+| 2026-04-11 21:35 | 0077a28 | Qwen3.5-27B-Claude-4.6-Opus-Distilled-MLX-4bit | long-1024 | 22.2 | 1024 | 46.03 |
+| 2026-04-11 21:30 | 0077a28 | Qwen3.5-27B-4bit | short-50 | 18.1 | 50 | 2.76 |
+| 2026-04-11 21:30 | 0077a28 | Qwen3.5-27B-4bit | medium-256 | 22.5 | 256 | 11.39 |
+| 2026-04-11 21:30 | 0077a28 | Qwen3.5-27B-4bit | long-512 | 22.9 | 512 | 22.40 |
+| 2026-04-11 21:30 | 0077a28 | Qwen3.5-27B-4bit | long-1024 | 20.3 | 1024 | 50.44 |
+| 2026-04-11 21:25 | 0077a28 | Qwen3.5-122B-A10B-4bit | short-50 | 20.6 | 50 | 2.43 |
+| 2026-04-11 21:25 | 0077a28 | Qwen3.5-122B-A10B-4bit | medium-256 | 24.6 | 256 | 10.42 |
+| 2026-04-11 21:25 | 0077a28 | Qwen3.5-122B-A10B-4bit | long-512 | 23.9 | 512 | 21.47 |
+| 2026-04-11 21:25 | 0077a28 | Qwen3.5-122B-A10B-4bit | long-1024 | 24.2 | 1024 | 42.25 |
+| 2026-04-11 21:20 | 0077a28 | Qwen3-Next-80B-A3B-Thinking-4bit | short-50 | 16.5 | 50 | 3.04 |
+| 2026-04-11 21:20 | 0077a28 | Qwen3-Next-80B-A3B-Thinking-4bit | medium-256 | 22.1 | 256 | 11.61 |
+| 2026-04-11 21:20 | 0077a28 | Qwen3-Next-80B-A3B-Thinking-4bit | long-512 | 24.0 | 512 | 21.31 |
+| 2026-04-11 21:20 | 0077a28 | Qwen3-Next-80B-A3B-Thinking-4bit | long-1024 | 25.1 | 1024 | 40.72 |
+| 2026-04-11 21:09 | 874efc4 | Qwen3-Next-80B-A3B-Instruct-4bit | short-50 | 20.8 | 50 | 2.41 |
+| 2026-04-11 21:09 | 874efc4 | Qwen3-Next-80B-A3B-Instruct-4bit | medium-256 | 25.9 | 256 | 9.89 |
+| 2026-04-11 21:09 | 874efc4 | Qwen3-Next-80B-A3B-Instruct-4bit | long-512 | 26.9 | 512 | 19.04 |
+| 2026-04-11 21:09 | 874efc4 | Qwen3-Next-80B-A3B-Instruct-4bit | long-1024 | 28.2 | 1024 | 36.37 |
+| 2026-04-11 21:05 | 874efc4 | Qwen3-Coder-30B-A3B-Instruct-8bit | short-50 | 29.0 | 50 | 1.73 |
+| 2026-04-11 21:05 | 874efc4 | Qwen3-Coder-30B-A3B-Instruct-8bit | medium-256 | 38.5 | 256 | 6.65 |
+| 2026-04-11 21:05 | 874efc4 | Qwen3-Coder-30B-A3B-Instruct-8bit | long-512 | 36.7 | 512 | 13.94 |
+| 2026-04-11 21:05 | 874efc4 | Qwen3-Coder-30B-A3B-Instruct-8bit | long-1024 | 41.2 | 1024 | 24.87 |
+| 2026-04-11 20:25 | dc8dc67 | DeepSeek-R1-0528-Qwen3-8B-4bit | short-50 | 38.4 | 50 | 1.30 |
+| 2026-04-11 20:25 | dc8dc67 | DeepSeek-R1-0528-Qwen3-8B-4bit | medium-256 | 45.3 | 256 | 5.65 |
+| 2026-04-11 20:25 | dc8dc67 | DeepSeek-R1-0528-Qwen3-8B-4bit | long-512 | 50.8 | 512 | 10.07 |
+| 2026-04-11 20:25 | dc8dc67 | DeepSeek-R1-0528-Qwen3-8B-4bit | long-1024 | 58.7 | 1024 | 17.44 |
 | 2026-04-10 11:06 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | short-50 | 1.9 | 50 | 25.95 |
 | 2026-04-10 11:06 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | medium-256 | 2.5 | 256 | 103.61 |
 | 2026-04-10 11:06 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | long-512 | 2.0 | 512 | 257.79 |
-| 2026-04-10 10:58 | 5572dde | Qwen3.5-122B-A10B-4bit | short-50 | 11.3 | 50 | 4.44 |
-| 2026-04-10 10:58 | 5572dde | Qwen3.5-122B-A10B-4bit | medium-256 | 13.9 | 256 | 18.41 |
-| 2026-04-10 10:58 | 5572dde | Qwen3.5-122B-A10B-4bit | long-512 | 14.6 | 512 | 35.06 |
-| 2026-04-10 10:58 | 5572dde | Qwen3.5-122B-A10B-4bit | long-1024 | 13.7 | 1024 | 75.01 |
-| 2026-04-10 10:53 | 5572dde | gpt-oss-120b-4bit | short-50 | 10.3 | 50 | 4.88 |
-| 2026-04-10 10:53 | 5572dde | gpt-oss-120b-4bit | medium-256 | 17.1 | 256 | 14.94 |
-| 2026-04-10 10:53 | 5572dde | gpt-oss-120b-4bit | long-512 | 16.5 | 512 | 31.01 |
-| 2026-04-10 10:53 | 5572dde | gpt-oss-120b-4bit | long-1024 | 18.9 | 1024 | 54.05 |
+| 2026-04-10 10:46 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | short-50 | 7.7 | 50 | 6.47 |
+| 2026-04-10 10:46 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | medium-256 | 11.1 | 256 | 23.08 |
+| 2026-04-10 10:46 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | long-512 | 10.5 | 511 | 48.82 |
+| 2026-04-10 10:46 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | long-1024 | 11.0 | 1024 | 93.13 |
 
 ### TTFT
 
 | Date | SHA | Model | Test | Latency (s) | Type |
 |------|-----|-------|------|-------------|------|
+| 2026-04-11 22:10 | 0077a28 | gpt-oss-120b-4bit | cold-avg | 0.727 | cold |
+| 2026-04-11 22:10 | 0077a28 | gpt-oss-120b-4bit | warm-avg | 0.659 | warm |
+| 2026-04-11 22:10 | 0077a28 | gpt-oss-120b-4bit | cache-speedup | 1.100 | — |
+| 2026-04-11 22:05 | 0077a28 | gemma-4-e4b-it-4bit | cold-avg | 0.693 | cold |
+| 2026-04-11 22:05 | 0077a28 | gemma-4-e4b-it-4bit | warm-avg | 0.673 | warm |
+| 2026-04-11 22:05 | 0077a28 | gemma-4-e4b-it-4bit | cache-speedup | 1.030 | — |
+| 2026-04-11 22:00 | 0077a28 | gemma-4-31b-it-4bit | cold-avg | 1.079 | cold |
+| 2026-04-11 22:00 | 0077a28 | gemma-4-31b-it-4bit | warm-avg | 0.999 | warm |
+| 2026-04-11 22:00 | 0077a28 | gemma-4-31b-it-4bit | cache-speedup | 1.080 | — |
+| 2026-04-11 21:55 | 0077a28 | Seed-OSS-36B-Instruct-4bit | cold-avg | 0.706 | cold |
+| 2026-04-11 21:55 | 0077a28 | Seed-OSS-36B-Instruct-4bit | warm-avg | 0.793 | warm |
+| 2026-04-11 21:55 | 0077a28 | Seed-OSS-36B-Instruct-4bit | cache-speedup | 0.890 | — |
+| 2026-04-11 21:48 | 0077a28 | Qwen3.5-9B-MLX-4bit | cold-avg | 0.518 | cold |
+| 2026-04-11 21:48 | 0077a28 | Qwen3.5-9B-MLX-4bit | warm-avg | 0.594 | warm |
+| 2026-04-11 21:48 | 0077a28 | Qwen3.5-9B-MLX-4bit | cache-speedup | 0.870 | — |
+| 2026-04-11 21:43 | 0077a28 | Qwen3.5-35B-A3B-4bit | cold-avg | 0.634 | cold |
+| 2026-04-11 21:43 | 0077a28 | Qwen3.5-35B-A3B-4bit | warm-avg | 0.459 | warm |
+| 2026-04-11 21:43 | 0077a28 | Qwen3.5-35B-A3B-4bit | cache-speedup | 1.380 | — |
+| 2026-04-11 21:36 | 0077a28 | Qwen3.5-27B-Claude-4.6-Opus-Distilled-MLX-4bit | cold-avg | 0.815 | cold |
+| 2026-04-11 21:36 | 0077a28 | Qwen3.5-27B-Claude-4.6-Opus-Distilled-MLX-4bit | warm-avg | 0.678 | warm |
+| 2026-04-11 21:36 | 0077a28 | Qwen3.5-27B-Claude-4.6-Opus-Distilled-MLX-4bit | cache-speedup | 1.200 | — |
+| 2026-04-11 21:31 | 0077a28 | Qwen3.5-27B-4bit | cold-avg | 0.848 | cold |
+| 2026-04-11 21:31 | 0077a28 | Qwen3.5-27B-4bit | warm-avg | 0.871 | warm |
+| 2026-04-11 21:31 | 0077a28 | Qwen3.5-27B-4bit | cache-speedup | 0.970 | — |
+| 2026-04-11 21:26 | 0077a28 | Qwen3.5-122B-A10B-4bit | cold-avg | 0.703 | cold |
+| 2026-04-11 21:26 | 0077a28 | Qwen3.5-122B-A10B-4bit | warm-avg | 0.683 | warm |
+| 2026-04-11 21:26 | 0077a28 | Qwen3.5-122B-A10B-4bit | cache-speedup | 1.030 | — |
+| 2026-04-11 21:21 | 0077a28 | Qwen3-Next-80B-A3B-Thinking-4bit | cold-avg | 0.413 | cold |
+| 2026-04-11 21:21 | 0077a28 | Qwen3-Next-80B-A3B-Thinking-4bit | warm-avg | 0.350 | warm |
+| 2026-04-11 21:21 | 0077a28 | Qwen3-Next-80B-A3B-Thinking-4bit | cache-speedup | 1.180 | — |
+| 2026-04-11 21:11 | 874efc4 | Qwen3-Next-80B-A3B-Instruct-4bit | cold-avg | 0.377 | cold |
+| 2026-04-11 21:11 | 874efc4 | Qwen3-Next-80B-A3B-Instruct-4bit | warm-avg | 0.386 | warm |
+| 2026-04-11 21:11 | 874efc4 | Qwen3-Next-80B-A3B-Instruct-4bit | cache-speedup | 0.980 | — |
+| 2026-04-11 21:06 | 874efc4 | Qwen3-Coder-30B-A3B-Instruct-8bit | cold-avg | 0.376 | cold |
+| 2026-04-11 21:06 | 874efc4 | Qwen3-Coder-30B-A3B-Instruct-8bit | warm-avg | 0.377 | warm |
+| 2026-04-11 21:06 | 874efc4 | Qwen3-Coder-30B-A3B-Instruct-8bit | cache-speedup | 1.000 | — |
+| 2026-04-11 20:25 | dc8dc67 | DeepSeek-R1-0528-Qwen3-8B-4bit | cold-avg | 0.387 | cold |
+| 2026-04-11 20:25 | dc8dc67 | DeepSeek-R1-0528-Qwen3-8B-4bit | warm-avg | 0.493 | warm |
+| 2026-04-11 20:25 | dc8dc67 | DeepSeek-R1-0528-Qwen3-8B-4bit | cache-speedup | 0.780 | — |
 | 2026-04-10 11:18 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | warm-avg | 14.156 | warm |
-| 2026-04-10 11:00 | 5572dde | Qwen3.5-122B-A10B-4bit | cold-avg | 16.500 | cold |
-| 2026-04-10 11:00 | 5572dde | Qwen3.5-122B-A10B-4bit | warm-avg | 11.952 | warm |
-| 2026-04-10 11:00 | 5572dde | Qwen3.5-122B-A10B-4bit | cache-speedup | 1.380 | — |
-| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | cold-avg | 1.245 | cold |
-| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | warm-avg | 1.314 | warm |
-| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | cache-speedup | 0.950 | — |
+| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | cold-avg | 0.694 | cold |
+| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | warm-avg | 0.671 | warm |
+| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | cache-speedup | 1.030 | — |
 
 ### Tool Calling
 
@@ -116,6 +200,50 @@ mlx-eval --tasks hellaswag --limit 100
 | 2026-04-11 19:10 | 2eeafad | Qwen3-Next-80B-A3B-Thinking-4bit | both-args | 100.0% | accuracy | — |
 | 2026-04-11 19:10 | 2eeafad | Qwen3-Next-80B-A3B-Thinking-4bit | no-tool-needed | 100.0% | accuracy | — |
 | 2026-04-11 19:10 | 2eeafad | Qwen3-Next-80B-A3B-Thinking-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-11 19:06 | 2eeafad | Qwen3-Next-80B-A3B-Instruct-4bit | should-call-tool | 100.0% | accuracy | — |
+| 2026-04-11 19:06 | 2eeafad | Qwen3-Next-80B-A3B-Instruct-4bit | both-args | 100.0% | accuracy | — |
+| 2026-04-11 19:06 | 2eeafad | Qwen3-Next-80B-A3B-Instruct-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-11 19:06 | 2eeafad | Qwen3-Next-80B-A3B-Instruct-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-11 19:02 | 2eeafad | Seed-OSS-36B-Instruct-4bit | should-call-tool | 0.0% | accuracy | — |
+| 2026-04-11 19:02 | 2eeafad | Seed-OSS-36B-Instruct-4bit | both-args | 0.0% | accuracy | — |
+| 2026-04-11 19:02 | 2eeafad | Seed-OSS-36B-Instruct-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-11 19:02 | 2eeafad | Seed-OSS-36B-Instruct-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-11 18:59 | 2eeafad | Devstral-Small-2-24B-Instruct-2512-4bit | should-call-tool | 0.0% | accuracy | — |
+| 2026-04-11 18:59 | 2eeafad | Devstral-Small-2-24B-Instruct-2512-4bit | both-args | 0.0% | accuracy | — |
+| 2026-04-11 18:59 | 2eeafad | Devstral-Small-2-24B-Instruct-2512-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-11 18:59 | 2eeafad | Devstral-Small-2-24B-Instruct-2512-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-11 18:55 | 2eeafad | Qwen3-Coder-30B-A3B-Instruct-8bit | should-call-tool | 100.0% | accuracy | — |
+| 2026-04-11 18:55 | 2eeafad | Qwen3-Coder-30B-A3B-Instruct-8bit | both-args | 100.0% | accuracy | — |
+| 2026-04-11 18:55 | 2eeafad | Qwen3-Coder-30B-A3B-Instruct-8bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-11 18:55 | 2eeafad | Qwen3-Coder-30B-A3B-Instruct-8bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-11 18:52 | 2eeafad | Qwen3-Coder-30B-A3B-Instruct-4bit | should-call-tool | 100.0% | accuracy | — |
+| 2026-04-11 18:52 | 2eeafad | Qwen3-Coder-30B-A3B-Instruct-4bit | both-args | 100.0% | accuracy | — |
+| 2026-04-11 18:52 | 2eeafad | Qwen3-Coder-30B-A3B-Instruct-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-11 18:52 | 2eeafad | Qwen3-Coder-30B-A3B-Instruct-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-10 11:19 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | should-call-tool | 0.0% | accuracy | — |
+| 2026-04-10 11:19 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | both-args | 0.0% | accuracy | — |
+| 2026-04-10 11:19 | 5572dde | Devstral-2-123B-Instruct-2512-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | should-call-tool | 100.0% | accuracy | — |
+| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | both-args | 100.0% | accuracy | — |
+| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-10 11:02 | 5572dde | Qwen3.5-122B-A10B-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | should-call-tool | 0.0% | accuracy | — |
+| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | both-args | 0.0% | accuracy | — |
+| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-10 10:55 | 5572dde | gpt-oss-120b-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | should-call-tool | 0.0% | accuracy | — |
+| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | both-args | 0.0% | accuracy | — |
+| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-10 10:49 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | should-call-tool | 100.0% | accuracy | — |
+| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | both-args | 100.0% | accuracy | — |
+| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | should-call-tool | 0.0% | accuracy | — |
+| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | both-args | 0.0% | accuracy | — |
+| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | no-tool-needed | 100.0% | accuracy | — |
+| 2026-04-10 02:56 | 3b5d3ea | gemma-4-31b-it-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
+| 2026-04-10 02:13 | 3b5d3ea | Qwen3.5-27B-4bit | ambiguous-no-tool | 100.0% | accuracy | — |
 
 ### Code Accuracy
 
@@ -126,6 +254,16 @@ mlx-eval --tasks hellaswag --limit 100
 | 2026-04-10 11:03 | 5572dde | Qwen3.5-122B-A10B-4bit | code-planning | 33.0% | accuracy | — |
 | 2026-04-10 10:56 | 5572dde | gpt-oss-120b-4bit | bug-detection | 67.0% | accuracy | — |
 | 2026-04-10 10:56 | 5572dde | gpt-oss-120b-4bit | code-planning | 0.0% | accuracy | — |
+| 2026-04-10 10:50 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | bug-detection | 100.0% | accuracy | — |
+| 2026-04-10 10:50 | 5572dde | GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | code-planning | 0.0% | accuracy | — |
+| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | bug-detection | 100.0% | accuracy | — |
+| 2026-04-10 03:07 | 3b5d3ea | Qwen3.5-35B-A3B-4bit | code-planning | 33.0% | accuracy | — |
+| 2026-04-10 02:58 | 3b5d3ea | gemma-4-31b-it-4bit | bug-detection | 100.0% | accuracy | — |
+| 2026-04-10 02:58 | 3b5d3ea | gemma-4-31b-it-4bit | code-planning | 0.0% | accuracy | — |
+| 2026-04-10 02:44 | 3b5d3ea | Qwen3.5-27B-4bit | bug-detection | 100.0% | accuracy | — |
+| 2026-04-10 02:44 | 3b5d3ea | Qwen3.5-27B-4bit | code-planning | 0.0% | accuracy | — |
+| 2026-04-10 00:55 | 3b5d3ea | gemma-4-e4b-it-4bit | bug-detection | 100.0% | accuracy | — |
+| 2026-04-10 00:55 | 3b5d3ea | gemma-4-e4b-it-4bit | code-planning | 0.0% | accuracy | — |
 
 ### Framework Benchmark
 
@@ -145,17 +283,36 @@ mlx-eval --tasks hellaswag --limit 100
 | 2026-04-11 17:12 | 2eeafad | minerva_math500 | math_verify | 0.42 | ratio |
 | 2026-04-11 16:55 | 2eeafad | minerva_math500 | math_verify | 0.42 | ratio |
 | 2026-04-11 16:30 | 2eeafad | minerva_math500 | math_verify | 0.08 | ratio |
+| 2026-04-11 16:10 | 2eeafad | minerva_math500 | math_verify | 0.08 | ratio |
+| 2026-04-11 15:50 | 2eeafad | minerva_math500 | math_verify | 0.08 | ratio |
+| 2026-04-11 15:18 | 2eeafad | minerva_math500 | math_verify | 0.34 | ratio |
+| 2026-04-11 14:34 | 2eeafad | minerva_math500 | math_verify | 0.37 | ratio |
+| 2026-04-11 14:19 | 1829b16 | minerva_math500 | math_verify | 0.37 | ratio |
+| 2026-04-11 02:19 | ff66999 | minerva_math500 | math_verify | 0.47 | ratio |
 
 ### Model Comparison Matrix
 
-| Model | Tool Calling | Math-Hard (minerva_math500) | Code Accuracy | TTFT | Throughput | Capability Comparison (vs Claude Opus 4.6) | Framework Benchmark |
-|-------|--------------|-----------------------------|---------------|------|------------|--------------------------------------------|---------------------|
-| Devstral-2-123B-Instruct-2512-4bit | — | 0.42 | 0% (0/2) | — | 2.5 tok/s | — | — |
-| GLM-4.5-Air-4bit | 50% | — | — | — | — | — | — |
-| Qwen3-Next-80B-A3B-Instruct-8bit | 100% | — | — | — | — | — | — |
-| Qwen3-Next-80B-A3B-Thinking-4bit | 75% | — | — | — | — | — | — |
-| Qwen3.5-122B-A10B-4bit | — | 0.08 | 66% | 16.50s | 14.6 tok/s | — | — |
-| gpt-oss-120b-4bit | — | 0.42 | 34% | 1.24s | 18.9 tok/s | — | — |
+| Model | TTFT | Throughput | Tool Calling | Math-Hard (minerva_math500) | Code Accuracy | Capability Comparison (vs Claude Opus 4.6) | Framework Benchmark |
+|-------|------|------------|--------------|-----------------------------|---------------|--------------------------------------------|---------------------|
+| DeepSeek-R1-0528-Qwen3-8B-4bit | 0.39s | 58.7 tok/s | — | — | — | — | — |
+| Devstral-2-123B-Instruct-2512-4bit | — | 2.5 tok/s | 25% (1/4) | 0.42 | 0% (0/2) | — | — |
+| Devstral-Small-2-24B-Instruct-2512-4bit | — | — | 50% | 0.37 | — | — | — |
+| GLM-4.5-Air-4bit | — | — | 50% | 0.08 | — | — | — |
+| GLM-4.7-Flash-Claude-Opus-4.5-High-Reasoning-Distill-8bit | 0.69s | 11.1 tok/s | 50% | — | 50% | — | — |
+| Qwen3-Coder-30B-A3B-Instruct-4bit | — | — | 100% | 0.47 | — | — | — |
+| Qwen3-Coder-30B-A3B-Instruct-8bit | 0.38s | 41.2 tok/s | 100% | 0.37 | — | — | — |
+| Qwen3-Next-80B-A3B-Instruct-4bit | 0.38s | 28.2 tok/s | 100% | 0.34 | — | — | — |
+| Qwen3-Next-80B-A3B-Instruct-8bit | — | — | 100% | — | — | — | — |
+| Qwen3-Next-80B-A3B-Thinking-4bit | 0.41s | 25.1 tok/s | 75% | 0.08 | — | — | — |
+| Qwen3.5-122B-A10B-4bit | 0.70s | 24.6 tok/s | 100% | 0.08 | 66% | — | — |
+| Qwen3.5-27B-4bit | 0.85s | 22.9 tok/s | 25% (1/4) | — | 50% | — | — |
+| Qwen3.5-27B-Claude-4.6-Opus-Distilled-MLX-4bit | 0.81s | 22.9 tok/s | — | — | — | — | — |
+| Qwen3.5-35B-A3B-4bit | 0.63s | 32.9 tok/s | 100% | — | 66% | — | — |
+| Qwen3.5-9B-MLX-4bit | 0.52s | 68.5 tok/s | — | — | — | — | — |
+| Seed-OSS-36B-Instruct-4bit | 0.71s | 18.6 tok/s | 50% | — | — | — | — |
+| gemma-4-31b-it-4bit | 1.08s | 18.4 tok/s | 50% | — | 50% | — | — |
+| gemma-4-e4b-it-4bit | 0.69s | 59.9 tok/s | — | — | 50% | — | — |
+| gpt-oss-120b-4bit | 0.73s | 44.9 tok/s | 50% | 0.42 | 34% | — | — |
 
 <!-- BENCHMARK-TABLE-END -->
 

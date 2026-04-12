@@ -1,0 +1,49 @@
+{
+  "schema_version": "1",
+  "timestamp": "2026-04-11T21:48:00Z",
+  "git_sha": "0077a28",
+  "trigger": "local",
+  "pr_number": null,
+  "suite": "ttft",
+  "model": "mlx-community/Qwen3.5-9B-MLX-4bit",
+  "system": {
+    "os": "macOS 26.4",
+    "chip": "Apple M4 Max",
+    "memory_gb": 128,
+    "vllm_mlx_version": "unknown",
+    "runner": "local"
+  },
+  "results": [
+    {
+      "name": "cold-avg",
+      "metric": "ttft",
+      "value": 0.5184,
+      "unit": "seconds",
+      "tags": {
+        "type": "cold",
+        "samples": "3"
+      }
+    },
+    {
+      "name": "warm-avg",
+      "metric": "ttft",
+      "value": 0.5941,
+      "unit": "seconds",
+      "tags": {
+        "type": "warm",
+        "samples": "3"
+      }
+    },
+    {
+      "name": "cache-speedup",
+      "metric": "ratio",
+      "value": 0.87,
+      "unit": "x",
+      "tags": {
+        "cold_avg": "0.5184",
+        "warm_avg": "0.5941"
+      }
+    }
+  ],
+  "errors": []
+}
