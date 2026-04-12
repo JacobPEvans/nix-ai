@@ -1,5 +1,5 @@
 {
-  description = "AI CLI ecosystem for Claude, Gemini, Copilot (Nix flake)";
+  description = "Claude Code module and automation stack extracted from nix-ai";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.11-darwin";
@@ -9,30 +9,16 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nix-ai-claude = {
-      url = "path:./nix-ai-claude";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-    };
-
-    # Official Anthropic repositories
-    claude-code-plugins = {
-      url = "github:anthropics/claude-code";
-      flake = false;
-    };
-
     claude-cookbooks = {
       url = "github:anthropics/claude-cookbooks";
       flake = false;
     };
 
-    # AI Assistant Instructions - source of truth for AI agent configuration
     ai-assistant-instructions = {
       url = "github:JacobPEvans/ai-assistant-instructions";
       flake = false;
     };
 
-    # Marketplace Inputs
     anthropic-agent-skills = {
       url = "github:anthropics/skills";
       flake = false;
@@ -43,6 +29,10 @@
     };
     bitwarden-marketplace = {
       url = "github:bitwarden/ai-plugins";
+      flake = false;
+    };
+    browser-use-skills = {
+      url = "github:browser-use/browser-use";
       flake = false;
     };
     cc-dev-tools = {
@@ -102,21 +92,11 @@
       flake = false;
     };
 
-    # Skill-only repos (no marketplace structure — wrapped via synthetic derivation)
-    browser-use-skills = {
-      url = "github:browser-use/browser-use";
-      flake = false;
-    };
-
-    # PAL MCP server - pinned for supply-chain safety; auto-bumped by deps-update-flake.yml
     pal-mcp-server = {
       url = "github:BeehiveInnovations/pal-mcp-server";
       flake = false;
     };
 
-    # Fabric - Daniel Miessler's 252+ AI prompt pattern framework (Go CLI).
-    # Source of both the fabric binary and the pattern library. Pinned to a
-    # release tag; Renovate bumps via the annotation in modules/fabric/package.nix.
     fabric-src = {
       url = "github:danielmiessler/fabric/v1.4.444";
       flake = false;
@@ -128,13 +108,12 @@
       self,
       nixpkgs,
       home-manager,
-      nix-ai-claude,
-      claude-code-plugins,
       claude-cookbooks,
       ai-assistant-instructions,
       anthropic-agent-skills,
       bills-claude-skills,
       bitwarden-marketplace,
+      browser-use-skills,
       cc-dev-tools,
       cc-marketplace,
       claude-code-plugins-plus,
@@ -149,7 +128,6 @@
       superpowers-marketplace,
       visual-explainer-marketplace,
       wakatime,
-      browser-use-skills,
       pal-mcp-server,
       fabric-src,
       ...
@@ -185,19 +163,13 @@
       };
     in
     {
-      # Home-manager modules
       homeManagerModules = {
-        # Full AI CLI module
         default = {
-          imports = [
-            "${nix-ai-claude}/modules/embedded.nix"
-            ./modules/default.nix
-          ];
+          imports = [ ./modules/default.nix ];
           _module.args = {
             inherit
               ai-assistant-instructions
               marketplaceInputs
-              claude-code-plugins
               claude-cookbooks
               pal-mcp-server
               fabric-src
@@ -205,57 +177,85 @@
           };
         };
 
-        # Individual modules for selective import
-        claude = nix-ai-claude.homeManagerModules.claude;
-
-        maestro = {
-          imports = [ ./modules/maestro ];
+        claude = {
+          imports = [ ./modules/embedded.nix ];
+          _module.args = {
+            inherit
+              ai-assistant-instructions
+              marketplaceInputs
+              claude-cookbooks
+              pal-mcp-server
+              fabric-src
+              ;
+          };
         };
       };
 
-      # CI-friendly outputs
       lib = {
         ci = {
-          inherit (nix-ai-claude.lib.ci) claudeSettingsJson;
+          claudeSettingsJson =
+            let
+              aiCommon = import ./modules/common {
+                inherit ai-assistant-instructions;
+                inherit (nixpkgs) lib;
+                config = {
+                  home.homeDirectory = "/home/user";
+                };
+              };
+              inherit (aiCommon) permissions formatters;
+            in
+            builtins.toJSON (
+              import ./lib/claude-settings.nix {
+                inherit (nixpkgs) lib;
+                homeDir = "/home/user";
+                schemaUrl = "https://json.schemastore.org/claude-code-settings.json";
+                permissions = {
+                  allow = formatters.claude.formatAllowed permissions;
+                  deny = formatters.claude.formatDenied permissions;
+                  ask = [ ];
+                };
+                plugins =
+                  (import ./modules/claude-plugins.nix {
+                    inherit (nixpkgs) lib;
+                    inherit marketplaceInputs claude-cookbooks;
+                  }).pluginConfig;
+              }
+            );
         };
 
-        # Expose lib functions
-        inherit (nix-ai-claude.lib) claude-settings claude-registry;
-        versions = import ./lib/versions.nix;
+        claude-settings = import ./lib/claude-settings.nix;
+        claude-registry = import ./lib/claude-registry.nix;
       };
 
-      # Quality checks (formatting, linting, dead code, shellcheck, module-eval)
       checks = forAllSystems (
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-        in
-        import ./lib/checks.nix {
-          inherit
-            pkgs
-            home-manager
-            pal-mcp-server
-            fabric-src
-            ;
-          src = ./.;
           aiModule = self.homeManagerModules.default;
-        }
-      );
-
-      # Expose custom packages for nix-update automation
-      packages = forAllSystems (
-        system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
+          hmConfig = home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            modules = [
+              aiModule
+              {
+                _module.args.userConfig = {
+                  ai.claudeSchemaUrl = "https://json.schemastore.org/claude-code-settings.json";
+                };
+                home = {
+                  username = "test-user";
+                  homeDirectory = "/home/test-user";
+                  stateVersion = "25.11";
+                };
+                programs.mlx = {
+                  enable = true;
+                  host = "127.0.0.1";
+                  port = 11434;
+                  defaultModel = "mlx-community/Qwen3.5-122B-A10B-4bit";
+                };
+              }
+            ];
+          };
         in
-        {
-          gh-aw = pkgs.callPackage ./modules/gh-extensions/gh-aw.nix { };
-          pal-mcp-server = pkgs.callPackage ./modules/mcp/pal-package.nix { inherit pal-mcp-server; };
-          fabric-ai = pkgs.callPackage ./modules/fabric/package.nix { inherit fabric-src; };
-        }
+        import ./lib/checks/claude.nix { inherit pkgs hmConfig; }
       );
-
-      # Formatter
-      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
     };
 }

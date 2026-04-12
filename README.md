@@ -57,7 +57,7 @@ nix-ai exports [home-manager](https://github.com/nix-community/home-manager) mod
 | Export | What it includes |
 | ------ | --------------- |
 | `homeManagerModules.default` | Full AI stack — Claude, Gemini, Copilot, Codex, MCP, MLX, dev tools |
-| `homeManagerModules.claude` | Just Claude Code |
+| `homeManagerModules.claude` | Claude Code via the extracted `nix-ai-claude` module |
 | `homeManagerModules.maestro` | Just Maestro orchestration |
 | `lib.ci.claudeSettingsJson` | Pure JSON for CI validation (no derivations needed) |
 
@@ -111,6 +111,7 @@ nix fmt
 ## Repository structure
 
 ```text
+nix-ai-claude/        # Staged standalone Claude-only flake
 modules/
 ├── claude/          # Claude Code (settings, plugins, statusline, auto-claude)
 ├── maestro/         # Maestro agent orchestration

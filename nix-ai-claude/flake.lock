@@ -1,0 +1,424 @@
+{
+  "nodes": {
+    "ai-assistant-instructions": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776008934,
+        "narHash": "sha256-R02sX+Dko7XHyFxQ4dgGz1uA8wjR+aBtJSFmjM9p4ek=",
+        "owner": "JacobPEvans",
+        "repo": "ai-assistant-instructions",
+        "rev": "253e4e2580faaaef9a9ed883e2d3489657c84532",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JacobPEvans",
+        "repo": "ai-assistant-instructions",
+        "type": "github"
+      }
+    },
+    "anthropic-agent-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775755206,
+        "narHash": "sha256-H/oorOl5cch7bnziDz7gHNBv5Q0OAwFbk9w1WLku2kk=",
+        "owner": "anthropics",
+        "repo": "skills",
+        "rev": "12ab35c2eb5668c95810e6a6066f40f4218adc39",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "skills",
+        "type": "github"
+      }
+    },
+    "axton-obsidian-visual-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1770862721,
+        "narHash": "sha256-28hLlKPifZ0GT3vc3eYuIN0C2DQm6vtZhJIKEomRp0M=",
+        "owner": "axtonliu",
+        "repo": "axton-obsidian-visual-skills",
+        "rev": "1265976d9746a84858b4b7b42fb86a215aa93de9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "axtonliu",
+        "repo": "axton-obsidian-visual-skills",
+        "type": "github"
+      }
+    },
+    "bills-claude-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772306604,
+        "narHash": "sha256-PyQSIuAzLXuah9qvfXSiiXedprtwvq/d7rzaAan7xTA=",
+        "owner": "BillChirico",
+        "repo": "bills-claude-skills",
+        "rev": "3a7e65e88949e3f98a75ea296b53e478e2b5995c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BillChirico",
+        "repo": "bills-claude-skills",
+        "type": "github"
+      }
+    },
+    "bitwarden-marketplace": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775576196,
+        "narHash": "sha256-/NW6DwIdZwt5UqQzuqIG3TE4qjQc9dtcm4ply92Jgsw=",
+        "owner": "bitwarden",
+        "repo": "ai-plugins",
+        "rev": "e6095fe6058d07f34ca32243b0dab19d556a3b2d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "bitwarden",
+        "repo": "ai-plugins",
+        "type": "github"
+      }
+    },
+    "browser-use-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776008847,
+        "narHash": "sha256-prDfQao291H8fgClUwjyKyee5yAxW2HUKn9COmm9WNQ=",
+        "owner": "browser-use",
+        "repo": "browser-use",
+        "rev": "36438e409e70ab6018a222c931c887b4a4720a71",
+        "type": "github"
+      },
+      "original": {
+        "owner": "browser-use",
+        "repo": "browser-use",
+        "type": "github"
+      }
+    },
+    "cc-dev-tools": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1773368188,
+        "narHash": "sha256-HcICAqqI3kP0PWQhWvkaM2DOegINXamgox5u+LH2wYA=",
+        "owner": "Lucklyric",
+        "repo": "cc-dev-tools",
+        "rev": "f6414993a4c5047ab3c6f88866789d03f50bef7c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Lucklyric",
+        "repo": "cc-dev-tools",
+        "type": "github"
+      }
+    },
+    "cc-marketplace": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1768758615,
+        "narHash": "sha256-BnH8+reZQRy4st+5zwA1EEDLIc2nVIp8CVBizUIkjXo=",
+        "owner": "ananddtyagi",
+        "repo": "cc-marketplace",
+        "rev": "b643305146890bda9b2e694d2c42206ae4d0a4df",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ananddtyagi",
+        "repo": "cc-marketplace",
+        "type": "github"
+      }
+    },
+    "claude-code-plugins-plus": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775769794,
+        "narHash": "sha256-ksmRNoD5Vhki99/nndJnLzBMf6B0Y+5eMMUPFFHXYkI=",
+        "owner": "jeremylongshore",
+        "repo": "claude-code-plugins-plus",
+        "rev": "c8a915cb82a09594c12ee5b9aca351a50e28b831",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jeremylongshore",
+        "repo": "claude-code-plugins-plus",
+        "type": "github"
+      }
+    },
+    "claude-code-workflows": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775684268,
+        "narHash": "sha256-LFApt/MSM5sp8KxNbghCNkVn3RF3986rhi3mamfsbhM=",
+        "owner": "wshobson",
+        "repo": "agents",
+        "rev": "03d0b4b9eb4d57bd961aa252a56025daa21543e6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "wshobson",
+        "repo": "agents",
+        "type": "github"
+      }
+    },
+    "claude-cookbooks": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775867615,
+        "narHash": "sha256-sDC2q9iJcN+n/wPr1fItLf+vNxBW8euUJROb5cHc0xA=",
+        "owner": "anthropics",
+        "repo": "claude-cookbooks",
+        "rev": "753ddfe35fdc7e310a45cadcfe314ba6809672f8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "claude-cookbooks",
+        "type": "github"
+      }
+    },
+    "claude-plugins-official": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775860746,
+        "narHash": "sha256-wt+D1LKRWQDPuLA0f4X2deV5LDL7+x0iz7+2BHkkAYs=",
+        "owner": "anthropics",
+        "repo": "claude-plugins-official",
+        "rev": "7ed523140f506611c968a0ec32e1dfc40a1d5673",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "claude-plugins-official",
+        "type": "github"
+      }
+    },
+    "claude-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775668456,
+        "narHash": "sha256-AGvjE398hSve2gctkVodCdcmMsN8/7OdwMTx4gR8rOo=",
+        "owner": "secondsky",
+        "repo": "claude-skills",
+        "rev": "88da5ffe9767d2b75bd5a5545165ca4bcd868168",
+        "type": "github"
+      },
+      "original": {
+        "owner": "secondsky",
+        "repo": "claude-skills",
+        "type": "github"
+      }
+    },
+    "fabric-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775769065,
+        "narHash": "sha256-986ny/DRchsu+MkZFnmGrWaCPaw+SFYJzY768ZEPtfQ=",
+        "owner": "danielmiessler",
+        "repo": "fabric",
+        "rev": "42311fe04b552f63503667b35f26b9b2ad537f95",
+        "type": "github"
+      },
+      "original": {
+        "owner": "danielmiessler",
+        "ref": "v1.4.444",
+        "repo": "fabric",
+        "type": "github"
+      }
+    },
+    "home-manager": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1775425411,
+        "narHash": "sha256-KY6HsebJHEe5nHOWP7ur09mb0drGxYSzE3rQxy62rJo=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "0d02ec1d0a05f88ef9e74b516842900c41f0f2fe",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "ref": "release-25.11",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
+    "jacobpevans-cc-plugins": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776009076,
+        "narHash": "sha256-ax0tWhq2lopf74Ct8uwRYHb9gfvSrb6VCyWvLlw7G0s=",
+        "owner": "JacobPEvans",
+        "repo": "claude-code-plugins",
+        "rev": "97b7db34db2b0f8388fcdf383929e799d3dd8890",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JacobPEvans",
+        "repo": "claude-code-plugins",
+        "type": "github"
+      }
+    },
+    "lunar-claude": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775954149,
+        "narHash": "sha256-2uerJNB6LwsHLn+tbR0EV6dpnOHzrjzZa6gjWAzZcfM=",
+        "owner": "basher83",
+        "repo": "lunar-claude",
+        "rev": "095effbcad721d82fa245c5d0d00b478b76d8838",
+        "type": "github"
+      },
+      "original": {
+        "owner": "basher83",
+        "repo": "lunar-claude",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1775749320,
+        "narHash": "sha256-msT6frWJSQ2WR+0cpk+KPcZdLTLagUIsJwQwIX9JNSo=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "74b87959b2d16f59f54d8559cf3cf26b9d907949",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-25.11-darwin",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "obsidian-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775150516,
+        "narHash": "sha256-/D5HKtLvVdBh7g7zCFDQmInL7/q8koiR6HL0ARmTCoE=",
+        "owner": "kepano",
+        "repo": "obsidian-skills",
+        "rev": "fa1e131a014576ff8f8919f191a7ca8d8fded39b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kepano",
+        "repo": "obsidian-skills",
+        "type": "github"
+      }
+    },
+    "openai-codex": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775684930,
+        "narHash": "sha256-4kqtfdHlcg3YXWX1og9b5JuLgnB/3Nj5dFMe4Ryt7No=",
+        "owner": "openai",
+        "repo": "codex-plugin-cc",
+        "rev": "6a5c2ba53b734f3cdd8daacbd49f68f3e6c8c167",
+        "type": "github"
+      },
+      "original": {
+        "owner": "openai",
+        "repo": "codex-plugin-cc",
+        "type": "github"
+      }
+    },
+    "pal-mcp-server": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1765818451,
+        "narHash": "sha256-N10TLndisNT48NVT8OZs7hZFf4D6j8ekPU7RfqwkqY0=",
+        "owner": "BeehiveInnovations",
+        "repo": "pal-mcp-server",
+        "rev": "7afc7c1cc96e23992c8f105f960132c657883bb1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BeehiveInnovations",
+        "repo": "pal-mcp-server",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "ai-assistant-instructions": "ai-assistant-instructions",
+        "anthropic-agent-skills": "anthropic-agent-skills",
+        "axton-obsidian-visual-skills": "axton-obsidian-visual-skills",
+        "bills-claude-skills": "bills-claude-skills",
+        "bitwarden-marketplace": "bitwarden-marketplace",
+        "browser-use-skills": "browser-use-skills",
+        "cc-dev-tools": "cc-dev-tools",
+        "cc-marketplace": "cc-marketplace",
+        "claude-code-plugins-plus": "claude-code-plugins-plus",
+        "claude-code-workflows": "claude-code-workflows",
+        "claude-cookbooks": "claude-cookbooks",
+        "claude-plugins-official": "claude-plugins-official",
+        "claude-skills": "claude-skills",
+        "fabric-src": "fabric-src",
+        "home-manager": "home-manager",
+        "jacobpevans-cc-plugins": "jacobpevans-cc-plugins",
+        "lunar-claude": "lunar-claude",
+        "nixpkgs": "nixpkgs",
+        "obsidian-skills": "obsidian-skills",
+        "openai-codex": "openai-codex",
+        "pal-mcp-server": "pal-mcp-server",
+        "superpowers-marketplace": "superpowers-marketplace",
+        "visual-explainer-marketplace": "visual-explainer-marketplace",
+        "wakatime": "wakatime"
+      }
+    },
+    "superpowers-marketplace": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775805828,
+        "narHash": "sha256-OU3AnCrFesExZdIKF39j9Mu2pXzcm2qHtrC1oALKhtw=",
+        "owner": "obra",
+        "repo": "superpowers-marketplace",
+        "rev": "0b73e2556d4ecf4fe54dbb32b248b5e17ed0c0f5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "obra",
+        "repo": "superpowers-marketplace",
+        "type": "github"
+      }
+    },
+    "visual-explainer-marketplace": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1774753729,
+        "narHash": "sha256-gaFtCysH6k5ogkb+6yvnwnAeuJqR4kK5OHbHdr64/hk=",
+        "owner": "nicobailon",
+        "repo": "visual-explainer",
+        "rev": "9a97a5818bebbcb61cccf8941d533b82a1ce958b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nicobailon",
+        "repo": "visual-explainer",
+        "type": "github"
+      }
+    },
+    "wakatime": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775007070,
+        "narHash": "sha256-XiFVK4LtFvq19LEPK1vNcBO2FUaqiHuaApkI3ZqmYu8=",
+        "owner": "wakatime",
+        "repo": "claude-code-wakatime",
+        "rev": "ec4df00f98ab749171b8899e8be11c063332a35c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "wakatime",
+        "repo": "claude-code-wakatime",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

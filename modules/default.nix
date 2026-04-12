@@ -11,30 +11,11 @@
   pkgs,
   lib,
   ai-assistant-instructions,
-  marketplaceInputs,
-  claude-cookbooks,
-  claude-code-plugins,
   fabric-src,
-  userConfig ? {
-    ai.claudeSchemaUrl = "https://json.schemastore.org/claude-code-settings.json";
-  },
   ...
 }:
 
 let
-  # Claude Code configuration values
-  claudeConfig = import ./claude-config.nix {
-    inherit
-      config
-      pkgs
-      lib
-      ai-assistant-instructions
-      marketplaceInputs
-      claude-cookbooks
-      fabric-src
-      ;
-  };
-
   # AgentsMD symlinks from ai-assistant-instructions flake input
   agentsMdSymlinks = {
     "CLAUDE.md" = {
@@ -91,7 +72,6 @@ let
 in
 {
   imports = [
-    ./claude
     ./fabric
     ./maestro
     ./mlx
@@ -106,13 +86,6 @@ in
       file = geminiFiles.file // codexFiles // geminiCommands // copilotFiles // agentsMdSymlinks;
 
       activation = geminiFiles.activation // {
-        # Claude Code Settings Validation (post-rebuild)
-        validateClaudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          $DRY_RUN_CMD ${./scripts/validate-claude-settings.sh} \
-            "${config.home.homeDirectory}/.claude/settings.json" \
-            "${userConfig.ai.claudeSchemaUrl}"
-        '';
-
         # open-webui: installed via uv (nixpkgs broken on darwin — see modules/open-webui.nix)
         installOpenWebui = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q "^open-webui"; then
@@ -133,13 +106,6 @@ in
 
     # Programs configuration
     programs = {
-      # Claude Code declarative configuration
-      claude = claudeConfig;
-
-      # Claude Code statusline (switched from powerline to daniel3303)
-      claudeStatusline.enable = false; # Disabled (kept for easy re-enable)
-      claudeStatuslineDaniel3303.enable = true; # Active: ClaudeCodeStatusLine (2-line)
-
       # MLX inference server (vllm-mlx on port 11434)
       mlx.enable = true;
 

@@ -70,7 +70,6 @@ constraints and on-demand patterns.
 
 - `modules/default.nix` — Module entry point (imports all AI modules)
 - `modules/claude/` — Claude Code settings, plugins, statusline, auto-claude
-- `nix-ai-claude/` — staged standalone Claude-only flake extracted from this repo
 - `modules/mcp/` — MCP server definitions
 - `modules/mlx/` — MLX inference server (vllm-mlx LaunchAgent, CLI tools, perf tuning)
 - `modules/common/` — Shared permission engine and formatters
