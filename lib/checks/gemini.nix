@@ -115,66 +115,24 @@ in
   # Validate Policy Engine TOML is deployed and settings.json uses policyPaths.
   gemini-policy-engine =
     let
-      # Verify the policy TOML file entry exists in home.file
       policyFileEntry = hmConfig.config.home.file.".gemini/policies/nix-managed.toml";
-      policySource = policyFileEntry.source;
-      # Read the generated TOML content
-      policyContent = builtins.readFile policySource;
+      policyContent = builtins.readFile policyFileEntry.source;
+      inherit (pkgs) lib;
     in
-    pkgs.runCommand "check-gemini-policy-engine"
-      {
-        nativeBuildInputs = [ pkgs.gnugrep ];
-        passAsFile = [ "policy" ];
-        policy = policyContent;
-      }
-      ''
-        echo "Validating Gemini Policy Engine TOML..."
-
-        # TOML must be non-empty
-        if [ ! -s "$policyPath" ]; then
-          echo "FAIL: policy TOML is empty"
-          exit 1
-        fi
-
-        # Must contain [[rule]] entries
-        if ! grep -q '^\[\[rule\]\]' "$policyPath"; then
-          echo "FAIL: no [[rule]] entries found"
-          exit 1
-        fi
-
-        # Must contain all three decision types
-        if ! grep -q 'decision = "allow"' "$policyPath"; then
-          echo "FAIL: no allow rules found"
-          exit 1
-        fi
-        if ! grep -q 'decision = "deny"' "$policyPath"; then
-          echo "FAIL: no deny rules found"
-          exit 1
-        fi
-        if ! grep -q 'decision = "ask_user"' "$policyPath"; then
-          echo "FAIL: no ask_user rules found"
-          exit 1
-        fi
-
-        # Must contain built-in tool mappings (read_file, glob, etc.)
-        if ! grep -q 'toolName = "read_file"' "$policyPath"; then
-          echo "FAIL: missing read_file tool mapping"
-          exit 1
-        fi
-
-        # Must contain shell command rules
-        if ! grep -q 'toolName = "run_shell_command"' "$policyPath"; then
-          echo "FAIL: no run_shell_command rules found"
-          exit 1
-        fi
-
-        # Must contain git allow rule
-        if ! grep -q 'commandPrefix = "git"' "$policyPath"; then
-          echo "FAIL: missing git commandPrefix rule"
-          exit 1
-        fi
-
-        echo "Gemini Policy Engine: TOML non-empty, 3 decision types, tool mappings, shell rules, git rule verified"
-        touch $out
-      '';
+    assert lib.stringLength policyContent > 0 || throw "Policy TOML is empty";
+    assert lib.hasInfix "[[rule]]" policyContent || throw "No [[rule]] entries found";
+    assert lib.hasInfix ''decision = "allow"'' policyContent || throw "No allow rules found";
+    assert lib.hasInfix ''decision = "deny"'' policyContent || throw "No deny rules found";
+    assert lib.hasInfix ''decision = "ask_user"'' policyContent || throw "No ask_user rules found";
+    assert
+      lib.hasInfix ''toolName = "read_file"'' policyContent || throw "Missing read_file tool mapping";
+    assert
+      lib.hasInfix ''toolName = "run_shell_command"'' policyContent
+      || throw "No run_shell_command rules found";
+    assert
+      lib.hasInfix ''commandPrefix = "git"'' policyContent || throw "Missing git commandPrefix rule";
+    pkgs.runCommand "check-gemini-policy-engine" { } ''
+      echo "Gemini Policy Engine: TOML structure verified (8 assertions: non-empty, [[rule]], 3 decision types, tool mappings, git rule)"
+      touch $out
+    '';
 }
