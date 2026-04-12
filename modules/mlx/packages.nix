@@ -2,8 +2,12 @@
 # MLX Module — CLI Tools, Environment & Ecosystem
 #
 # All home.packages and home.sessionVariables for the MLX module.
-# Includes: vllm-mlx wrapper, mlx CLI tools, benchmark suite, health check,
+# Includes: vllm-mlx wrapper, mlx CLI tools (including upstream mlx-bench /
+# mlx-bench-engine / mlx-bench-raw for ad-hoc measurement), health check,
 # and ecosystem uvx wrappers (parakeet-mlx, mlx-vlm).
+#
+# Orchestrated sweep runs live in the companion repo JacobPEvans/mlx-benchmarks;
+# results are published to https://huggingface.co/datasets/JacobPEvans/mlx-benchmarks
 #
 {
   config,
@@ -155,11 +159,6 @@ in
             --model_args "base_url=''${MLX_API_URL:-${apiUrl}}/chat/completions,model=''${MLX_DEFAULT_MODEL:-${cfg.defaultModel}},tokenizer_backend=None,tokenized_requests=False,num_concurrent=''${concurrent},max_retries=3,max_length=32768" \
             --apply_chat_template \
             "$@"
-        '')
-
-        # mlx-benchmark — orchestrate benchmark runs across models and suites
-        (pkgs.writeShellScriptBin "mlx-benchmark" ''
-          exec ${pkgs.uv}/bin/uv run "${../../scripts/benchmarks/orchestrate.py}" "$@"
         '')
 
         # ======================================================================

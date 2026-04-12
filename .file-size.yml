@@ -1,12 +1,6 @@
 # Per-repo file-size config for JacobPEvans/.github/_file-size.yml
 # options.nix: vllm-mlx parameter reference (active + commented-out options)
 # ai-tools: multi-tool AI package definitions
-# mlx-benchmarks: full dated decision history + post-mortems for MLX model sweeps
-#
-# Bumped from 20480 → 32768 when the benchmark summary switched from
-# "last N runs per suite" (which truncated large sweeps) to
-# "latest per (suite, model) pair" (which scales with catalog size).
-# See generate-summary.py for the new logic.
 extended:
-  limit: 32768
-  files: [options, ai-tools, mlx-benchmarks, mlx-benchmarks-history]
+  limit: 20480
+  files: [options, ai-tools]

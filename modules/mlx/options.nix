@@ -15,9 +15,9 @@
       default = "mlx-community/Qwen3.5-35B-A3B-4bit";
       description = ''
         Default mlx-community/ HuggingFace model to serve via vllm-mlx.
-        See `docs/mlx-benchmarks.md` for the current benchmark-driven
-        rationale and `docs/mlx-benchmarks-history.md` for historical
-        default-swap context.
+        Benchmark-driven rationale and historical default-swap context live
+        on the companion dataset:
+        https://huggingface.co/datasets/JacobPEvans/mlx-benchmarks
       '';
     };
 
