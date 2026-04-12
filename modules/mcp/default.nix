@@ -153,16 +153,15 @@ in
   };
 
   # ================================================================
-  # Obsidian - NOT IMPLEMENTED
+  # Obsidian - Integrated via Claude Code Plugin (not MCP)
   # ================================================================
-  # Decision: Not moving forward with REST API approach since official Obsidian CLI will be released soon.
-  # Using Claude Skills plugins for Obsidian integration instead (see plugins/community.nix).
+  # The official Obsidian CLI (v1.8+, ships in Obsidian.app) provides 80+
+  # commands. Integration uses the kepano/obsidian-skills Claude Code plugin
+  # which teaches Claude to invoke the CLI via Bash (auto-approved in
+  # ai-assistant-instructions permissions). No MCP server needed — the skill
+  # provides equivalent structured access without an additional layer.
   #
-  # If revisited in the future:
-  # - Use `uvx mcp-obsidian` (PyPI package)
-  # - Requires Obsidian REST API plugin: https://github.com/coddingtonbear/obsidian-local-rest-api
-  # - IMPORTANT: Inject OBSIDIAN_API_KEY via secrets manager at runtime (never in Nix store)
-  # - Non-secret defaults: OBSIDIAN_HOST=127.0.0.1, OBSIDIAN_PORT=27124
+  # If MCP is desired later: bunx [ "mcp-obsidian-cli@1.2.0" ] (stonematt)
 
   # ================================================================
   # Database (disabled by default)
