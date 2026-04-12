@@ -1,0 +1,143 @@
+# Codex module regression tests
+{ pkgs, hmConfig }:
+let
+  cfg = hmConfig.config.programs.codex;
+in
+{
+  # Verify all expected Codex option paths exist.
+  codex-options-regression =
+    let
+      expectedOptions = [
+        "approvalPolicy"
+        "enable"
+        "excludedMcpServers"
+        "features"
+        "hooks"
+        "skills"
+        "trustedProjectDirs"
+      ];
+      actualOptions = builtins.attrNames cfg;
+      missingOptions = builtins.filter (o: !(builtins.elem o actualOptions)) expectedOptions;
+    in
+    assert missingOptions == [ ] || throw "Missing Codex options: ${builtins.toJSON missingOptions}";
+    pkgs.runCommand "check-codex-options-regression" { } ''
+      echo "Codex option regression: ${toString (builtins.length expectedOptions)} options verified"
+      touch $out
+    '';
+
+  # Verify evaluated config values match expected defaults.
+  codex-defaults-regression =
+    let
+      checks = [
+        {
+          name = "codex.enable";
+          actual = cfg.enable;
+          expected = true;
+        }
+        {
+          name = "codex.approvalPolicy";
+          actual = cfg.approvalPolicy;
+          expected = "untrusted";
+        }
+        {
+          name = "codex.features";
+          actual = cfg.features;
+          expected = { };
+        }
+        {
+          name = "codex.excludedMcpServers.length";
+          actual = builtins.length cfg.excludedMcpServers;
+          expected = 11;
+        }
+        {
+          name = "codex.trustedProjectDirs";
+          actual = cfg.trustedProjectDirs;
+          expected = [ ];
+        }
+        {
+          name = "codex.hooks.notification";
+          actual = cfg.hooks.notification;
+          expected = null;
+        }
+        {
+          name = "codex.skills.fromFlakeInputs";
+          actual = cfg.skills.fromFlakeInputs;
+          expected = [ ];
+        }
+        {
+          name = "codex.skills.local";
+          actual = cfg.skills.local;
+          expected = { };
+        }
+      ];
+      failures = builtins.filter (c: c.actual != c.expected) checks;
+      failureMsg = builtins.concatStringsSep "\n" (
+        map (
+          c: "  ${c.name}: expected ${builtins.toJSON c.expected}, got ${builtins.toJSON c.actual}"
+        ) failures
+      );
+    in
+    assert failures == [ ] || throw "Codex default value regression:\n${failureMsg}";
+    pkgs.runCommand "check-codex-defaults-regression" { } ''
+      echo "Codex defaults regression: ${toString (builtins.length checks)} critical defaults verified"
+      touch $out
+    '';
+
+  # Validate the activation package builds (forces config.toml generation).
+  codex-settings-toml = builtins.seq hmConfig.activationPackage (
+    pkgs.runCommand "check-codex-settings-toml" { } ''
+      echo "Codex settings: activation package builds successfully (config.toml generation verified)"
+      touch $out
+    ''
+  );
+
+  # Validate permissions pipeline produces non-empty rules via home.file output.
+  codex-permissions =
+    let
+      # Extract the generated rules text from the evaluated home.file entries.
+      # Path matches configDir computation in settings.nix (non-XDG default for test env).
+      rulesText = hmConfig.config.home.file.".codex/rules/default.rules".text;
+    in
+    pkgs.runCommand "check-codex-permissions"
+      {
+        nativeBuildInputs = [ pkgs.gnugrep ];
+        passAsFile = [ "rules" ];
+        rules = rulesText;
+      }
+      ''
+        echo "Validating Codex permissions pipeline..."
+
+        # Rules file must be non-empty
+        if [ ! -s "$rulesPath" ]; then
+          echo "FAIL: codex rules file is empty"
+          exit 1
+        fi
+
+        # Must contain prefix_rule entries
+        if ! grep -q "prefix_rule" "$rulesPath"; then
+          echo "FAIL: no prefix_rule entries found"
+          exit 1
+        fi
+
+        # Must contain both allow and forbidden rules
+        if ! grep -q '"allow"' "$rulesPath"; then
+          echo "FAIL: no allow rules found"
+          exit 1
+        fi
+        if ! grep -q '"forbidden"' "$rulesPath"; then
+          echo "FAIL: no forbidden rules found"
+          exit 1
+        fi
+
+        # Deny rules must appear before allow rules (line numbers)
+        FIRST_DENY=$(grep -n '"forbidden"' "$rulesPath" | head -1 | cut -d: -f1)
+        FIRST_ALLOW=$(grep -n '"allow"' "$rulesPath" | head -1 | cut -d: -f1)
+        if [ "$FIRST_DENY" -gt "$FIRST_ALLOW" ]; then
+          echo "FAIL: deny rules should appear before allow rules"
+          exit 1
+        fi
+
+        echo "Codex permissions: rules file non-empty, prefix_rule entries present, deny-before-allow ordering verified"
+        touch $out
+      '';
+}

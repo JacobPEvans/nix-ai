@@ -210,7 +210,14 @@
         };
 
         codex = {
-          imports = [ ./modules/codex.nix ];
+          imports = [ ./modules/codex ];
+          _module.args = {
+            inherit ai-assistant-instructions;
+          };
+        };
+
+        gemini = {
+          imports = [ ./modules/gemini ];
           _module.args = {
             inherit ai-assistant-instructions;
           };
