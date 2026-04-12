@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.39.0](https://github.com/JacobPEvans/nix-ai/compare/v1.38.1...v1.39.0) (2026-04-12)
+
+
+### Features
+
+* **fabric:** add zsh completions and AI tool decision tree ([28af185](https://github.com/JacobPEvans/nix-ai/commit/28af1856d02d23da1b33d090d5ebb681ab2cc8e4))
+
 ## [1.38.1](https://github.com/JacobPEvans/nix-ai/compare/v1.38.0...v1.38.1) (2026-04-12)
 
 
