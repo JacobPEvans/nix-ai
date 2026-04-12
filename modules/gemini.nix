@@ -8,27 +8,25 @@
 # Instead, we use an activation script that deep-merges Nix config
 # with existing runtime state, preserving auth tokens across rebuilds.
 #
-# CRITICAL - tools.allowed vs tools.core:
+# POLICY ENGINE:
 # =========================================
-# DO NOT USE tools.core FOR AUTO-APPROVAL!
+# Gemini CLI has deprecated tools.allowed and tools.exclude in favor of the
+# Policy Engine. Policies are defined in TOML files and matched via rules.
+#
+# We generate a consolidated nix-managed.toml policy file from our unified
+# permission definitions and link it via policyPaths in settings.json.
 #
 # Per the official Gemini CLI schema:
-# - tools.allowed = "Tool names that bypass the confirmation dialog" (AUTO-APPROVE)
-# - tools.core = "Allowlist to RESTRICT built-in tools to a specific set" (LIMITS usage!)
-#
-# Using tools.core LIMITS what tools Gemini can use, it does NOT grant permissions.
-# Always use tools.allowed for auto-approved commands.
+# - tools.allowed = (DEPRECATED) replaced by Policy rules with decision="allow"
+# - tools.exclude = (DEPRECATED) replaced by Policy rules with decision="deny"
+# - tools.core = "Allowlist to RESTRICT built-in tools" (LIMITS usage!)
 #
 # Schema reference: https://github.com/google-gemini/gemini-cli/blob/main/schemas/settings.schema.json
 #
-# Configuration format:
-# - allowedTools: List of auto-approved tools (bypass confirmation dialog)
-# - excludeTools: List of permanently blocked commands
-#
 # Permission files:
-# - gemini-permissions-allow.nix - allowedTools (auto-approved commands)
-# - gemini-permissions-deny.nix - excludeTools (blocked commands)
-# - gemini-permissions-ask.nix - Reference only (Gemini doesn't support ask mode)
+# - gemini-permissions-allow.nix -> decision="allow" rules
+# - gemini-permissions-deny.nix -> decision="deny" rules
+# - gemini-permissions-ask.nix -> decision="ask_user" rules (now supported!)
 
 {
   config,
@@ -45,6 +43,14 @@ let
   geminiDeny = import ./permissions/gemini-permissions-deny.nix {
     inherit config lib ai-assistant-instructions;
   };
+  geminiAsk = import ./permissions/gemini-permissions-ask.nix {
+    inherit config lib ai-assistant-instructions;
+  };
+
+  # Generate consolidated TOML policy file for the Policy Engine
+  policyFile = (pkgs.formats.toml { }).generate "gemini-policy.toml" {
+    rule = geminiAllow.allowRules ++ geminiDeny.denyRules ++ geminiAsk.askRules;
+  };
 
   # Gemini settings object
   settings = {
@@ -54,6 +60,12 @@ let
     # See: https://github.com/google-gemini/gemini-cli/issues/12695
     "$schema" =
       "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json";
+
+    # Policy Engine Configuration
+    # We use a Nix-managed TOML file for all tool permissions
+    policyPaths = [
+      (builtins.toString policyFile)
+    ];
 
     # General settings
     general = {
@@ -106,17 +118,7 @@ let
 
     # Tools configuration (must be nested under "tools" key)
     # See: https://google-gemini.github.io/gemini-cli/docs/get-started/configuration.html
-    #
-    # CRITICAL: Use "allowed" NOT "core" for auto-approval!
-    # - "allowed" = bypass confirmation dialog (what we want)
-    # - "core" = RESTRICT available tools (NOT what we want!)
     tools = {
-      # Auto-approved tools (bypass confirmation dialog)
-      allowed = geminiAllow.allowedTools;
-
-      # Blocked tools (catastrophic operations)
-      exclude = geminiDeny.excludeTools;
-
       # Sandbox configuration (macOS Seatbelt)
       # Uses permissive-open profile: restricts writes outside project directory
       # CRITICAL: Gemini won't execute commands without sandbox enabled

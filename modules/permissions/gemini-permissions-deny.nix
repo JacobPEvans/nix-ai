@@ -28,6 +28,9 @@ let
 
 in
 {
-  # Export excludeTools (permanently blocked commands)
+  # Export denyRules for the Policy Engine (TOML)
+  denyRules = formatters.gemini.formatDenyRules permissions;
+
+  # DEPRECATED: Export excludeTools (permanently blocked commands)
   excludeTools = formatters.gemini.formatExcludeTools permissions;
 }

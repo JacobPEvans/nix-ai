@@ -35,7 +35,10 @@ let
 
 in
 {
-  # Export allowedTools list (auto-approved commands that bypass confirmation)
+  # Export allowRules for the Policy Engine (TOML)
+  allowRules = formatters.gemini.formatAllowRules permissions;
+
+  # DEPRECATED: Export allowedTools list for tools.allowed (settings.json)
   # Maps to "tools.allowed" in settings.json - NOT "tools.core"!
   # Combines Gemini-specific tools with formatted shell commands
   allowedTools = formatters.gemini.formatAllowedTools permissions;

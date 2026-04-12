@@ -116,47 +116,85 @@ in
   # ============================================================================
   # GEMINI CLI FORMATTER
   # ============================================================================
-  # Format: ShellTool(cmd) for shell commands
-  # No wildcard suffix - exact command match or prefix match
+  # Format: TOML rules for Policy Engine
   #
-  # CRITICAL - tools.allowed vs tools.core in settings.json:
-  # =========================================================
   # Per the official Gemini CLI schema:
-  # - tools.allowed = "Tool names that bypass the confirmation dialog" (AUTO-APPROVE)
-  # - tools.core = "Allowlist to RESTRICT built-in tools to a specific set" (LIMITS usage!)
-  #
-  # This formatter provides formatAllowedTools for the "allowed" key.
-  # NEVER use formatAllowedTools output for "core" - that would break permissions!
-  # Schema: https://github.com/google-gemini/gemini-cli/blob/main/schemas/settings.schema.json
+  # Policies use rule arrays with toolName, commandPrefix, and decision.
+  gemini = rec {
+    # Tool name mapping from legacy builtin names to new Policy Engine names
+    toolNameMap = {
+      "ReadFileTool" = "read_file";
+      "GlobTool" = "glob";
+      "GrepTool" = "grep_search";
+      "WebFetchTool" = "web_fetch";
+    };
 
-  gemini = {
-    # Format a single shell command for Gemini
+    # Format into TOML-compatible attribute sets for the Policy Engine
+    formatAllowRules =
+      permissions:
+      let
+        allCommands = flattenCommands permissions.allow;
+        builtinTools = permissions.toolSpecific.gemini.builtin or [ ];
+
+        shellRules = map (cmd: {
+          toolName = "run_shell_command";
+          commandPrefix = cmd;
+          decision = "allow";
+          priority = 100;
+        }) allCommands;
+
+        builtinRules = map (tool: {
+          toolName = toolNameMap.${tool} or tool;
+          decision = "allow";
+          priority = 100;
+        }) builtinTools;
+      in
+      builtinRules ++ shellRules;
+
+    # Format all denied commands for the Policy Engine
+    formatDenyRules =
+      permissions:
+      let
+        allCommands = flattenCommands permissions.deny;
+      in
+      map (cmd: {
+        toolName = "run_shell_command";
+        commandPrefix = cmd;
+        decision = "deny";
+        priority = 200;
+        denyMessage = "Command permanently blocked by system security policy.";
+      }) allCommands;
+
+    # Format all ask commands for the Policy Engine
+    formatAskRules =
+      permissions:
+      let
+        allCommands = flattenCommands permissions.ask;
+      in
+      map (cmd: {
+        toolName = "run_shell_command";
+        commandPrefix = cmd;
+        decision = "ask_user";
+        priority = 50;
+      }) allCommands;
+
+    # Deprecated formatters (kept for backward compatibility during migration)
     formatShellCommand = cmd: "ShellTool(${cmd})";
-
-    # Format a list of shell commands
     formatShellCommands = cmds: map (cmd: "ShellTool(${cmd})") cmds;
-
-    # Format all auto-approved commands for tools.allowed (NOT tools.core!)
-    # Output goes to settings.json "tools.allowed" to bypass confirmation dialog
     formatAllowedTools =
       permissions:
       let
         allCommands = flattenCommands permissions.allow;
         shellTools = map (cmd: "ShellTool(${cmd})") allCommands;
-        # Built-in Gemini tools (ReadFileTool, etc.) from permissions.nix
         builtinTools = permissions.toolSpecific.gemini.builtin or [ ];
       in
       builtinTools ++ shellTools;
-
-    # Format all denied commands (excludeTools)
     formatExcludeTools =
       permissions:
       let
         allCommands = flattenCommands permissions.deny;
       in
       map (cmd: "ShellTool(${cmd})") allCommands;
-
-    # Get tool-specific permissions (non-shell)
     getToolPermissions = permissions: permissions.toolSpecific.gemini.builtin or [ ];
   };
 
