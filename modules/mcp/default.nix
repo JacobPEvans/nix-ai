@@ -152,22 +152,9 @@ in
     ];
   };
 
-  # ================================================================
-  # Fabric MCP - Daniel Miessler's 252+ AI prompt patterns as tools
-  # ================================================================
-  # Python MCP server (FastMCP 3.x) exposing fabric's pattern library as
-  # callable tools within Claude Code sessions. Each pattern becomes a tool
-  # that accepts input text and returns pattern-processed output.
-  #
-  # Source: https://github.com/ksylvan/fabric-mcp
-  # PyPI: fabric-mcp (pinned version for reproducibility)
-  #
-  # Patterns read from ~/.config/fabric/patterns/ (symlinked by modules/fabric/).
-  # The server uses FastMCP's stdio transport and auto-discovers the patterns
-  # directory from the FABRIC_PATTERNS_DIR env var set by modules/fabric/.
-  #
-  # Requires: fabric CLI configured via ~/.config/fabric/.env (see
-  # modules/fabric/README.md for the setup procedure).
+  # Fabric MCP — community-maintained (ksylvan/fabric-mcp), exposes fabric
+  # patterns as MCP tools. Requires fabric CLI setup (see modules/fabric/).
+  # renovate: datasource=pypi depName=fabric-mcp
   fabric = {
     command = "uvx";
     args = [
