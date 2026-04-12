@@ -1,5 +1,5 @@
 {
-  description = "AI CLI ecosystem for Claude, Gemini, Copilot (Nix flake)";
+  description = "AI CLI ecosystem for Claude, Gemini, Copilot, and Codex (Nix flake)";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.11-darwin";
@@ -209,6 +209,13 @@
           };
         };
 
+        codex = {
+          imports = [ ./modules/codex.nix ];
+          _module.args = {
+            inherit ai-assistant-instructions;
+          };
+        };
+
         maestro = {
           imports = [ ./modules/maestro ];
         };
@@ -245,6 +252,18 @@
                   }).pluginConfig;
               }
             );
+          codexRules =
+            let
+              aiCommon = import ./modules/common {
+                inherit ai-assistant-instructions;
+                inherit (nixpkgs) lib;
+                config = {
+                  home.homeDirectory = "/home/user";
+                };
+              };
+              inherit (aiCommon) permissions formatters;
+            in
+            formatters.codex.formatRulesFile permissions;
         };
 
         # Expose lib functions

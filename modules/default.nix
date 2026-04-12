@@ -65,9 +65,6 @@ let
       ;
   };
 
-  # Codex CLI configuration
-  codexFiles = import ./codex.nix { inherit pkgs; };
-
   # Gemini custom commands
   geminiCommands = import ./gemini-commands.nix {
     inherit lib ai-assistant-instructions;
@@ -92,6 +89,7 @@ in
 {
   imports = [
     ./claude
+    ./codex.nix
     ./fabric
     ./maestro
     ./mlx
@@ -103,7 +101,7 @@ in
       # AI development tools (MCP servers, linters, CLI wrappers)
       inherit (import ./ai-tools.nix { inherit pkgs; }) packages;
 
-      file = geminiFiles.file // codexFiles // geminiCommands // copilotFiles // agentsMdSymlinks;
+      file = geminiFiles.file // geminiCommands // copilotFiles // agentsMdSymlinks;
 
       activation = geminiFiles.activation // {
         # Claude Code Settings Validation (post-rebuild)
@@ -139,6 +137,9 @@ in
       # Claude Code statusline (switched from powerline to daniel3303)
       claudeStatusline.enable = false; # Disabled (kept for easy re-enable)
       claudeStatuslineDaniel3303.enable = true; # Active: ClaudeCodeStatusLine (2-line)
+
+      # OpenAI Codex configuration (settings handled by modules/codex.nix)
+      codex.enable = true;
 
       # MLX inference server (vllm-mlx on port 11434)
       mlx.enable = true;
