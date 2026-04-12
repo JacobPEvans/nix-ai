@@ -55,21 +55,6 @@ let
     };
   };
 
-  # Gemini CLI configuration
-  geminiFiles = import ./gemini.nix {
-    inherit
-      config
-      lib
-      pkgs
-      ai-assistant-instructions
-      ;
-  };
-
-  # Gemini custom commands
-  geminiCommands = import ./gemini-commands.nix {
-    inherit lib ai-assistant-instructions;
-  };
-
   # Copilot CLI configuration
   copilotFiles = import ./copilot.nix {
     inherit
@@ -89,7 +74,8 @@ in
 {
   imports = [
     ./claude
-    ./codex.nix
+    ./codex
+    ./gemini
     ./fabric
     ./maestro
     ./mlx
@@ -101,9 +87,9 @@ in
       # AI development tools (MCP servers, linters, CLI wrappers)
       inherit (import ./ai-tools.nix { inherit pkgs; }) packages;
 
-      file = geminiFiles.file // geminiCommands // copilotFiles // agentsMdSymlinks;
+      file = copilotFiles // agentsMdSymlinks;
 
-      activation = geminiFiles.activation // {
+      activation = {
         # Claude Code Settings Validation (post-rebuild)
         validateClaudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           $DRY_RUN_CMD ${./scripts/validate-claude-settings.sh} \
@@ -138,8 +124,11 @@ in
       claudeStatusline.enable = false; # Disabled (kept for easy re-enable)
       claudeStatuslineDaniel3303.enable = true; # Active: ClaudeCodeStatusLine (2-line)
 
-      # OpenAI Codex configuration (settings handled by modules/codex.nix)
+      # OpenAI Codex configuration (settings handled by modules/codex/)
       codex.enable = true;
+
+      # Gemini CLI configuration (settings handled by modules/gemini/)
+      gemini.enable = true;
 
       # MLX inference server (vllm-mlx on port 11434)
       mlx.enable = true;

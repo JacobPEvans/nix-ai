@@ -1,0 +1,136 @@
+# Gemini Module Options
+#
+# Declarative options for Google Gemini CLI configuration.
+# Follows the same patterns as modules/claude/options.nix.
+{ lib, ... }:
+
+let
+  componentModule = lib.types.submodule {
+    options = {
+      name = lib.mkOption { type = lib.types.str; };
+      source = lib.mkOption { type = lib.types.path; };
+    };
+  };
+
+  hookType = lib.types.nullOr (lib.types.either lib.types.path lib.types.lines);
+
+  extensionModule = lib.types.submodule {
+    options = {
+      description = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "Extension description";
+      };
+      mcpServers = lib.mkOption {
+        type = lib.types.attrsOf lib.types.attrs;
+        default = { };
+        description = "MCP servers provided by this extension";
+      };
+      skills = lib.mkOption {
+        type = lib.types.attrsOf lib.types.path;
+        default = { };
+        description = "Skills within this extension (name -> path to SKILL.md)";
+      };
+      commands = lib.mkOption {
+        type = lib.types.attrsOf lib.types.path;
+        default = { };
+        description = "Commands within this extension (name -> path to .toml)";
+      };
+    };
+  };
+in
+{
+  options.programs.gemini = {
+    enable = lib.mkEnableOption "Gemini CLI configuration";
+
+    # Skills
+    skills = {
+      fromFlakeInputs = lib.mkOption {
+        type = lib.types.listOf componentModule;
+        default = [ ];
+        description = "Skills sourced from flake inputs (immutable, from Nix store)";
+      };
+      local = lib.mkOption {
+        type = lib.types.attrsOf lib.types.path;
+        default = { };
+        description = "Local skill files (name -> path to SKILL.md)";
+      };
+    };
+
+    # Commands
+    commands = {
+      fromFlakeInputs = lib.mkOption {
+        type = lib.types.listOf componentModule;
+        default = [ ];
+        description = "Command TOML files sourced from flake inputs";
+      };
+      local = lib.mkOption {
+        type = lib.types.attrsOf lib.types.path;
+        default = { };
+        description = "Local command TOML files (name -> path)";
+      };
+    };
+
+    # Hooks
+    hooks = {
+      beforeTool = lib.mkOption {
+        type = hookType;
+        default = null;
+        description = "Gemini BeforeTool hook";
+      };
+      afterTool = lib.mkOption {
+        type = hookType;
+        default = null;
+        description = "Gemini AfterTool hook";
+      };
+      sessionStart = lib.mkOption {
+        type = hookType;
+        default = null;
+        description = "Gemini SessionStart hook";
+      };
+      sessionEnd = lib.mkOption {
+        type = hookType;
+        default = null;
+        description = "Gemini SessionEnd hook";
+      };
+      notification = lib.mkOption {
+        type = hookType;
+        default = null;
+        description = "Gemini Notification hook";
+      };
+    };
+
+    # Extensions
+    extensions = lib.mkOption {
+      type = lib.types.attrsOf extensionModule;
+      default = { };
+      description = "Nix-managed Gemini extensions";
+    };
+
+    # Trusted folders
+    trustedFolders = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Additional trusted folders (merged with defaults)";
+    };
+
+    # MCP servers to exclude from shared definitions
+    excludedMcpServers = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [
+        "cloudflare"
+        "cribl"
+        "docker"
+        "everything"
+        "exa"
+        "fetch"
+        "filesystem"
+        "firecrawl"
+        "git"
+        "github"
+        "terraform"
+      ];
+      description = "MCP servers to exclude from the shared definitions";
+    };
+  };
+}

@@ -1,3 +1,8 @@
+# Codex Settings Generation
+#
+# Generates config.toml and manages the activation merge.
+# config.toml is NOT a read-only symlink — Codex writes to it at runtime.
+# We use an activation script that deep-merges Nix defaults with runtime state.
 {
   pkgs,
   config,
@@ -10,13 +15,12 @@ let
   cfg = config.programs.codex;
   homeDir = config.home.homeDirectory;
 
-  aiCommon = import ./common {
+  aiCommon = import ../common {
     inherit lib config ai-assistant-instructions;
   };
   inherit (aiCommon) permissions formatters;
 
   # Mirror upstream home-manager programs.codex path logic so rules/config.toml stay co-located.
-  # If upstream changes its path calculation, update here too.
   packageVersion = if cfg.package != null then lib.getVersion cfg.package else "0.2.0";
   isTomlConfig = lib.versionAtLeast packageVersion "0.2.0";
   useXdgDirectories = config.home.preferXdgDirectories && isTomlConfig;
@@ -29,22 +33,10 @@ let
   ++ lib.optional useXdgDirectories "${config.xdg.configHome}/codex";
 
   trustedProjects = lib.unique (
-    (permissions.directories.development or [ ]) ++ (permissions.directories.config or [ ])
+    (permissions.directories.development or [ ])
+    ++ (permissions.directories.config or [ ])
+    ++ cfg.trustedProjectDirs
   );
-
-  excludedMcpServers = [
-    "cloudflare"
-    "cribl"
-    "docker"
-    "everything"
-    "exa"
-    "fetch"
-    "filesystem"
-    "firecrawl"
-    "git"
-    "github"
-    "terraform"
-  ];
 
   normalizeMcpServer =
     server:
@@ -82,22 +74,17 @@ let
 
   mcpServers =
     let
-      sharedServers = import ./mcp;
+      sharedServers = import ../mcp;
     in
     lib.mapAttrs' (name: server: lib.nameValuePair name (normalizeMcpServer server)) (
       lib.filterAttrs (
-        name: server: !(server.disabled or false) && !(lib.elem name excludedMcpServers)
+        name: server: !(server.disabled or false) && !(lib.elem name cfg.excludedMcpServers)
       ) sharedServers
     );
 
   # Nix-managed defaults for config.toml.
-  # NOTE: config.toml is NOT managed as a read-only symlink. Codex writes to this file
-  # at runtime (project trust levels, approval policy changes). Instead we use an
-  # activation script that deep-merges these defaults with existing runtime state,
-  # preserving Codex's runtime writes across rebuilds. Same pattern as Claude's
-  # settings.json and Gemini's settings.json.
   configAttrs = {
-    approval_policy = "untrusted";
+    approval_policy = cfg.approvalPolicy;
     personality = "pragmatic";
     project_doc_fallback_filenames = [
       "AGENTS.md"
@@ -116,31 +103,22 @@ let
       writable_roots = writableRoots;
     };
     mcp_servers = mcpServers;
+  }
+  // lib.optionalAttrs (cfg.features != { }) {
+    inherit (cfg) features;
   };
 
   configJson = pkgs.writeText "codex-config.json" (builtins.toJSON configAttrs);
   configToml = pkgs.runCommand "codex-config.toml" { nativeBuildInputs = [ pkgs.yj ]; } ''
     yj -jt < ${configJson} > $out
   '';
-
 in
 {
   config = lib.mkIf cfg.enable {
-    programs = {
-      codex = {
-        # nix-darwin installs Codex via Homebrew for stable TCC paths.
-        package = lib.mkDefault null;
-        custom-instructions = lib.mkDefault (builtins.readFile "${ai-assistant-instructions}/AGENTS.md");
-        # config.toml is managed via home.activation below — do NOT set settings here.
-        # The upstream home-manager module writes settings via home.file (read-only symlink),
-        # which breaks Codex's runtime writes. We handle config.toml generation ourselves.
-      };
-    };
-
     home = {
       activation.codexConfigMerge = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         export PATH="${pkgs.jq}/bin:${pkgs.yj}/bin:$PATH"
-        $DRY_RUN_CMD ${./scripts/merge-toml-settings.sh} \
+        $DRY_RUN_CMD ${../scripts/merge-toml-settings.sh} \
           "${configToml}" \
           "${homeDir}/.codex/config.toml"
       '';
