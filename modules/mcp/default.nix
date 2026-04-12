@@ -161,7 +161,7 @@ in
   # ai-assistant-instructions permissions). No MCP server needed — the skill
   # provides equivalent structured access without an additional layer.
   #
-  # If MCP is desired later: bunx [ "mcp-obsidian-cli@latest" ] (stonematt)
+  # If MCP is desired later: bunx [ "mcp-obsidian-cli@1.2.0" ] (stonematt)
 
   # ================================================================
   # Database (disabled by default)
