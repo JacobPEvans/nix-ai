@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.42.0](https://github.com/JacobPEvans/nix-ai/compare/v1.41.0...v1.42.0) (2026-04-12)
+
+
+### Features
+
+* **gemini:** migrate to Policy Engine, drop deprecated tools.allowed/exclude ([#516](https://github.com/JacobPEvans/nix-ai/issues/516)) ([6df0934](https://github.com/JacobPEvans/nix-ai/commit/6df0934fd02d3643eed55abf153b9594bb6b23e8))
+
 ## [1.41.0](https://github.com/JacobPEvans/nix-ai/compare/v1.40.0...v1.41.0) (2026-04-12)
 
 
