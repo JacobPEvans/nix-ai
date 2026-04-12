@@ -42,10 +42,10 @@ _fabric() {
     '(-x --listcontexts)'{-x,--listcontexts}'[List all contexts]' \
     '(-X --listsessions)'{-X,--listsessions}'[List all sessions]' \
     '(-U --updatepatterns)'{-U,--updatepatterns}'[Update patterns]' \
-    '(-y --youtube)'{-y,--youtube}'[YouTube URL]:url:' \
-    '(-u --scrape_url)'{-u,--scrape_url}'[Scrape URL to markdown]:url:' \
-    '(-t --temperature)'{-t,--temperature}'[Set temperature]:temp:' \
-    '(-T --topp)'{-T,--topp}'[Set top P]:topp:' \
+    '(-y --youtube)'{-y,--youtube}'[YouTube URL]:url:_urls' \
+    '(-u --scrape_url)'{-u,--scrape_url}'[Scrape URL to markdown]:url:_urls' \
+    '(-t --temperature)'{-t,--temperature}'[Set temperature (0.0-2.0)]:temp:' \
+    '(-T --topp)'{-T,--topp}'[Set top P (0.0-1.0)]:topp:' \
     '(-S --setup)'{-S,--setup}'[Run setup]' \
     '(-d --changeDefaultModel)'{-d,--changeDefaultModel}'[Change default model]' \
     '--serve[Start REST API server]' \
