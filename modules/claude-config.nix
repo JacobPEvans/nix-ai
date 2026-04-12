@@ -212,6 +212,16 @@ in
 
       # Effort level via env var (alternative to settings.json key)
       # CLAUDE_CODE_EFFORT_LEVEL = "medium";
+
+      # ===== OpenTelemetry — OrbStack k8s OTEL Collector =====
+      # Pipeline: Claude Code → OTEL Collector (:30317) → Cribl Stream (:4317) → Splunk HEC
+      # Requires: OrbStack k8s running with OTEL collector deployed.
+      # Source: orbstack-kubernetes/k8s/monitoring/otel-collector/service-external.yaml
+      CLAUDE_CODE_ENABLE_TELEMETRY = "1";
+      OTEL_EXPORTER_OTLP_ENDPOINT = "http://localhost:30317";
+      OTEL_EXPORTER_OTLP_PROTOCOL = "grpc";
+      OTEL_METRICS_EXPORTER = "otlp";
+      OTEL_LOGS_EXPORTER = "otlp";
     };
 
     # Permissions from unified ai-assistant-instructions system
