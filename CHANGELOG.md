@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.40.0](https://github.com/JacobPEvans/nix-ai/compare/v1.39.0...v1.40.0) (2026-04-12)
+
+
+### Features
+
+* **codex:** add native Codex configuration with writable config.toml ([8b4b088](https://github.com/JacobPEvans/nix-ai/commit/8b4b088076c1d7c6b730e8fe3a7c45899275658c))
+
 ## [1.39.0](https://github.com/JacobPEvans/nix-ai/compare/v1.38.1...v1.39.0) (2026-04-12)
 
 
