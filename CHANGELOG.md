@@ -5,6 +5,7 @@
 
 ### Bug Fixes
 
+* **docs:** drop "quartet" and numeric group words from CLAUDE.md ([#488](https://github.com/JacobPEvans/nix-ai/issues/488)) ([a48d8f3](https://github.com/JacobPEvans/nix-ai/commit/a48d8f3d80e132e890c72976e6ac19bc1fc38611))
 * **mcp:** document Obsidian CLI integration, remove REST API port ([#493](https://github.com/JacobPEvans/nix-ai/issues/493)) ([171d946](https://github.com/JacobPEvans/nix-ai/commit/171d9469d94c27b1f4df6979f0c051c393d06d59))
 * **mlx:** restore Qwen3.5-35B-A3B-4bit as defaultModel — fabricated incident ([#489](https://github.com/JacobPEvans/nix-ai/issues/489)) ([e6ccc03](https://github.com/JacobPEvans/nix-ai/commit/e6ccc032db50a6e0d5dbff0d1328cf7d5fc8c36c))
 
