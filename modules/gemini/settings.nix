@@ -129,14 +129,8 @@ in
         $DRY_RUN_CMD ${../scripts/merge-json-settings.sh} \
           "${settingsJson}" \
           "${homeDir}/.gemini/settings.json"
-
-        # Strip deprecated tools.allowed and tools.exclude (migrated to Policy Engine).
-        # The deep-merge preserves them from runtime state; clean up explicitly.
-        GEMINI_SETTINGS="${homeDir}/.gemini/settings.json"
-        if [ -f "$GEMINI_SETTINGS" ] && [ -z "$DRY_RUN_CMD" ]; then
-          jq 'del(.tools.allowed, .tools.exclude)' "$GEMINI_SETTINGS" > "$GEMINI_SETTINGS.tmp" \
-            && mv "$GEMINI_SETTINGS.tmp" "$GEMINI_SETTINGS"
-        fi
+        $DRY_RUN_CMD ${../scripts/strip-deprecated-gemini-keys.sh} \
+          "${homeDir}/.gemini/settings.json"
       '';
     };
   };
