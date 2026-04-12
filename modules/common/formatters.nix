@@ -197,8 +197,9 @@ in
   # execpolicy `.rules` files for command-prefix decisions outside the sandbox.
   #
   # We only translate shell command patterns that map cleanly to execpolicy
-  # prefix rules. Shell-only constructs like redirections or globbing are
-  # intentionally skipped rather than emitted as misleading rules.
+  # prefix rules. Shell-only constructs (redirections, globs, pipes, etc.) are
+  # skipped because execpolicy prefix_rule has no equivalent for them — emitting
+  # a partial rule would give Codex a false sense of coverage.
 
   codex =
     let

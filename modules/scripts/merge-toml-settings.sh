@@ -26,13 +26,17 @@ TARGET_NAME=$(basename "$TARGET")
 TARGET_DIR=$(dirname "$TARGET")
 mkdir -p "$TARGET_DIR"
 
+use_nix_config() {
+  cp "$NIX_TOML" "$TARGET"
+  chmod 600 "$TARGET"
+}
+
 if [[ -f "$TARGET" ]] && [[ ! -L "$TARGET" ]]; then
   # File exists and is a real file (not symlink) - merge
   # Convert both TOML files to JSON, deep-merge, convert result back to TOML
   EXISTING_JSON=$(yj -tj < "$TARGET") || {
     echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to parse existing ${TARGET_NAME}, using Nix config" >&2
-    cp "$NIX_TOML" "$TARGET"
-    chmod 600 "$TARGET"
+    use_nix_config
     exit 0
   }
   NIX_JSON=$(yj -tj < "$NIX_TOML") || {
@@ -41,14 +45,12 @@ if [[ -f "$TARGET" ]] && [[ ! -L "$TARGET" ]]; then
   }
   MERGED_JSON=$(printf '%s\n%s\n' "$EXISTING_JSON" "$NIX_JSON" | jq -s '.[0] * .[1]') || {
     echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to merge ${TARGET_NAME}, using Nix config" >&2
-    cp "$NIX_TOML" "$TARGET"
-    chmod 600 "$TARGET"
+    use_nix_config
     exit 0
   }
   printf '%s\n' "$MERGED_JSON" | yj -jt > "${TARGET}.tmp" || {
     echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to convert merged ${TARGET_NAME} to TOML, using Nix config" >&2
-    cp "$NIX_TOML" "$TARGET"
-    chmod 600 "$TARGET"
+    use_nix_config
     exit 0
   }
   mv "${TARGET}.tmp" "$TARGET"

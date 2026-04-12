@@ -15,17 +15,18 @@ let
   };
   inherit (aiCommon) permissions formatters;
 
-  # NOTE: These path variables mirror the upstream home-manager programs.codex module.
-  # If upstream changes its config path logic, update here too so rules/config.toml stay co-located.
+  # Mirror upstream home-manager programs.codex path logic so rules/config.toml stay co-located.
+  # If upstream changes its path calculation, update here too.
   packageVersion = if cfg.package != null then lib.getVersion cfg.package else "0.2.0";
   isTomlConfig = lib.versionAtLeast packageVersion "0.2.0";
   useXdgDirectories = config.home.preferXdgDirectories && isTomlConfig;
   xdgConfigHome = lib.removePrefix "${homeDir}/" config.xdg.configHome;
   configDir = if useXdgDirectories then "${xdgConfigHome}/codex" else ".codex";
 
-  writableRoots = lib.unique (
-    [ "${homeDir}/.codex" ] ++ lib.optional useXdgDirectories "${config.xdg.configHome}/codex"
-  );
+  writableRoots = [
+    "${homeDir}/.codex"
+  ]
+  ++ lib.optional useXdgDirectories "${config.xdg.configHome}/codex";
 
   trustedProjects = lib.unique (
     (permissions.directories.development or [ ]) ++ (permissions.directories.config or [ ])
