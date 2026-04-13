@@ -14,7 +14,7 @@ on:
     types: [opened]
     forks: "*"
   skip-roles: [admin, maintainer, write, triage]
-  skip-bots: [github-actions, copilot]
+  skip-bots: [github-actions, copilot, renovate, dependabot, release-please, jacobpevans-github-actions]
 permissions:
   contents: read
   issues: read
