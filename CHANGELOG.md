@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.43.1](https://github.com/JacobPEvans/nix-ai/compare/v1.43.0...v1.43.1) (2026-04-13)
+
+
+### Bug Fixes
+
+* relax codex default approvals ([#526](https://github.com/JacobPEvans/nix-ai/issues/526)) ([7fd2508](https://github.com/JacobPEvans/nix-ai/commit/7fd2508d703a98c287eec60a918d96e71660f92e))
+
 ## [1.43.0](https://github.com/JacobPEvans/nix-ai/compare/v1.42.2...v1.43.0) (2026-04-13)
 
 
