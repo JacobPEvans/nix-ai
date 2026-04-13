@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.42.2](https://github.com/JacobPEvans/nix-ai/compare/v1.42.1...v1.42.2) (2026-04-13)
+
+
+### Bug Fixes
+
+* **gemini:** replace shell grep validation with pure Nix assertions ([#518](https://github.com/JacobPEvans/nix-ai/issues/518)) ([78672a5](https://github.com/JacobPEvans/nix-ai/commit/78672a506f3cd8e77c2e4a6c1b15ae73400ae937))
+
 ## [1.42.1](https://github.com/JacobPEvans/nix-ai/compare/v1.42.0...v1.42.1) (2026-04-12)
 
 
