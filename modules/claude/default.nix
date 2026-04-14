@@ -38,6 +38,7 @@ in
     ./menubar.nix
     ./orphan-cleanup.nix
     ./pal-models.nix
+    ./pal-launchd.nix
   ];
 
   config = lib.mkIf cfg.enable {

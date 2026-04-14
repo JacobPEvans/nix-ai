@@ -152,10 +152,11 @@ new ports to avoid collisions (e.g., the 11434/11435/11436 fragmentation during 
 
 | Port | Service | Protocol | Module |
 | ---- | ------- | -------- | ------ |
-| 11434 | llama-swap proxy (routes to vllm-mlx) | HTTP (OpenAI-compatible) | `modules/mlx/` |
-| 11436 | vllm-mlx backend (internal, managed by llama-swap) | HTTP | `modules/mlx/` |
+| 3001 | PAL MCP HTTP server (mcp-proxy + pal-mcp-server) | HTTP (MCP streamable) | `modules/claude/pal-launchd.nix` |
 | 8080 | Open WebUI | HTTP | `modules/open-webui.nix` |
 | 8180 | Fabric REST API (opt-in LaunchAgent) | HTTP + Swagger UI | `modules/fabric/` |
+| 11434 | llama-swap proxy (routes to vllm-mlx) | HTTP (OpenAI-compatible) | `modules/mlx/` |
+| 11436 | vllm-mlx backend (internal, managed by llama-swap) | HTTP | `modules/mlx/` |
 
 **Reserved/conflicting ports to avoid:**
 

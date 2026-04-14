@@ -75,19 +75,22 @@ in
   #   docgen, tracer
   # See: https://github.com/BeehiveInnovations/pal-mcp-server
   #
-  # API keys injected via Doppler (doppler-mcp wrapper):
+  # API keys injected via Doppler at LaunchAgent startup (not at Claude Code spawn):
   #   - GEMINI_API_KEY (Google Gemini — pro, flash models)
   #   - OPENAI_API_KEY (OpenAI — reasoning and chat/codex models)
   #   - OPENROUTER_API_KEY (OpenRouter — unified multi-model access)
   #
-  # Non-secret config is set in env below (belongs in Nix, not Doppler).
+  # Non-secret config is set in env below (ignored in settings.json for HTTP;
+  # read by pal-launchd.nix to populate the LaunchAgent EnvironmentVariables).
 
-  # Built as a Nix derivation (modules/mcp/pal-package.nix), installed to PATH.
-  # Wrapped with doppler-mcp to inject Doppler secrets at subprocess launch time.
-  # Secrets are never written to ~/.claude.json or any file Claude Code can read.
+  # Transport: HTTP (streamable HTTP). Served by the dev.pal-mcp.server LaunchAgent
+  # (modules/claude/pal-launchd.nix). mcp-proxy wraps pal-mcp-server on port 3001.
+  # Secrets injected by doppler at LaunchAgent startup — no spawn-timeout race.
+  # env block is ignored by settings.nix for HTTP servers but is read by
+  # pal-launchd.nix via config.programs.claude.mcpServers.pal.env.
   pal = {
-    command = "doppler-mcp";
-    args = [ "pal-mcp-server" ];
+    type = "http";
+    url = "http://127.0.0.1:3001/mcp";
     env = {
       # Disable PAL tools that have native Claude Code / Bifrost equivalents,
       # plus drop `version` (no functional value). Only `clink` (parallel
