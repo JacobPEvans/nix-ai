@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.43.3](https://github.com/JacobPEvans/nix-ai/compare/v1.43.2...v1.43.3) (2026-04-14)
+
+
+### Bug Fixes
+
+* add automation bots to AI Moderator skip-bots ([#535](https://github.com/JacobPEvans/nix-ai/issues/535)) ([09cf37a](https://github.com/JacobPEvans/nix-ai/commit/09cf37aa40e5252f24c4437608aecffd03d3220b))
+
+## [1.43.2](https://github.com/JacobPEvans/nix-ai/compare/v1.43.1...v1.43.2) (2026-04-13)
+
+
+### Bug Fixes
+
+* **gh-aw:** recompile workflows with v0.68.1, enable ai-ci auto-triggers ([786d881](https://github.com/JacobPEvans/nix-ai/commit/786d881252541b495724d4a9bcf445e79191b9c6)), closes [#508](https://github.com/JacobPEvans/nix-ai/issues/508)
+
 ## [1.43.1](https://github.com/JacobPEvans/nix-ai/compare/v1.43.0...v1.43.1) (2026-04-13)
 
 
