@@ -82,9 +82,14 @@ let
       ) sharedServers
     );
 
+  optionalValue = key: value: lib.optionalAttrs (value != null) { ${key} = value; };
+
   # Nix-managed defaults for config.toml.
   configAttrs = {
     approval_policy = cfg.approvalPolicy;
+    model_reasoning_effort = cfg.modelReasoningEffort;
+    model_verbosity = cfg.modelVerbosity;
+    plan_mode_reasoning_effort = cfg.planModeReasoningEffort;
     personality = "pragmatic";
     project_doc_fallback_filenames = [
       "AGENTS.md"
@@ -104,6 +109,11 @@ let
     };
     mcp_servers = mcpServers;
   }
+  // optionalValue "model" cfg.model
+  // optionalValue "review_model" cfg.reviewModel
+  // optionalValue "model_provider" cfg.modelProvider
+  // optionalValue "service_tier" cfg.serviceTier
+  // optionalValue "web_search" cfg.webSearch
   // lib.optionalAttrs (cfg.features != { }) {
     inherit (cfg) features;
   };

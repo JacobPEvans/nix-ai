@@ -13,8 +13,16 @@ in
         "excludedMcpServers"
         "features"
         "hooks"
+        "model"
+        "modelProvider"
+        "modelReasoningEffort"
+        "modelVerbosity"
+        "planModeReasoningEffort"
+        "reviewModel"
         "skills"
+        "serviceTier"
         "trustedProjectDirs"
+        "webSearch"
       ];
       actualOptions = builtins.attrNames cfg;
       missingOptions = builtins.filter (o: !(builtins.elem o actualOptions)) expectedOptions;
@@ -43,6 +51,46 @@ in
           name = "codex.features";
           actual = cfg.features;
           expected = { };
+        }
+        {
+          name = "codex.model";
+          actual = cfg.model;
+          expected = null;
+        }
+        {
+          name = "codex.reviewModel";
+          actual = cfg.reviewModel;
+          expected = null;
+        }
+        {
+          name = "codex.modelProvider";
+          actual = cfg.modelProvider;
+          expected = null;
+        }
+        {
+          name = "codex.serviceTier";
+          actual = cfg.serviceTier;
+          expected = null;
+        }
+        {
+          name = "codex.modelReasoningEffort";
+          actual = cfg.modelReasoningEffort;
+          expected = "medium";
+        }
+        {
+          name = "codex.planModeReasoningEffort";
+          actual = cfg.planModeReasoningEffort;
+          expected = "high";
+        }
+        {
+          name = "codex.modelVerbosity";
+          actual = cfg.modelVerbosity;
+          expected = "medium";
+        }
+        {
+          name = "codex.webSearch";
+          actual = cfg.webSearch;
+          expected = null;
         }
         {
           name = "codex.excludedMcpServers.length";
