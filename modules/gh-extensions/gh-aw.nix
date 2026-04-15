@@ -4,20 +4,20 @@
   fetchFromGitHub,
 }:
 
-# v0.68.1+ requires go >= 1.25.8; use go_1_26 which satisfies that constraint
+# v0.68.3+ requires go >= 1.25.8; use go_1_26 which satisfies that constraint
 (pkgs.buildGoModule.override { go = pkgs.go_1_26; }) rec {
   pname = "gh-aw";
   # managed by: nix-update (deps-update-flake.yml)
-  version = "0.68.1";
+  version = "0.68.3";
 
   src = fetchFromGitHub {
     owner = "github";
     repo = "gh-aw";
     rev = "v${version}"; # Use commit SHA if no tags exist
-    hash = "sha256-cgFSae+9iQ6NmwviYgkE2HDCOmG5ZhYqZ3sRhLoSt+M=";
+    hash = "sha256-P3psfcuzLJ0W+3iJbPI7lfWiy8CIfZsYyY/4bcLEEjs=";
   };
 
-  vendorHash = "sha256-zWCDpkQLEtVV3heyqvJEUskFBnuDb2/NHAWY9Sb2lgA=";
+  vendorHash = "sha256-1BMh4mC62usE4pUCU5osHm1a1pBrXsp4YCumvvcAHIY=";
 
   # Build from cmd/gh-aw directory
   subPackages = [ "cmd/gh-aw" ];
