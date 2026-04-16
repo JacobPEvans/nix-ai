@@ -27,13 +27,22 @@ CLAUDE_DIR="${HOME_DIR}/.claude"
 
 ACTIVE_UUIDS=()
 
-if compgen -G "${CLAUDE_DIR}/sessions/*.json" >/dev/null 2>&1; then
-  while IFS= read -r uuid; do
-    [[ -n "$uuid" ]] && ACTIVE_UUIDS+=("$uuid")
-  done < <(
-    jq -r '.sessionId // .session_id // empty' "${CLAUDE_DIR}"/sessions/*.json 2>/dev/null | sort -u
-  )
-fi
+# Use find to enumerate session files — avoids ARG_MAX limits with many sessions.
+# PID is encoded in the filename (e.g., 36922.json); check it with kill -0 to
+# confirm the process is still running before treating the session as active.
+while IFS= read -r session_file; do
+  uuid=$(jq -r '.sessionId // .session_id // empty' "$session_file" 2>/dev/null)
+  [[ -z "$uuid" ]] && continue
+  pid="${session_file##*/}"
+  pid="${pid%.json}"
+  if [[ "$pid" =~ ^[0-9]+$ ]] && kill -0 "$pid" 2>/dev/null; then
+    ACTIVE_UUIDS+=("$uuid")
+  elif [[ ! "$pid" =~ ^[0-9]+$ ]]; then
+    # Non-numeric filename: include UUID conservatively
+    ACTIVE_UUIDS+=("$uuid")
+  fi
+  # Numeric pid that failed kill -0: process is dead — omit UUID so its data gets pruned
+done < <(find "${CLAUDE_DIR}/sessions" -maxdepth 1 -name "*.json" -type f 2>/dev/null)
 
 log_info "Active sessions: ${#ACTIVE_UUIDS[@]}"
 
@@ -97,23 +106,35 @@ LOCAL_JSON="${CLAUDE_DIR}/settings.local.json"
 MAIN_JSON="${CLAUDE_DIR}/settings.json"
 
 if [[ -f "$LOCAL_JSON" ]] && [[ -f "$MAIN_JSON" ]]; then
-  all_redundant=true
-  while IFS= read -r perm; do
-    [[ -z "$perm" ]] && continue
-    # Check if any entry in settings.json.permissions.allow covers this permission
-    covered=$(jq -r --arg p "$perm" '
-      .permissions.allow // [] |
-      map(. as $pat |
-        $p | test("^" + ($pat | gsub("\\*"; ".*")) + "$")
-      ) | any
-    ' "$MAIN_JSON" 2>/dev/null)
-    if [[ "$covered" != "true" ]]; then
-      all_redundant=false
-      break
-    fi
-  done < <(jq -r '.permissions.allow // [] | .[]' "$LOCAL_JSON" 2>/dev/null)
+  # Delete settings.local.json only when:
+  # 1. It contains ONLY a non-empty permissions.allow list (no other keys)
+  # 2. Every permission is already covered by a wildcard in settings.json
+  # Claude permissions contain literal parens/dots (e.g. "Bash(cmd *)") — escape all
+  # regex metacharacters before the wildcard substitution to avoid false matches.
+  all_redundant=$(jq -rs '
+    (.[0].permissions.allow // []) as $main |
+    .[1] as $local |
+    if (($local | keys | sort) == ["permissions"]) and
+       (($local.permissions | keys | sort) == ["allow"]) and
+       (($local.permissions.allow | type) == "array") and
+       (($local.permissions.allow | length) > 0)
+    then
+      $local.permissions.allow | all(. as $p |
+        $main | any(. as $pat |
+          $p | test(
+            "^" + (
+              $pat
+              | gsub("(?<c>[\\[\\]{}()\\\\^$+?|./-])"; "\\\(.c)")
+              | gsub("\\*"; ".*")
+            ) + "$"
+          )
+        )
+      ) | tostring
+    else "false"
+    end
+  ' "$MAIN_JSON" "$LOCAL_JSON" 2>/dev/null || echo "false")
 
-  if $all_redundant; then
+  if [[ "$all_redundant" == "true" ]]; then
     rm -f "$LOCAL_JSON"
     log_info "Removed redundant settings.local.json (all permissions covered by settings.json)"
   fi
@@ -155,8 +176,7 @@ for empty_dir in \
   "${CLAUDE_DIR}/debug" \
   "${CLAUDE_DIR}/powerline/locks"
 do
-  if [[ -d "$empty_dir" ]] && [[ -z "$(ls -A "$empty_dir" 2>/dev/null)" ]]; then
-    rmdir "$empty_dir"
+  if [[ -d "$empty_dir" ]] && rmdir "$empty_dir" 2>/dev/null; then
     log_info "Removed empty directory: ${empty_dir#"$HOME_DIR/"}"
   fi
 done
@@ -199,9 +219,11 @@ prune_dir_by_age "${CLAUDE_DIR}/tasks"          "task"
 
 backups_dir="${CLAUDE_DIR}/backups"
 if [[ -d "$backups_dir" ]]; then
-  mapfile -d $'\0' backup_files < <(
-    find "$backups_dir" -maxdepth 1 -name ".claude.json.backup.*" -print0 2>/dev/null |
-    sort -z
+  # Use -print (not -print0) + LC_ALL=C sort: backup filenames have no spaces/newlines
+  # and sort -z is a GNU extension not available on macOS BSD sort.
+  mapfile -t backup_files < <(
+    find "$backups_dir" -maxdepth 1 -name ".claude.json.backup.*" -print 2>/dev/null |
+    LC_ALL=C sort
   )
   excess=$(( ${#backup_files[@]} - MAX_BACKUPS ))
   if [[ $excess -gt 0 ]]; then
@@ -221,7 +243,7 @@ if [[ -d "${CLAUDE_DIR}/statsig" ]]; then
   while IFS= read -r -d $'\0' f; do
     rm -f "$f"
     statsig_pruned=$((statsig_pruned + 1))
-  done < <(find "${CLAUDE_DIR}/statsig" -maxdepth 1 -mtime +7 -print0 2>/dev/null)
+  done < <(find "${CLAUDE_DIR}/statsig" -mindepth 1 -maxdepth 1 -type f -mtime +7 -print0 2>/dev/null)
   [[ $statsig_pruned -gt 0 ]] && log_info "Pruned $statsig_pruned stale statsig cache files"
 fi
 

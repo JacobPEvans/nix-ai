@@ -18,7 +18,12 @@
 # - Removes known cruft files and empty directories
 # - Controlled by programs.claude.runtimeCleanup.{retentionDays, maxBackups}
 #
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.programs.claude;
@@ -85,7 +90,9 @@ in
     }
     // lib.optionalAttrs cfg.runtimeCleanup.enable {
       # Phase 4: Prune stale runtime data on every home-manager switch.
+      # Prepend jq to PATH — activation runs before the Nix profile is fully sourced.
       cleanupRuntimeData = lib.hm.dag.entryAfter [ "verifyCacheIntegrity" ] ''
+        export PATH="${pkgs.jq}/bin:$PATH"
         $DRY_RUN_CMD ${./scripts/cleanup-runtime-data.sh} \
           "${homeDir}" \
           "${toString cfg.runtimeCleanup.retentionDays}" \
