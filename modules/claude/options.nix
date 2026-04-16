@@ -280,7 +280,7 @@ in
       default = null;
       description = ''
         Override the default model. Accepts aliases ("opus", "sonnet",
-        "haiku", "opusplan") or full names ("claude-opus-4-6").
+        "haiku", "opusplan") or full names ("claude-opus-4-7").
         null = account-tier default. See: https://code.claude.com/docs/en/model-config
       '';
     };
@@ -295,7 +295,7 @@ in
       );
       default = null;
       description = ''
-        Adaptive reasoning effort for Opus 4.6 and Sonnet 4.6.
+        Adaptive reasoning effort for Opus 4.7 and Sonnet 4.6.
         - null: Use upstream default (medium for Max/Team as of v2.1.68)
         - "high": Full reasoning
         - "medium": Balanced cost/quality

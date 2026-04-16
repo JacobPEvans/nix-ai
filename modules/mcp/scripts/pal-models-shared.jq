@@ -12,13 +12,13 @@
 #
 # Score normalization: linear map from Elo to PAL's 1-20 scale.
 #   (rating - 800) / 700 * 19 + 1, clamped to [1, 20]
-#   1499 → 20  (claude-opus-4-6-thinking, current top)
+#   1499 → 20  (claude-opus-4-7, current top)
 #   1300 → ~14 (median 2026 frontier model)
 #   1100 → ~9  (older frontier, e.g. claude-3-opus-20240229)
 #    800 → 1   (early-2024 baseline)
 
 # Lowercase + strip provider prefix + strip MLX quant suffix.
-# OpenRouter ids: "anthropic/claude-opus-4.6" → "claude-opus-4.6"
+# OpenRouter ids: "anthropic/claude-opus-4.7" → "claude-opus-4.7"
 # MLX ids:        "mlx-community/Qwen3.5-122B-A10B-4bit" → "qwen3.5-122b-a10b"
 def normalize_name:
   ascii_downcase
