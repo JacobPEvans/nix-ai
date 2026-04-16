@@ -179,6 +179,9 @@ in
     "retrospective-report-location" = ./claude/rules/retrospective-report-location.md;
   };
 
+  # Prune stale runtime data on every home-manager switch (no custom agents/timers)
+  runtimeCleanup.enable = true;
+
   settings = {
     # Extended thinking enabled with token budget controlled via env vars
     alwaysThinkingEnabled = true;
