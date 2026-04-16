@@ -55,10 +55,9 @@ is_active_session() {
 }
 
 # ────────────────────────────────────────────────
-# Helper: delete items older than RETENTION_DAYS
+# Helpers: delete items older than a given age
 # ────────────────────────────────────────────────
 
-# Deletes files/dirs inside $dir older than RETENTION_DAYS, skipping active sessions.
 prune_dir_by_age() {
   local dir="$1"
   local label="$2"
@@ -74,16 +73,31 @@ prune_dir_by_age() {
   [[ $count -gt 0 ]] && log_info "Pruned $count stale $label entries"
 }
 
+prune_files_by_age() {
+  local dir="$1"
+  local label="$2"
+  local days="$3"
+  [[ -d "$dir" ]] || return 0
+
+  local count=0
+  while IFS= read -r -d $'\0' f; do
+    rm -f "$f"
+    count=$((count + 1))
+  done < <(find "$dir" -mindepth 1 -maxdepth 1 -type f -mtime +"$days" -print0 2>/dev/null)
+  [[ $count -gt 0 ]] && log_info "Pruned $count stale $label files"
+}
+
 # ────────────────────────────────────────────────
 # 1. Telemetry — always delete (failed events never retry)
 # ────────────────────────────────────────────────
 
 if [[ -d "${CLAUDE_DIR}/telemetry" ]]; then
-  count=$(find "${CLAUDE_DIR}/telemetry" -name "1p_failed_events*" 2>/dev/null | wc -l | tr -d ' ')
-  if [[ $count -gt 0 ]]; then
-    find "${CLAUDE_DIR}/telemetry" -name "1p_failed_events*" -delete 2>/dev/null || true
-    log_info "Removed $count failed telemetry events"
-  fi
+  count=0
+  while IFS= read -r -d $'\0' f; do
+    rm -f "$f"
+    count=$((count + 1))
+  done < <(find "${CLAUDE_DIR}/telemetry" -name "1p_failed_events*" -print0 2>/dev/null)
+  [[ $count -gt 0 ]] && log_info "Removed $count failed telemetry events"
 fi
 
 # ────────────────────────────────────────────────
@@ -238,26 +252,12 @@ fi
 # 15. statsig/ — feature flag caches, 7-day retention
 # ────────────────────────────────────────────────
 
-if [[ -d "${CLAUDE_DIR}/statsig" ]]; then
-  statsig_pruned=0
-  while IFS= read -r -d $'\0' f; do
-    rm -f "$f"
-    statsig_pruned=$((statsig_pruned + 1))
-  done < <(find "${CLAUDE_DIR}/statsig" -mindepth 1 -maxdepth 1 -type f -mtime +7 -print0 2>/dev/null)
-  [[ $statsig_pruned -gt 0 ]] && log_info "Pruned $statsig_pruned stale statsig cache files"
-fi
+prune_files_by_age "${CLAUDE_DIR}/statsig" "statsig cache" 7
 
 # ────────────────────────────────────────────────
 # 16. logs/ — delete log files older than RETENTION_DAYS
 # ────────────────────────────────────────────────
 
-if [[ -d "${CLAUDE_DIR}/logs" ]]; then
-  logs_pruned=0
-  while IFS= read -r -d $'\0' f; do
-    rm -f "$f"
-    logs_pruned=$((logs_pruned + 1))
-  done < <(find "${CLAUDE_DIR}/logs" -maxdepth 1 -type f -mtime +"$RETENTION_DAYS" -print0 2>/dev/null)
-  [[ $logs_pruned -gt 0 ]] && log_info "Pruned $logs_pruned old log files"
-fi
+prune_files_by_age "${CLAUDE_DIR}/logs" "log" "$RETENTION_DAYS"
 
 log_info "Runtime data cleanup complete (retention: ${RETENTION_DAYS}d, max backups: ${MAX_BACKUPS})"
