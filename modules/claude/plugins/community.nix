@@ -19,7 +19,7 @@ _:
 
     # Superpowers - comprehensive Claude enhancement suite
     "superpowers@superpowers-marketplace" = true;
-    "double-shot-latte@superpowers-marketplace" = true; # User requested restore
+    # "double-shot-latte@superpowers-marketplace" = true; # Disabled — auto-continuation not in use
     "superpowers-lab@superpowers-marketplace" = true; # User requested add
     "superpowers-developing-for-claude-code@superpowers-marketplace" = true; # User requested restore
 
