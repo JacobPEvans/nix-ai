@@ -274,7 +274,7 @@ natively by `doppler run` (exits non-zero with a clear error message).
 **If you still see failures after the fix:**
 
 1. Verify Doppler auth: `doppler me`
-2. Test the wrapper manually: `doppler-mcp pal-mcp-server` (Ctrl-C to stop)
+2. Test the wrapper manually: `pal-mcp` (Ctrl-C to stop)
 3. Check the invocation log: `cat ~/.local/state/doppler-mcp.log`
    - Records commands only, not error details
    - Doppler auth errors go to stderr — re-run the logged command in a terminal to see them
@@ -284,7 +284,7 @@ natively by `doppler run` (exits non-zero with a clear error message).
 **Mid-session recovery** (if server failed at startup but Doppler is now healthy):
 
 ```bash
-claude mcp remove pal -s user && claude mcp add pal -s user -- doppler-mcp pal-mcp-server
+claude mcp remove pal -s user && claude mcp add pal -s user -- pal-mcp
 ```
 
 This reconnects the server, but tools won't appear in the current session's ToolSearch.

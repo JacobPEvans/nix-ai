@@ -269,7 +269,7 @@
           echo "   $pal_status"
         else
           echo "   PAL not found in Claude Code MCP server list"
-          echo "   Register: claude mcp add pal -s user -- doppler-mcp pal-mcp-server"
+          echo "   Register: claude mcp add pal -s user -- pal-mcp"
         fi
       else
         echo "   claude CLI not in PATH — skipping"

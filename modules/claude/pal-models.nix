@@ -60,10 +60,48 @@ in
 {
   config = lib.mkIf cfg.enable {
     home = {
-      # Install pal-mcp-server as a Nix package so `doppler-mcp pal-mcp-server`
-      # resolves via PATH. The package is built from the pinned flake input.
+      # Install pal-mcp-server as a Nix package so the pal-mcp wrapper below can
+      # exec it via PATH. The package is built from the pinned flake input.
       packages = [
         palPkg
+
+        # pal-mcp — PAL MCP launcher with baked-in env vars.
+        #
+        # Claude Code overwrites ~/.claude.json with its in-memory state at runtime,
+        # losing any env dict set in the Nix overlay (JacobPEvans/nix-ai#557).
+        # Baking all env vars into a wrapper script ensures they reach pal-mcp-server
+        # via process environment, independent of Claude Code's config management.
+        # This also fixes Codex and Gemini, which import mcp/default.nix directly
+        # and previously missed the dynamic vars from pal-models.nix.
+        #
+        # Enabled tools: chat, listmodels, clink, consensus
+        #   - chat/listmodels re-enabled: over-pruned in Phase 3 audit (#450).
+        #     chat routes local MLX inference through Bifrost; listmodels enumerates models.
+        #   - clink/consensus: no native equivalent — remain in pal-mcp-policy.md.
+        (pkgs.writeShellScriptBin "pal-mcp" ''
+          set -euo pipefail
+          # Static config (belongs in Nix, not Doppler)
+          export DISABLED_TOOLS="thinkdeep,planner,codereview,precommit,debug,analyze,tracer,refactor,testgen,secaudit,docgen,apilookup,challenge,version"
+          # 'auto' = PAL picks model alias per-task; Bifrost routes to the right provider.
+          export DEFAULT_MODEL="auto"
+          # Route through Bifrost AI gateway — fans out to OpenAI/Gemini/OpenRouter/MLX.
+          export CUSTOM_API_URL="http://localhost:30080/v1"
+          # OpenAI-compatible client timeouts
+          export CUSTOM_CONNECT_TIMEOUT="30"
+          export CUSTOM_READ_TIMEOUT="300"
+          # Conversation limits
+          export CONVERSATION_TIMEOUT_HOURS="6"
+          export MAX_CONVERSATION_TURNS="50"
+          export LOG_LEVEL="INFO"
+          # Dynamic config — paths baked in at Nix evaluation time
+          export CUSTOM_MODELS_CONFIG_PATH="${outputFile}"
+          # Overrides PAL's upstream hardcoded default — tracks programs.mlx.defaultModel.
+          export CUSTOM_MODEL_NAME="${mlxCfg.defaultModel}"
+          export OPENROUTER_MODELS_CONFIG_PATH="${outputDir}/openrouter_models.json"
+          # Writable log dir (PAL default tries the read-only Nix store).
+          export PAL_LOG_DIR="${palLogDir}"
+          exec doppler-mcp pal-mcp-server
+        '')
 
         # Refresh custom_models.json between darwin-rebuild switches.
         # Queries MLX /v1/models for available models.
@@ -118,17 +156,8 @@ in
       };
     };
 
-    # Inject env vars into PAL server.
-    # Merges with the env block defined in mcp/default.nix (DISABLED_TOOLS, etc.).
-    programs.claude.mcpServers.pal.env = {
-      CUSTOM_MODELS_CONFIG_PATH = outputFile;
-      # Override PAL's hardcoded llama3.2 default — dynamically tracks programs.mlx.defaultModel.
-      CUSTOM_MODEL_NAME = mlxCfg.defaultModel;
-      # Cloud models — single source of truth via OpenRouter public API.
-      OPENROUTER_MODELS_CONFIG_PATH = "${outputDir}/openrouter_models.json";
-      # Point PAL logs to a writable location (default tries to write inside the
-      # read-only Nix store, producing "Permission denied: logs/" warnings).
-      PAL_LOG_DIR = palLogDir;
-    };
+    # PAL MCP server is now launched via the pal-mcp wrapper (above).
+    # All env vars are baked into the wrapper — no env block needed here.
+    programs.claude.mcpServers.pal.command = "pal-mcp";
   };
 }
