@@ -271,6 +271,7 @@ in
       "~/.config/mlx/"
       "~/.config/nix/"
       "~/.config/pal-mcp/"
+      "/tmp/"
     ];
 
     # Sandbox configuration (Dec 2025 feature)
