@@ -7,6 +7,9 @@
 # Input format (OpenAI-compatible):
 #   { "data": [{ "id": "mlx-community/<model-id>", ... }] }
 #
+# Output model_name uses Bifrost provider prefix: "mlx-local/mlx-community/<model-id>"
+# Bifrost requires "provider/model" format; mlx-local routes to the local MLX backend.
+#
 # Filtering: model MUST have a real LMSYS arena Elo rating. Models without
 # a benchmark score are omitted entirely. PAL only sees scored models.
 
@@ -25,7 +28,7 @@ def has_function_calling: test("Qwen3|Llama-4|Scout|Mistral|Nemotron");
     | model_intelligence_score($id) as $score
     | select($score != null)               # require real benchmark score
     | {
-        model_name: $id,
+        model_name: "mlx-local/\($id)",
         aliases: [$short, $clean],
         intelligence_score: $score,
         json_mode: false,
