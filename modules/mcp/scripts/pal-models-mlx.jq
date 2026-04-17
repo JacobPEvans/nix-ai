@@ -24,16 +24,16 @@ def has_function_calling: test("Qwen3|Llama-4|Scout|Mistral|Nemotron");
     .data[]
     | .id as $id
     | ($id | split("/") | last) as $short
-    | ($short | ascii_downcase | gsub("-[0-9]+bit$"; "")) as $clean
+    | ($short | ascii_downcase) as $lower
     | model_intelligence_score($id) as $score
     | select($score != null)               # require real benchmark score
     | {
         model_name: "mlx-local/\($id)",
-        aliases: [$short, $clean],
+        aliases: [$short, $lower],
         intelligence_score: $score,
-        json_mode: false,
-        function_calling: ($short | has_function_calling),
-        images: ($short | has_vision)
+        supports_json_mode: false,
+        supports_function_calling: ($short | has_function_calling),
+        supports_images: ($short | has_vision)
       }
   ]
 }
