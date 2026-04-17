@@ -29,7 +29,7 @@ def has_function_calling: test("Qwen3|Llama-4|Scout|Mistral|Nemotron");
     | select($score != null)               # require real benchmark score
     | {
         model_name: "mlx-local/\($id)",
-        aliases: [$short, $lower],
+        aliases: ([$short, $lower] | unique),
         intelligence_score: $score,
         supports_json_mode: false,
         supports_function_calling: ($short | has_function_calling),
