@@ -39,7 +39,7 @@ let
   # Static config lives in the script file; only values requiring Nix evaluation go here.
   palMcpEnv = ''
     export CUSTOM_MODELS_CONFIG_PATH="${outputFile}"
-    export CUSTOM_MODEL_NAME="${mlxCfg.defaultModel}"
+    export CUSTOM_MODEL_NAME="mlx-local/${mlxCfg.defaultModel}"
     export OPENROUTER_MODELS_CONFIG_PATH="${outputDir}/openrouter_models.json"
     export PAL_LOG_DIR="${palLogDir}"
     export PAL_MCP_SERVER="${palPkg}/bin/pal-mcp-server"
