@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.44.0](https://github.com/JacobPEvans/nix-ai/compare/v1.43.5...v1.44.0) (2026-04-17)
+
+
+### Features
+
+* **codex:** add config surface with 8 knobs ([#549](https://github.com/JacobPEvans/nix-ai/issues/549)) ([79070c5](https://github.com/JacobPEvans/nix-ai/commit/79070c53bb66aad08ee3dc5fde836df9a5896f17))
+
 ## [1.43.5](https://github.com/JacobPEvans/nix-ai/compare/v1.43.4...v1.43.5) (2026-04-17)
 
 
