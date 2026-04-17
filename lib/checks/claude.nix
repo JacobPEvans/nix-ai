@@ -71,6 +71,7 @@ in
       expectedPermissionOptions = [
         "allow"
         "ask"
+        "defaultMode"
         "deny"
       ];
       actualPermissionOptions = builtins.attrNames cfg.settings.permissions;
@@ -193,6 +194,11 @@ in
           actual = cfg.apiKeyHelper.enable;
           expected = true;
         }
+        {
+          name = "settings.permissions.defaultMode";
+          actual = cfg.settings.permissions.defaultMode;
+          expected = "auto";
+        }
       ];
       failures = builtins.filter (c: c.actual != c.expected) checks;
       failureMsg = builtins.concatStringsSep "\n" (
@@ -251,6 +257,7 @@ in
         jq -e '.permissions | has("deny")' "$jsonPath" > /dev/null || { echo "FAIL: missing permissions.deny"; exit 1; }
         jq -e '.permissions | has("ask")' "$jsonPath" > /dev/null || { echo "FAIL: missing permissions.ask"; exit 1; }
         jq -e '.permissions | has("additionalDirectories")' "$jsonPath" > /dev/null || { echo "FAIL: missing permissions.additionalDirectories"; exit 1; }
+        jq -e '.permissions | has("defaultMode")' "$jsonPath" > /dev/null || { echo "FAIL: missing permissions.defaultMode"; exit 1; }
 
         # Verify types
         jq -e '.alwaysThinkingEnabled | type == "boolean"' "$jsonPath" > /dev/null || { echo "FAIL: alwaysThinkingEnabled not boolean"; exit 1; }

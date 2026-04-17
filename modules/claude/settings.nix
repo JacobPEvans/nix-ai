@@ -93,6 +93,9 @@ let
     permissions = {
       inherit (cfg.settings.permissions) allow deny ask;
       inherit (cfg.settings) additionalDirectories;
+    }
+    // lib.optionalAttrs (cfg.settings.permissions.defaultMode != null) {
+      inherit (cfg.settings.permissions) defaultMode;
     };
 
     # Plugin configuration

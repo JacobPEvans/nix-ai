@@ -42,6 +42,7 @@ in
   # Permissions from ai-assistant-instructions
   permissions = {
     inherit (permissions) allow deny ask;
+    defaultMode = "auto";
 
     # Directory-level read access
     additionalDirectories = [

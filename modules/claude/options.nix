@@ -365,6 +365,28 @@ in
           default = [ ];
           description = "Commands and operations requiring user confirmation";
         };
+        defaultMode = lib.mkOption {
+          type = lib.types.nullOr (
+            lib.types.enum [
+              "acceptEdits"
+              "auto"
+              "bypassPermissions"
+              "default"
+              "dontAsk"
+              "plan"
+            ]
+          );
+          default = "auto";
+          description = ''
+            Default permission mode for Claude Code sessions.
+            - "auto": AI classifier decides per-action (eliminates most prompts)
+            - "default": prompt for everything (upstream default)
+            - "acceptEdits": auto-approve file edits, prompt for shell
+            - "dontAsk": bypass all prompts (use with caution)
+            - "plan": plan mode by default
+            null = omit from settings.json (use upstream default)
+          '';
+        };
       };
 
       additionalDirectories = lib.mkOption {
