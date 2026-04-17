@@ -23,6 +23,13 @@ let
       "xhigh"
     ]
   );
+  nullableVerbosity = lib.types.nullOr (
+    lib.types.enum [
+      "low"
+      "medium"
+      "high"
+    ]
+  );
 in
 {
   options.programs.codex = {
@@ -62,22 +69,10 @@ in
       description = "Default Codex model.";
     };
 
-    reviewModel = lib.mkOption {
-      type = nullableStr;
-      default = null;
-      description = "Model to use for Codex review flows.";
-    };
-
     modelProvider = lib.mkOption {
       type = nullableStr;
       default = null;
       description = "Default model provider identifier.";
-    };
-
-    serviceTier = lib.mkOption {
-      type = nullableStr;
-      default = null;
-      description = "Default Codex service tier.";
     };
 
     modelReasoningEffort = lib.mkOption {
@@ -86,16 +81,28 @@ in
       description = "Default reasoning effort for Codex.";
     };
 
+    modelVerbosity = lib.mkOption {
+      type = nullableVerbosity;
+      default = "medium";
+      description = "Default model verbosity.";
+    };
+
     planModeReasoningEffort = lib.mkOption {
       type = nullableReasoningEffort;
       default = "high";
       description = "Default reasoning effort for plan mode.";
     };
 
-    modelVerbosity = lib.mkOption {
+    reviewModel = lib.mkOption {
       type = nullableStr;
-      default = "medium";
-      description = "Default model verbosity.";
+      default = null;
+      description = "Model to use for Codex review flows.";
+    };
+
+    serviceTier = lib.mkOption {
+      type = nullableStr;
+      default = null;
+      description = "Default Codex service tier.";
     };
 
     webSearch = lib.mkOption {

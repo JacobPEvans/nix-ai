@@ -19,8 +19,8 @@ in
         "modelVerbosity"
         "planModeReasoningEffort"
         "reviewModel"
-        "skills"
         "serviceTier"
+        "skills"
         "trustedProjectDirs"
         "webSearch"
       ];
@@ -58,18 +58,8 @@ in
           expected = null;
         }
         {
-          name = "codex.reviewModel";
-          actual = cfg.reviewModel;
-          expected = null;
-        }
-        {
           name = "codex.modelProvider";
           actual = cfg.modelProvider;
-          expected = null;
-        }
-        {
-          name = "codex.serviceTier";
-          actual = cfg.serviceTier;
           expected = null;
         }
         {
@@ -78,14 +68,24 @@ in
           expected = "medium";
         }
         {
+          name = "codex.modelVerbosity";
+          actual = cfg.modelVerbosity;
+          expected = "medium";
+        }
+        {
           name = "codex.planModeReasoningEffort";
           actual = cfg.planModeReasoningEffort;
           expected = "high";
         }
         {
-          name = "codex.modelVerbosity";
-          actual = cfg.modelVerbosity;
-          expected = "medium";
+          name = "codex.reviewModel";
+          actual = cfg.reviewModel;
+          expected = null;
+        }
+        {
+          name = "codex.serviceTier";
+          actual = cfg.serviceTier;
+          expected = null;
         }
         {
           name = "codex.webSearch";
