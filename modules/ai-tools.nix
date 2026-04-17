@@ -168,7 +168,7 @@
     # ==========================================================================
     # Wraps any MCP server command with Doppler secret injection.
     # Fetches secrets from the ai-ci-automation project at subprocess launch time.
-    # Used by mcp/default.nix withDoppler helper — secrets never stored in any file.
+    # Used by mcp/default.nix withDoppler helper — secrets never stored in plaintext.
     # Usage: doppler-mcp <command> [args...]
     #
     # Logs invocations (command + args) to $XDG_STATE_HOME/doppler-mcp.log.
@@ -183,11 +183,11 @@
     # Since `doppler run` already exits non-zero on auth failure with a clear error
     # message, the preflight provided no safety benefit — just latency.
     # Removed 2026-03-25. See modules/mcp/README.md → Troubleshooting.
-    (writeShellScriptBin "doppler-mcp" ''
-      set -euo pipefail
-      export DOPPLER_BIN="${pkgs.doppler}/bin/doppler"
-      . ${./mcp/scripts/doppler-mcp.sh} "$@"
-    '')
+    (writeShellApplication {
+      name = "doppler-mcp";
+      runtimeInputs = [ doppler ];
+      text = builtins.readFile ./mcp/scripts/doppler-mcp.sh;
+    })
 
     # sync-mlx-models moved to modules/claude/pal-models.nix
     # (needs MLX config access for dynamic model discovery)
@@ -198,9 +198,11 @@
     # Verifies that doppler-mcp can authenticate and access PAL secrets.
     # Run after a darwin-rebuild switch to confirm the PAL MCP server will start.
     # Also useful for diagnosing why PAL is absent from Claude Code sessions.
-    (writeShellScriptBin "check-pal-mcp" ''
-      . ${./mcp/scripts/check-pal-mcp.sh} "$@"
-    '')
+    (writeShellApplication {
+      name = "check-pal-mcp";
+      runtimeInputs = [ doppler ];
+      text = builtins.readFile ./mcp/scripts/check-pal-mcp.sh;
+    })
 
     # ==========================================================================
     # Splunk MCP Connect Wrapper
@@ -210,11 +212,11 @@
     # doppler-mcp from Doppler ai-ci-automation/prd project).
     # MCP server entry: nix-darwin hosts/macbook-m4/home.nix (infrastructure, not AI-specific)
     # Usage: splunk-mcp-connect (no args — called by Claude Code MCP server config)
-    (writeShellScriptBin "splunk-mcp-connect" ''
-      set -euo pipefail
-      export BUNX="${bun}/bin/bunx"
-      . ${./mcp/scripts/splunk-mcp-connect.sh} "$@"
-    '')
+    (writeShellApplication {
+      name = "splunk-mcp-connect";
+      runtimeInputs = [ bun ];
+      text = builtins.readFile ./mcp/scripts/splunk-mcp-connect.sh;
+    })
 
     # ==========================================================================
     # HuggingFace Hub CLI

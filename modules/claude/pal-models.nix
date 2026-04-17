@@ -35,16 +35,6 @@ let
   # Scripts directory holds pal-models-shared.jq, used by jq -L for `include`.
   scriptsDir = ../mcp/scripts;
 
-  # PAL MCP launcher env — Nix-interpolated paths exported before sourcing pal-mcp.sh.
-  # Static config lives in the script file; only values requiring Nix evaluation go here.
-  palMcpEnv = ''
-    export CUSTOM_MODELS_CONFIG_PATH="${outputFile}"
-    export CUSTOM_MODEL_NAME="mlx-local/${mlxCfg.defaultModel}"
-    export OPENROUTER_MODELS_CONFIG_PATH="${outputDir}/openrouter_models.json"
-    export PAL_LOG_DIR="${palLogDir}"
-    export PAL_MCP_SERVER="${palPkg}/bin/pal-mcp-server"
-  '';
-
   # Common env shared by all sync scripts
   commonSyncEnv = ''
     export CURL="${pkgs.curl}/bin/curl"
@@ -79,12 +69,19 @@ in
 
         # pal-mcp — PAL MCP launcher with baked-in env vars.
         # Env vars survive Claude Code's ~/.claude.json rewrites (JacobPEvans/nix-ai#557).
-        # Logic in modules/mcp/scripts/pal-mcp.sh; Nix-specific paths in palMcpEnv above.
-        (pkgs.writeShellScriptBin "pal-mcp" ''
-          set -euo pipefail
-          ${palMcpEnv}
-          . ${../mcp/scripts/pal-mcp.sh} "$@"
-        '')
+        # Dynamic paths (Nix-interpolated) prepended; static config in pal-mcp.sh.
+        (pkgs.writeShellApplication {
+          name = "pal-mcp";
+          runtimeInputs = [ ]; # doppler-mcp resolved from user PATH at runtime
+          text = ''
+            export CUSTOM_MODELS_CONFIG_PATH="${outputFile}"
+            export CUSTOM_MODEL_NAME="mlx-local/${mlxCfg.defaultModel}"
+            export OPENROUTER_MODELS_CONFIG_PATH="${outputDir}/openrouter_models.json"
+            export PAL_LOG_DIR="${palLogDir}"
+            export PAL_MCP_SERVER="${palPkg}/bin/pal-mcp-server"
+          ''
+          + builtins.readFile ../mcp/scripts/pal-mcp.sh;
+        })
       ];
     }
 
