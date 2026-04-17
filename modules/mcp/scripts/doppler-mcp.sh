@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # doppler-mcp — wraps any command with Doppler secret injection.
 #
 # Fetches secrets from ai-ci-automation/prd at subprocess launch time.
@@ -15,9 +14,7 @@
 # The preflight also fetched secrets twice (check + real exec). Removed 2026-03-25.
 # See modules/mcp/README.md → Troubleshooting for the full story.
 #
-# Env vars exported by ai-tools.nix before sourcing:
-#   DOPPLER_BIN — absolute Nix store path to doppler binary
-set -euo pipefail
+# doppler is on PATH via runtimeInputs (writeShellApplication)
 if [ "$#" -lt 1 ]; then
   echo "Usage: doppler-mcp <command> [args...]" >&2
   echo "Wraps a command with: doppler run -p ai-ci-automation -c prd -- <command> [args...]" >&2
@@ -28,6 +25,6 @@ mkdir -p "$(dirname "$LOG_FILE")"
 touch "$LOG_FILE" && chmod 600 "$LOG_FILE"
 echo "$(date -u +%FT%TZ) doppler-mcp starting: $(printf '%q ' "$@")" >> "$LOG_FILE"
 FALLBACK="${XDG_STATE_HOME:-$HOME/.local/state}/doppler-mcp-fallback.enc"
-exec "$DOPPLER_BIN" run -p ai-ci-automation -c prd \
+exec doppler run -p ai-ci-automation -c prd \
   --fallback "$FALLBACK" \
   -- "$@"

@@ -1,21 +1,21 @@
-#!/usr/bin/env bash
 # check-pal-mcp — interactive PAL MCP health diagnostic.
 #
 # Run after darwin-rebuild switch or when PAL is absent from Claude Code sessions.
 # Unlike check-pal-health.sh (non-blocking activation check that always exits 0),
 # this script exits non-zero when critical failures are found.
-set -euo pipefail
+#
+# doppler is on PATH via runtimeInputs (writeShellApplication)
 LOG_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/doppler-mcp.log"
 
 echo "=== PAL MCP Health Check ==="
 
 echo ""
 echo "1. Doppler version:"
-"${DOPPLER_BIN:-doppler}" --version
+doppler --version
 
 echo ""
 echo "2. Doppler auth status:"
-"${DOPPLER_BIN:-doppler}" me 2>&1 || {
+doppler me 2>&1 || {
   echo "   ERROR: Not authenticated. Run: doppler login"
   exit 1
 }
@@ -27,7 +27,7 @@ echo "3. PAL secrets (ai-ci-automation/prd):"
 provider_secrets=(GEMINI_API_KEY OPENAI_API_KEY OPENROUTER_API_KEY)
 available=0
 for secret in "${provider_secrets[@]}"; do
-  if "${DOPPLER_BIN:-doppler}" secrets get "$secret" \
+  if doppler secrets get "$secret" \
        --project ai-ci-automation \
        --config prd \
        --plain >/dev/null 2>&1; then

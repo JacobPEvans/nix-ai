@@ -35,16 +35,6 @@ let
   # Scripts directory holds pal-models-shared.jq, used by jq -L for `include`.
   scriptsDir = ../mcp/scripts;
 
-  # PAL MCP launcher env — Nix-interpolated paths exported before sourcing pal-mcp.sh.
-  # Static config lives in the script file; only values requiring Nix evaluation go here.
-  palMcpEnv = ''
-    export CUSTOM_MODELS_CONFIG_PATH="${outputFile}"
-    export CUSTOM_MODEL_NAME="${mlxCfg.defaultModel}"
-    export OPENROUTER_MODELS_CONFIG_PATH="${outputDir}/openrouter_models.json"
-    export PAL_LOG_DIR="${palLogDir}"
-    export PAL_MCP_SERVER="${palPkg}/bin/pal-mcp-server"
-  '';
-
   # Common env shared by all sync scripts
   commonSyncEnv = ''
     export CURL="${pkgs.curl}/bin/curl"
@@ -77,14 +67,32 @@ in
       home.packages = [
         palPkg
 
-        # pal-mcp — PAL MCP launcher with baked-in env vars.
+        # pal-mcp — PAL MCP launcher with all env vars baked in.
         # Env vars survive Claude Code's ~/.claude.json rewrites (JacobPEvans/nix-ai#557).
-        # Logic in modules/mcp/scripts/pal-mcp.sh; Nix-specific paths in palMcpEnv above.
-        (pkgs.writeShellScriptBin "pal-mcp" ''
-          set -euo pipefail
-          ${palMcpEnv}
-          . ${../mcp/scripts/pal-mcp.sh} "$@"
-        '')
+        # Dynamic paths (Nix-interpolated) + static config inline — no separate .sh file.
+        (pkgs.writeShellApplication {
+          name = "pal-mcp";
+          runtimeInputs = [ ];
+          text = ''
+            # Dynamic config (Nix-interpolated at build time)
+            export CUSTOM_MODELS_CONFIG_PATH="${outputFile}"
+            export CUSTOM_MODEL_NAME="${mlxCfg.defaultModel}"
+            export OPENROUTER_MODELS_CONFIG_PATH="${outputDir}/openrouter_models.json"
+            export PAL_LOG_DIR="${palLogDir}"
+
+            # Static PAL config — enabled tools: chat, listmodels, clink, consensus
+            export DISABLED_TOOLS="thinkdeep,planner,codereview,precommit,debug,analyze,tracer,refactor,testgen,secaudit,docgen,apilookup,challenge,version"
+            export DEFAULT_MODEL="auto"
+            export CUSTOM_API_URL="http://localhost:30080/v1"
+            export CUSTOM_CONNECT_TIMEOUT="30"
+            export CUSTOM_READ_TIMEOUT="300"
+            export CONVERSATION_TIMEOUT_HOURS="6"
+            export MAX_CONVERSATION_TURNS="50"
+            export LOG_LEVEL="INFO"
+
+            exec doppler-mcp "${palPkg}/bin/pal-mcp-server" "$@"
+          '';
+        })
       ];
     }
 
