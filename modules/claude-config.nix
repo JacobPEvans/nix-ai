@@ -258,11 +258,19 @@ in
       ask = formatters.claude.formatAsk permissions;
     };
 
-    # Additional directories accessible to Claude Code without prompts
+    # Additional directories accessible to Claude Code without prompts.
+    # Consumed by modules/claude/settings.nix via cfg.settings.additionalDirectories.
+    # lib/claude-settings.nix (CI-only) accepts a separate caller-provided parameter.
     additionalDirectories = [
-      "~/"
       "~/.claude/"
-      "~/.config/"
+      "~/.claude/skills/retrospecting/reports/"
+      "~/.config/direnv/"
+      "~/.config/fabric/"
+      "~/.config/gh/"
+      "~/.config/git/"
+      "~/.config/mlx/"
+      "~/.config/nix/"
+      "~/.config/pal-mcp/"
     ];
 
     # Sandbox configuration (Dec 2025 feature)

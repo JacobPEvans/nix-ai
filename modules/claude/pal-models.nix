@@ -76,7 +76,7 @@ in
           text = ''
             # Dynamic config (Nix-interpolated at build time)
             export CUSTOM_MODELS_CONFIG_PATH="${outputFile}"
-            export CUSTOM_MODEL_NAME="${mlxCfg.defaultModel}"
+            export CUSTOM_MODEL_NAME="mlx-local/${mlxCfg.defaultModel}"
             export OPENROUTER_MODELS_CONFIG_PATH="${outputDir}/openrouter_models.json"
             export PAL_LOG_DIR="${palLogDir}"
 

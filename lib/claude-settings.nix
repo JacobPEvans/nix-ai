@@ -17,8 +17,9 @@
   lib,
   homeDir,
   schemaUrl,
-  permissions, # { allow, deny, ask }
+  permissions, # { allow, deny, ask, defaultMode? }
   plugins, # { marketplaces, enabledPlugins }
+  additionalDirectories ? [ ], # caller-provided; CI passes a fixture, deployment uses modules/claude/settings.nix
 }:
 
 let
@@ -42,13 +43,10 @@ in
   # Permissions from ai-assistant-instructions
   permissions = {
     inherit (permissions) allow deny ask;
+    defaultMode = permissions.defaultMode or "auto";
 
-    # Directory-level read access
-    additionalDirectories = [
-      "~/" # Full home directory access
-      "~/.claude/" # Claude configuration
-      "~/.config/" # XDG config directory
-    ];
+    # Directory-level access — canonical list in modules/claude-config.nix
+    inherit additionalDirectories;
   };
 
   # Status line configuration

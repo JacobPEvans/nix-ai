@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.45.1](https://github.com/JacobPEvans/nix-ai/compare/v1.45.0...v1.45.1) (2026-04-17)
+
+
+### Bug Fixes
+
+* **claude:** narrow additionalDirectories, DRY the list, add retrospecting/reports ([#567](https://github.com/JacobPEvans/nix-ai/issues/567)) ([2d0dae7](https://github.com/JacobPEvans/nix-ai/commit/2d0dae78139903016272b25bc6eae63b16f1fbd1))
+
+## [1.45.0](https://github.com/JacobPEvans/nix-ai/compare/v1.44.1...v1.45.0) (2026-04-17)
+
+
+### Features
+
+* **claude:** enable auto mode by default ([#564](https://github.com/JacobPEvans/nix-ai/issues/564)) ([f54be3d](https://github.com/JacobPEvans/nix-ai/commit/f54be3d8c5242cdce2adb13c9e864bbdbfe5fa05))
+
+## [1.44.1](https://github.com/JacobPEvans/nix-ai/compare/v1.44.0...v1.44.1) (2026-04-17)
+
+
+### Bug Fixes
+
+* **pal-mcp:** use mlx-local/ provider prefix for Bifrost routing ([#565](https://github.com/JacobPEvans/nix-ai/issues/565)) ([f818d9a](https://github.com/JacobPEvans/nix-ai/commit/f818d9ac2a4ce0a612951b3c8615f000535e3024))
+
 ## [1.44.0](https://github.com/JacobPEvans/nix-ai/compare/v1.43.5...v1.44.0) (2026-04-17)
 
 
