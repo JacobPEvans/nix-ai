@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.43.5](https://github.com/JacobPEvans/nix-ai/compare/v1.43.4...v1.43.5) (2026-04-17)
+
+
+### Bug Fixes
+
+* **pal-mcp:** env var injection and restore disabled tools ([#559](https://github.com/JacobPEvans/nix-ai/issues/559)) ([a1829f8](https://github.com/JacobPEvans/nix-ai/commit/a1829f8890c973ce44c1c702d6850a5ce2ca980f))
+
 ## [1.43.4](https://github.com/JacobPEvans/nix-ai/compare/v1.43.3...v1.43.4) (2026-04-16)
 
 
