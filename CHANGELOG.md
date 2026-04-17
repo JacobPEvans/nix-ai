@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.44.1](https://github.com/JacobPEvans/nix-ai/compare/v1.44.0...v1.44.1) (2026-04-17)
+
+
+### Bug Fixes
+
+* **pal-mcp:** use mlx-local/ provider prefix for Bifrost routing ([#565](https://github.com/JacobPEvans/nix-ai/issues/565)) ([f818d9a](https://github.com/JacobPEvans/nix-ai/commit/f818d9ac2a4ce0a612951b3c8615f000535e3024))
+
 ## [1.44.0](https://github.com/JacobPEvans/nix-ai/compare/v1.43.5...v1.44.0) (2026-04-17)
 
 
