@@ -71,6 +71,7 @@ in
       expectedPermissionOptions = [
         "allow"
         "ask"
+        "defaultMode"
         "deny"
       ];
       actualPermissionOptions = builtins.attrNames cfg.settings.permissions;
@@ -193,6 +194,11 @@ in
           actual = cfg.apiKeyHelper.enable;
           expected = true;
         }
+        {
+          name = "settings.permissions.defaultMode";
+          actual = cfg.settings.permissions.defaultMode;
+          expected = "auto";
+        }
       ];
       failures = builtins.filter (c: c.actual != c.expected) checks;
       failureMsg = builtins.concatStringsSep "\n" (
@@ -251,14 +257,10 @@ in
         jq -e '.permissions | has("deny")' "$jsonPath" > /dev/null || { echo "FAIL: missing permissions.deny"; exit 1; }
         jq -e '.permissions | has("ask")' "$jsonPath" > /dev/null || { echo "FAIL: missing permissions.ask"; exit 1; }
         jq -e '.permissions | has("additionalDirectories")' "$jsonPath" > /dev/null || { echo "FAIL: missing permissions.additionalDirectories"; exit 1; }
+        jq -e '.permissions.defaultMode == "auto"' "$jsonPath" > /dev/null || { echo "FAIL: permissions.defaultMode not \"auto\""; exit 1; }
 
-        # Verify types
-        jq -e '.alwaysThinkingEnabled | type == "boolean"' "$jsonPath" > /dev/null || { echo "FAIL: alwaysThinkingEnabled not boolean"; exit 1; }
-        jq -e '.permissions.allow | type == "array"' "$jsonPath" > /dev/null || { echo "FAIL: permissions.allow not array"; exit 1; }
-        jq -e '.permissions.deny | type == "array"' "$jsonPath" > /dev/null || { echo "FAIL: permissions.deny not array"; exit 1; }
-        jq -e '.permissions.ask | type == "array"' "$jsonPath" > /dev/null || { echo "FAIL: permissions.ask not array"; exit 1; }
+        # Verify types (only for fields without a value assertion)
         jq -e '.permissions.additionalDirectories | type == "array"' "$jsonPath" > /dev/null || { echo "FAIL: additionalDirectories not array"; exit 1; }
-        jq -e '.statusLine | type == "object"' "$jsonPath" > /dev/null || { echo "FAIL: statusLine not object"; exit 1; }
         jq -e '.extraKnownMarketplaces | type == "object"' "$jsonPath" > /dev/null || { echo "FAIL: extraKnownMarketplaces not object"; exit 1; }
 
         # Verify values
@@ -269,7 +271,7 @@ in
         jq -e '.permissions.ask | length == 0' "$jsonPath" > /dev/null || { echo "FAIL: expected 0 ask entries"; exit 1; }
         jq -e '.statusLine.type == "command"' "$jsonPath" > /dev/null || { echo "FAIL: statusLine.type should be command"; exit 1; }
 
-        echo "Settings JSON: 6 keys, 5 permission fields, 6 type checks, 6 value checks passed"
+        echo "Settings JSON: 6 keys, 5 permission fields, 2 type checks, 6 value checks passed"
         touch $out
       '';
 
