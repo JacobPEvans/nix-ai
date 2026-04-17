@@ -19,6 +19,7 @@
   schemaUrl,
   permissions, # { allow, deny, ask, defaultMode? }
   plugins, # { marketplaces, enabledPlugins }
+  additionalDirectories ? [ ], # caller-provided; CI passes a fixture, deployment uses modules/claude/settings.nix
 }:
 
 let
@@ -44,12 +45,8 @@ in
     inherit (permissions) allow deny ask;
     defaultMode = permissions.defaultMode or "auto";
 
-    # Directory-level read access
-    additionalDirectories = [
-      "~/" # Full home directory access
-      "~/.claude/" # Claude configuration
-      "~/.config/" # XDG config directory
-    ];
+    # Directory-level access — canonical list in modules/claude-config.nix
+    inherit additionalDirectories;
   };
 
   # Status line configuration

@@ -233,6 +233,7 @@ in
           marketplaces = { };
           enabledPlugins = { };
         };
+        additionalDirectories = [ "~/.claude/" ]; # CI fixture — real list in modules/claude-config.nix
       };
     in
     pkgs.runCommand "check-settings-json"
