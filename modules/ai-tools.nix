@@ -168,7 +168,7 @@
     # ==========================================================================
     # Wraps any MCP server command with Doppler secret injection.
     # Fetches secrets from the ai-ci-automation project at subprocess launch time.
-    # Used by mcp/default.nix withDoppler helper — secrets never stored in any file.
+    # Used by mcp/default.nix withDoppler helper — secrets never stored in plaintext.
     # Usage: doppler-mcp <command> [args...]
     #
     # Logs invocations (command + args) to $XDG_STATE_HOME/doppler-mcp.log.

@@ -1,7 +1,7 @@
 # check-pal-mcp — interactive PAL MCP health diagnostic.
 #
 # Run after darwin-rebuild switch or when PAL is absent from Claude Code sessions.
-# Unlike check-pal-health.sh (non-blocking activation check that always exits 0),
+# Unlike ./check-pal-health.sh (non-blocking activation check that always exits 0),
 # this script exits non-zero when critical failures are found.
 #
 # doppler is on PATH via runtimeInputs (writeShellApplication)
@@ -60,7 +60,7 @@ if command -v claude &>/dev/null; then
     echo "   $pal_status"
   else
     echo "   PAL not found in Claude Code MCP server list"
-    echo "   Register: claude mcp add pal -s user -- pal-mcp"
+    echo "   Register: claude mcp add pal -s user -- pal-mcp (or darwin-rebuild switch if Nix-managed)"
   fi
 else
   echo "   claude CLI not in PATH — skipping"

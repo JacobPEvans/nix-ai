@@ -1,6 +1,6 @@
 # splunk-mcp-connect — connects to the Splunk MCP Server via mcp-remote stdio proxy.
 #
-# Reads credentials from env (injected by doppler-mcp wrapper upstream).
+# Reads credentials from env (injected by doppler-mcp wrapper at MCP launch time).
 #
 # SECURITY NOTE: Bearer token is visible in process list via --header arg.
 # This is a known mcp-remote limitation — no stdin/env-based header injection exists yet.

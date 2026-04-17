@@ -72,7 +72,7 @@ in
         # Dynamic paths (Nix-interpolated) prepended; static config in pal-mcp.sh.
         (pkgs.writeShellApplication {
           name = "pal-mcp";
-          runtimeInputs = [ ];
+          runtimeInputs = [ ]; # doppler-mcp resolved from user PATH at runtime
           text = ''
             export CUSTOM_MODELS_CONFIG_PATH="${outputFile}"
             export CUSTOM_MODEL_NAME="mlx-local/${mlxCfg.defaultModel}"
