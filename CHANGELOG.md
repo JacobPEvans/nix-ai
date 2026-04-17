@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.45.2](https://github.com/JacobPEvans/nix-ai/compare/v1.45.1...v1.45.2) (2026-04-17)
+
+
+### Bug Fixes
+
+* **claude:** add /tmp/ to additionalDirectories ([#571](https://github.com/JacobPEvans/nix-ai/issues/571)) ([bb6fef9](https://github.com/JacobPEvans/nix-ai/commit/bb6fef9ff1c1371b5539d61b946885dfbddba07c))
+
 ## [1.45.1](https://github.com/JacobPEvans/nix-ai/compare/v1.45.0...v1.45.1) (2026-04-17)
 
 
