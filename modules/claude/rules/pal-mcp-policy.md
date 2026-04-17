@@ -1,20 +1,30 @@
 ---
-description: PAL MCP availability protocol — scoped to clink and consensus after Bifrost migration
+description: PAL MCP availability protocol — clink/consensus have no native fallback; chat/listmodels re-enabled
 ---
 
 # PAL MCP Policy
 
-PAL MCP hosts two tools with no native Claude Code or Bifrost equivalent:
-**`clink`** (parallel multi-model prompting) and **`consensus`** (multi-model
-voting/agreement). Every other PAL tool has a native replacement — single-model
-prompts go through the Bifrost AI gateway at `http://localhost:30080/v1`,
-architecture/planning work goes through Plan mode or the `Plan` subagent, etc.
-See the Phase 3 audit matrix on `JacobPEvans/nix-ai#450` for the full mapping.
+PAL MCP exposes four enabled tools:
 
-This policy **only applies to `clink` and `consensus`**. Never declare either
-unavailable without completing the investigation protocol below. Silently
-skipping a multi-model step because `ToolSearch` came back empty is the
-failure mode this rule exists to prevent.
+| Tool | Purpose |
+| ---- | ------- |
+| `chat` | Single-model inference via Bifrost. Local MLX and cloud models. |
+| `listmodels` | Enumerate available models (local MLX + cloud via OpenRouter). |
+| `clink` | Parallel multi-model prompting. No native equivalent. |
+| `consensus` | Multi-model voting/agreement. No native equivalent. |
+
+All other PAL tools have native Claude Code or Bifrost equivalents and are
+disabled. See the Phase 3 audit matrix on `JacobPEvans/nix-ai#450` for the
+full mapping.
+
+The availability-check protocol below **applies to `clink` and `consensus`**
+— the two tools with no fallback. `chat` and `listmodels` have degraded
+alternatives (`curl http://localhost:30080/v1/chat/completions` and
+`curl http://localhost:30080/v1/models`), so a failed PAL server is less
+critical for them.
+
+Silently skipping a multi-model step because `ToolSearch` came back empty is
+the failure mode this rule exists to prevent.
 
 ## Configuration
 
@@ -62,7 +72,7 @@ claude mcp list 2>/dev/null | grep "^pal:"
 ### Step 3: Attempt reconnection
 
 ```bash
-claude mcp remove pal -s user && claude mcp add pal -s user -- doppler-mcp pal-mcp-server
+claude mcp remove pal -s user && claude mcp add pal -s user -- pal-mcp
 ```
 
 Wait 5s, re-check with `claude mcp list`.

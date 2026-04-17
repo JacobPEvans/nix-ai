@@ -35,6 +35,16 @@ let
   # Scripts directory holds pal-models-shared.jq, used by jq -L for `include`.
   scriptsDir = ../mcp/scripts;
 
+  # PAL MCP launcher env — Nix-interpolated paths exported before sourcing pal-mcp.sh.
+  # Static config lives in the script file; only values requiring Nix evaluation go here.
+  palMcpEnv = ''
+    export CUSTOM_MODELS_CONFIG_PATH="${outputFile}"
+    export CUSTOM_MODEL_NAME="${mlxCfg.defaultModel}"
+    export OPENROUTER_MODELS_CONFIG_PATH="${outputDir}/openrouter_models.json"
+    export PAL_LOG_DIR="${palLogDir}"
+    export PAL_MCP_SERVER="${palPkg}/bin/pal-mcp-server"
+  '';
+
   # Common env shared by all sync scripts
   commonSyncEnv = ''
     export CURL="${pkgs.curl}/bin/curl"
@@ -58,77 +68,83 @@ let
   '';
 in
 {
-  config = lib.mkIf cfg.enable {
-    home = {
-      # Install pal-mcp-server as a Nix package so `doppler-mcp pal-mcp-server`
-      # resolves via PATH. The package is built from the pinned flake input.
-      packages = [
+  config = lib.mkMerge [
+    {
+      # Install palPkg and pal-mcp wrapper unconditionally — needed by Codex and
+      # Gemini MCP config (mcp/default.nix: `command = "pal-mcp"`) even when
+      # programs.claude.enable = false. Previously only doppler-mcp was unconditional;
+      # moving to the wrapper pattern must preserve that availability.
+      home.packages = [
         palPkg
 
-        # Refresh custom_models.json between darwin-rebuild switches.
-        # Queries MLX /v1/models for available models.
-        (pkgs.writeShellScriptBin "sync-mlx-models" ''
+        # pal-mcp — PAL MCP launcher with baked-in env vars.
+        # Env vars survive Claude Code's ~/.claude.json rewrites (JacobPEvans/nix-ai#557).
+        # Logic in modules/mcp/scripts/pal-mcp.sh; Nix-specific paths in palMcpEnv above.
+        (pkgs.writeShellScriptBin "pal-mcp" ''
           set -euo pipefail
-          ${mlxSyncEnv}
-          . ${../mcp/scripts/sync-pal-models.sh}
-          echo "PAL custom models updated. Restart Claude Code to pick up changes."
-        '')
-
-        # Refresh cloud model config between darwin-rebuild switches.
-        # Queries OpenRouter public API (no auth) — single source of truth for all cloud models.
-        (pkgs.writeShellScriptBin "sync-pal-cloud-models" ''
-          set -euo pipefail
-          ${cloudSyncEnv}
-          . ${../mcp/scripts/sync-pal-cloud-models.sh}
-          echo "PAL cloud models updated. Restart Claude Code to pick up changes."
+          ${palMcpEnv}
+          . ${../mcp/scripts/pal-mcp.sh} "$@"
         '')
       ];
+    }
 
-      activation = {
-        # Generate custom_models.json from dynamic MLX models.
-        # If the server is unreachable, the previous file is preserved.
-        palCustomModels = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          ${mlxSyncEnv}
-          $DRY_RUN_CMD bash -c '(umask 077 && mkdir -p "${palLogDir}")'
-          . ${../mcp/scripts/sync-pal-models.sh}
-        '';
+    (lib.mkIf cfg.enable {
+      home = {
+        packages = [
+          # Refresh custom_models.json between darwin-rebuild switches.
+          # Queries MLX /v1/models for available models.
+          (pkgs.writeShellScriptBin "sync-mlx-models" ''
+            set -euo pipefail
+            ${mlxSyncEnv}
+            . ${../mcp/scripts/sync-pal-models.sh}
+            echo "PAL custom models updated. Restart Claude Code to pick up changes."
+          '')
 
-        # Generate cloud model configs from OpenRouter public API.
-        # No auth required. Preserves previous files if API is unreachable.
-        # Skipped on dry-run because the sync script makes external network calls.
-        palCloudModels = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          ${cloudSyncEnv}
-          if [ -z "''${DRY_RUN_CMD:-}" ]; then
+          # Refresh cloud model config between darwin-rebuild switches.
+          # Queries OpenRouter public API (no auth) — single source of truth for all cloud models.
+          (pkgs.writeShellScriptBin "sync-pal-cloud-models" ''
+            set -euo pipefail
+            ${cloudSyncEnv}
             . ${../mcp/scripts/sync-pal-cloud-models.sh}
-          fi
-        '';
+            echo "PAL cloud models updated. Restart Claude Code to pick up changes."
+          '')
+        ];
 
-        # Non-blocking health check — runs after activation to surface PAL issues
-        # early (Doppler auth, missing secrets). Never blocks activation (always exits 0).
-        # Skipped on dry-run (not prefixed with $DRY_RUN_CMD) because the check makes
-        # network calls to Doppler that are inappropriate for a dry-run.
-        palHealthCheck = lib.hm.dag.entryAfter [ "writeBoundary" "palCustomModels" "palCloudModels" ] ''
-          if [ -z "''${DRY_RUN_CMD:-}" ]; then
-            export DOPPLER="${pkgs.doppler}/bin/doppler"
-            export PAL_MCP_BIN="${palPkg}/bin/pal-mcp-server"
-            export PAL_LOG_DIR="${palLogDir}"
-            . ${../mcp/scripts/check-pal-health.sh}
-          fi
-        '';
+        activation = {
+          # Generate custom_models.json from dynamic MLX models.
+          # If the server is unreachable, the previous file is preserved.
+          palCustomModels = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+            ${mlxSyncEnv}
+            $DRY_RUN_CMD bash -c '(umask 077 && mkdir -p "${palLogDir}")'
+            . ${../mcp/scripts/sync-pal-models.sh}
+          '';
+
+          # Generate cloud model configs from OpenRouter public API.
+          # No auth required. Preserves previous files if API is unreachable.
+          # Skipped on dry-run because the sync script makes external network calls.
+          palCloudModels = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+            ${cloudSyncEnv}
+            if [ -z "''${DRY_RUN_CMD:-}" ]; then
+              . ${../mcp/scripts/sync-pal-cloud-models.sh}
+            fi
+          '';
+
+          # Non-blocking health check — runs after activation to surface PAL issues
+          # early (Doppler auth, missing secrets). Never blocks activation (always exits 0).
+          # Skipped on dry-run (not prefixed with $DRY_RUN_CMD) because the check makes
+          # network calls to Doppler that are inappropriate for a dry-run.
+          palHealthCheck = lib.hm.dag.entryAfter [ "writeBoundary" "palCustomModels" "palCloudModels" ] ''
+            if [ -z "''${DRY_RUN_CMD:-}" ]; then
+              export DOPPLER="${pkgs.doppler}/bin/doppler" PAL_MCP_BIN="${palPkg}/bin/pal-mcp-server" PAL_LOG_DIR="${palLogDir}"
+              . ${../mcp/scripts/check-pal-health.sh}
+            fi
+          '';
+        };
       };
-    };
 
-    # Inject env vars into PAL server.
-    # Merges with the env block defined in mcp/default.nix (DISABLED_TOOLS, etc.).
-    programs.claude.mcpServers.pal.env = {
-      CUSTOM_MODELS_CONFIG_PATH = outputFile;
-      # Override PAL's hardcoded llama3.2 default — dynamically tracks programs.mlx.defaultModel.
-      CUSTOM_MODEL_NAME = mlxCfg.defaultModel;
-      # Cloud models — single source of truth via OpenRouter public API.
-      OPENROUTER_MODELS_CONFIG_PATH = "${outputDir}/openrouter_models.json";
-      # Point PAL logs to a writable location (default tries to write inside the
-      # read-only Nix store, producing "Permission denied: logs/" warnings).
-      PAL_LOG_DIR = palLogDir;
-    };
-  };
+      # PAL MCP server is now launched via the pal-mcp wrapper (above).
+      # All env vars are baked into the wrapper — no env block needed here.
+      programs.claude.mcpServers.pal.command = "pal-mcp";
+    })
+  ];
 }

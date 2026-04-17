@@ -70,69 +70,22 @@ in
   # PAL MCP - Multi-model orchestration
   # ================================================================
   # Provider Abstraction Layer for routing tasks to different AI models
-  # Tools (all enabled): chat, thinkdeep, planner, codereview, precommit, debug,
-  #   apilookup, challenge, clink, consensus, analyze, refactor, testgen, secaudit,
-  #   docgen, tracer
+  # Enabled tools (4): chat, listmodels, clink, consensus
+  #   - chat: single-model inference via Bifrost (local MLX + cloud)
+  #   - listmodels: enumerate available models (local + cloud)
+  #   - clink: parallel multi-model prompting (no native equivalent)
+  #   - consensus: multi-model voting/agreement (no native equivalent)
+  # Disabled tools (14): thinkdeep, planner, codereview, precommit, debug,
+  #   analyze, tracer, refactor, testgen, secaudit, docgen, apilookup,
+  #   challenge, version — all have native Claude Code / Bifrost equivalents
   # See: https://github.com/BeehiveInnovations/pal-mcp-server
   #
-  # API keys injected via Doppler (doppler-mcp wrapper):
-  #   - GEMINI_API_KEY (Google Gemini — pro, flash models)
-  #   - OPENAI_API_KEY (OpenAI — reasoning and chat/codex models)
-  #   - OPENROUTER_API_KEY (OpenRouter — unified multi-model access)
-  #
-  # Non-secret config is set in env below (belongs in Nix, not Doppler).
-
-  # Built as a Nix derivation (modules/mcp/pal-package.nix), installed to PATH.
-  # Wrapped with doppler-mcp to inject Doppler secrets at subprocess launch time.
-  # Secrets are never written to ~/.claude.json or any file Claude Code can read.
+  # Transport: stdio, launched via pal-mcp wrapper (modules/claude/pal-models.nix).
+  # All env vars (DISABLED_TOOLS, model config, paths) are baked into the wrapper —
+  # process env survives Claude Code's ~/.claude.json rewrites (JacobPEvans/nix-ai#557).
+  # API keys are injected by doppler-mcp (called from within the wrapper).
   pal = {
-    command = "doppler-mcp";
-    args = [ "pal-mcp-server" ];
-    env = {
-      # Disable PAL tools that have native Claude Code / Bifrost equivalents,
-      # plus drop `version` (no functional value). Only `clink` (parallel
-      # multi-model) and `consensus` (multi-model voting) remain enabled —
-      # neither has a Bifrost equivalent, and the canonical
-      # `modules/claude/rules/pal-mcp-policy.md` rule scopes PAL's
-      # availability-check protocol to exactly those two tools. The
-      # audit matrix that decided this split was posted as a comment on
-      # JacobPEvans/nix-ai#450.
-      DISABLED_TOOLS = builtins.concatStringsSep "," [
-        "chat"
-        "thinkdeep"
-        "planner"
-        "listmodels"
-        "codereview"
-        "precommit"
-        "debug"
-        "analyze"
-        "tracer"
-        "refactor"
-        "testgen"
-        "secaudit"
-        "docgen"
-        "apilookup"
-        "challenge"
-        "version"
-      ];
-      # 'auto' = PAL picks a model alias per-task; Bifrost then routes the
-      # resulting request to the right provider based on the model name.
-      # `listmodels` is disabled (see above) — query available models via
-      # `curl http://localhost:30080/v1/models` instead.
-      DEFAULT_MODEL = "auto";
-      # Route PAL through Bifrost AI gateway (localhost:30080) instead of
-      # vllm-mlx directly. Bifrost fans out to OpenAI/Gemini/OpenRouter/MLX
-      # based on model name. Tracked: JacobPEvans/nix-ai#450
-      CUSTOM_API_URL = "http://localhost:30080/v1";
-      # OpenAI-compatible client timeouts — applies to whichever backend
-      # CUSTOM_API_URL points at (Bifrost in this config).
-      CUSTOM_CONNECT_TIMEOUT = "30"; # 30s connect — catches stalled upstream
-      CUSTOM_READ_TIMEOUT = "300"; # 5min read — accommodates large model inference
-      # Conversation limits
-      CONVERSATION_TIMEOUT_HOURS = "6";
-      MAX_CONVERSATION_TURNS = "50";
-      LOG_LEVEL = "INFO";
-    };
+    command = "pal-mcp";
   };
 
   # ================================================================

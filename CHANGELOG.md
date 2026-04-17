@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.43.5](https://github.com/JacobPEvans/nix-ai/compare/v1.43.4...v1.43.5) (2026-04-17)
+
+
+### Bug Fixes
+
+* **pal-mcp:** env var injection and restore disabled tools ([#559](https://github.com/JacobPEvans/nix-ai/issues/559)) ([a1829f8](https://github.com/JacobPEvans/nix-ai/commit/a1829f8890c973ce44c1c702d6850a5ce2ca980f))
+
+## [1.43.4](https://github.com/JacobPEvans/nix-ai/compare/v1.43.3...v1.43.4) (2026-04-16)
+
+
+### Bug Fixes
+
+* **claude:** update model references from Opus 4.6 to Opus 4.7 ([#556](https://github.com/JacobPEvans/nix-ai/issues/556)) ([d526bbb](https://github.com/JacobPEvans/nix-ai/commit/d526bbb0303453d93a788dfcb771a776ac50e8ff))
+
 ## [1.43.3](https://github.com/JacobPEvans/nix-ai/compare/v1.43.2...v1.43.3) (2026-04-14)
 
 
