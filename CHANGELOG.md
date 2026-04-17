@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.45.0](https://github.com/JacobPEvans/nix-ai/compare/v1.44.1...v1.45.0) (2026-04-17)
+
+
+### Features
+
+* **claude:** enable auto mode by default ([#564](https://github.com/JacobPEvans/nix-ai/issues/564)) ([f54be3d](https://github.com/JacobPEvans/nix-ai/commit/f54be3d8c5242cdce2adb13c9e864bbdbfe5fa05))
+
 ## [1.44.1](https://github.com/JacobPEvans/nix-ai/compare/v1.44.0...v1.44.1) (2026-04-17)
 
 
