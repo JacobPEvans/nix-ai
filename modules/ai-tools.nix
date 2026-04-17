@@ -200,6 +200,7 @@
     # Also useful for diagnosing why PAL is absent from Claude Code sessions.
     (writeShellScriptBin "check-pal-mcp" ''
       set -euo pipefail
+      export DOPPLER_BIN="${pkgs.doppler}/bin/doppler"
       . ${./mcp/scripts/check-pal-mcp.sh} "$@"
     '')
 

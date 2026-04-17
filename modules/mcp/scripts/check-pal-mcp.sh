@@ -11,11 +11,11 @@ echo "=== PAL MCP Health Check ==="
 
 echo ""
 echo "1. Doppler version:"
-doppler --version
+"${DOPPLER_BIN:-doppler}" --version
 
 echo ""
 echo "2. Doppler auth status:"
-doppler me 2>&1 || {
+"${DOPPLER_BIN:-doppler}" me 2>&1 || {
   echo "   ERROR: Not authenticated. Run: doppler login"
   exit 1
 }
@@ -27,7 +27,7 @@ echo "3. PAL secrets (ai-ci-automation/prd):"
 provider_secrets=(GEMINI_API_KEY OPENAI_API_KEY OPENROUTER_API_KEY)
 available=0
 for secret in "${provider_secrets[@]}"; do
-  if doppler secrets get "$secret" \
+  if "${DOPPLER_BIN:-doppler}" secrets get "$secret" \
        --project ai-ci-automation \
        --config prd \
        --plain >/dev/null 2>&1; then
