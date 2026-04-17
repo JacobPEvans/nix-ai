@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.45.1](https://github.com/JacobPEvans/nix-ai/compare/v1.45.0...v1.45.1) (2026-04-17)
+
+
+### Bug Fixes
+
+* **claude:** narrow additionalDirectories, DRY the list, add retrospecting/reports ([#567](https://github.com/JacobPEvans/nix-ai/issues/567)) ([2d0dae7](https://github.com/JacobPEvans/nix-ai/commit/2d0dae78139903016272b25bc6eae63b16f1fbd1))
+
 ## [1.45.0](https://github.com/JacobPEvans/nix-ai/compare/v1.44.1...v1.45.0) (2026-04-17)
 
 
