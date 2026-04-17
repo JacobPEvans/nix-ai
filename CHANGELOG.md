@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.45.3](https://github.com/JacobPEvans/nix-ai/compare/v1.45.2...v1.45.3) (2026-04-17)
+
+
+### Bug Fixes
+
+* **mcp:** env vars, wrappers, tool restoration ([#563](https://github.com/JacobPEvans/nix-ai/issues/563)) ([68ce7fc](https://github.com/JacobPEvans/nix-ai/commit/68ce7fc6f3173e775e0da92d8c801811a9277bda))
+* remove cspell spell checker entirely ([#573](https://github.com/JacobPEvans/nix-ai/issues/573)) ([54f439d](https://github.com/JacobPEvans/nix-ai/commit/54f439d9f2f2f757108bbe69370bdb6823e58eff))
+
 ## [1.45.2](https://github.com/JacobPEvans/nix-ai/compare/v1.45.1...v1.45.2) (2026-04-17)
 
 
