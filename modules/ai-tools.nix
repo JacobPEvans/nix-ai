@@ -199,6 +199,7 @@
     # Run after a darwin-rebuild switch to confirm the PAL MCP server will start.
     # Also useful for diagnosing why PAL is absent from Claude Code sessions.
     (writeShellScriptBin "check-pal-mcp" ''
+      set -euo pipefail
       . ${./mcp/scripts/check-pal-mcp.sh} "$@"
     '')
 
