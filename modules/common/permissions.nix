@@ -81,7 +81,7 @@ in
 
   # MCP tool permissions (non-shell, bare identifiers like mcp__plugin_*)
   mcpAllow = lib.flatten (lib.mapAttrsToList (_: v: v.mcp or [ ]) allowJsons);
-  mcpDeny = lib.flatten (lib.mapAttrsToList (_: v: v.mcp or [ ]) denyJsons);
+  mcpDeny = lib.flatten (lib.mapAttrsToList (_: v: v.mcp or [ ]) filteredDenyJsons);
   mcpAsk = lib.flatten (lib.mapAttrsToList (_: v: v.mcp or [ ]) askJsons);
 
   # WebFetch domains
