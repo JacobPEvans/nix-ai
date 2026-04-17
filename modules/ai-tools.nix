@@ -185,22 +185,8 @@
     # Removed 2026-03-25. See modules/mcp/README.md → Troubleshooting.
     (writeShellScriptBin "doppler-mcp" ''
       set -euo pipefail
-      if [ "$#" -lt 1 ]; then
-        echo "Usage: doppler-mcp <command> [args...]" >&2
-        echo "Wraps a command with: doppler run -p ai-ci-automation -c prd -- <command> [args...]" >&2
-        exit 1
-      fi
-      LOG_FILE="''${XDG_STATE_HOME:-$HOME/.local/state}/doppler-mcp.log"
-      mkdir -p "$(dirname "$LOG_FILE")"
-      touch "$LOG_FILE" && chmod 600 "$LOG_FILE"
-      # Log invocation for audit trail. No preflight — go straight to exec.
-      # Auth failures are handled natively by `doppler run` (non-zero exit + stderr).
-      # --fallback: cache encrypted secrets locally; use cache if Doppler API is unreachable.
-      echo "$(date -u +%FT%TZ) doppler-mcp starting: $(printf '%q ' "$@")" >> "$LOG_FILE"
-      FALLBACK="''${XDG_STATE_HOME:-$HOME/.local/state}/doppler-mcp-fallback.enc"
-      exec ${pkgs.doppler}/bin/doppler run -p ai-ci-automation -c prd \
-        --fallback "$FALLBACK" \
-        -- "$@"
+      export DOPPLER_BIN="${pkgs.doppler}/bin/doppler"
+      . ${./mcp/scripts/doppler-mcp.sh} "$@"
     '')
 
     # sync-mlx-models moved to modules/claude/pal-models.nix
@@ -213,70 +199,7 @@
     # Run after a darwin-rebuild switch to confirm the PAL MCP server will start.
     # Also useful for diagnosing why PAL is absent from Claude Code sessions.
     (writeShellScriptBin "check-pal-mcp" ''
-      set -euo pipefail
-      LOG_FILE="''${XDG_STATE_HOME:-$HOME/.local/state}/doppler-mcp.log"
-
-      echo "=== PAL MCP Health Check ==="
-
-      echo ""
-      echo "1. Doppler version:"
-      ${pkgs.doppler}/bin/doppler --version
-
-      echo ""
-      echo "2. Doppler auth status:"
-      ${pkgs.doppler}/bin/doppler me 2>&1 || {
-        echo "   ERROR: Not authenticated. Run: doppler login"
-        exit 1
-      }
-
-      echo ""
-      echo "3. PAL secrets (ai-ci-automation/prd):"
-      # With DEFAULT_MODEL=auto, PAL works with ANY available provider.
-      # Warn about missing keys but only fail if NONE are available.
-      provider_secrets=(GEMINI_API_KEY OPENAI_API_KEY OPENROUTER_API_KEY)
-      available=0
-      for secret in "''${provider_secrets[@]}"; do
-        if ${pkgs.doppler}/bin/doppler secrets get "$secret" \
-             --project ai-ci-automation \
-             --config prd \
-             --plain >/dev/null 2>&1; then
-          echo "   OK: $secret available"
-          available=$((available + 1))
-        else
-          echo "   WARN: $secret missing (PAL auto mode will use other providers)"
-        fi
-      done
-      if [ "$available" -eq 0 ]; then
-        echo "   ERROR: No provider API keys found. PAL MCP will not work."
-        exit 1
-      fi
-      echo "   $available/''${#provider_secrets[@]} providers available"
-
-      echo ""
-      echo "4. Last doppler-mcp log entries (if any):"
-      # Note: log file has chmod 600 - contents are diagnostic only, no secret values
-      if [ -f "$LOG_FILE" ]; then
-        ${pkgs.coreutils}/bin/tail -20 "$LOG_FILE"
-      else
-        echo "   No log file found at $LOG_FILE (no failures recorded)"
-      fi
-
-      echo ""
-      echo "5. Claude Code MCP connection status:"
-      if command -v claude &>/dev/null; then
-        pal_status=$(claude mcp list 2>/dev/null | grep "^pal:" || true)
-        if [ -n "$pal_status" ]; then
-          echo "   $pal_status"
-        else
-          echo "   PAL not found in Claude Code MCP server list"
-          echo "   Register: claude mcp add pal -s user -- doppler-mcp pal-mcp-server"
-        fi
-      else
-        echo "   claude CLI not in PATH — skipping"
-      fi
-
-      echo ""
-      echo "=== Health check complete ==="
+      . ${./mcp/scripts/check-pal-mcp.sh} "$@"
     '')
 
     # ==========================================================================
@@ -289,16 +212,8 @@
     # Usage: splunk-mcp-connect (no args — called by Claude Code MCP server config)
     (writeShellScriptBin "splunk-mcp-connect" ''
       set -euo pipefail
-      : "''${SPLUNK_MCP_ENDPOINT:?SPLUNK_MCP_ENDPOINT not set in Doppler}"
-      : "''${SPLUNK_MCP_TOKEN:?SPLUNK_MCP_TOKEN not set in Doppler}"
-      # SECURITY NOTE: Bearer token is visible in process list via --header arg.
-      # This is a known mcp-remote limitation — no stdin/env-based header injection
-      # exists yet. Mitigated by: (1) macOS single-user system, (2) token is
-      # Splunk-scoped with limited capabilities, (3) rotatable via Doppler.
-      export NODE_TLS_REJECT_UNAUTHORIZED=0  # Self-signed cert on Splunk; scoped to mcp-remote only
-      exec ${bun}/bin/bunx --bun mcp-remote@0.1.38 \
-        "$SPLUNK_MCP_ENDPOINT" \
-        --header "Authorization: Bearer $SPLUNK_MCP_TOKEN"
+      export BUNX="${bun}/bin/bunx"
+      . ${./mcp/scripts/splunk-mcp-connect.sh} "$@"
     '')
 
     # ==========================================================================
