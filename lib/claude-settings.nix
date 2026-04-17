@@ -19,7 +19,7 @@
   schemaUrl,
   permissions, # { allow, deny, ask }
   plugins, # { marketplaces, enabledPlugins }
-  additionalDirectories ? [ ], # deployment list from modules/claude-config.nix
+  additionalDirectories ? [ ], # caller-provided; CI passes a fixture, deployment uses modules/claude/settings.nix
 }:
 
 let

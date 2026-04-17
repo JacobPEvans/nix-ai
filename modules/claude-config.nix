@@ -259,7 +259,8 @@ in
     };
 
     # Additional directories accessible to Claude Code without prompts.
-    # Single source of truth — lib/claude-settings.nix accepts this as a parameter.
+    # Consumed by modules/claude/settings.nix via cfg.settings.additionalDirectories.
+    # lib/claude-settings.nix (CI-only) accepts a separate caller-provided parameter.
     additionalDirectories = [
       "~/.claude/"
       "~/.claude/skills/retrospecting/reports/"
