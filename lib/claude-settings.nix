@@ -17,7 +17,7 @@
   lib,
   homeDir,
   schemaUrl,
-  permissions, # { allow, deny, ask }
+  permissions, # { allow, deny, ask, defaultMode? }
   plugins, # { marketplaces, enabledPlugins }
 }:
 
@@ -42,7 +42,7 @@ in
   # Permissions from ai-assistant-instructions
   permissions = {
     inherit (permissions) allow deny ask;
-    defaultMode = "auto";
+    defaultMode = permissions.defaultMode or "auto";
 
     # Directory-level read access
     additionalDirectories = [

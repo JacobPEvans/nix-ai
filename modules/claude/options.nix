@@ -382,9 +382,10 @@ in
             - "auto": AI classifier decides per-action (eliminates most prompts)
             - "default": prompt for everything (upstream default)
             - "acceptEdits": auto-approve file edits, prompt for shell
+            - "bypassPermissions": bypass all permission checks (sandboxes only)
             - "dontAsk": bypass all prompts (use with caution)
             - "plan": plan mode by default
-            null = omit from settings.json (use upstream default)
+            - null: omit from settings.json (use upstream default)
           '';
         };
       };

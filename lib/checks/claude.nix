@@ -258,6 +258,8 @@ in
         jq -e '.permissions | has("ask")' "$jsonPath" > /dev/null || { echo "FAIL: missing permissions.ask"; exit 1; }
         jq -e '.permissions | has("additionalDirectories")' "$jsonPath" > /dev/null || { echo "FAIL: missing permissions.additionalDirectories"; exit 1; }
         jq -e '.permissions | has("defaultMode")' "$jsonPath" > /dev/null || { echo "FAIL: missing permissions.defaultMode"; exit 1; }
+        jq -e '.permissions.defaultMode | type == "string"' "$jsonPath" > /dev/null || { echo "FAIL: permissions.defaultMode not a string"; exit 1; }
+        jq -e '.permissions.defaultMode == "auto"' "$jsonPath" > /dev/null || { echo "FAIL: permissions.defaultMode not \"auto\""; exit 1; }
 
         # Verify types
         jq -e '.alwaysThinkingEnabled | type == "boolean"' "$jsonPath" > /dev/null || { echo "FAIL: alwaysThinkingEnabled not boolean"; exit 1; }
