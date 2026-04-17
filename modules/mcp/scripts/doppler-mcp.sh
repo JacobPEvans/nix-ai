@@ -20,11 +20,12 @@ if [ "$#" -lt 1 ]; then
   echo "Wraps a command with: doppler run -p ai-ci-automation -c prd -- <command> [args...]" >&2
   exit 1
 fi
-LOG_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/doppler-mcp.log"
-mkdir -p "$(dirname "$LOG_FILE")"
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}"
+LOG_FILE="$STATE_DIR/doppler-mcp.log"
+mkdir -p "$STATE_DIR"
 touch "$LOG_FILE" && chmod 600 "$LOG_FILE"
 echo "$(date -u +%FT%TZ) doppler-mcp starting: $(printf '%q ' "$@")" >> "$LOG_FILE"
-FALLBACK="${XDG_STATE_HOME:-$HOME/.local/state}/doppler-mcp-fallback.enc"
+FALLBACK="$STATE_DIR/doppler-mcp-fallback.enc"
 exec doppler run -p ai-ci-automation -c prd \
   --fallback "$FALLBACK" \
   -- "$@"
