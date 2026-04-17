@@ -19,6 +19,7 @@
   schemaUrl,
   permissions, # { allow, deny, ask }
   plugins, # { marketplaces, enabledPlugins }
+  additionalDirectories ? [ ], # deployment list from modules/claude-config.nix
 }:
 
 let
@@ -43,12 +44,8 @@ in
   permissions = {
     inherit (permissions) allow deny ask;
 
-    # Directory-level read access
-    additionalDirectories = [
-      "~/" # Full home directory access
-      "~/.claude/" # Claude configuration
-      "~/.config/" # XDG config directory
-    ];
+    # Directory-level access — canonical list in modules/claude-config.nix
+    inherit additionalDirectories;
   };
 
   # Status line configuration

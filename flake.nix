@@ -257,6 +257,7 @@
                     inherit (nixpkgs) lib;
                     inherit marketplaceInputs claude-cookbooks;
                   }).pluginConfig;
+                additionalDirectories = [ "~/.claude/" ]; # CI fixture — real list in modules/claude-config.nix
               }
             );
           codexRules =

@@ -258,11 +258,18 @@ in
       ask = formatters.claude.formatAsk permissions;
     };
 
-    # Additional directories accessible to Claude Code without prompts
+    # Additional directories accessible to Claude Code without prompts.
+    # Single source of truth — lib/claude-settings.nix accepts this as a parameter.
     additionalDirectories = [
-      "~/"
       "~/.claude/"
-      "~/.config/"
+      "~/.claude/skills/retrospecting/reports/"
+      "~/.config/direnv/"
+      "~/.config/fabric/"
+      "~/.config/gh/"
+      "~/.config/git/"
+      "~/.config/mlx/"
+      "~/.config/nix/"
+      "~/.config/pal-mcp/"
     ];
 
     # Sandbox configuration (Dec 2025 feature)
