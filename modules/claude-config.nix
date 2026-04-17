@@ -16,7 +16,21 @@
 let
   # Import unified permissions from common module
   # This reads from ai-assistant-instructions agentsmd/permissions/
-  aiCommon = import ./common { inherit lib config ai-assistant-instructions; };
+  # Auto mode's AI classifier handles safety for excluded categories;
+  # shell.json (inline code execution) and network.json (curl mutations) are
+  # excluded because auto mode detects malicious usage contextually.
+  # npm run/test are false positives in the package-install deny list.
+  aiCommon = import ./common {
+    inherit lib config ai-assistant-instructions;
+    excludeDenyFiles = [
+      "shell.json"
+      "network.json"
+    ];
+    excludeDenyCommands = [
+      "npm run"
+      "npm test"
+    ];
+  };
   inherit (aiCommon) permissions;
   inherit (aiCommon) formatters;
 

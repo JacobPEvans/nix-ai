@@ -19,6 +19,8 @@
   lib,
   config,
   ai-assistant-instructions,
+  excludeDenyFiles ? [ ],
+  excludeDenyCommands ? [ ],
   ...
 }:
 
@@ -60,13 +62,19 @@ let
   denyJsons = readJsonsFromDir denyDir;
   askJsons = readJsonsFromDir askDir;
 
+  # Apply deny exclusions: drop entire files, then filter specific commands.
+  # Excluded categories are handled by auto mode's AI classifier instead.
+  filteredDenyJsons = lib.filterAttrs (name: _: !(builtins.elem name excludeDenyFiles)) denyJsons;
+
 in
 {
   # Auto-approved commands from ai-assistant-instructions
   allow = lib.flatten (lib.mapAttrsToList (_: v: v.commands or [ ]) allowJsons);
 
-  # Denied commands from ai-assistant-instructions
-  deny = lib.flatten (lib.mapAttrsToList (_: v: v.commands or [ ]) denyJsons);
+  # Denied commands with exclusions applied
+  deny = lib.filter (cmd: !(builtins.elem cmd excludeDenyCommands)) (
+    lib.flatten (lib.mapAttrsToList (_: v: v.commands or [ ]) filteredDenyJsons)
+  );
 
   # Commands that require explicit user confirmation
   ask = lib.flatten (lib.mapAttrsToList (_: v: v.commands or [ ]) askJsons);
