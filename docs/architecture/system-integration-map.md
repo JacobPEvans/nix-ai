@@ -76,7 +76,7 @@ graph TD
 | Claude Code | `modules/claude/` | Desktop app | Primary AI coding assistant | `~/.claude/settings.json`, `~/.claude.json` |
 | Gemini CLI | `modules/gemini/` | CLI | Google AI assistant | `~/.gemini/settings.json` |
 | Codex CLI | `modules/codex/` | CLI | OpenAI coding assistant | `~/.codex/config.toml` |
-| GitHub Copilot | `modules/copilot.nix` | IDE extension | Inline completions | `~/.copilot/config.json` |
+| GitHub Copilot CLI | `modules/copilot.nix` | CLI | Trusted folder configuration | `~/.copilot/config.json` |
 | PAL MCP | `modules/claude/pal-models.nix` | stdio → HTTP | Multi-model orchestration | `~/.config/pal-mcp/custom_models.json` |
 | Bifrost | `orbstack-kubernetes` repo | HTTP :30080 | Multi-provider AI gateway | K8s secrets (Doppler Operator) |
 | MLX / llama-swap | `modules/mlx/` | HTTP :11434 | Local Apple Silicon inference | `~/.config/mlx/llama-swap.json` |
@@ -119,7 +119,7 @@ graph LR
 | `fabric` | stdio (uvx) | Pattern execution |
 | `google-workspace` | stdio (doppler-mcp + uvx) | Gmail/Drive/Calendar; requires OAuth |
 | `codex` | stdio (binary) | OpenAI Codex CLI server |
-| `splunk` | stdio (mcp-remote proxy) | Defined in `nix-darwin` repo |
+| `splunk` | stdio (doppler-mcp + mcp-remote) | Defined in `nix-darwin` repo |
 | `context7` | plugin-managed | Lifecycle owned by `context7` plugin |
 
 ### Disabled Servers (configured but off)

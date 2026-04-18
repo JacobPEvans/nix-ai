@@ -55,7 +55,8 @@ accidentally committed.
 **Secrets injected for PAL**: `GEMINI_API_KEY`, `OPENAI_API_KEY`, `OPENROUTER_API_KEY`
 
 **Fallback cache**: An encrypted local file used when Doppler is unreachable (offline work).
-The fallback is stored in the Nix store and never written to a user-writable location.
+The fallback is stored under `$XDG_STATE_HOME` (e.g. `~/.local/state/doppler-mcp-fallback.enc`),
+so it resides in a user-writable local state directory rather than the Nix store.
 
 **Why no preflight check**: PAL's startup is fast and runs in parallel with ~17 other MCP
 servers at Claude Code launch. A Doppler connectivity check before each launch would add
