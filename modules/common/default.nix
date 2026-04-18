@@ -23,12 +23,22 @@
   lib,
   config,
   ai-assistant-instructions,
+  excludeDenyFiles ? [ ],
+  excludeDenyCommands ? [ ],
   ...
 }:
 
 {
   # Unified permission definitions
-  permissions = import ./permissions.nix { inherit lib config ai-assistant-instructions; };
+  permissions = import ./permissions.nix {
+    inherit
+      lib
+      config
+      ai-assistant-instructions
+      excludeDenyFiles
+      excludeDenyCommands
+      ;
+  };
 
   # Tool-specific formatters
   formatters = import ./formatters.nix { inherit lib; };
