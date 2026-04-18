@@ -70,6 +70,40 @@ let
     inherit pkgs lib;
     inherit (pkgs) fetchFromGitHub;
   };
+
+  # ── Cross-tool skill discovery ──────────────────────────────────────
+  # Discovers SKILL.md files from plugin repos and builds a list usable by
+  # both Codex and Gemini modules via skills.fromFlakeInputs.
+  # Pattern: <plugin>/skills/<skill-name>/SKILL.md
+
+  discoverSkills =
+    input:
+    let
+      topDirs = lib.filterAttrs (_: type: type == "directory") (builtins.readDir input);
+      pluginSkills =
+        pluginName:
+        let
+          skillsPath = "${input}/${pluginName}/skills";
+          hasSkills = builtins.pathExists skillsPath;
+          skillDirs =
+            if hasSkills then
+              lib.filterAttrs (_: type: type == "directory") (builtins.readDir skillsPath)
+            else
+              { };
+        in
+        lib.mapAttrsToList
+          (skillName: _: {
+            name = skillName;
+            source = "${skillsPath}/${skillName}/SKILL.md";
+          })
+          (
+            lib.filterAttrs (skillName: _: builtins.pathExists "${skillsPath}/${skillName}/SKILL.md") skillDirs
+          );
+    in
+    lib.concatMap pluginSkills (builtins.attrNames topDirs);
+
+  # Skills from JacobPEvans/claude-code-plugins (tool-agnostic markdown)
+  sharedSkills = discoverSkills marketplaceInputs.jacobpevans-cc-plugins;
 in
 {
   imports = [
@@ -125,10 +159,16 @@ in
       claudeStatuslineDaniel3303.enable = true; # Active: ClaudeCodeStatusLine (2-line)
 
       # OpenAI Codex configuration (settings handled by modules/codex/)
-      codex.enable = true;
+      codex = {
+        enable = true;
+        skills.fromFlakeInputs = sharedSkills;
+      };
 
       # Gemini CLI configuration (settings handled by modules/gemini/)
-      gemini.enable = true;
+      gemini = {
+        enable = true;
+        skills.fromFlakeInputs = sharedSkills;
+      };
 
       # MLX inference server (vllm-mlx on port 11434)
       mlx.enable = true;

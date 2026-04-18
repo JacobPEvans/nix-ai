@@ -31,9 +31,13 @@ mkdir -p "$TARGET_DIR"
 
 if [[ -f "$TARGET" ]] && [[ ! -L "$TARGET" ]]; then
   # File exists and is a real file (not symlink) - merge
-  # jq -s '.[0] * .[1]' merges deeply: [0]=existing runtime, [1]=Nix config
+  # Strip Nix-authoritative sections from existing config before merge.
+  # This prevents stale entries (e.g. removed MCP servers) from persisting.
+  # del(.mcpServers) is a no-op on files without that key (safe for Claude settings.json).
+  STRIPPED=$(jq 'del(.mcpServers)' "$TARGET" 2>/dev/null) || STRIPPED=$(cat "$TARGET")
+  # jq -s '.[0] * .[1]' merges deeply: [0]=existing runtime (stripped), [1]=Nix config
   # Nix config wins on conflicts, runtime-only keys are preserved
-  MERGED=$(jq -s '.[0] * .[1]' "$TARGET" "$NIX_SETTINGS") || {
+  MERGED=$(printf '%s\n%s\n' "$STRIPPED" "$(cat "$NIX_SETTINGS")" | jq -s '.[0] * .[1]') || {
     # If merge fails (e.g., invalid JSON in target), just use Nix settings
     echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to merge existing ${TARGET_NAME}, using Nix config" >&2
     cp "$NIX_SETTINGS" "$TARGET"
