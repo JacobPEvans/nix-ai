@@ -13,12 +13,12 @@ One command rebuilds everything, identically, every time.
 
 | Tool | What you get |
 | ---- | ------------ |
-| **Claude Code** | Plugins, marketplace, statusline, settings, autonomous agents, hooks |
+| **Claude Code** | [Plugin ecosystem](modules/claude/README.md), hooks, agents, commands, rules, statusline |
 | **Gemini CLI** | Settings, custom commands, permission rules |
 | **GitHub Copilot** | Configuration, permissions |
 | **OpenAI Codex** | Settings |
 | **MCP Servers** | 15+ servers — GitHub, Terraform, Context7, PAL, filesystem, memory, and more |
-| **Plugin Marketplace** | 14 curated plugin repositories |
+| **Plugin Marketplace** | [Curated marketplaces](modules/claude/plugins/README.md) with Nix-pinned flake inputs |
 | **AI Dev Tools** | cclint, doppler-mcp, claude-flow, sync-mlx-models |
 | **MLX** | Local Apple Silicon inference via vllm-mlx with macOS launchd integration |
 
@@ -114,7 +114,7 @@ nix fmt
 
 ```text
 modules/
-├── claude/          # Claude Code (settings, plugins, statusline, auto-claude)
+├── claude/          # Claude Code module — see [modules/claude/README.md](modules/claude/README.md)
 ├── maestro/         # Maestro agent orchestration
 ├── mcp/             # 15+ MCP server definitions
 ├── common/          # Shared permission engine

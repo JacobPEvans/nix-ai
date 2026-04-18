@@ -80,7 +80,7 @@ Design decisions: [`docs/adr/`](docs/adr/README.md)
 ## Key Files
 
 - `modules/default.nix` — Module entry point (imports all AI modules)
-- `modules/claude/` — Claude Code settings, plugins, statusline, auto-claude
+- `modules/claude/` — Claude Code module (plugins, hooks, agents, commands, rules); see [`modules/claude/README.md`](modules/claude/README.md)
 - `modules/mcp/` — MCP server definitions
 - `modules/mlx/` — MLX inference server (vllm-mlx LaunchAgent, CLI tools, perf tuning)
 - `modules/common/` — Shared permission engine and formatters
