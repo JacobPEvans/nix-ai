@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.46.1](https://github.com/JacobPEvans/nix-ai/compare/v1.46.0...v1.46.1) (2026-04-18)
+
+
+### Bug Fixes
+
+* **claude:** run conflicting-dir cleanup before checkLinkTargets ([#582](https://github.com/JacobPEvans/nix-ai/issues/582)) ([3fb42b4](https://github.com/JacobPEvans/nix-ai/commit/3fb42b45e5c18d2addffb5cf99fc8dec6810351f))
+
 ## [1.46.0](https://github.com/JacobPEvans/nix-ai/compare/v1.45.5...v1.46.0) (2026-04-18)
 
 
