@@ -34,7 +34,15 @@ if [[ -f "$TARGET" ]] && [[ ! -L "$TARGET" ]]; then
   # Strip Nix-authoritative sections from existing config before merge.
   # This prevents stale entries (e.g. removed MCP servers) from persisting.
   # del(.mcpServers) is a no-op on files without that key (safe for Claude settings.json).
-  STRIPPED=$(jq 'del(.mcpServers)' "$TARGET" 2>/dev/null) || STRIPPED=$(cat "$TARGET")
+  if ! STRIPPED=$(jq 'del(.mcpServers)' "$TARGET" 2>/dev/null); then
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to strip Nix-managed keys from existing ${TARGET_NAME}, using existing file contents as-is" >&2
+    if ! STRIPPED=$(cat "$TARGET"); then
+      echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to read existing ${TARGET_NAME}, using Nix config" >&2
+      cp "$NIX_SETTINGS" "$TARGET"
+      chmod 600 "$TARGET"
+      exit 0
+    fi
+  fi
   # jq -s '.[0] * .[1]' merges deeply: [0]=existing runtime (stripped), [1]=Nix config
   # Nix config wins on conflicts, runtime-only keys are preserved
   MERGED=$(jq -s '.[0] * .[1]' - "$NIX_SETTINGS" <<< "$STRIPPED") || {

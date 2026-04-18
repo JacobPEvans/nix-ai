@@ -45,7 +45,11 @@ if [[ -f "$TARGET" ]] && [[ ! -L "$TARGET" ]]; then
   }
   # Strip Nix-authoritative sections from existing config before merge.
   # This prevents stale entries (e.g. removed MCP servers) from persisting.
-  EXISTING_JSON=$(jq 'del(.mcp_servers)' <<< "$EXISTING_JSON") || true
+  if STRIPPED_EXISTING_JSON=$(jq 'del(.mcp_servers)' <<< "$EXISTING_JSON"); then
+    EXISTING_JSON="$STRIPPED_EXISTING_JSON"
+  else
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to strip Nix-authoritative sections from existing ${TARGET_NAME}, preserving existing runtime state for merge" >&2
+  fi
   MERGED_JSON=$(printf '%s\n%s\n' "$EXISTING_JSON" "$NIX_JSON" | jq -s '.[0] * .[1]') || {
     echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to merge ${TARGET_NAME}, using Nix config" >&2
     use_nix_config
