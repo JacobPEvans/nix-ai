@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.45.5](https://github.com/JacobPEvans/nix-ai/compare/v1.45.4...v1.45.5) (2026-04-18)
+
+
+### Bug Fixes
+
+* **permissions:** simplify deny rules for auto mode ([#576](https://github.com/JacobPEvans/nix-ai/issues/576)) ([6909691](https://github.com/JacobPEvans/nix-ai/commit/6909691cb484a227903226b23559dc4d9211afa7))
+
 ## [1.45.4](https://github.com/JacobPEvans/nix-ai/compare/v1.45.3...v1.45.4) (2026-04-18)
 
 
