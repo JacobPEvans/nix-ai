@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.46.0](https://github.com/JacobPEvans/nix-ai/compare/v1.45.5...v1.46.0) (2026-04-18)
+
+
+### Features
+
+* **cross-tool:** wire shared skills to Codex and Gemini, fix stale MCP keys ([c63a358](https://github.com/JacobPEvans/nix-ai/commit/c63a358b6f8c843774001ad96ec673187ce6e7dd))
+
 ## [1.45.5](https://github.com/JacobPEvans/nix-ai/compare/v1.45.4...v1.45.5) (2026-04-18)
 
 
