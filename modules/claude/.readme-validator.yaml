@@ -1,0 +1,9 @@
+# Claude module README — subdirectory documentation, not a top-level project README.
+required_sections:
+  - Component Map
+optional_sections:
+  - Hooks
+  - Agents
+  - Commands
+  - Rules
+  - Plugins
