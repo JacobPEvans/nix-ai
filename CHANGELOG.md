@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.45.4](https://github.com/JacobPEvans/nix-ai/compare/v1.45.3...v1.45.4) (2026-04-18)
+
+
+### Bug Fixes
+
+* **pal:** correct custom_models.json field names and alias collisions ([#575](https://github.com/JacobPEvans/nix-ai/issues/575)) ([068f418](https://github.com/JacobPEvans/nix-ai/commit/068f418bcf26cced99242b25a6baaec45158f100))
+
 ## [1.45.3](https://github.com/JacobPEvans/nix-ai/compare/v1.45.2...v1.45.3) (2026-04-17)
 
 
