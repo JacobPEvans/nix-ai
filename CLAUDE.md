@@ -66,6 +66,17 @@ and auto-loads via path-scoping when `.nix` / `flake.*` files are in context.
 It contains the full decision matrix for the nix repos, including homebrew
 constraints and on-demand patterns.
 
+## Architecture Documentation
+
+Cross-cutting architecture views live in `docs/architecture/`:
+
+- [`system-integration-map.md`](docs/architecture/system-integration-map.md) — How all 10 AI products connect
+- [`model-discovery-flow.md`](docs/architecture/model-discovery-flow.md) — MLX → PAL model data flow (debugging reference)
+- [`config-lifecycle.md`](docs/architecture/config-lifecycle.md) — Build → activation → runtime config pipeline
+- [`secrets-and-injection.md`](docs/architecture/secrets-and-injection.md) — Doppler, Keychain, K8s Operator patterns
+
+Design decisions: [`docs/adr/`](docs/adr/README.md)
+
 ## Key Files
 
 - `modules/default.nix` — Module entry point (imports all AI modules)
