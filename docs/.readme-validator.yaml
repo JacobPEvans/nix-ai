@@ -1,0 +1,7 @@
+# README validation config for docs/ directory.
+# Documentation READMEs are navigation indexes, not module docs — different structure.
+required_sections:
+  - Documents in This Directory
+optional_sections:
+  - ADRs
+  - Relationship to Other Docs

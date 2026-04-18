@@ -167,6 +167,9 @@ The last 6 are disabled upstream by default; `DISABLED_TOOLS = ""` enables all o
 
 ## PAL MLX Model Discovery
 
+> For the full cross-module trace (Nix options → llama-swap → jq transform → PAL),
+> see [`docs/architecture/model-discovery-flow.md`](../../docs/architecture/model-discovery-flow.md).
+
 PAL's model registry (`custom_models.json`) is generated automatically from the MLX
 vllm-mlx `/v1/models` endpoint during every `darwin-rebuild switch`. This keeps PAL's
 model list in sync with the running MLX model without manual configuration.
