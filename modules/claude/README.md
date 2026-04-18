@@ -108,4 +108,4 @@ and enabled plugins organized by category.
 - [MCP Servers](../mcp/README.md) — 15+ MCP server definitions
 - [Fabric Module](../fabric/README.md) — Fabric CLI and pattern integration
 - [Auto-Claude Testing](TESTING.md) — Autonomous agent testing procedures
-- [Plugin Cache Architecture](rules/plugin-cache-architecture.md) — Marketplace symlink and cache rules
+- [Plugin Cache Architecture](../../.claude/rules/plugin-cache-architecture.md) — Marketplace symlink and cache rules

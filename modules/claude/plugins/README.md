@@ -6,8 +6,9 @@ Parent doc: [`modules/claude/README.md`](../README.md)
 
 ## How Plugins Work
 
-Plugins are referenced as `"plugin-name@marketplace-name"` pairs. Each marketplace is a GitHub repo
-containing a `.claude-plugin/marketplace.json` manifest. Nix pins every marketplace as a flake input
+Plugins are referenced as `"plugin-name@marketplace-name"` pairs. Most marketplaces are GitHub repos
+containing a `.claude-plugin/marketplace.json` manifest; synthetic marketplaces (see below) are adapted
+via Nix derivations without requiring the native structure. Nix pins every marketplace as a flake input
 for reproducible deployments. Setting a plugin to `true` enables it; `false` keeps it visible but disabled.
 
 ## Marketplaces
@@ -37,6 +38,11 @@ Registered marketplaces, defined in [`marketplaces.nix`](marketplaces.nix).
 | `fabric-patterns` | `danielmiessler/fabric` | Synthetic |
 
 ## Enabled Plugins by Category
+
+> **Note on status values**: Each table reflects the value set in the named `.nix` file, not the
+> final merged result. When a plugin appears in multiple sections, the last-merged file wins
+> (see `plugins/default.nix`). For example, `ralph-loop` is `false` in `official.nix` but
+> `true` in `experimental.nix` — the effective result is **enabled**.
 
 ### Official Anthropic — [`official.nix`](official.nix)
 
@@ -99,12 +105,12 @@ Registered marketplaces, defined in [`marketplaces.nix`](marketplaces.nix).
 | `proxmox-infrastructure@lunar-claude` | enabled | Proxmox VM/LXC management |
 | `ansible-workflows@lunar-claude` | enabled | Ansible playbook workflows |
 | `infrastructure-as-code-generator@claude-code-plugins-plus` | enabled | IaC generation |
-| `terraform-module-builder@claude-code-plugins-plus` | enabled | Terraform module authoring |
+| `terraform-module-builder@claude-code-plugins-plus` | enabled | OpenTofu module authoring |
 | `cicd-automation@claude-code-workflows` | enabled | GitHub Actions CI/CD |
 
 ### Development — [`development.nix`](development.nix)
 
-**Auto-discovered personal plugins (18):** All plugin directories in `JacobPEvans/claude-code-plugins`
+**Auto-discovered personal plugins:** All plugin directories in `JacobPEvans/claude-code-plugins`
 are discovered at flake update time and enabled automatically as `*@jacobpevans-cc-plugins`:
 
 `ai-delegation`, `code-standards`, `codeql-resolver`, `config-management`, `content-guards`,
@@ -162,7 +168,7 @@ are discovered at flake update time and enabled automatically as `*@jacobpevans-
 
 | Plugin | Status | Description |
 | ------ | ------ | ----------- |
-| `fabric-patterns@fabric-patterns` | enabled | 32 curated patterns from danielmiessler/fabric |
+| `fabric-patterns@fabric-patterns` | enabled | Curated patterns from danielmiessler/fabric |
 
 Curated pattern list is in [`fabric-curated-patterns.json`](../fabric-curated-patterns.json).
 See [`modules/fabric/README.md`](../../fabric/README.md) for full Fabric documentation.
