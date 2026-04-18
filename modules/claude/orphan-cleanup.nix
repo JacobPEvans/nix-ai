@@ -2,10 +2,12 @@
 #
 # Three-phase cleanup for Nix-managed directories, plus optional runtime data pruning:
 #
-# Phase 1 (BEFORE linkGeneration):
+# Phase 1 (BEFORE checkLinkTargets):
 # - Removes directory symlinks and real directories that conflict with
 #   directory symlinks in the new generation.
 # - Also removes stale root-level symlinks whose nix store targets no longer exist.
+# - Must run before checkLinkTargets because cmp(1) fails on directories, causing
+#   checkLinkTargets to abort before any backup/link logic can run.
 #
 # Phase 2 (AFTER linkGeneration):
 # - Removes broken symlinks (targets that no longer exist) inside component dirs.
@@ -47,10 +49,12 @@ in
 {
   config = lib.mkIf cfg.enable {
     home.activation = {
-      # Phase 1: Remove conflicting entries BEFORE linkGeneration.
+      # Phase 1: Remove conflicting entries BEFORE checkLinkTargets.
       # Handles directory symlinks AND real directories (migration from recursive=true)
-      # so home-manager can create fresh directory symlinks.
-      cleanupConflictingDirectorySymlinks = lib.hm.dag.entryBefore [ "linkGeneration" ] ''
+      # so home-manager can create fresh directory symlinks without collision errors.
+      # Must run before checkLinkTargets (not just linkGeneration) because cmp(1) fails
+      # on directories, causing checkLinkTargets to abort before link generation begins.
+      cleanupConflictingDirectorySymlinks = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
         . ${./scripts/cleanup-common.sh}
         . ${./scripts/cleanup-conflicting-symlinks.sh} \
           ${lib.escapeShellArgs (componentDirs ++ marketplaceDirs)}
