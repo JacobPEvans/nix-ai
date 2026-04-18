@@ -60,9 +60,9 @@ in
           expected = null;
         }
         {
-          name = "gemini.skills.fromFlakeInputs";
-          actual = cfg.skills.fromFlakeInputs;
-          expected = [ ];
+          name = "gemini.skills.fromFlakeInputs.populated";
+          actual = builtins.length cfg.skills.fromFlakeInputs > 0;
+          expected = true;
         }
         {
           name = "gemini.skills.local";

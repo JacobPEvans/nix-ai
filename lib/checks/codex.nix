@@ -108,9 +108,9 @@ in
           expected = null;
         }
         {
-          name = "codex.skills.fromFlakeInputs";
-          actual = cfg.skills.fromFlakeInputs;
-          expected = [ ];
+          name = "codex.skills.fromFlakeInputs.populated";
+          actual = builtins.length cfg.skills.fromFlakeInputs > 0;
+          expected = true;
         }
         {
           name = "codex.skills.local";
