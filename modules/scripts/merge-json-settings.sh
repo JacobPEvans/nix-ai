@@ -37,7 +37,7 @@ if [[ -f "$TARGET" ]] && [[ ! -L "$TARGET" ]]; then
   STRIPPED=$(jq 'del(.mcpServers)' "$TARGET" 2>/dev/null) || STRIPPED=$(cat "$TARGET")
   # jq -s '.[0] * .[1]' merges deeply: [0]=existing runtime (stripped), [1]=Nix config
   # Nix config wins on conflicts, runtime-only keys are preserved
-  MERGED=$(printf '%s\n%s\n' "$STRIPPED" "$(cat "$NIX_SETTINGS")" | jq -s '.[0] * .[1]') || {
+  MERGED=$(jq -s '.[0] * .[1]' - "$NIX_SETTINGS" <<< "$STRIPPED") || {
     # If merge fails (e.g., invalid JSON in target), just use Nix settings
     echo "$(date '+%Y-%m-%d %H:%M:%S') [WARN] Failed to merge existing ${TARGET_NAME}, using Nix config" >&2
     cp "$NIX_SETTINGS" "$TARGET"
