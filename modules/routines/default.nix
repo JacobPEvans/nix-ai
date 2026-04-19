@@ -36,7 +36,7 @@ let
     if schedule.times != [ ] then
       schedule.times
     else if schedule.hour != null then
-      [ { hour = schedule.hour; minute = 0; } ]
+      [ { inherit (schedule) hour; minute = 0; } ]
     else
       [ ];
 
@@ -106,12 +106,12 @@ in
 
     home.file =
       # Deploy prompt files
-      (lib.mapAttrs' (
+      lib.mapAttrs' (
         name: task:
         lib.nameValuePair "${cfg.promptsDir}/${name}.txt" {
           text = task.prompt;
         }
-      ) enabledTasks);
+      ) enabledTasks;
 
     # Create launchd agents for each enabled task
     launchd.agents = lib.mapAttrs' (
