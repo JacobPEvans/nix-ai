@@ -21,12 +21,6 @@
       description = "Prompt files directory relative to home directory";
     };
 
-    scriptsDir = lib.mkOption {
-      type = lib.types.str;
-      default = ".routines/scripts";
-      description = "Runner scripts directory relative to home directory";
-    };
-
     tasks = lib.mkOption {
       type = lib.types.attrsOf (
         lib.types.submodule {

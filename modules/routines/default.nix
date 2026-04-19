@@ -49,7 +49,7 @@ let
   mkRunCommand =
     name: task:
     let
-      promptFile = "${promptsDir}/${name}.txt";
+      promptFile = "${promptsDir}/${name}.md";
       modelFlag = lib.optionalString (task.model != null) "--model '${task.model}'";
     in
     if task.aiTool == "gemini" then
@@ -102,7 +102,7 @@ in
         timesList = getScheduleTimes task.schedule;
       in
       {
-        assertion = (!task.enabled) || (timesList != [ ]);
+        assertion = timesList != [ ];
         message = "programs.routines.tasks.${name} must set schedule.times (or deprecated schedule.hour) when enabled";
       }
     ) enabledTasks;
@@ -111,7 +111,7 @@ in
       # Deploy prompt files
       lib.mapAttrs' (
         name: task:
-        lib.nameValuePair "${cfg.promptsDir}/${name}.txt" {
+        lib.nameValuePair "${cfg.promptsDir}/${name}.md" {
           text = task.prompt;
         }
       ) enabledTasks;

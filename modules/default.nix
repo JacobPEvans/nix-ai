@@ -185,7 +185,7 @@ in
       routines = {
         enable = true;
         tasks.permission-sync = {
-          prompt = builtins.readFile ./routines/prompts/permission-sync.txt;
+          prompt = builtins.readFile ./routines/prompts/permission-sync.md;
           aiTool = "gemini";
           # Use the most capable model for accurate diff logic
           model = "gemini-2.5-pro";
