@@ -2,7 +2,7 @@
 #
 # Generic scheduled task options for running AI CLI commands via launchd.
 # Each task has a prompt, AI tool selection, schedule, and working directory.
-# Implementation in ../routines.nix (default.nix)
+# Implementation in ./default.nix
 { lib, ... }:
 
 {

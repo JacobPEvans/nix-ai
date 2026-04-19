@@ -89,7 +89,7 @@ cd ~/git/ai-assistant-instructions/main
 git fetch origin
 git pull --ff-only origin main
 
-EXISTING_PR=$(run_shell_command: gh pr list --repo JacobPEvans/ai-assistant-instructions --head chore/upstream-local-overrides --state open --json number --jq '.[0].number // empty')
+EXISTING_PR=$(gh pr list --repo JacobPEvans/ai-assistant-instructions --head chore/upstream-local-overrides --state open --json number --jq '.[0].number // empty')
 
 git branch -D chore/upstream-local-overrides 2>/dev/null || true
 git checkout -b chore/upstream-local-overrides

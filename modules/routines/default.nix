@@ -3,7 +3,6 @@
 # Creates macOS launchd agents that run AI CLI tools (Gemini, Claude) on a
 # schedule with a configured prompt. Each task:
 #   - Deploys its prompt to ~/.routines/prompts/<name>.txt
-#   - Deploys a runner script to ~/.routines/scripts/<name>.sh
 #   - Creates a launchd agent: com.routines.<name>
 #   - Logs stdout to ~/.routines/logs/<name>.log
 #   - Logs stderr to ~/.routines/logs/<name>.err
@@ -60,6 +59,8 @@ let
       "claude --print ${modelFlag} < '${promptFile}'";
 
   # Generate a runner script for a task
+  # Runner scripts live in the Nix store (not ~/.routines); the launchd agent
+  # references them by their store path via ProgramArguments.
   mkRunnerScript =
     name: task:
     let
@@ -68,8 +69,7 @@ let
       runCmd = mkRunCommand name task;
     in
     pkgs.writeShellScript "routine-${name}" ''
-      #!/usr/bin/env zsh
-      set -euo pipefail
+      set -uo pipefail
 
       mkdir -p '${logDir}'
 
@@ -79,8 +79,8 @@ let
 
       log "START" "routine triggered"
 
-      ${runCmd} >> '${logFile}' 2>> '${errFile}'
-      EXIT_CODE=$?
+      EXIT_CODE=0
+      ${runCmd} >> '${logFile}' 2>> '${errFile}' || EXIT_CODE=$?
 
       if [[ $EXIT_CODE -eq 0 ]]; then
         log "END" "completed successfully"
@@ -103,7 +103,7 @@ in
       in
       {
         assertion = (!task.enabled) || (timesList != [ ]);
-        message = "programs.routines.tasks.${name} must set schedule.times when enabled";
+        message = "programs.routines.tasks.${name} must set schedule.times (or deprecated schedule.hour) when enabled";
       }
     ) enabledTasks;
 
@@ -140,10 +140,11 @@ in
             HOME = homeDir;
             # gh CLI auth via config directory (token in ~/.config/gh/hosts.yml)
             GH_CONFIG_DIR = "${homeDir}/.config/gh";
-            # SSH batch mode for git operations (no interactive prompts)
-            GIT_SSH_COMMAND = "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes";
-            # Full PATH: per-user Nix profile + system paths
-            PATH = "/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+            # SSH batch mode: accept-new allows first connection to known CI hosts
+            # without interactive prompts while still rejecting changed keys
+            GIT_SSH_COMMAND = "ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new";
+            # Full PATH: per-user Nix profile + Homebrew (Apple Silicon) + system paths
+            PATH = "${config.home.profileDirectory}/bin:/opt/homebrew/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin:/usr/sbin:/sbin";
           };
         };
       }
