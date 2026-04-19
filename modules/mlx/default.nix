@@ -139,11 +139,12 @@ let
 
   llamaSwapConfigAttrs = {
     inherit (cfg.proxy) healthCheckTimeout;
-    # debug logs every proxied HTTP request/response — required for live I/O
-    # visibility via `curl http://localhost:11434/logs/stream`.
-    # "both" includes vllm-mlx upstream output alongside proxy request logs.
-    logLevel = "debug";
-    logToStdout = "both";
+    # logLevel="debug" logs every proxied HTTP request/response body.
+    # logToStdout="both" merges proxy and vllm-mlx output into one stream.
+    # Tap live I/O with: curl http://127.0.0.1:11434/logs/stream
+    # Configurable via programs.mlx.proxy.logLevel / logToStdout.
+    logLevel = cfg.proxy.logLevel;
+    logToStdout = cfg.proxy.logToStdout;
     startPort = 11436;
 
     models = allModels;
