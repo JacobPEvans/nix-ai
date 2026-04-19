@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.47.0](https://github.com/JacobPEvans/nix-ai/compare/v1.46.1...v1.47.0) (2026-04-19)
+
+
+### Features
+
+* **mlx:** expose llama-swap logLevel and logToStdout as configurable options ([#587](https://github.com/JacobPEvans/nix-ai/issues/587)) ([c1102df](https://github.com/JacobPEvans/nix-ai/commit/c1102df3776c271e4193c579fe4b01ffdca38e50))
+
 ## [1.46.1](https://github.com/JacobPEvans/nix-ai/compare/v1.46.0...v1.46.1) (2026-04-18)
 
 
