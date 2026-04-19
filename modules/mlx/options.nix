@@ -405,6 +405,37 @@
         default = 1800;
         description = "Default idle TTL in seconds for non-default models. 0 = never auto-unload. Default 30 min.";
       };
+      logLevel = lib.mkOption {
+        type = lib.types.enum [
+          "debug"
+          "info"
+          "warn"
+          "error"
+        ];
+        default = "debug";
+        description = ''
+          llama-swap log verbosity. "debug" logs every proxied HTTP
+          request/response body (prompts and completions), making
+          `curl http://127.0.0.1:11434/logs/stream` a live I/O tap.
+          Set to "info" to suppress request bodies and reduce log volume.
+          Note: debug output rotates within the 10 MB LaunchAgent log limit.
+        '';
+      };
+      logToStdout = lib.mkOption {
+        type = lib.types.enum [
+          "proxy"
+          "upstream"
+          "both"
+          "none"
+        ];
+        default = "both";
+        description = ''
+          Which output streams llama-swap forwards to stdout (and therefore
+          the /logs/stream SSE endpoint). "both" interleaves proxy request
+          logs with vllm-mlx upstream output. "proxy" (default upstream
+          behaviour) shows only proxy-level events.
+        '';
+      };
     };
   };
 }
