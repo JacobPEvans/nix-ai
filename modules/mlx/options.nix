@@ -406,7 +406,12 @@
         description = "Default idle TTL in seconds for non-default models. 0 = never auto-unload. Default 30 min.";
       };
       logLevel = lib.mkOption {
-        type = lib.types.enum [ "debug" "info" "warn" "error" ];
+        type = lib.types.enum [
+          "debug"
+          "info"
+          "warn"
+          "error"
+        ];
         default = "debug";
         description = ''
           llama-swap log verbosity. "debug" logs every proxied HTTP
@@ -417,7 +422,12 @@
         '';
       };
       logToStdout = lib.mkOption {
-        type = lib.types.enum [ "proxy" "upstream" "both" "none" ];
+        type = lib.types.enum [
+          "proxy"
+          "upstream"
+          "both"
+          "none"
+        ];
         default = "both";
         description = ''
           Which output streams llama-swap forwards to stdout (and therefore
