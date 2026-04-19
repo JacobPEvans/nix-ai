@@ -21,7 +21,6 @@ let
   homeDir = config.home.homeDirectory;
   logDir = "${homeDir}/${cfg.logDir}";
   promptsDir = "${homeDir}/${cfg.promptsDir}";
-  scriptsDir = "${homeDir}/${cfg.scriptsDir}";
 
   # Convert {hour, minute} attrset to launchd StartCalendarInterval entry
   mkCalendarInterval =
