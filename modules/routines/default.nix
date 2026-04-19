@@ -23,12 +23,10 @@ let
   promptsDir = "${homeDir}/${cfg.promptsDir}";
 
   # Convert {hour, minute} attrset to launchd StartCalendarInterval entry
-  mkCalendarInterval =
-    time:
-    {
-      Hour = time.hour;
-      Minute = time.minute;
-    };
+  mkCalendarInterval = time: {
+    Hour = time.hour;
+    Minute = time.minute;
+  };
 
   # Resolve schedule to a list of {hour, minute} attrsets
   getScheduleTimes =
@@ -36,7 +34,12 @@ let
     if schedule.times != [ ] then
       schedule.times
     else if schedule.hour != null then
-      [ { inherit (schedule) hour; minute = 0; } ]
+      [
+        {
+          inherit (schedule) hour;
+          minute = 0;
+        }
+      ]
     else
       [ ];
 
