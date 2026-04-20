@@ -118,7 +118,7 @@ in
     sandboxAllowedPaths = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
-      description = "Additional paths the sandbox is allowed to write to (merged with defaults). Required for git operations on bare repos when sandbox is enabled.";
+      description = "Paths the sandbox is allowed to write to. Required for git operations on bare repos when sandbox is enabled.";
     };
 
     # Worktrees feature
