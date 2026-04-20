@@ -1,8 +1,12 @@
-You are the Permission Sync Routine. Collect all locally-accepted AI tool permission overrides and create a draft PR against ai-assistant-instructions for human review. Be terse. No preamble.
+# Permission Sync Routine
+
+Collect all locally-accepted AI tool permission overrides and create a draft PR
+against ai-assistant-instructions for human review. Be terse. No preamble.
 
 ## Step 1: Collect local overrides
 
 Use the glob tool to find files at these EXACT patterns (no others):
+
 - ~/.claude/settings.local.json
 - ~/git/*/main/.claude/settings.local.json
 - ~/git/*/.claude/settings.local.json
@@ -20,6 +24,7 @@ Collect all entries into a single list with source paths.
 ## Step 2: Read canonical permissions
 
 Read ALL of these files:
+
 - ~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/core.json
 - ~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/mcp.json
 - ~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/network.json
@@ -35,6 +40,7 @@ Read ALL of these files:
 - All files in ~/git/ai-assistant-instructions/main/agentsmd/permissions/deny/
 
 Extract:
+
 - .commands[] from allow/ask/deny files → canonical command set
 - .domains[] from domains/webfetch.json → canonical domain set
 - .mcp[] from allow/mcp.json → canonical MCP set
@@ -42,15 +48,19 @@ Extract:
 ## Step 3: Classify and deduplicate
 
 For each collected local entry, parse its type:
+
 - Bash(cmd:*) or Bash(cmd) → bare command = strip Bash( prefix and :*) or ) suffix
 - WebFetch(domain:X) → domain = X
 - mcp__server__tool → MCP tool
 - Skill(name) or Skill(name:*) → skill
 - Read(path) or Read(path/**) → read path
 
-Junk filter: Skip entries where the bare command contains a comma OR is longer than 80 characters AND looks like English prose (sentences, not commands). Include everything else — do NOT apply judgment about whether an entry should be permanent.
+Junk filter: Skip entries where the bare command contains a comma OR is longer than 80 characters
+AND looks like English prose (sentences, not commands).
+Include everything else — do NOT apply judgment about whether an entry should be permanent.
 
 Coverage check (an entry is already covered if):
+
 - Command: ANY canonical command entry is a prefix of the bare command (e.g., canonical "git" covers local "git status")
 - Domain: exact match in canonical domains list
 - MCP: a canonical mcp__server__* wildcard pattern covers the specific tool
@@ -85,34 +95,79 @@ The _source and underscored keys are ignored by the Nix formatter (it only reads
 
 Run these shell commands:
 
+```bash
 cd ~/git/ai-assistant-instructions/main
 git fetch origin
 git pull --ff-only origin main
 
-EXISTING_PR=$(gh pr list --repo JacobPEvans/ai-assistant-instructions --head chore/upstream-local-overrides --state open --json number --jq '.[0].number // empty')
+EXISTING_PR=$(gh pr list --repo JacobPEvans/ai-assistant-instructions \
+  --head chore/upstream-local-overrides --state open \
+  --json number --jq '.[0].number // empty')
 
 git branch -D chore/upstream-local-overrides 2>/dev/null || true
 git checkout -b chore/upstream-local-overrides
+```
 
-Write the JSON content to: ~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/local-overrides.json
+Write the JSON content to:
+`~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/local-overrides.json`
 
-Then run:
+```bash
 git add agentsmd/permissions/allow/local-overrides.json
 git commit -m "chore: upstream local permission overrides"
 git push origin chore/upstream-local-overrides --force-with-lease
+```
 
 If EXISTING_PR is set, update the PR body:
-gh pr edit "$EXISTING_PR" --repo JacobPEvans/ai-assistant-instructions --body "## Auto-collected local permission overrides\n\nThese permissions were found in settings.local.json files across local repos but are not yet in the canonical permission files.\n\n### Action required\nReview each entry and move to the appropriate category file (allow/core.json, ask/git.json, domains/webfetch.json) or delete if it was a one-off approval.\n\nThe commands array is the only thing the Nix formatter reads. Entries under _domains, _mcp, _skills, and _read_paths need manual migration."
+
+```bash
+gh pr edit "$EXISTING_PR" \
+  --repo JacobPEvans/ai-assistant-instructions \
+  --body "$(cat <<'BODY'
+## Auto-collected local permission overrides
+
+These permissions were found in settings.local.json files across local repos
+but are not yet in the canonical permission files.
+
+### Action required
+
+Review each entry and move to the appropriate category file
+(allow/core.json, ask/git.json, domains/webfetch.json) or delete if it was a one-off approval.
+
+The commands array is the only thing the Nix formatter reads. Entries under
+_domains,_mcp, _skills, and_read_paths need manual migration.
+BODY
+)"
+```
 
 Otherwise create a new draft PR:
+
+```bash
 gh pr create \
   --repo JacobPEvans/ai-assistant-instructions \
   --head chore/upstream-local-overrides \
   --base main \
   --draft \
   --title "chore: upstream local permission overrides -- $(date +%Y-%m-%d)" \
-  --body "## Auto-collected local permission overrides\n\nThese permissions were found in settings.local.json files across local repos but are not yet in the canonical permission files.\n\n### Action required\nReview each entry and move to the appropriate category file (allow/core.json, ask/git.json, domains/webfetch.json) or delete if it was a one-off approval.\n\nThe commands array is the only thing the Nix formatter reads. Entries under _domains, _mcp, _skills, and _read_paths need manual migration."
+  --body "$(cat <<'BODY'
+## Auto-collected local permission overrides
+
+These permissions were found in settings.local.json files across local repos
+but are not yet in the canonical permission files.
+
+### Action required
+
+Review each entry and move to the appropriate category file
+(allow/core.json, ask/git.json, domains/webfetch.json) or delete if it was a one-off approval.
+
+The commands array is the only thing the Nix formatter reads. Entries under
+_domains,_mcp, _skills, and_read_paths need manual migration.
+BODY
+)"
+```
 
 Finally return to main:
+
+```bash
 git checkout main
 git branch -D chore/upstream-local-overrides 2>/dev/null || true
+```
