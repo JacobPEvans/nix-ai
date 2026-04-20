@@ -114,6 +114,20 @@ in
       description = "Additional trusted folders (merged with defaults)";
     };
 
+    # Sandbox allowed paths
+    sandboxAllowedPaths = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Additional paths the sandbox is allowed to write to (merged with defaults). Required for git operations on bare repos when sandbox is enabled.";
+    };
+
+    # Worktrees feature
+    worktrees = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable automated Git worktree management for parallel work (experimental).";
+    };
+
     # MCP servers to exclude from shared definitions
     excludedMcpServers = lib.mkOption {
       type = lib.types.listOf lib.types.str;

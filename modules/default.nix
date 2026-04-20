@@ -168,6 +168,8 @@ in
       gemini = {
         enable = true;
         skills.fromFlakeInputs = sharedSkills;
+        worktrees = true;
+        sandboxAllowedPaths = [ "${config.home.homeDirectory}/git" ];
       };
 
       # MLX inference server (vllm-mlx on port 11434)

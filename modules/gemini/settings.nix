@@ -99,9 +99,13 @@ let
       };
     };
 
-    # Sandbox only — no more tools.allowed or tools.exclude (deprecated)
+    # Sandbox + worktree support
     tools = {
       sandbox = true;
+      inherit (cfg) worktrees;
+    }
+    // lib.optionalAttrs (cfg.sandboxAllowedPaths != [ ]) {
+      inherit (cfg) sandboxAllowedPaths;
     };
 
     inherit mcpServers;
