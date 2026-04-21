@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.48.3](https://github.com/JacobPEvans/nix-ai/compare/v1.48.2...v1.48.3) (2026-04-21)
+
+
+### Bug Fixes
+
+* **mlx:** bump defaultModel to Qwen3.6-35B-A3B-mxfp4 ([#606](https://github.com/JacobPEvans/nix-ai/issues/606)) ([fed7bc0](https://github.com/JacobPEvans/nix-ai/commit/fed7bc005a1ca197a5bc4ae037baa13438160024))
+
 ## [1.48.2](https://github.com/JacobPEvans/nix-ai/compare/v1.48.1...v1.48.2) (2026-04-21)
 
 
