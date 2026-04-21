@@ -2,7 +2,7 @@
 #
 # Creates macOS launchd agents that run AI CLI tools (Gemini, Claude) on a
 # schedule with a configured prompt. Each task:
-#   - Deploys its prompt to ~/.routines/prompts/<name>.txt
+#   - Deploys its prompt to ~/.routines/prompts/<name>.md
 #   - Creates a launchd agent: com.routines.<name>
 #   - Logs stdout to ~/.routines/logs/<name>.log
 #   - Logs stderr to ~/.routines/logs/<name>.err
@@ -122,19 +122,15 @@ in
       let
         timesList = getScheduleTimes task.schedule;
         runnerScript = mkRunnerScript name task;
-        logFile = "${logDir}/${name}.log";
-        errFile = "${logDir}/${name}.err";
       in
       lib.nameValuePair "com.routines.${name}" {
-        enable = task.enabled;
+        enable = true;
         config = {
           Label = "com.routines.${name}";
           # Inherit Full Disk Access from Ghostty via TCC association
           AssociatedBundleIdentifiers = [ "com.mitchellh.ghostty" ];
           ProgramArguments = [ "${runnerScript}" ];
           StartCalendarInterval = map mkCalendarInterval timesList;
-          StandardOutPath = logFile;
-          StandardErrorPath = errFile;
           WorkingDirectory = task.workingDirectory;
           EnvironmentVariables = {
             HOME = homeDir;
