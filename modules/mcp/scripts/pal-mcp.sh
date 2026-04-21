@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # PAL MCP launcher — static config.
 #
 # Dynamic values exported by pal-models.nix wrapper (Nix-interpolated paths):

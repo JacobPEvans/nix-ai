@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # sync-pal-models.sh
 #
 # Shared logic for PAL custom_models.json generation.

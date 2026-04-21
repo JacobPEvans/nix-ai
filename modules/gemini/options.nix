@@ -130,11 +130,13 @@ in
 
     # Default approval mode
     defaultApprovalMode = lib.mkOption {
-      type = lib.types.nullOr (lib.types.enum [
-        "default"
-        "auto_edit"
-        "plan"
-      ]);
+      type = lib.types.nullOr (
+        lib.types.enum [
+          "default"
+          "auto_edit"
+          "plan"
+        ]
+      );
       default = null;
       description = ''
         Default approval mode for tool execution.
