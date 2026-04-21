@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.48.1](https://github.com/JacobPEvans/nix-ai/compare/v1.48.0...v1.48.1) (2026-04-21)
+
+
+### Bug Fixes
+
+* **ci:** add gh-aw-pin-refresh workflow and recompile lock files ([5515e5d](https://github.com/JacobPEvans/nix-ai/commit/5515e5d0dc60b9abb8e8129bdb90d647f7951325)), closes [#600](https://github.com/JacobPEvans/nix-ai/issues/600)
+
 ## [1.48.0](https://github.com/JacobPEvans/nix-ai/compare/v1.47.0...v1.48.0) (2026-04-21)
 
 
