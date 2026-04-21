@@ -42,7 +42,6 @@ let
     else
       [ ];
 
-  # Only process enabled tasks
   enabledTasks = lib.filterAttrs (_: task: task.enabled) cfg.tasks;
 
   # Build the run command for a task based on its AI tool
