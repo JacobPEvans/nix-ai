@@ -83,8 +83,9 @@ let
     general = {
       previewFeatures = true;
       disableAutoUpdate = true;
-    } // lib.optionalAttrs (cfg.defaultApprovalMode != null) {
-      defaultApprovalMode = cfg.defaultApprovalMode;
+    }
+    // lib.optionalAttrs (cfg.defaultApprovalMode != null) {
+      inherit (cfg) defaultApprovalMode;
     };
 
     context = {
@@ -103,8 +104,9 @@ let
 
     tools = {
       sandbox = true;
-    } // lib.optionalAttrs (cfg.sandboxAllowedPaths != [ ]) {
-      sandboxAllowedPaths = cfg.sandboxAllowedPaths;
+    }
+    // lib.optionalAttrs (cfg.sandboxAllowedPaths != [ ]) {
+      inherit (cfg) sandboxAllowedPaths;
     };
 
     experimental = lib.optionalAttrs cfg.worktrees {
