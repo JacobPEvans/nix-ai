@@ -1,0 +1,24 @@
+---
+name: Retrigger PR Checks
+
+# Ensures bot-created PRs (GITHUB_TOKEN) get the Merge Gate check.
+# Calls shared logic from JacobPEvans/.github.
+# See: .github/workflows/_retrigger-pr-checks.yml in JacobPEvans/.github
+
+on:
+  schedule:
+    - cron: "0 10 * * *"  # 6 AM ET (UTC-4)
+    - cron: "0 20 * * *"  # 4 PM ET (UTC-4)
+    - cron: "0 0 * * *"   # 8 PM ET (UTC-4)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  retrigger:
+    uses: JacobPEvans/.github/.github/workflows/_retrigger-pr-checks.yml@main
+    secrets:
+      GH_ACTION_JACOBPEVANS_APP_ID: ${{ secrets.GH_ACTION_JACOBPEVANS_APP_ID }}
+      GH_APP_PRIVATE_KEY: ${{ secrets.GH_APP_PRIVATE_KEY }}
