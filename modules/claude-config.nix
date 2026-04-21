@@ -321,10 +321,7 @@ in
     # Can be read by statusline, tmux, or other display tools
     postToolUse = ./claude/hooks/last-output.sh;
 
-    # Refresh marketplace indexes after Nix rebuilds update marketplace symlinks.
-    # Reads the .nix-refresh-needed marker written by verify-cache-integrity.sh
-    # when store paths change. Best-effort: failures are logged but do not block
-    # session start. Runs within Claude Code's lifecycle (safe — before any tool use).
+    # Refresh stale marketplace indexes after Nix rebuilds; see hooks/marketplace-refresh.sh.
     sessionStart = ./claude/hooks/marketplace-refresh.sh;
 
   };

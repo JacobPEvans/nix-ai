@@ -49,6 +49,7 @@ fi
 # Build new hashes and detect staleness
 # Marketplaces are directory symlinks to /nix/store/ (plugins.nix without recursive)
 declare -A new_hashes
+declare -a stale_names
 stale_detected=false
 while IFS= read -r -d '' entry; do
   name=$(basename "$entry")
@@ -63,20 +64,18 @@ while IFS= read -r -d '' entry; do
 
   if [[ "${old_hashes[$name]:-}" != "$hash" ]]; then
     stale_detected=true
+    stale_names+=("$name")
   fi
 done < <(find "$MARKETPLACES_DIR" -mindepth 1 -maxdepth 1 -type l -print0)
 
-# When staleness is detected, write a refresh marker so the sessionStart hook can
-# update marketplace indexes on the next session. Writing a marker file is always
-# safe — it does NOT invoke claude or mutate plugin cache directories.
+# Write a refresh marker so the sessionStart hook can update marketplace indexes.
+# Writing a marker file is safe — it does not invoke claude or mutate cache directories.
 if [[ "$stale_detected" == true ]]; then
   REFRESH_MARKER="$CACHE_DIR/.nix-refresh-needed"
   tmp_marker="$(mktemp "${REFRESH_MARKER}.XXXXXX")"
   echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$tmp_marker"
-  for name in "${!new_hashes[@]}"; do
-    if [[ "${old_hashes[$name]:-}" != "${new_hashes[$name]}" ]]; then
-      echo "marketplace=$name" >> "$tmp_marker"
-    fi
+  for name in "${stale_names[@]}"; do
+    echo "marketplace=$name" >> "$tmp_marker"
   done
   mv "$tmp_marker" "$REFRESH_MARKER"
   log_info "Wrote marketplace refresh marker: $REFRESH_MARKER"
@@ -87,7 +86,6 @@ fi
 # resolved at session start — deleting them mid-session causes an unbreakable error
 # loop (every hook fails, including Stop). By also skipping the hash file update,
 # the next rebuild will re-detect staleness and purge when no sessions are active.
-# The refresh marker above will be consumed by the sessionStart hook instead.
 if [[ "$stale_detected" == true ]] && pgrep -qx "claude"; then
   log_info "Stale caches detected but Claude Code session is active — deferring purge"
   exit 0
