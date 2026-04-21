@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.48.0](https://github.com/JacobPEvans/nix-ai/compare/v1.47.0...v1.48.0) (2026-04-21)
+
+
+### Features
+
+* **gemini:** add worktree, sandbox path, and auto-edit defaults ([#597](https://github.com/JacobPEvans/nix-ai/issues/597)) ([9e29a07](https://github.com/JacobPEvans/nix-ai/commit/9e29a07ecb19bd0cb400ea58d911bf4b933f8bd7))
+
+
+### Bug Fixes
+
+* add bot PR CI retrigger workflow ([#599](https://github.com/JacobPEvans/nix-ai/issues/599)) ([ce38b8b](https://github.com/JacobPEvans/nix-ai/commit/ce38b8b6b24d4e7d82fbc7c926796ff5bdfff7e0))
+
 ## [1.47.0](https://github.com/JacobPEvans/nix-ai/compare/v1.46.1...v1.47.0) (2026-04-19)
 
 
