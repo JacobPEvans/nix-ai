@@ -126,7 +126,7 @@ in
         "on-request"
         "never"
       ];
-      default = "on-request";
+      default = "untrusted";
       description = "Default approval policy for Codex sessions";
     };
 
