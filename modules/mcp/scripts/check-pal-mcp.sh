@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # check-pal-mcp — interactive PAL MCP health diagnostic.
 #
 # Run after darwin-rebuild switch or when PAL is absent from Claude Code sessions.

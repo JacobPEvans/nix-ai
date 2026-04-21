@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # sync-lmarena-ratings.sh
 #
 # Fetches LMSYS Chatbot Arena leaderboard via HuggingFace datasets-server

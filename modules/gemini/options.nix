@@ -114,6 +114,37 @@ in
       description = "Additional trusted folders (merged with defaults)";
     };
 
+    # Sandbox allowed paths
+    sandboxAllowedPaths = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Paths the sandbox is allowed to write to. Required for git operations on bare repos when sandbox is enabled.";
+    };
+
+    # Worktrees feature
+    worktrees = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable automated Git worktree management for parallel work (experimental).";
+    };
+
+    # Default approval mode
+    defaultApprovalMode = lib.mkOption {
+      type = lib.types.nullOr (
+        lib.types.enum [
+          "default"
+          "auto_edit"
+          "plan"
+        ]
+      );
+      default = null;
+      description = ''
+        Default approval mode for tool execution.
+        "auto_edit" auto-approves file edits without prompting.
+        Null omits the key from settings.json (Gemini uses its built-in default).
+      '';
+    };
+
     # MCP servers to exclude from shared definitions
     excludedMcpServers = lib.mkOption {
       type = lib.types.listOf lib.types.str;
