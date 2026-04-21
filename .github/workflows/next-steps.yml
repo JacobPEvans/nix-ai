@@ -17,5 +17,5 @@ concurrency:
 
 jobs:
   next-steps:
-    uses: JacobPEvans/ai-workflows/.github/workflows/next-steps.yml@v0.12.4
+    uses: JacobPEvans/ai-workflows/.github/workflows/next-steps.yml@v0.12.5
     secrets: inherit # zizmor: ignore[secrets-inherit]
