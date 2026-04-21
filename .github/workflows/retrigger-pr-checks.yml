@@ -1,4 +1,3 @@
----
 name: Retrigger PR Checks
 
 # Ensures bot-created PRs (GITHUB_TOKEN) get the Merge Gate check.
@@ -7,9 +6,9 @@ name: Retrigger PR Checks
 
 on:
   schedule:
-    - cron: "0 10 * * *"  # 6 AM ET (UTC-4)
-    - cron: "0 20 * * *"  # 4 PM ET (UTC-4)
-    - cron: "0 0 * * *"   # 8 PM ET (UTC-4)
+    - cron: "0 10 * * *"  # 6 AM EDT
+    - cron: "0 20 * * *"  # 4 PM EDT
+    - cron: "0 0 * * *"   # 8 PM EDT
   workflow_dispatch:
 
 permissions:
