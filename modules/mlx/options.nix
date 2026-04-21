@@ -12,7 +12,7 @@
 
     defaultModel = lib.mkOption {
       type = lib.types.str;
-      default = "mlx-community/Qwen3.5-35B-A3B-4bit";
+      default = "mlx-community/Qwen3.6-35B-A3B-mxfp4";
       description = ''
         Default mlx-community/ HuggingFace model to serve via vllm-mlx.
         Benchmark-driven rationale and historical default-swap context live
