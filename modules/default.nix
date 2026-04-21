@@ -170,6 +170,7 @@ in
         skills.fromFlakeInputs = sharedSkills;
         worktrees = true;
         sandboxAllowedPaths = [ "${config.home.homeDirectory}/git" ];
+        defaultApprovalMode = "auto_edit";
       };
 
       # MLX inference server (vllm-mlx on port 11434)

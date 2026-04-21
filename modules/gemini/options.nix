@@ -128,6 +128,21 @@ in
       description = "Enable automated Git worktree management for parallel work (experimental).";
     };
 
+    # Default approval mode
+    defaultApprovalMode = lib.mkOption {
+      type = lib.types.nullOr (lib.types.enum [
+        "default"
+        "auto_edit"
+        "plan"
+      ]);
+      default = null;
+      description = ''
+        Default approval mode for tool execution.
+        "auto_edit" auto-approves file edits without prompting.
+        Null omits the key from settings.json (Gemini uses its built-in default).
+      '';
+    };
+
     # MCP servers to exclude from shared definitions
     excludedMcpServers = lib.mkOption {
       type = lib.types.listOf lib.types.str;

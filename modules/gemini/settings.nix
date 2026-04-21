@@ -83,6 +83,8 @@ let
     general = {
       previewFeatures = true;
       disableAutoUpdate = true;
+    } // lib.optionalAttrs (cfg.defaultApprovalMode != null) {
+      defaultApprovalMode = cfg.defaultApprovalMode;
     };
 
     context = {
@@ -99,13 +101,14 @@ let
       };
     };
 
-    # Sandbox + worktree support
     tools = {
       sandbox = true;
-      inherit (cfg) worktrees;
-    }
-    // lib.optionalAttrs (cfg.sandboxAllowedPaths != [ ]) {
-      inherit (cfg) sandboxAllowedPaths;
+    } // lib.optionalAttrs (cfg.sandboxAllowedPaths != [ ]) {
+      sandboxAllowedPaths = cfg.sandboxAllowedPaths;
+    };
+
+    experimental = lib.optionalAttrs cfg.worktrees {
+      worktrees = true;
     };
 
     inherit mcpServers;
