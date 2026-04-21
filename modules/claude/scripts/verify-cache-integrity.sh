@@ -66,11 +66,28 @@ while IFS= read -r -d '' entry; do
   fi
 done < <(find "$MARKETPLACES_DIR" -mindepth 1 -maxdepth 1 -type l -print0)
 
+# When staleness is detected, write a refresh marker so the sessionStart hook can
+# update marketplace indexes on the next session. Writing a marker file is always
+# safe — it does NOT invoke claude or mutate plugin cache directories.
+if [[ "$stale_detected" == true ]]; then
+  REFRESH_MARKER="$CACHE_DIR/.nix-refresh-needed"
+  tmp_marker="$(mktemp "${REFRESH_MARKER}.XXXXXX")"
+  echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$tmp_marker"
+  for name in "${!new_hashes[@]}"; do
+    if [[ "${old_hashes[$name]:-}" != "${new_hashes[$name]}" ]]; then
+      echo "marketplace=$name" >> "$tmp_marker"
+    fi
+  done
+  mv "$tmp_marker" "$REFRESH_MARKER"
+  log_info "Wrote marketplace refresh marker: $REFRESH_MARKER"
+fi
+
 # Session-aware guard: if caches are stale but Claude Code is running, defer the
 # purge to avoid breaking active sessions. Hook scripts inside cache directories are
 # resolved at session start — deleting them mid-session causes an unbreakable error
 # loop (every hook fails, including Stop). By also skipping the hash file update,
 # the next rebuild will re-detect staleness and purge when no sessions are active.
+# The refresh marker above will be consumed by the sessionStart hook instead.
 if [[ "$stale_detected" == true ]] && pgrep -qx "claude"; then
   log_info "Stale caches detected but Claude Code session is active — deferring purge"
   exit 0
