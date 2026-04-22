@@ -173,9 +173,9 @@ in
       # MLX inference server (vllm-mlx on port 11434)
       mlx = {
         enable = true;
-        # Screenpipe's pi-agent path can omit max_tokens. Cap the server
-        # fallback so uncapped local runs cannot expand to vllm-mlx's 32768.
-        maxTokens = 4096;
+        # Some local consumers omit max_tokens. Cap the server fallback so
+        # uncapped runs cannot expand to vllm-mlx's 32768-token default.
+        maxTokens = 8192;
       };
 
       # Fabric — 252+ AI prompt patterns + CLI (defaults to MLX backend)

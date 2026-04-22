@@ -147,10 +147,10 @@
 
     # maxTokens — Default max generation length (--max-tokens).
     # Server default: 32768. Only affects requests that omit max_tokens.
-    # Some OpenAI-compatible consumers, including Screenpipe's pi-agent path,
-    # omit max_tokens even when their model metadata has a token cap. Keep this
-    # nullable so explicit client limits still win, but allow the server default
-    # to be capped for local multi-request workloads.
+    # Some OpenAI-compatible consumers omit max_tokens even when their model
+    # metadata has a token cap. Keep this nullable so explicit client limits
+    # still win, but allow the server default to be capped for local
+    # multi-request workloads.
     maxTokens = lib.mkOption {
       type = lib.types.nullOr lib.types.ints.positive;
       default = null;

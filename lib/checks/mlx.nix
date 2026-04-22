@@ -99,7 +99,7 @@ in
         {
           name = "mlx.maxTokens";
           actual = mlxCfg.maxTokens;
-          expected = 4096;
+          expected = 8192;
         }
         {
           name = "mlx.memoryHardLimitGb";
