@@ -49,6 +49,7 @@ fi
 # Build new hashes and detect staleness
 # Marketplaces are directory symlinks to /nix/store/ (plugins.nix without recursive)
 declare -A new_hashes
+declare -a stale_names
 stale_detected=false
 while IFS= read -r -d '' entry; do
   name=$(basename "$entry")
@@ -63,8 +64,22 @@ while IFS= read -r -d '' entry; do
 
   if [[ "${old_hashes[$name]:-}" != "$hash" ]]; then
     stale_detected=true
+    stale_names+=("$name")
   fi
 done < <(find "$MARKETPLACES_DIR" -mindepth 1 -maxdepth 1 -type l -print0)
+
+# Write a refresh marker so the sessionStart hook can update marketplace indexes.
+# Writing a marker file is safe — it does not invoke claude or mutate cache directories.
+if [[ "$stale_detected" == true ]]; then
+  REFRESH_MARKER="$CACHE_DIR/.nix-refresh-needed"
+  tmp_marker="$(mktemp "${REFRESH_MARKER}.XXXXXX")"
+  echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$tmp_marker"
+  for name in "${stale_names[@]}"; do
+    echo "marketplace=$name" >> "$tmp_marker"
+  done
+  mv "$tmp_marker" "$REFRESH_MARKER"
+  log_info "Wrote marketplace refresh marker: $REFRESH_MARKER"
+fi
 
 # Session-aware guard: if caches are stale but Claude Code is running, defer the
 # purge to avoid breaking active sessions. Hook scripts inside cache directories are
