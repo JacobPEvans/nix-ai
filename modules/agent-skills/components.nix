@@ -29,13 +29,12 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
-    home.file =
-      {
-        ".agents/.keep".text = ''
-          # Managed by Nix - programs.agentSkills module
-        '';
-      }
-      // mkSkillFiles cfg.fromFlakeInputs
-      // mkLocalSkills cfg.local;
+    home.file = {
+      ".agents/.keep".text = ''
+        # Managed by Nix - programs.agentSkills module
+      '';
+    }
+    // mkSkillFiles cfg.fromFlakeInputs
+    // mkLocalSkills cfg.local;
   };
 }
