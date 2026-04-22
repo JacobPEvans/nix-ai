@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.48.5](https://github.com/JacobPEvans/nix-ai/compare/v1.48.4...v1.48.5) (2026-04-22)
+
+
+### Bug Fixes
+
+* **mlx:** cap uncapped local generations ([#596](https://github.com/JacobPEvans/nix-ai/issues/596)) ([33430f7](https://github.com/JacobPEvans/nix-ai/commit/33430f72b1de33e6f19fcc0c137e2db2a22cffd6))
+
 ## [1.48.4](https://github.com/JacobPEvans/nix-ai/compare/v1.48.3...v1.48.4) (2026-04-22)
 
 
