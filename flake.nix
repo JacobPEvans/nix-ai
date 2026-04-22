@@ -209,17 +209,36 @@
           };
         };
 
-        codex = {
-          imports = [ ./modules/codex ];
+        agent-skills = {
+          imports = [ ./modules/agent-skills ];
           _module.args = {
-            inherit ai-assistant-instructions;
+            inherit marketplaceInputs;
+          };
+        };
+
+        codex = {
+          imports = [
+            ./modules/agent-skills
+            ./modules/codex
+          ];
+          _module.args = {
+            inherit
+              ai-assistant-instructions
+              marketplaceInputs
+              ;
           };
         };
 
         gemini = {
-          imports = [ ./modules/gemini ];
+          imports = [
+            ./modules/agent-skills
+            ./modules/gemini
+          ];
           _module.args = {
-            inherit ai-assistant-instructions;
+            inherit
+              ai-assistant-instructions
+              marketplaceInputs
+              ;
           };
         };
 

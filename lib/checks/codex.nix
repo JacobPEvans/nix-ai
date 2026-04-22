@@ -20,7 +20,6 @@ in
         "planModeReasoningEffort"
         "reviewModel"
         "serviceTier"
-        "skills"
         "trustedProjectDirs"
         "webSearch"
       ];
@@ -106,16 +105,6 @@ in
           name = "codex.hooks.notification";
           actual = cfg.hooks.notification;
           expected = null;
-        }
-        {
-          name = "codex.skills.fromFlakeInputs.populated";
-          actual = builtins.length cfg.skills.fromFlakeInputs > 0;
-          expected = true;
-        }
-        {
-          name = "codex.skills.local";
-          actual = cfg.skills.local;
-          expected = { };
         }
       ];
       failures = builtins.filter (c: c.actual != c.expected) checks;
