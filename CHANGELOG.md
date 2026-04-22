@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.48.4](https://github.com/JacobPEvans/nix-ai/compare/v1.48.3...v1.48.4) (2026-04-22)
+
+
+### Bug Fixes
+
+* **claude:** automate marketplace cache refresh after Nix rebuilds ([#611](https://github.com/JacobPEvans/nix-ai/issues/611)) ([472e886](https://github.com/JacobPEvans/nix-ai/commit/472e88660a1d0ecb479e4c34f4583589d3590701))
+
 ## [1.48.3](https://github.com/JacobPEvans/nix-ai/compare/v1.48.2...v1.48.3) (2026-04-21)
 
 
