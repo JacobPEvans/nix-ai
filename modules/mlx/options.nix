@@ -78,8 +78,9 @@
     # ---- CONCURRENCY & BATCHING OPTIONS (vllm-mlx 0.2.6) ----
     # Complete parameter reference from `vllm-mlx serve --help`.
     # Each option explains what it does, the server default, why it defaults to off,
-    # and when to enable it. All configurable but off by default — enable in
-    # nix-darwin config to benchmark concurrent query performance.
+    # and when to enable it. Raw option defaults mirror conservative server
+    # behavior. Keep continuous batching opt-in until the current Qwen3.5/Gemma
+    # MLLM batching path can pass parallel request validation.
 
     # ---- ACTIVE TUNING (uncomment to override server defaults) ----
 
@@ -97,7 +98,7 @@
     # Server default: disabled. Improves multi-user throughput by interleaving
     # prefill and decode across requests, but adds scheduling overhead for
     # single-user workloads (~5% slower per-request in isolation).
-    # Default: false. Enable to benchmark concurrent query throughput.
+    # Option default: false. Validate with the target model before enabling.
     continuousBatching = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -106,7 +107,7 @@
 
     # maxNumSeqs — Max concurrent sequences (--max-num-seqs).
     # Server default: unset (no limit). Caps parallel request handling.
-    # Default: null (no limit). Set to 2-8 when enabling continuousBatching
+    # Option default: null (no limit). Set to 2-8 when enabling continuousBatching
     # to control memory pressure from concurrent requests.
     maxNumSeqs = lib.mkOption {
       type = lib.types.nullOr lib.types.ints.positive;
@@ -117,7 +118,7 @@
     # chunkedPrefillTokens — Max prefill tokens per scheduler step (--chunked-prefill-tokens).
     # Server default: 0 (disabled). Prevents prefill starvation in multi-request
     # scenarios by limiting how many tokens are prefilled before yielding to decode.
-    # Default: null (disabled). Set to 256-2048 when enabling continuousBatching.
+    # Option default: null (disabled). Set to 256-2048 when enabling continuousBatching.
     chunkedPrefillTokens = lib.mkOption {
       type = lib.types.nullOr lib.types.ints.unsigned;
       default = null;
@@ -146,13 +147,15 @@
 
     # maxTokens — Default max generation length (--max-tokens).
     # Server default: 32768. Only affects requests that omit max_tokens.
-    # Disabled: all consumers (PAL, mlx-chat, local AI tools) set max_tokens explicitly.
-    # Revisit: no need unless adding a consumer that omits max_tokens.
-    # maxTokens = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.ints.positive;
-    #   default = null;
-    #   description = "Default max tokens when client omits max_tokens. Server default: 32768.";
-    # };
+    # Some OpenAI-compatible consumers omit max_tokens even when their model
+    # metadata has a token cap. Keep this nullable so explicit client limits
+    # still win, but allow the server default to be capped for local
+    # multi-request workloads.
+    maxTokens = lib.mkOption {
+      type = lib.types.nullOr lib.types.ints.positive;
+      default = null;
+      description = "Default max tokens when client omits max_tokens. Null = vllm-mlx server default: 32768.";
+    };
 
     # defaultTemperature — Override default temperature (--default-temperature).
     # Server default: model-dependent. Overrides for all requests without explicit temperature.

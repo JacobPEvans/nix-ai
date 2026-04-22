@@ -18,6 +18,7 @@ in
         "enableAutoToolChoice"
         "host"
         "huggingFaceHome"
+        "maxTokens"
         "maxNumSeqs"
         "memoryHardLimitGb"
         "models"
@@ -94,6 +95,11 @@ in
           name = "mlx.completionBatchSize";
           actual = mlxCfg.completionBatchSize;
           expected = null;
+        }
+        {
+          name = "mlx.maxTokens";
+          actual = mlxCfg.maxTokens;
+          expected = 8192;
         }
         {
           name = "mlx.memoryHardLimitGb";
