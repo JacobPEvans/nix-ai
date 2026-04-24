@@ -28,7 +28,6 @@ let
     name = "claude-latest-install";
     runtimeInputs = [
       pkgs.curl
-      pkgs.bash
       pkgs.coreutils
     ];
     text = builtins.readFile ./claude/scripts/claude-latest-install.sh;
