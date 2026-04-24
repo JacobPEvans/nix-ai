@@ -12,7 +12,6 @@
 #
 # Features:
 # - Shared MCP server definitions (normalized for Gemini format)
-# - Declarative skills deployment (~/.gemini/skills/ + ~/.agents/skills/)
 # - Auto-generated custom commands from agentsmd
 # - Extension management (~/.gemini/extensions/)
 # - settings.json deep-merge activation (preserves auth tokens)

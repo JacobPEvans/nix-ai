@@ -13,7 +13,6 @@ in
         "excludedMcpServers"
         "extensions"
         "hooks"
-        "skills"
         "trustedFolders"
       ];
       actualOptions = builtins.attrNames cfg;
@@ -58,16 +57,6 @@ in
           name = "gemini.hooks.afterTool";
           actual = cfg.hooks.afterTool;
           expected = null;
-        }
-        {
-          name = "gemini.skills.fromFlakeInputs.populated";
-          actual = builtins.length cfg.skills.fromFlakeInputs > 0;
-          expected = true;
-        }
-        {
-          name = "gemini.skills.local";
-          actual = cfg.skills.local;
-          expected = { };
         }
         {
           name = "gemini.commands.fromFlakeInputs";

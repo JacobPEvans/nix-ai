@@ -43,20 +43,6 @@ in
   options.programs.gemini = {
     enable = lib.mkEnableOption "Gemini CLI configuration";
 
-    # Skills
-    skills = {
-      fromFlakeInputs = lib.mkOption {
-        type = lib.types.listOf componentModule;
-        default = [ ];
-        description = "Skills sourced from flake inputs (immutable, from Nix store)";
-      };
-      local = lib.mkOption {
-        type = lib.types.attrsOf lib.types.path;
-        default = { };
-        description = "Local skill files (name -> path to SKILL.md)";
-      };
-    };
-
     # Commands
     commands = {
       fromFlakeInputs = lib.mkOption {
