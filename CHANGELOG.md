@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.50.1](https://github.com/JacobPEvans/nix-ai/compare/v1.50.0...v1.50.1) (2026-04-24)
+
+
+### Bug Fixes
+
+* **codex:** tighten default approvalPolicy to untrusted ([#609](https://github.com/JacobPEvans/nix-ai/issues/609)) ([bd91928](https://github.com/JacobPEvans/nix-ai/commit/bd919284f9d1a7857f80ba51f08c352ce87e5d1d))
+
 ## [1.50.0](https://github.com/JacobPEvans/nix-ai/compare/v1.49.0...v1.50.0) (2026-04-24)
 
 
