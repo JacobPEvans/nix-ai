@@ -30,6 +30,12 @@ let
     "${homeDir}/git"
   ];
 
+  # Default paths the sandbox may write to. Merged with cfg.sandboxAllowedPaths
+  # so every bare repo under ~/git/ can create worktrees without a denial.
+  defaultSandboxAllowedPaths = [ "${homeDir}/git" ];
+
+  mergedSandboxAllowedPaths = lib.unique (defaultSandboxAllowedPaths ++ cfg.sandboxAllowedPaths);
+
   # Normalize MCP server for Gemini format
   # stdio: { command, args?, env?, cwd?, timeout? }
   # HTTP/SSE: { httpUrl, headers? } (note: httpUrl not url)
@@ -105,8 +111,8 @@ let
     tools = {
       sandbox = if cfg.sandbox.profile != null then cfg.sandbox.profile else cfg.sandbox.enable;
     }
-    // lib.optionalAttrs (cfg.sandboxAllowedPaths != [ ]) {
-      inherit (cfg) sandboxAllowedPaths;
+    // lib.optionalAttrs (mergedSandboxAllowedPaths != [ ]) {
+      sandboxAllowedPaths = mergedSandboxAllowedPaths;
     };
 
     experimental = lib.optionalAttrs cfg.worktrees {

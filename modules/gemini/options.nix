@@ -100,11 +100,18 @@ in
       description = "Additional trusted folders (merged with defaults)";
     };
 
-    # Sandbox allowed paths
+    # Sandbox allowed paths (merged with `~/git` default so worktree operations
+    # on bare repos succeed without per-host configuration).
     sandboxAllowedPaths = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
-      description = "Paths the sandbox is allowed to write to. Required for git operations on bare repos when sandbox is enabled.";
+      description = ''
+        Extra paths the sandbox is allowed to write to.
+
+        Merged with the default `~/git` so git operations (including worktree
+        creation on bare repos) work out of the box. Use this option only for
+        paths outside `~/git/`.
+      '';
     };
 
     # Sandbox configuration

@@ -79,6 +79,11 @@ in
           actual = cfg.sandbox.profile;
           expected = null;
         }
+        {
+          name = "gemini.sandboxAllowedPaths";
+          actual = cfg.sandboxAllowedPaths;
+          expected = [ ];
+        }
       ];
       failures = builtins.filter (c: c.actual != c.expected) checks;
       failureMsg = builtins.concatStringsSep "\n" (

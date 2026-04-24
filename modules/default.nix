@@ -136,7 +136,6 @@ in
       gemini = {
         enable = true;
         worktrees = true;
-        sandboxAllowedPaths = [ "${config.home.homeDirectory}/git" ];
         defaultApprovalMode = "auto_edit";
       };
 
