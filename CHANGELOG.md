@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.49.0](https://github.com/JacobPEvans/nix-ai/compare/v1.48.6...v1.49.0) (2026-04-24)
+
+
+### Features
+
+* centralize shared skills in agent-skills module ([#612](https://github.com/JacobPEvans/nix-ai/issues/612)) ([955eda6](https://github.com/JacobPEvans/nix-ai/commit/955eda6a22722fdc17eb1154abcc527167cd8adb))
+
 ## [1.48.6](https://github.com/JacobPEvans/nix-ai/compare/v1.48.5...v1.48.6) (2026-04-24)
 
 
