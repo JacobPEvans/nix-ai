@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.51.0](https://github.com/JacobPEvans/nix-ai/compare/v1.50.1...v1.51.0) (2026-04-24)
+
+
+### Features
+
+* **claude:** bump effort to high, add claude-latest install, centralize AI aliases ([#619](https://github.com/JacobPEvans/nix-ai/issues/619)) ([d68bac6](https://github.com/JacobPEvans/nix-ai/commit/d68bac6970944471f735b2a543016906529ed2a5))
+
 ## [1.50.1](https://github.com/JacobPEvans/nix-ai/compare/v1.50.0...v1.50.1) (2026-04-24)
 
 
