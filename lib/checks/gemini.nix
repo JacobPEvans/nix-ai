@@ -106,6 +106,24 @@ in
     ''
   );
 
+  # Validate that the evaluated settings always include the `~/git` sandbox
+  # default (what actually lands in `tools.sandboxAllowedPaths` in settings.json).
+  # Reads the read-only `sandboxAllowedPathsMerged` option the settings module
+  # populates, so a broken merge fails the check at eval time.
+  gemini-sandbox-default-paths =
+    let
+      expected = "${hmConfig.config.home.homeDirectory}/git";
+      merged = hmConfig.config.programs.gemini.sandboxAllowedPathsMerged;
+      hasGitDir = builtins.elem expected merged;
+    in
+    assert
+      hasGitDir
+      || throw "Gemini sandboxAllowedPathsMerged missing ${expected}: ${builtins.toJSON merged}";
+    pkgs.runCommand "check-gemini-sandbox-default-paths" { } ''
+      echo "Gemini sandbox default: ${expected} is present in merged settings"
+      touch $out
+    '';
+
   # Validate the .gemini/.keep directory marker is created (proves module loaded).
   gemini-module-loaded =
     let

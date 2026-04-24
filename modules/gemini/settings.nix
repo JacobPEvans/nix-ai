@@ -19,6 +19,7 @@
 let
   cfg = config.programs.gemini;
   homeDir = config.home.homeDirectory;
+  gitDir = "${homeDir}/git";
 
   aiCommon = import ../common {
     inherit lib config ai-assistant-instructions;
@@ -27,12 +28,12 @@ let
 
   defaultTrustedFolders = [
     "${homeDir}/.config/nix"
-    "${homeDir}/git"
+    gitDir
   ];
 
   # Default paths the sandbox may write to. Merged with cfg.sandboxAllowedPaths
   # so every bare repo under ~/git/ can create worktrees without a denial.
-  defaultSandboxAllowedPaths = [ "${homeDir}/git" ];
+  defaultSandboxAllowedPaths = [ gitDir ];
 
   mergedSandboxAllowedPaths = lib.unique (defaultSandboxAllowedPaths ++ cfg.sandboxAllowedPaths);
 
@@ -110,8 +111,6 @@ let
 
     tools = {
       sandbox = if cfg.sandbox.profile != null then cfg.sandbox.profile else cfg.sandbox.enable;
-    }
-    // lib.optionalAttrs (mergedSandboxAllowedPaths != [ ]) {
       sandboxAllowedPaths = mergedSandboxAllowedPaths;
     };
 
@@ -135,6 +134,8 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
+    programs.gemini.sandboxAllowedPathsMerged = mergedSandboxAllowedPaths;
+
     home = {
       # Deploy the Policy Engine TOML file (read-only is fine — Gemini only reads it)
       file."${lib.removePrefix "${homeDir}/" policyPath}".source = policyToml;
