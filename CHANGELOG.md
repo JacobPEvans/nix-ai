@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.52.0](https://github.com/JacobPEvans/nix-ai/compare/v1.51.0...v1.52.0) (2026-04-24)
+
+
+### Features
+
+* **gemini:** default sandboxAllowedPaths to ~/git ([#628](https://github.com/JacobPEvans/nix-ai/issues/628)) ([ae043cf](https://github.com/JacobPEvans/nix-ai/commit/ae043cfeaa586dfb72134478a85765541a5c2dd3))
+
 ## [1.51.0](https://github.com/JacobPEvans/nix-ai/compare/v1.50.1...v1.51.0) (2026-04-24)
 
 
