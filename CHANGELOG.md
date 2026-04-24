@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.50.0](https://github.com/JacobPEvans/nix-ai/compare/v1.49.0...v1.50.0) (2026-04-24)
+
+
+### Features
+
+* **gemini:** support custom sandbox profile path ([#615](https://github.com/JacobPEvans/nix-ai/issues/615)) ([7b3a661](https://github.com/JacobPEvans/nix-ai/commit/7b3a661ab35fa6237882bde2448ac40b19dfcaf1))
+
 ## [1.49.0](https://github.com/JacobPEvans/nix-ai/compare/v1.48.6...v1.49.0) (2026-04-24)
 
 
