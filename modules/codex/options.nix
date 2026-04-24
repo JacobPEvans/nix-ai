@@ -5,13 +5,6 @@
 { lib, ... }:
 
 let
-  componentModule = lib.types.submodule {
-    options = {
-      name = lib.mkOption { type = lib.types.str; };
-      source = lib.mkOption { type = lib.types.path; };
-    };
-  };
-
   hookType = lib.types.nullOr (lib.types.either lib.types.path lib.types.lines);
   nullableStr = lib.types.nullOr lib.types.str;
   nullableReasoningEffort = lib.types.nullOr (
@@ -33,20 +26,6 @@ let
 in
 {
   options.programs.codex = {
-    # Skills
-    skills = {
-      fromFlakeInputs = lib.mkOption {
-        type = lib.types.listOf componentModule;
-        default = [ ];
-        description = "Skills sourced from flake inputs (immutable, from Nix store)";
-      };
-      local = lib.mkOption {
-        type = lib.types.attrsOf lib.types.path;
-        default = { };
-        description = "Local skill files (name -> path to SKILL.md)";
-      };
-    };
-
     # Hooks
     hooks = {
       notification = lib.mkOption {
@@ -126,7 +105,7 @@ in
         "on-request"
         "never"
       ];
-      default = "on-request";
+      default = "untrusted";
       description = "Default approval policy for Codex sessions";
     };
 

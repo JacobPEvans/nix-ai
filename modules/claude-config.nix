@@ -245,9 +245,6 @@ in
       # Effort level via env var (alternative to settings.json key)
       # CLAUDE_CODE_EFFORT_LEVEL = "medium";
 
-      # Force plugin auto-update on startup (skips staleness check)
-      FORCE_AUTOUPDATE_PLUGINS = "1";
-
       # Auto-compact threshold — using upstream default (~95% of context window)
       # CLAUDE_AUTOCOMPACT_PCT_OVERRIDE = "95";
 
@@ -323,6 +320,9 @@ in
     # Writes compact summary of last tool execution to ~/.cache/claude-last-output.txt
     # Can be read by statusline, tmux, or other display tools
     postToolUse = ./claude/hooks/last-output.sh;
+
+    # Refresh stale marketplace indexes after Nix rebuilds; see hooks/marketplace-refresh.sh.
+    sessionStart = ./claude/hooks/marketplace-refresh.sh;
 
   };
 }

@@ -1,5 +1,73 @@
 # Changelog
 
+## [1.50.0](https://github.com/JacobPEvans/nix-ai/compare/v1.49.0...v1.50.0) (2026-04-24)
+
+
+### Features
+
+* **gemini:** support custom sandbox profile path ([#615](https://github.com/JacobPEvans/nix-ai/issues/615)) ([7b3a661](https://github.com/JacobPEvans/nix-ai/commit/7b3a661ab35fa6237882bde2448ac40b19dfcaf1))
+
+## [1.49.0](https://github.com/JacobPEvans/nix-ai/compare/v1.48.6...v1.49.0) (2026-04-24)
+
+
+### Features
+
+* centralize shared skills in agent-skills module ([#612](https://github.com/JacobPEvans/nix-ai/issues/612)) ([955eda6](https://github.com/JacobPEvans/nix-ai/commit/955eda6a22722fdc17eb1154abcc527167cd8adb))
+
+## [1.48.6](https://github.com/JacobPEvans/nix-ai/compare/v1.48.5...v1.48.6) (2026-04-24)
+
+
+### Bug Fixes
+
+* **deps:** refresh gh-aw action SHA pins ([#618](https://github.com/JacobPEvans/nix-ai/issues/618)) ([d9e402f](https://github.com/JacobPEvans/nix-ai/commit/d9e402fb1d49bb19aae4f529547fc376cfe6b4a5))
+
+## [1.48.5](https://github.com/JacobPEvans/nix-ai/compare/v1.48.4...v1.48.5) (2026-04-22)
+
+
+### Bug Fixes
+
+* **mlx:** cap uncapped local generations ([#596](https://github.com/JacobPEvans/nix-ai/issues/596)) ([33430f7](https://github.com/JacobPEvans/nix-ai/commit/33430f72b1de33e6f19fcc0c137e2db2a22cffd6))
+
+## [1.48.4](https://github.com/JacobPEvans/nix-ai/compare/v1.48.3...v1.48.4) (2026-04-22)
+
+
+### Bug Fixes
+
+* **claude:** automate marketplace cache refresh after Nix rebuilds ([#611](https://github.com/JacobPEvans/nix-ai/issues/611)) ([472e886](https://github.com/JacobPEvans/nix-ai/commit/472e88660a1d0ecb479e4c34f4583589d3590701))
+
+## [1.48.3](https://github.com/JacobPEvans/nix-ai/compare/v1.48.2...v1.48.3) (2026-04-21)
+
+
+### Bug Fixes
+
+* **mlx:** bump defaultModel to Qwen3.6-35B-A3B-mxfp4 ([#606](https://github.com/JacobPEvans/nix-ai/issues/606)) ([fed7bc0](https://github.com/JacobPEvans/nix-ai/commit/fed7bc005a1ca197a5bc4ae037baa13438160024))
+
+## [1.48.2](https://github.com/JacobPEvans/nix-ai/compare/v1.48.1...v1.48.2) (2026-04-21)
+
+
+### Bug Fixes
+
+* **deps:** refresh gh-aw action SHA pins ([9f5e27a](https://github.com/JacobPEvans/nix-ai/commit/9f5e27a4363fe79573e9ad342fee4d79c9b334c5))
+
+## [1.48.1](https://github.com/JacobPEvans/nix-ai/compare/v1.48.0...v1.48.1) (2026-04-21)
+
+
+### Bug Fixes
+
+* **ci:** add gh-aw-pin-refresh workflow and recompile lock files ([5515e5d](https://github.com/JacobPEvans/nix-ai/commit/5515e5d0dc60b9abb8e8129bdb90d647f7951325)), closes [#600](https://github.com/JacobPEvans/nix-ai/issues/600)
+
+## [1.48.0](https://github.com/JacobPEvans/nix-ai/compare/v1.47.0...v1.48.0) (2026-04-21)
+
+
+### Features
+
+* **gemini:** add worktree, sandbox path, and auto-edit defaults ([#597](https://github.com/JacobPEvans/nix-ai/issues/597)) ([9e29a07](https://github.com/JacobPEvans/nix-ai/commit/9e29a07ecb19bd0cb400ea58d911bf4b933f8bd7))
+
+
+### Bug Fixes
+
+* add bot PR CI retrigger workflow ([#599](https://github.com/JacobPEvans/nix-ai/issues/599)) ([ce38b8b](https://github.com/JacobPEvans/nix-ai/commit/ce38b8b6b24d4e7d82fbc7c926796ff5bdfff7e0))
+
 ## [1.47.0](https://github.com/JacobPEvans/nix-ai/compare/v1.46.1...v1.47.0) (2026-04-19)
 
 

@@ -1,12 +1,11 @@
 # Codex CLI Configuration Module
 #
 # Declarative configuration for OpenAI Codex CLI.
-# Generates config.toml with shared MCP servers, permissions, skills,
+# Generates config.toml with shared MCP servers, permissions,
 # and project trust levels.
 #
 # Features:
 # - Shared MCP server definitions (filtered for Codex compatibility)
-# - Declarative skills deployment (~/.codex/skills/ + ~/.agents/skills/)
 # - Execpolicy rules file from shared permissions
 # - config.toml deep-merge activation (preserves runtime state)
 {
@@ -23,7 +22,6 @@ in
   imports = [
     ./options.nix
     ./settings.nix
-    ./components.nix
   ];
 
   config = lib.mkIf cfg.enable {

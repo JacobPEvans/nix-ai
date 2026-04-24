@@ -18,6 +18,7 @@ in
         "enableAutoToolChoice"
         "host"
         "huggingFaceHome"
+        "maxTokens"
         "maxNumSeqs"
         "memoryHardLimitGb"
         "models"
@@ -48,7 +49,7 @@ in
         {
           name = "mlx.defaultModel";
           actual = mlxCfg.defaultModel;
-          expected = "mlx-community/Qwen3.5-35B-A3B-4bit";
+          expected = "mlx-community/Qwen3.6-35B-A3B-mxfp4";
         }
         {
           name = "mlx.port";
@@ -94,6 +95,11 @@ in
           name = "mlx.completionBatchSize";
           actual = mlxCfg.completionBatchSize;
           expected = null;
+        }
+        {
+          name = "mlx.maxTokens";
+          actual = mlxCfg.maxTokens;
+          expected = 8192;
         }
         {
           name = "mlx.memoryHardLimitGb";

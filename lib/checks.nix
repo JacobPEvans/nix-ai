@@ -1,5 +1,5 @@
 # Nix quality checks - thin aggregator
-# Individual check groups live in lib/checks/{lint,claude,codex,gemini,mlx,pal,fabric}.nix
+# Individual check groups live in lib/checks/{lint,claude,agent-skills,codex,gemini,mlx,pal,fabric}.nix
 {
   pkgs,
   src,
@@ -49,6 +49,7 @@ let
 in
 (import ./checks/lint.nix { inherit pkgs src; })
 // (import ./checks/claude.nix { inherit pkgs hmConfig; })
+// (import ./checks/agent-skills.nix { inherit pkgs hmConfig; })
 // (import ./checks/codex.nix { inherit pkgs hmConfig; })
 // (import ./checks/gemini.nix { inherit pkgs hmConfig; })
 // (import ./checks/mlx.nix { inherit pkgs hmConfig; })

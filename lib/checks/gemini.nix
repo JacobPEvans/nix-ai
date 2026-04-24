@@ -13,7 +13,7 @@ in
         "excludedMcpServers"
         "extensions"
         "hooks"
-        "skills"
+        "sandbox"
         "trustedFolders"
       ];
       actualOptions = builtins.attrNames cfg;
@@ -60,16 +60,6 @@ in
           expected = null;
         }
         {
-          name = "gemini.skills.fromFlakeInputs.populated";
-          actual = builtins.length cfg.skills.fromFlakeInputs > 0;
-          expected = true;
-        }
-        {
-          name = "gemini.skills.local";
-          actual = cfg.skills.local;
-          expected = { };
-        }
-        {
           name = "gemini.commands.fromFlakeInputs";
           actual = cfg.commands.fromFlakeInputs;
           expected = [ ];
@@ -78,6 +68,16 @@ in
           name = "gemini.commands.local";
           actual = cfg.commands.local;
           expected = { };
+        }
+        {
+          name = "gemini.sandbox.enable";
+          actual = cfg.sandbox.enable;
+          expected = true;
+        }
+        {
+          name = "gemini.sandbox.profile";
+          actual = cfg.sandbox.profile;
+          expected = null;
         }
       ];
       failures = builtins.filter (c: c.actual != c.expected) checks;

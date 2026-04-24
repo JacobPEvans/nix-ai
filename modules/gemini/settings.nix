@@ -83,6 +83,9 @@ let
     general = {
       previewFeatures = true;
       disableAutoUpdate = true;
+    }
+    // lib.optionalAttrs (cfg.defaultApprovalMode != null) {
+      inherit (cfg) defaultApprovalMode;
     };
 
     context = {
@@ -99,9 +102,15 @@ let
       };
     };
 
-    # Sandbox only — no more tools.allowed or tools.exclude (deprecated)
     tools = {
-      sandbox = true;
+      sandbox = if cfg.sandbox.profile != null then cfg.sandbox.profile else cfg.sandbox.enable;
+    }
+    // lib.optionalAttrs (cfg.sandboxAllowedPaths != [ ]) {
+      inherit (cfg) sandboxAllowedPaths;
+    };
+
+    experimental = lib.optionalAttrs cfg.worktrees {
+      worktrees = true;
     };
 
     inherit mcpServers;

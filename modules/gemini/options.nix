@@ -43,20 +43,6 @@ in
   options.programs.gemini = {
     enable = lib.mkEnableOption "Gemini CLI configuration";
 
-    # Skills
-    skills = {
-      fromFlakeInputs = lib.mkOption {
-        type = lib.types.listOf componentModule;
-        default = [ ];
-        description = "Skills sourced from flake inputs (immutable, from Nix store)";
-      };
-      local = lib.mkOption {
-        type = lib.types.attrsOf lib.types.path;
-        default = { };
-        description = "Local skill files (name -> path to SKILL.md)";
-      };
-    };
-
     # Commands
     commands = {
       fromFlakeInputs = lib.mkOption {
@@ -112,6 +98,51 @@ in
       type = lib.types.listOf lib.types.str;
       default = [ ];
       description = "Additional trusted folders (merged with defaults)";
+    };
+
+    # Sandbox allowed paths
+    sandboxAllowedPaths = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Paths the sandbox is allowed to write to. Required for git operations on bare repos when sandbox is enabled.";
+    };
+
+    # Sandbox configuration
+    sandbox = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable sandbox mode for filesystem/network isolation.";
+      };
+      profile = lib.mkOption {
+        type = lib.types.nullOr (lib.types.either lib.types.str lib.types.path);
+        default = null;
+        description = "Path to a custom macOS sandbox profile (.sb) to use instead of the default sandbox.";
+      };
+    };
+
+    # Worktrees feature
+    worktrees = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable automated Git worktree management for parallel work (experimental).";
+    };
+
+    # Default approval mode
+    defaultApprovalMode = lib.mkOption {
+      type = lib.types.nullOr (
+        lib.types.enum [
+          "default"
+          "auto_edit"
+          "plan"
+        ]
+      );
+      default = null;
+      description = ''
+        Default approval mode for tool execution.
+        "auto_edit" auto-approves file edits without prompting.
+        Null omits the key from settings.json (Gemini uses its built-in default).
+      '';
     };
 
     # MCP servers to exclude from shared definitions

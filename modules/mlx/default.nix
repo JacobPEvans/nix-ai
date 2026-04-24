@@ -37,9 +37,8 @@ let
   # Pinned to 0.2.6: 0.2.7 introduced a regression in
   # vllm_mlx/utils/tokenizer.py::load_model_with_fallback where the success
   # path `model, tokenizer = load(...)` forgot to return, returning None
-  # implicitly. Every model load then fails with
-  # `TypeError: cannot unpack non-iterable NoneType object` in llm.py:93.
-  # 0.2.6 had `return load(...)` as a single line. Revisit on 0.2.8+.
+  # implicitly. 0.2.8 fixes that regression, but detects Qwen3.5 as MLLM and
+  # its MLLM continuous-batching path fails parallel text requests.
   vllmMlxVersion = "0.2.6";
   # renovate: datasource=pypi depName=parakeet-mlx
   parakeetMlxVersion = "0.5.1";
@@ -92,6 +91,10 @@ let
         ++ lib.optionals (cfg.completionBatchSize != null) [
           "--completion-batch-size"
           (toString cfg.completionBatchSize)
+        ]
+        ++ lib.optionals (cfg.maxTokens != null) [
+          "--max-tokens"
+          (toString cfg.maxTokens)
         ]
         ++ lib.optionals cfg.enableAutoToolChoice [ "--enable-auto-tool-choice" ]
         ++ lib.optionals (cfg.enableAutoToolChoice && cfg.toolCallParser != null) [
