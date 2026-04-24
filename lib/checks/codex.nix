@@ -44,7 +44,7 @@ in
         {
           name = "codex.approvalPolicy";
           actual = cfg.approvalPolicy;
-          expected = "on-request";
+          expected = "untrusted";
         }
         {
           name = "codex.features";
