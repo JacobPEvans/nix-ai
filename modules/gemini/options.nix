@@ -107,6 +107,20 @@ in
       description = "Paths the sandbox is allowed to write to. Required for git operations on bare repos when sandbox is enabled.";
     };
 
+    # Sandbox configuration
+    sandbox = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable sandbox mode for filesystem/network isolation.";
+      };
+      profile = lib.mkOption {
+        type = lib.types.nullOr (lib.types.either lib.types.str lib.types.path);
+        default = null;
+        description = "Path to a custom macOS sandbox profile (.sb) to use instead of the default sandbox.";
+      };
+    };
+
     # Worktrees feature
     worktrees = lib.mkOption {
       type = lib.types.bool;

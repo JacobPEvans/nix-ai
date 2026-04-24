@@ -13,6 +13,7 @@ in
         "excludedMcpServers"
         "extensions"
         "hooks"
+        "sandbox"
         "trustedFolders"
       ];
       actualOptions = builtins.attrNames cfg;
@@ -67,6 +68,16 @@ in
           name = "gemini.commands.local";
           actual = cfg.commands.local;
           expected = { };
+        }
+        {
+          name = "gemini.sandbox.enable";
+          actual = cfg.sandbox.enable;
+          expected = true;
+        }
+        {
+          name = "gemini.sandbox.profile";
+          actual = cfg.sandbox.profile;
+          expected = null;
         }
       ];
       failures = builtins.filter (c: c.actual != c.expected) checks;

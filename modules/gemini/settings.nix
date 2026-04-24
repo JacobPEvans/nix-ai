@@ -103,7 +103,7 @@ let
     };
 
     tools = {
-      sandbox = true;
+      sandbox = if cfg.sandbox.profile != null then cfg.sandbox.profile else cfg.sandbox.enable;
     }
     // lib.optionalAttrs (cfg.sandboxAllowedPaths != [ ]) {
       inherit (cfg) sandboxAllowedPaths;
