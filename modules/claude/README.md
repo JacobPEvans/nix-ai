@@ -5,6 +5,25 @@ rules, settings, and statusline via `programs.claude.*` options.
 
 Configured in [`modules/claude-config.nix`](../claude-config.nix). Deployed to `~/.claude/` by home-manager.
 
+## Parallel Installs
+
+Two Claude Code binaries live side-by-side on this system:
+
+| Binary | Path | Channel | Managed by |
+| ------ | ---- | ------- | ---------- |
+| `claude` | `/opt/homebrew/bin/claude` | Stable (Homebrew) | nix-darwin `homebrew.brews` |
+| `claude-latest` | `~/.local/bin/claude` | Bleeding edge (Anthropic installer) | [`modules/claude-latest.nix`](../claude-latest.nix) |
+
+`claude-latest` is bootstrapped once by a user-level LaunchAgent
+(`com.jacobpevans.claude-latest-install`) that runs
+[`scripts/claude-latest-install.sh`](scripts/claude-latest-install.sh) via
+`pkgs.writeShellApplication`. Self-updates happen via `claude update` after
+first install. Run `claude-latest-install` by hand to force a reinstall.
+
+Shell aliases (`claude-latest`, `claude-d`, `claude-latest-d`, `d-claude`,
+`tf-claude`) live in [`../ai-aliases.zsh`](../ai-aliases.zsh), wired into
+`programs.zsh.initContent` by [`../ai-shell.nix`](../ai-shell.nix).
+
 ## Component Map
 
 | Component | Location | Description |

@@ -73,8 +73,10 @@ let
 in
 {
   imports = [
-    ./claude
+    ./ai-shell.nix
     ./agent-skills
+    ./claude
+    ./claude-latest.nix
     ./codex
     ./gemini
     ./fabric
@@ -152,6 +154,11 @@ in
       # Fabric — 252+ AI prompt patterns + CLI (defaults to MLX backend)
       # REST API server is opt-in via programs.fabric.enableServer
       fabric.enable = true;
+
+      # Bleeding-edge Claude Code at ~/.local/bin/claude via the official installer.
+      # Coexists with Homebrew's stable `claude`. See modules/ai-aliases.zsh for
+      # alias definitions (claude-latest, claude-d, claude-latest-d).
+      claude-latest.enable = true;
 
       # GitHub CLI extension for AI workflows
       gh.extensions = [ ghExtensions.gh-aw ];

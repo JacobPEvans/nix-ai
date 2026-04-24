@@ -152,7 +152,7 @@ in
         {
           name = "effortLevel";
           actual = cfg.effortLevel;
-          expected = "medium";
+          expected = "high";
         }
         {
           name = "sandbox.enabled";
