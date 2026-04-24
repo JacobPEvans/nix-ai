@@ -102,13 +102,14 @@ in
   # teammateMode — using upstream default: "auto" (options.nix)
   # "auto" splits panes in tmux, in-process otherwise.
 
-  # Model: opusplan — Opus 4.7 for planning, Sonnet 4.6 for execution (1M context).
+  # Model: opusplan — Opus for planning, Sonnet for execution (1M context).
   model = "opusplan";
 
-  # Effort: medium — matches upstream Max/Team default (v2.1.68+).
-  # Must be explicit to override runtime "high" value (merge script preserves runtime keys).
+  # Effort: high — maximize reasoning quality by default.
+  # Must be explicit (merge script preserves runtime keys, so without this users stay on
+  # whatever was last set at runtime or upstream default).
   # Override per-session via /model effort slider or "ultrathink" keyword.
-  effortLevel = "medium";
+  effortLevel = "high";
 
   # autoUpdatesChannel — using upstream default: "latest" (options.nix)
   # showTurnDuration — using upstream default: false (options.nix)
@@ -224,7 +225,7 @@ in
       # See: https://code.claude.com/docs/en/agent-teams
       CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
 
-      # Adaptive thinking for Opus 4.7/Sonnet 4.6 (explicitly enabled)
+      # Adaptive thinking for Opus/Sonnet (explicitly enabled)
       CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING = "0";
 
       # DEFAULT VALUES (upstream) - reference only, do not uncomment unless tuning
