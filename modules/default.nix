@@ -102,7 +102,7 @@ in
         '';
 
         # open-webui: installed via uv (nixpkgs broken on darwin — see modules/open-webui.nix)
-        installOpenWebui = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        installOpenWebui = lib.hm.dag.entryAfter [ "writeBoundary" "knownMarketplacesMerge" ] ''
           if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q "^open-webui"; then
             echo "-> Installing open-webui via uv (Python 3.14)..."
             $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "open-webui==0.8.12" --python 3.14
@@ -110,7 +110,7 @@ in
         '';
 
         # browser-use: CLI for browser automation (not in nixpkgs)
-        installBrowserUse = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        installBrowserUse = lib.hm.dag.entryAfter [ "writeBoundary" "knownMarketplacesMerge" ] ''
           if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q "^browser-use"; then
             echo "-> Installing browser-use via uv..."
             $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "browser-use==0.12.6"

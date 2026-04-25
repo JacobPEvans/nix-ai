@@ -250,6 +250,9 @@ in
       # Claude Code populates this by fetching from GitHub, but synthetic marketplaces (repos without
       # .claude-plugin structure) fail the fetch. This merge ensures the local installLocation is
       # registered so Claude Code reads the synthetic marketplace from the Nix-managed symlink.
+      # install* activations (installBrowserUse, installOpenWebui) declare a dependency on this step
+      # so a failing uv/npm install cannot abort the activation before the critical file merge runs
+      # (activation uses set -eu).
       knownMarketplacesMerge = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         export PATH="${pkgs.jq}/bin:$PATH"
         $DRY_RUN_CMD ${../scripts/merge-json-settings.sh} \
