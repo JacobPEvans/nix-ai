@@ -145,11 +145,10 @@ in
       description = ''
         Enable automated Git worktree management for parallel work (experimental).
 
-        Known limitation: gemini-cli hardcodes the worktree base path to
-        `<repo>/.gemini/worktrees/<branch>`, which triggers a macOS sandbox
-        denial under bare-repo + sibling-worktree layouts (e.g.
-        `~/git/<repo>/main`). Leave disabled until upstream exposes a
-        configurable base path; run `git worktree add` directly instead.
+        Note: gemini-cli currently writes worktrees under
+        `<repo>/.gemini/worktrees/<branch>` (path is hardcoded upstream).
+        Tracked at <https://github.com/google-gemini/gemini-cli> — once a
+        configurable base path lands upstream, surface it here.
       '';
     };
 

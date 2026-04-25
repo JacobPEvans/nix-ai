@@ -136,10 +136,7 @@ in
       # Gemini CLI configuration (settings handled by modules/gemini/)
       gemini = {
         enable = true;
-        # worktrees disabled: gemini-cli hardcodes <repo>/.gemini/worktrees/<branch>,
-        # which triggers a macOS sandbox denial in our bare-repo + worktree layout.
-        # Re-enable when upstream exposes a configurable base path.
-        worktrees = false;
+        worktrees = true;
         defaultApprovalMode = "auto_edit";
       };
 
