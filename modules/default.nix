@@ -136,7 +136,10 @@ in
       # Gemini CLI configuration (settings handled by modules/gemini/)
       gemini = {
         enable = true;
-        worktrees = true;
+        # worktrees disabled: gemini-cli hardcodes <repo>/.gemini/worktrees/<branch>
+        # which fails in our bare-repo + worktree layout. Re-enable when upstream
+        # exposes a configurable base path. Use `git worktree add` directly meanwhile.
+        worktrees = false;
         defaultApprovalMode = "auto_edit";
       };
 

@@ -142,7 +142,14 @@ in
     worktrees = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Enable automated Git worktree management for parallel work (experimental).";
+      description = ''
+        Enable automated Git worktree management for parallel work (experimental).
+
+        Known limitation: gemini-cli hardcodes the worktree base path to
+        <repo>/.gemini/worktrees/<branch>, which fails under bare-repo + sibling
+        worktree layouts (e.g. ~/git/<repo>/main). Leave disabled until upstream
+        exposes a configurable base path; run `git worktree add` directly instead.
+      '';
     };
 
     # Default approval mode
