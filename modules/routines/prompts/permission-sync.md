@@ -1,173 +1,67 @@
 # Permission Sync Routine
 
-Collect all locally-accepted AI tool permission overrides and create a draft PR
-against ai-assistant-instructions for human review. Be terse. No preamble.
+Find AI-tool permissions accepted locally but not yet upstreamed, and open a
+draft PR against `ai-assistant-instructions` for human review. Be terse.
 
-## Step 1: Collect local overrides
+## Inputs
 
-Use the glob tool to find files at these EXACT patterns (no others):
+- **Local overrides**: any `settings.local.json` (Claude, Gemini) or `config.json` (Codex)
+  under `~` and under `~/git/**`. Glob recursively; don't enumerate paths.
+- **Canonical set**: every JSON file under
+  `~/git/ai-assistant-instructions/main/agentsmd/permissions/` (allow, ask, deny, domains).
+  Read whatever is there — the directory layout may grow.
 
-- ~/.claude/settings.local.json
-- ~/git/*/main/.claude/settings.local.json
-- ~/git/*/.claude/settings.local.json
-- ~/.codex/config.json
-- ~/git/*/main/.codex/config.json
-- ~/git/*/.codex/config.json
-- ~/.gemini/settings.local.json
-- ~/git/*/main/.gemini/settings.local.json
-- ~/git/*/.gemini/settings.local.json
+## What to extract
 
-For each file found, read it. Extract permissions.allow[] entries (Claude Code format). Track which source file each entry came from.
+From each local override, pull `permissions.allow[]` (Claude format).
+From each canonical file, pull `commands[]`, `domains[]`, and `mcp[]` as applicable.
 
-Collect all entries into a single list with source paths.
+Classify each local entry by prefix:
 
-## Step 2: Read canonical permissions
+| Pattern                  | Type         |
+| ------------------------ | ------------ |
+| `Bash(cmd)` / `Bash(cmd:*)` | command (strip wrapper) |
+| `WebFetch(domain:X)`     | domain       |
+| `mcp__server__tool`      | mcp tool     |
+| `Skill(name)`            | skill        |
+| `Read(path)`             | read path    |
 
-Read ALL of these files:
+**Junk filter**: drop entries that look like English prose (have a comma or
+exceed 80 chars AND read as a sentence). Otherwise keep — don't editorialize.
 
-- ~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/core.json
-- ~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/mcp.json
-- ~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/network.json
-- ~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/nix.json
-- ~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/nodejs.json
-- ~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/python.json
-- ~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/rust.json
-- ~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/security.json
-- ~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/system.json
-- ~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/tools.json
-- ~/git/ai-assistant-instructions/main/agentsmd/permissions/domains/webfetch.json
-- All files in ~/git/ai-assistant-instructions/main/agentsmd/permissions/ask/
-- All files in ~/git/ai-assistant-instructions/main/agentsmd/permissions/deny/
+**Coverage**: an entry is already canonical if any canonical command is a prefix
+of the local bare command, or if a domain/mcp matches exactly (or via wildcard).
+Skills and read paths are never covered — always net-new.
 
-Extract:
+## Output
 
-- .commands[] from allow/ask/deny files → canonical command set
-- .domains[] from domains/webfetch.json → canonical domain set
-- .mcp[] from allow/mcp.json → canonical MCP set
+If no net-new entries: log `permission-sync: no new overrides found` and exit.
 
-## Step 3: Classify and deduplicate
+Otherwise write `agentsmd/permissions/allow/local-overrides.json` in the
+ai-assistant-instructions checkout:
 
-For each collected local entry, parse its type:
-
-- Bash(cmd:*) or Bash(cmd) → bare command = strip Bash( prefix and :*) or ) suffix
-- WebFetch(domain:X) → domain = X
-- mcp__server__tool → MCP tool
-- Skill(name) or Skill(name:*) → skill
-- Read(path) or Read(path/**) → read path
-
-Junk filter: Skip entries where the bare command contains a comma OR is longer than 80 characters
-AND looks like English prose (sentences, not commands).
-Include everything else — do NOT apply judgment about whether an entry should be permanent.
-
-Coverage check (an entry is already covered if):
-
-- Command: ANY canonical command entry is a prefix of the bare command (e.g., canonical "git" covers local "git status")
-- Domain: exact match in canonical domains list
-- MCP: a canonical mcp__server__* wildcard pattern covers the specific tool
-- Skills and Read paths: NEVER covered — always net-new (no canonical file exists for these)
-
-Collect only net-new (uncovered) entries.
-
-## Step 4: If no net-new entries
-
-Exit silently. Do not create a PR. Log: "permission-sync: no new overrides found"
-
-## Step 5: Build local-overrides.json
-
-Build the file content as JSON with net-new entries:
+```json
 {
-  "commands": ["sorted", "list", "of", "bare", "commands"],
-  "_source": "Auto-collected from settings.local.json files. Review and move to appropriate category files.",
+  "_source": "Auto-collected from local settings. Review and migrate.",
   "_collected_at": "YYYY-MM-DD",
-  "_domains": ["list of net-new domains"],
-  "_mcp": ["list of net-new mcp tools"],
-  "_skills": ["list of net-new skills"],
-  "_read_paths": ["list of net-new read paths"],
-  "_sources": {
-    "command-name": "~/git/repo-name/main/.claude/settings.local.json"
-  }
+  "commands": [],
+  "_domains": [],
+  "_mcp": [],
+  "_skills": [],
+  "_read_paths": [],
+  "_sources": { "entry": "path/to/source.json" }
 }
-
-Sort all arrays alphabetically. Use today's date for _collected_at.
-The _source and underscored keys are ignored by the Nix formatter (it only reads "commands").
-
-## Step 6: Create the PR
-
-Run these shell commands:
-
-```bash
-cd ~/git/ai-assistant-instructions/main
-git fetch origin
-git pull --ff-only origin main
-
-EXISTING_PR=$(gh pr list --repo JacobPEvans/ai-assistant-instructions \
-  --head chore/upstream-local-overrides --state open \
-  --json number --jq '.[0].number // empty')
-
-git branch -D chore/upstream-local-overrides 2>/dev/null || true
-git checkout -b chore/upstream-local-overrides
 ```
 
-Write the JSON content to:
-`~/git/ai-assistant-instructions/main/agentsmd/permissions/allow/local-overrides.json`
+Sort arrays. Only `commands` is consumed by the Nix formatter; the underscored
+keys are review hints for the human.
 
-```bash
-git add agentsmd/permissions/allow/local-overrides.json
-git commit -m "chore: upstream local permission overrides"
-git push origin chore/upstream-local-overrides --force-with-lease
-```
+## Delivery
 
-If EXISTING_PR is set, update the PR body:
+Open or update a draft PR on `JacobPEvans/ai-assistant-instructions`, branch
+`chore/upstream-local-overrides`, base `main`. Title:
+`chore: upstream local permission overrides -- YYYY-MM-DD`.
 
-```bash
-gh pr edit "$EXISTING_PR" \
-  --repo JacobPEvans/ai-assistant-instructions \
-  --body "$(cat <<'BODY'
-## Auto-collected local permission overrides
-
-These permissions were found in settings.local.json files across local repos
-but are not yet in the canonical permission files.
-
-### Action required
-
-Review each entry and move to the appropriate category file
-(allow/core.json, ask/git.json, domains/webfetch.json) or delete if it was a one-off approval.
-
-The commands array is the only thing the Nix formatter reads. Entries under
-_domains,_mcp, _skills, and_read_paths need manual migration.
-BODY
-)"
-```
-
-Otherwise create a new draft PR:
-
-```bash
-gh pr create \
-  --repo JacobPEvans/ai-assistant-instructions \
-  --head chore/upstream-local-overrides \
-  --base main \
-  --draft \
-  --title "chore: upstream local permission overrides -- $(date +%Y-%m-%d)" \
-  --body "$(cat <<'BODY'
-## Auto-collected local permission overrides
-
-These permissions were found in settings.local.json files across local repos
-but are not yet in the canonical permission files.
-
-### Action required
-
-Review each entry and move to the appropriate category file
-(allow/core.json, ask/git.json, domains/webfetch.json) or delete if it was a one-off approval.
-
-The commands array is the only thing the Nix formatter reads. Entries under
-_domains,_mcp, _skills, and_read_paths need manual migration.
-BODY
-)"
-```
-
-Finally return to main:
-
-```bash
-git checkout main
-git branch -D chore/upstream-local-overrides 2>/dev/null || true
-```
+Body should explain the file is auto-generated and entries need to be migrated
+into the appropriate category file (or deleted if one-off). Reuse the existing
+PR if one is open on that branch — don't open duplicates.
