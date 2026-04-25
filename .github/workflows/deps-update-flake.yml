@@ -2,7 +2,7 @@
 #
 # Flake input updates (flake.lock) are handled by Renovate's nix manager,
 # which creates individual PRs per input with auto-merge for trusted owners.
-# See renovate.json and renovate-presets.json in JacobPEvans/.github.
+# See renovate.json5 and renovate-presets.json in JacobPEvans/.github.
 #
 # This workflow only handles nix-update for packages with pinned source hashes
 # that Renovate cannot manage natively.
@@ -26,7 +26,7 @@ jobs:
         id: app-token
         uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ secrets.GH_ACTION_JACOBPEVANS_APP_ID }}
+          client-id: ${{ secrets.GH_ACTION_JACOBPEVANS_APP_ID }}
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
 
       - name: Checkout repository
