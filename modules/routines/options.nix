@@ -45,7 +45,7 @@
               description = ''
                 Model override passed to the AI CLI.
                 null = use the tool's configured default.
-                Examples: "gemini-2.5-pro", "claude-sonnet-4-6"
+                Examples: "gemini-3-pro-preview", "claude-sonnet-4-6"
               '';
             };
 

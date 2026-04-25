@@ -188,7 +188,7 @@ in
           prompt = builtins.readFile ./routines/prompts/permission-sync.md;
           aiTool = "gemini";
           # Use the most capable model for accurate diff logic
-          model = "gemini-2.5-pro";
+          model = "gemini-3-pro-preview";
           schedule.times = [
             {
               hour = 6;
