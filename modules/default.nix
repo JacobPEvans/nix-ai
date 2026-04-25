@@ -83,6 +83,7 @@ in
     ./maestro
     ./mlx
     ./open-webui.nix
+    ./routines
   ];
 
   config = {
@@ -161,6 +162,23 @@ in
 
       # GitHub CLI extension for AI workflows
       gh.extensions = [ ghExtensions.gh-aw ];
+
+      # Scheduled AI routines via launchd
+      routines = {
+        enable = true;
+        tasks.permission-sync = {
+          prompt = builtins.readFile ./routines/prompts/permission-sync.md;
+          aiTool = "gemini";
+          schedule.times = [
+            {
+              hour = 6;
+              minute = 13;
+            }
+          ];
+          workingDirectory = config.home.homeDirectory;
+          enabled = true;
+        };
+      };
     };
   };
 }
