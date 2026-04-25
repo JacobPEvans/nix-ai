@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.54.2](https://github.com/JacobPEvans/nix-ai/compare/v1.54.1...v1.54.2) (2026-04-25)
+
+
+### Bug Fixes
+
+* **ci:** app-id → client-id deprecation + renovate.json5 rename ([#634](https://github.com/JacobPEvans/nix-ai/issues/634)) ([58b75c6](https://github.com/JacobPEvans/nix-ai/commit/58b75c60488a5bfc1a4cb29d193c27d00285839b))
+
 ## [1.54.1](https://github.com/JacobPEvans/nix-ai/compare/v1.54.0...v1.54.1) (2026-04-25)
 
 
