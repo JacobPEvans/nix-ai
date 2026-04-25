@@ -114,8 +114,8 @@ let
       sandboxAllowedPaths = mergedSandboxAllowedPaths;
     };
 
-    experimental = lib.optionalAttrs cfg.worktrees {
-      worktrees = true;
+    experimental = {
+      worktrees = cfg.worktrees;
     };
 
     inherit mcpServers;
