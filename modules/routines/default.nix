@@ -27,9 +27,6 @@ let
     Minute = time.minute;
   };
 
-  # Resolve schedule to a list of {hour, minute} attrsets
-  getScheduleTimes = schedule: schedule.times;
-
   enabledTasks = lib.filterAttrs (_: task: task.enabled) cfg.tasks;
 
   # Build the run command for a task based on its AI tool
@@ -83,16 +80,10 @@ in
   imports = [ ./options.nix ];
 
   config = lib.mkIf cfg.enable {
-    assertions = lib.mapAttrsToList (
-      name: task:
-      let
-        timesList = getScheduleTimes task.schedule;
-      in
-      {
-        assertion = timesList != [ ];
-        message = "programs.routines.tasks.${name} must set schedule.times when enabled";
-      }
-    ) enabledTasks;
+    assertions = lib.mapAttrsToList (name: task: {
+      assertion = task.schedule.times != [ ];
+      message = "programs.routines.tasks.${name} must set schedule.times when enabled";
+    }) enabledTasks;
 
     home.file =
       # Deploy prompt files
@@ -106,18 +97,14 @@ in
     # Create launchd agents for each enabled task
     launchd.agents = lib.mapAttrs' (
       name: task:
-      let
-        timesList = getScheduleTimes task.schedule;
-        runnerScript = mkRunnerScript name task;
-      in
       lib.nameValuePair "com.routines.${name}" {
         enable = true;
         config = {
           Label = "com.routines.${name}";
           # Inherit Full Disk Access from Ghostty via TCC association
           AssociatedBundleIdentifiers = [ "com.mitchellh.ghostty" ];
-          ProgramArguments = [ "${runnerScript}" ];
-          StartCalendarInterval = map mkCalendarInterval timesList;
+          ProgramArguments = [ "${mkRunnerScript name task}" ];
+          StartCalendarInterval = map mkCalendarInterval task.schedule.times;
           WorkingDirectory = task.workingDirectory;
           EnvironmentVariables = {
             HOME = homeDir;

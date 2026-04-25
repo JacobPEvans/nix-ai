@@ -75,7 +75,6 @@
                         times = [{ hour = 6; minute = 13; }];
                     '';
                   };
-
                 };
               };
               description = "When to run the task";
