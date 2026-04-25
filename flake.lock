@@ -383,6 +383,7 @@
         "openai-codex": "openai-codex",
         "pal-mcp-server": "pal-mcp-server",
         "superpowers-marketplace": "superpowers-marketplace",
+        "vct-cribl-pack-validator-skills": "vct-cribl-pack-validator-skills",
         "visual-explainer-marketplace": "visual-explainer-marketplace",
         "wakatime": "wakatime"
       }
@@ -400,6 +401,22 @@
       "original": {
         "owner": "obra",
         "repo": "superpowers-marketplace",
+        "type": "github"
+      }
+    },
+    "vct-cribl-pack-validator-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1774484708,
+        "narHash": "sha256-cQEbj7K2HcFlL7vUVFYKsjlgZbzQqbVcAtw2QX7H4WQ=",
+        "owner": "VisiCore",
+        "repo": "vct-cribl-pack-validator",
+        "rev": "eaf3b3f17f77faf6825c587dfdd552f8a9837926",
+        "type": "github"
+      },
+      "original": {
+        "owner": "VisiCore",
+        "repo": "vct-cribl-pack-validator",
         "type": "github"
       }
     },

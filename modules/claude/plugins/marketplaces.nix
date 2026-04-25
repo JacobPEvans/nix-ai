@@ -229,6 +229,15 @@ let
       };
     };
 
+    # VisiCore Cribl pack validator — lints .crbl pack files against pack standards.
+    # Bare .claude/skills/ layout; wrapped into synthetic marketplace.
+    "vct-cribl-pack-validator-skills" = {
+      source = {
+        type = "github";
+        url = "VisiCore/vct-cribl-pack-validator";
+      };
+    };
+
     # Fabric patterns — Daniel Miessler's 252+ AI prompt patterns.
     # The upstream repo has no .claude-plugin/ structure, so we wrap a curated
     # subset into a synthetic marketplace (see fabricMarketplace in

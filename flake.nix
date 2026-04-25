@@ -101,6 +101,10 @@
       url = "github:browser-use/browser-use";
       flake = false;
     };
+    vct-cribl-pack-validator-skills = {
+      url = "github:VisiCore/vct-cribl-pack-validator";
+      flake = false;
+    };
 
     # PAL MCP server - pinned for supply-chain safety; auto-bumped by deps-update-flake.yml
     pal-mcp-server = {
@@ -143,6 +147,7 @@
       visual-explainer-marketplace,
       wakatime,
       browser-use-skills,
+      vct-cribl-pack-validator-skills,
       pal-mcp-server,
       fabric-src,
       ...
@@ -160,6 +165,7 @@
           bills-claude-skills
           bitwarden-marketplace
           browser-use-skills
+          vct-cribl-pack-validator-skills
           cc-dev-tools
           cc-marketplace
           claude-code-plugins-plus

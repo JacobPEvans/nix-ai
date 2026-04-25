@@ -75,6 +75,7 @@ let
   };
   inherit (marketplaceOverrides)
     browserUseMarketplace
+    criblPackValidatorMarketplace
     jacobpevansMarketplace
     fabricMarketplace
     ;
@@ -154,6 +155,10 @@ in
         # Override flakeInput for synthetic marketplace (source defined in marketplaces.nix)
         "browser-use-skills" = base."browser-use-skills" // {
           flakeInput = browserUseMarketplace;
+        };
+        # Override flakeInput for synthetic Cribl pack validator marketplace.
+        "vct-cribl-pack-validator-skills" = base."vct-cribl-pack-validator-skills" // {
+          flakeInput = criblPackValidatorMarketplace;
         };
         # Override flakeInput with auto-generated marketplace manifest
         "jacobpevans-cc-plugins" = base."jacobpevans-cc-plugins" // {

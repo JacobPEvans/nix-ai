@@ -150,6 +150,60 @@
       ${copySkillCommands}
     '';
 
+  # Synthetic marketplace for VisiCore/vct-cribl-pack-validator.
+  # Upstream uses .claude/skills/<name>/SKILL.md layout (no marketplace structure).
+  criblPackValidatorMarketplace =
+    let
+      src = marketplaceInputs.vct-cribl-pack-validator-skills;
+      skillsPath = "${src}/.claude/skills";
+      # Discover skills dynamically — mirrors discoverDotClaudeSkills in agent-skills/default.nix
+      skillDirs = lib.filterAttrs (_: t: t == "directory") (builtins.readDir skillsPath);
+      skillNames = builtins.attrNames (
+        lib.filterAttrs (name: _: builtins.pathExists "${skillsPath}/${name}/SKILL.md") skillDirs
+      );
+
+      manifestJson = builtins.toFile "marketplace.json" (
+        builtins.toJSON {
+          name = "vct-cribl-pack-validator-skills";
+          metadata = {
+            description = "Cribl pack validation skill from VisiCore";
+            version = "0.1.0";
+          };
+          owner = {
+            name = "VisiCore";
+            url = "https://github.com/VisiCore";
+          };
+          plugins = [
+            {
+              name = "cribl-pack-validator";
+              source = "./cribl-pack-validator";
+              description = "Validate Cribl .crbl packs against pack standards: naming, routing, sources/destinations, pipeline ordering, PII masking, and test coverage.";
+              version = "0.1.0";
+              author = {
+                name = "VisiCore";
+              };
+            }
+          ];
+        }
+      );
+      pluginJson = builtins.toFile "plugin.json" (
+        builtins.toJSON {
+          name = "cribl-pack-validator";
+          version = "0.1.0";
+          description = "Validate Cribl .crbl packs against pack standards.";
+          author = {
+            name = "VisiCore";
+          };
+          skills = map (n: "./skills/${n}") skillNames;
+        }
+      );
+    in
+    pkgs.runCommand "vct-cribl-pack-validator-marketplace" { } ''
+      install -D -m 644 ${manifestJson} $out/.claude-plugin/marketplace.json
+      install -D -m 644 ${pluginJson} $out/cribl-pack-validator/.claude-plugin/plugin.json
+      ln -s ${src}/.claude/skills $out/cribl-pack-validator/skills
+    '';
+
   # Auto-generated marketplace manifest for jacobpevans-cc-plugins
   # Ensures every plugin directory is registered — eliminates manual marketplace.json maintenance.
   jacobpevansMarketplace =
