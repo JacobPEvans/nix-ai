@@ -142,7 +142,14 @@ in
     worktrees = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Enable automated Git worktree management for parallel work (experimental).";
+      description = ''
+        Enable automated Git worktree management for parallel work (experimental).
+
+        Note: gemini-cli currently writes worktrees under
+        `<repo>/.gemini/worktrees/<branch>` (path is hardcoded upstream).
+        Tracked at <https://github.com/google-gemini/gemini-cli> — once a
+        configurable base path lands upstream, surface it here.
+      '';
     };
 
     # Default approval mode
