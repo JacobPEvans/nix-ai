@@ -28,19 +28,7 @@ let
   };
 
   # Resolve schedule to a list of {hour, minute} attrsets
-  getScheduleTimes =
-    schedule:
-    if schedule.times != [ ] then
-      schedule.times
-    else if schedule.hour != null then
-      [
-        {
-          inherit (schedule) hour;
-          minute = 0;
-        }
-      ]
-    else
-      [ ];
+  getScheduleTimes = schedule: schedule.times;
 
   enabledTasks = lib.filterAttrs (_: task: task.enabled) cfg.tasks;
 
@@ -102,7 +90,7 @@ in
       in
       {
         assertion = timesList != [ ];
-        message = "programs.routines.tasks.${name} must set schedule.times (or deprecated schedule.hour) when enabled";
+        message = "programs.routines.tasks.${name} must set schedule.times when enabled";
       }
     ) enabledTasks;
 

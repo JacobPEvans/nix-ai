@@ -76,11 +76,6 @@
                     '';
                   };
 
-                  hour = lib.mkOption {
-                    type = lib.types.nullOr (lib.types.ints.between 0 23);
-                    default = null;
-                    description = "Single hour shorthand (deprecated in favor of times)";
-                  };
                 };
               };
               description = "When to run the task";
