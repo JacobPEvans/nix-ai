@@ -1,0 +1,32 @@
+name: CI Fail Notify
+
+on:
+  workflow_run:
+    workflows:
+      - "CI Gate"
+      - "Update custom packages"
+    types: [completed]
+    branches: [main]
+
+concurrency:
+  group: ci-fail-${{ github.event.workflow_run.id }}
+  cancel-in-progress: false
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  slack:
+    if: github.event.workflow_run.conclusion == 'failure'
+    uses: JacobPEvans/ai-workflows/.github/workflows/notify-ci-fail.yml@main
+    with:
+      workflow_name: ${{ github.event.workflow_run.name }}
+      run_url:       ${{ github.event.workflow_run.html_url }}
+      run_id:        ${{ github.event.workflow_run.id }}
+      head_sha:      ${{ github.event.workflow_run.head_sha }}
+      head_branch:   ${{ github.event.workflow_run.head_branch }}
+      repository:    ${{ github.event.workflow_run.repository.full_name }}
+      conclusion:    ${{ github.event.workflow_run.conclusion }}
+      event_name:    ${{ github.event.workflow_run.event }}
+    secrets: inherit

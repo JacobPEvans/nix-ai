@@ -2,27 +2,27 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
-    "local>JacobPEvans/.github:renovate-presets"
+    "local>JacobPEvans/.github:renovate-presets",
   ],
   "nix": {
-    "enabled": true
+    "enabled": true,
   },
   "lockFileMaintenance": {
     "enabled": true,
-    "schedule": ["before 7am on Monday"]
+    "schedule": ["before 7am on Monday"],
   },
   "packageRules": [
     {
       "description": "Group MLX Python packages into a single PR",
       "matchManagers": ["pep621"],
       "matchFileNames": ["mlx-server/**"],
-      "groupName": "mlx-packages"
+      "groupName": "mlx-packages",
     },
     {
       "description": "Group Orchestrator Python packages into a single PR",
       "matchManagers": ["pep621"],
       "matchFileNames": ["orchestrator/**"],
-      "groupName": "orchestrator-packages"
-    }
-  ]
+      "groupName": "orchestrator-packages",
+    },
+  ],
 }
