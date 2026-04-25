@@ -154,6 +154,14 @@
   # Upstream uses .claude/skills/<name>/SKILL.md layout (no marketplace structure).
   criblPackValidatorMarketplace =
     let
+      src = marketplaceInputs.vct-cribl-pack-validator-skills;
+      skillsPath = "${src}/.claude/skills";
+      # Discover skills dynamically — mirrors discoverDotClaudeSkills in agent-skills/default.nix
+      skillDirs = lib.filterAttrs (_: t: t == "directory") (builtins.readDir skillsPath);
+      skillNames = builtins.attrNames (
+        lib.filterAttrs (name: _: builtins.pathExists "${skillsPath}/${name}/SKILL.md") skillDirs
+      );
+
       manifestJson = builtins.toFile "marketplace.json" (
         builtins.toJSON {
           name = "vct-cribl-pack-validator-skills";
@@ -186,15 +194,14 @@
           author = {
             name = "VisiCore";
           };
-          skills = [ "./skills/validate-pack" ];
+          skills = map (n: "./skills/${n}") skillNames;
         }
       );
     in
     pkgs.runCommand "vct-cribl-pack-validator-marketplace" { } ''
-      mkdir -p $out/.claude-plugin $out/cribl-pack-validator/.claude-plugin
-      cp ${manifestJson} $out/.claude-plugin/marketplace.json
-      cp ${pluginJson} $out/cribl-pack-validator/.claude-plugin/plugin.json
-      ln -s ${marketplaceInputs.vct-cribl-pack-validator-skills}/.claude/skills $out/cribl-pack-validator/skills
+      install -D -m 644 ${manifestJson} $out/.claude-plugin/marketplace.json
+      install -D -m 644 ${pluginJson} $out/cribl-pack-validator/.claude-plugin/plugin.json
+      ln -s ${src}/.claude/skills $out/cribl-pack-validator/skills
     '';
 
   # Auto-generated marketplace manifest for jacobpevans-cc-plugins
