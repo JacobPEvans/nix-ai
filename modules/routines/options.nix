@@ -43,9 +43,9 @@
               type = lib.types.nullOr lib.types.str;
               default = null;
               description = ''
-                Model override passed to the AI CLI.
-                null = use the tool's configured default.
-                Examples: "gemini-3-pro-preview", "claude-sonnet-4-6"
+                Optional model override passed to the AI CLI via --model.
+                Leave null (default) so the CLI picks its current best model —
+                avoids stale pins as upstream defaults move forward.
               '';
             };
 
