@@ -115,7 +115,7 @@ let
     };
 
     experimental = {
-      worktrees = cfg.worktrees;
+      inherit (cfg) worktrees;
     };
 
     inherit mcpServers;
