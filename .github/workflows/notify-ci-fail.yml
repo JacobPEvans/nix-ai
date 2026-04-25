@@ -6,7 +6,6 @@ on:
       - "CI Gate"
       - "Update custom packages"
     types: [completed]
-    branches: [main]
 
 concurrency:
   group: ci-fail-${{ github.event.workflow_run.id }}
