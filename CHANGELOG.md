@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.54.3](https://github.com/JacobPEvans/nix-ai/compare/v1.54.2...v1.54.3) (2026-04-25)
+
+
+### Bug Fixes
+
+* **claude:** guarantee knownMarketplacesMerge runs before install activations ([d7890ef](https://github.com/JacobPEvans/nix-ai/commit/d7890eff7f636b1f009dba6726365a8c877769f3))
+
 ## [1.54.2](https://github.com/JacobPEvans/nix-ai/compare/v1.54.1...v1.54.2) (2026-04-25)
 
 
