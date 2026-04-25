@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.54.1](https://github.com/JacobPEvans/nix-ai/compare/v1.54.0...v1.54.1) (2026-04-25)
+
+
+### Bug Fixes
+
+* convert assignment to `inherit (cfg) worktrees`. ([b668877](https://github.com/JacobPEvans/nix-ai/commit/b66887797ac79d5839f5b09de7a6b8b6dc0d5360))
+* **gemini:** document worktree location quirk, keep feature enabled ([b668877](https://github.com/JacobPEvans/nix-ai/commit/b66887797ac79d5839f5b09de7a6b8b6dc0d5360))
+
 ## [1.54.0](https://github.com/JacobPEvans/nix-ai/compare/v1.53.0...v1.54.0) (2026-04-25)
 
 
