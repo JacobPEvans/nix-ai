@@ -33,8 +33,29 @@ let
     in
     lib.concatMap pluginSkills (builtins.attrNames topDirs);
 
+  # Discovers SKILL.md files from a bare .claude/skills/ directory.
+  # Pattern: <repo>/.claude/skills/<skill-name>/SKILL.md
+  discoverDotClaudeSkills =
+    input:
+    let
+      skillsPath = "${input}/.claude/skills";
+      hasSkills = builtins.pathExists skillsPath;
+      skillDirs =
+        if hasSkills then
+          lib.filterAttrs (_: type: type == "directory") (builtins.readDir skillsPath)
+        else
+          { };
+    in
+    lib.mapAttrsToList (name: _: {
+      inherit name;
+      source = "${skillsPath}/${name}/SKILL.md";
+    }) (lib.filterAttrs (name: _: builtins.pathExists "${skillsPath}/${name}/SKILL.md") skillDirs);
+
   # Skills from JacobPEvans/claude-code-plugins (tool-agnostic markdown)
-  sharedSkills = discoverSkills marketplaceInputs.jacobpevans-cc-plugins;
+  # Plus VisiCore cribl-pack-validator (bare .claude/skills/ layout)
+  sharedSkills =
+    discoverSkills marketplaceInputs.jacobpevans-cc-plugins
+    ++ discoverDotClaudeSkills marketplaceInputs.vct-cribl-pack-validator-skills;
 in
 {
   imports = [

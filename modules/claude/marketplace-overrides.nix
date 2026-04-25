@@ -150,6 +150,53 @@
       ${copySkillCommands}
     '';
 
+  # Synthetic marketplace for VisiCore/vct-cribl-pack-validator.
+  # Upstream uses .claude/skills/<name>/SKILL.md layout (no marketplace structure).
+  criblPackValidatorMarketplace =
+    let
+      manifestJson = builtins.toFile "marketplace.json" (
+        builtins.toJSON {
+          name = "vct-cribl-pack-validator-skills";
+          metadata = {
+            description = "Cribl pack validation skill from VisiCore";
+            version = "0.1.0";
+          };
+          owner = {
+            name = "VisiCore";
+            url = "https://github.com/VisiCore";
+          };
+          plugins = [
+            {
+              name = "cribl-pack-validator";
+              source = "./cribl-pack-validator";
+              description = "Validate Cribl .crbl packs against pack standards: naming, routing, sources/destinations, pipeline ordering, PII masking, and test coverage.";
+              version = "0.1.0";
+              author = {
+                name = "VisiCore";
+              };
+            }
+          ];
+        }
+      );
+      pluginJson = builtins.toFile "plugin.json" (
+        builtins.toJSON {
+          name = "cribl-pack-validator";
+          version = "0.1.0";
+          description = "Validate Cribl .crbl packs against pack standards.";
+          author = {
+            name = "VisiCore";
+          };
+          skills = [ "./skills/validate-pack" ];
+        }
+      );
+    in
+    pkgs.runCommand "vct-cribl-pack-validator-marketplace" { } ''
+      mkdir -p $out/.claude-plugin $out/cribl-pack-validator/.claude-plugin
+      cp ${manifestJson} $out/.claude-plugin/marketplace.json
+      cp ${pluginJson} $out/cribl-pack-validator/.claude-plugin/plugin.json
+      ln -s ${marketplaceInputs.vct-cribl-pack-validator-skills}/.claude/skills $out/cribl-pack-validator/skills
+    '';
+
   # Auto-generated marketplace manifest for jacobpevans-cc-plugins
   # Ensures every plugin directory is registered — eliminates manual marketplace.json maintenance.
   jacobpevansMarketplace =

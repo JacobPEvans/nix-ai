@@ -33,6 +33,9 @@ _:
     # CI/CD (GitHub Actions in repos)
     "cicd-automation@claude-code-workflows" = true;
 
+    # Cribl pack validation (log pipeline infrastructure)
+    "cribl-pack-validator@vct-cribl-pack-validator-skills" = true;
+
     # REMOVED - not actively used:
     # observability-monitoring - moved to development.nix (avoid duplication)
     # cloud-infrastructure - too generic
