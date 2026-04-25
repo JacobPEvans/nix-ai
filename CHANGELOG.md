@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.53.0](https://github.com/JacobPEvans/nix-ai/compare/v1.52.0...v1.53.0) (2026-04-25)
+
+
+### Features
+
+* **routines:** add routines module with permission-sync Gemini task ([#588](https://github.com/JacobPEvans/nix-ai/issues/588)) ([82388a1](https://github.com/JacobPEvans/nix-ai/commit/82388a1b1f6cb835e0ff1511beb832cd90367fb8))
+
 ## [1.52.0](https://github.com/JacobPEvans/nix-ai/compare/v1.51.0...v1.52.0) (2026-04-24)
 
 
