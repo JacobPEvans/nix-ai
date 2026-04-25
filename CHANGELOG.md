@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.54.0](https://github.com/JacobPEvans/nix-ai/compare/v1.53.0...v1.54.0) (2026-04-25)
+
+
+### Features
+
+* **plugins:** add VisiCore cribl-pack-validator skill (Claude+Codex+Gemini) ([#630](https://github.com/JacobPEvans/nix-ai/issues/630)) ([466fd1d](https://github.com/JacobPEvans/nix-ai/commit/466fd1d9721d856c5d0fce27ae1eb94df8d3b763))
+
 ## [1.53.0](https://github.com/JacobPEvans/nix-ai/compare/v1.52.0...v1.53.0) (2026-04-25)
 
 
