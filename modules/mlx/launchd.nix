@@ -60,27 +60,39 @@ in
       };
     };
 
-    # ==========================================================================
-    # Log Rotation (closes #255)
-    # ==========================================================================
-    # newsyslog rotates logs when they exceed 10MB, keeping 3 compressed archives.
-    # Stock macOS newsyslog only reads /etc/newsyslog.d/ (requires root), so a
-    # companion LaunchAgent invokes it hourly with our user-level config.
-    home.file.".config/newsyslog.d/vllm-mlx.conf".text = ''
-      # logfilename                                                                [owner:group]  mode  count  size  when  flags
-      ${config.home.homeDirectory}/Library/Logs/vllm-mlx/vllm-mlx.error.log        :              644   3      10240 *     J
-      ${config.home.homeDirectory}/Library/Logs/vllm-mlx/vllm-mlx.log              :              644   3      10240 *     J
-    '';
+    home = {
+      # ==========================================================================
+      # Log Rotation (closes #255)
+      # ==========================================================================
+      # newsyslog rotates logs when they exceed 10MB, keeping 3 compressed archives.
+      # Stock macOS newsyslog only reads /etc/newsyslog.d/ (requires root), so a
+      # companion LaunchAgent invokes it hourly with our user-level config.
+      file.".config/newsyslog.d/vllm-mlx.conf".text = ''
+        # logfilename                                                                [owner:group]  mode  count  size  when  flags
+        ${config.home.homeDirectory}/Library/Logs/vllm-mlx/vllm-mlx.error.log        :              644   3      10240 *     J
+        ${config.home.homeDirectory}/Library/Logs/vllm-mlx/vllm-mlx.log              :              644   3      10240 *     J
+      '';
 
-    # ==========================================================================
-    # Runtime Config Seeding
-    # ==========================================================================
-    # On activation (darwin-rebuild switch), seed the mutable runtime config
-    # from the Nix-generated base config. Preserves runtime-discovered models
-    # by only overwriting when the base config has actually changed.
-    home.activation.seedLlamaSwapConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      run ${pkgs.python3}/bin/python3 "${./seed-config.py}" "${llamaSwapConfigFile}" "${llamaSwapRuntimeConfigPath}"
-    '';
+      # ==========================================================================
+      # Runtime Config Seeding and Model Discovery
+      # ==========================================================================
+      # On activation (darwin-rebuild switch), seed the mutable runtime config
+      # from the Nix-generated base config. Preserves runtime-discovered models
+      # by only overwriting when the base config has actually changed.
+      activation.seedLlamaSwapConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        run ${pkgs.python3}/bin/python3 "${./seed-config.py}" "${llamaSwapConfigFile}" "${llamaSwapRuntimeConfigPath}"
+      '';
+
+      # Auto-discover newly downloaded HF models and register them with llama-swap.
+      # Runs after seeding so the runtime config exists. The script exits 0 when
+      # the HF volume is absent (scan_models returns []), so no || true needed.
+      activation.discoverMlxModels = lib.hm.dag.entryAfter [ "seedLlamaSwapConfig" ] ''
+        export MLX_HF_HOME="${cfg.huggingFaceHome}"
+        export MLX_LLAMA_SWAP_CONFIG="${llamaSwapRuntimeConfigPath}"
+        export MLX_LLAMA_SWAP_BASE_CONFIG="${llamaSwapConfigFile}"
+        run ${pkgs.python3}/bin/python3 "${./discover-models.py}" --quiet
+      '';
+    };
 
     launchd.agents.vllm-mlx-logrotate = {
       enable = true;
