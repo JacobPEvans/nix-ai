@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.55.0](https://github.com/JacobPEvans/nix-ai/compare/v1.54.4...v1.55.0) (2026-04-26)
+
+
+### Features
+
+* **mlx:** auto-discover HF models on every darwin-rebuild switch ([de6b51f](https://github.com/JacobPEvans/nix-ai/commit/de6b51f689c5ceecf6537c8f9304d1a9134fdc39))
+
 ## [1.54.4](https://github.com/JacobPEvans/nix-ai/compare/v1.54.3...v1.54.4) (2026-04-26)
 
 
