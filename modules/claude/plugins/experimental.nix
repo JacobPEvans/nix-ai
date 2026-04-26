@@ -17,13 +17,6 @@ _:
 {
   enabledPlugins = {
     # ========================================================================
-    # Autonomous Iteration
-    # ========================================================================
-    # ralph-loop: autonomous iteration loops with file/git history preservation
-    # Commands: /ralph-loop, /cancel-ralph
-    "ralph-loop@claude-plugins-official" = true;
-
-    # ========================================================================
     # Multi-Model AI Integrations (cc-dev-tools)
     # ========================================================================
     # WARNING: These plugins invoke external AI models (OpenAI, Google)
