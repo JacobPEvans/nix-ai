@@ -34,6 +34,7 @@ Registered marketplaces, defined in [`marketplaces.nix`](marketplaces.nix).
 | `cc-dev-tools` | `Lucklyric/cc-dev-tools` | AI Integrations |
 | `wakatime` | `wakatime/claude-code-wakatime` | Time Tracking |
 | `openai-codex` | `openai/codex-plugin-cc` | AI Integrations |
+| `huggingface-skills` | `huggingface/skills` | AI/ML |
 | `browser-use-skills` | `browser-use/browser-use` | Synthetic |
 | `fabric-patterns` | `danielmiessler/fabric` | Synthetic |
 
@@ -95,6 +96,7 @@ Registered marketplaces, defined in [`marketplaces.nix`](marketplaces.nix).
 | `claude-retrospective@bitwarden-marketplace` | enabled | 3 skills: retrospecting, session data, git analysis |
 | `claude-config-validator@bitwarden-marketplace` | enabled | 1 skill: reviewing-claude-config |
 | `browser-use@browser-use-skills` | enabled | Browser automation (requires `browser-use` via uv) |
+| `hf-cli@huggingface-skills` | enabled | HF CLI: download/upload models, datasets, manage Hub repos |
 
 ### Infrastructure — [`infrastructure.nix`](infrastructure.nix)
 

@@ -6,6 +6,7 @@
 # - visual-explainer-marketplace: Rich HTML diagrams, diff reviews, slides (nicobailon)
 # - bitwarden-marketplace: Enterprise-grade session analysis and config validation
 # - browser-use-skills: Browser automation (synthetic marketplace — repo lacks native structure)
+# - huggingface-skills: HF CLI, datasets, papers, local models, gradio, and more
 
 _:
 
@@ -46,6 +47,9 @@ _:
 
     # Browser Automation - browser-use (CLI skills require `browser-use` installed via uv)
     "browser-use@browser-use-skills" = true;
+
+    # Hugging Face Skills - hf CLI for Hub operations (download/upload models, manage repos)
+    "hf-cli@huggingface-skills" = true;
 
     # REMOVED - redundant or unused:
     # double-check - unnecessary
