@@ -110,6 +110,14 @@ let
       };
     };
 
+    # --- AI/ML ---
+    "huggingface-skills" = {
+      source = {
+        type = "github";
+        url = "huggingface/skills";
+      };
+    };
+
     # --- Community ---
     "cc-marketplace" = {
       source = {

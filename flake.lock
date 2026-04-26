@@ -262,6 +262,22 @@
         "type": "github"
       }
     },
+    "huggingface-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776941956,
+        "narHash": "sha256-p8sMxWxn6r5wdGo+HAH0p76wO9SZO5pRXt6RkSSOV/8=",
+        "owner": "huggingface",
+        "repo": "skills",
+        "rev": "ddcf68038c45b78adda240b924a427f1e069f4b2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "huggingface",
+        "repo": "skills",
+        "type": "github"
+      }
+    },
     "jacobpevans-cc-plugins": {
       "flake": false,
       "locked": {
@@ -376,6 +392,7 @@
         "claude-skills": "claude-skills",
         "fabric-src": "fabric-src",
         "home-manager": "home-manager",
+        "huggingface-skills": "huggingface-skills",
         "jacobpevans-cc-plugins": "jacobpevans-cc-plugins",
         "lunar-claude": "lunar-claude",
         "nixpkgs": "nixpkgs",

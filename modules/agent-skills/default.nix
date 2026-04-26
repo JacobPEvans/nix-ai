@@ -33,6 +33,28 @@ let
     in
     lib.concatMap pluginSkills (builtins.attrNames topDirs);
 
+  # Discovers SKILL.md files from a flat skills/ directory at the repo root.
+  # Pattern: <repo>/skills/<skill-name>/SKILL.md
+  # Used for marketplaces like huggingface/skills that store skills at the top level.
+  discoverFlatSkills =
+    input:
+    let
+      skillsPath = "${input}/skills";
+    in
+    if builtins.pathExists skillsPath then
+      lib.mapAttrsToList
+        (name: _: {
+          inherit name;
+          source = "${skillsPath}/${name}/SKILL.md";
+        })
+        (
+          lib.filterAttrs (
+            name: type: type == "directory" && builtins.pathExists "${skillsPath}/${name}/SKILL.md"
+          ) (builtins.readDir skillsPath)
+        )
+    else
+      [ ];
+
   # Discovers SKILL.md files from a bare .claude/skills/ directory.
   # Pattern: <repo>/.claude/skills/<skill-name>/SKILL.md
   discoverDotClaudeSkills =
@@ -53,9 +75,11 @@ let
 
   # Skills from JacobPEvans/claude-code-plugins (tool-agnostic markdown)
   # Plus VisiCore cribl-pack-validator (bare .claude/skills/ layout)
+  # Plus Hugging Face Hub skills (flat skills/<n>/SKILL.md layout)
   sharedSkills =
     discoverSkills marketplaceInputs.jacobpevans-cc-plugins
-    ++ discoverDotClaudeSkills marketplaceInputs.vct-cribl-pack-validator-skills;
+    ++ discoverDotClaudeSkills marketplaceInputs.vct-cribl-pack-validator-skills
+    ++ discoverFlatSkills marketplaceInputs.huggingface-skills;
 in
 {
   imports = [

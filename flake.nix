@@ -96,6 +96,12 @@
       flake = false;
     };
 
+    # Hugging Face Skills marketplace - hf-cli, datasets, papers, models, gradio, etc.
+    huggingface-skills = {
+      url = "github:huggingface/skills";
+      flake = false;
+    };
+
     # Skill-only repos (no marketplace structure — wrapped via synthetic derivation)
     browser-use-skills = {
       url = "github:browser-use/browser-use";
@@ -146,6 +152,7 @@
       superpowers-marketplace,
       visual-explainer-marketplace,
       wakatime,
+      huggingface-skills,
       browser-use-skills,
       vct-cribl-pack-validator-skills,
       pal-mcp-server,
@@ -165,6 +172,7 @@
           bills-claude-skills
           bitwarden-marketplace
           browser-use-skills
+          huggingface-skills
           vct-cribl-pack-validator-skills
           cc-dev-tools
           cc-marketplace
