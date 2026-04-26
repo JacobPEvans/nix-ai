@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.56.0](https://github.com/JacobPEvans/nix-ai/compare/v1.55.0...v1.56.0) (2026-04-26)
+
+
+### Features
+
+* **plugins:** add huggingface/skills marketplace with hf-cli ([06c4d2b](https://github.com/JacobPEvans/nix-ai/commit/06c4d2b76ecbcdb3529049c4962dc36dc5ba1251))
+
 ## [1.55.0](https://github.com/JacobPEvans/nix-ai/compare/v1.54.4...v1.55.0) (2026-04-26)
 
 
