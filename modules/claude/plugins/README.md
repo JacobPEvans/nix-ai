@@ -41,8 +41,7 @@ Registered marketplaces, defined in [`marketplaces.nix`](marketplaces.nix).
 
 > **Note on status values**: Each table reflects the value set in the named `.nix` file, not the
 > final merged result. When a plugin appears in multiple sections, the last-merged file wins
-> (see `plugins/default.nix`). For example, `ralph-loop` is `false` in `official.nix` but
-> `true` in `experimental.nix` — the effective result is **enabled**.
+> (see `plugins/default.nix`).
 
 ### Official Anthropic — [`official.nix`](official.nix)
 
@@ -60,7 +59,6 @@ Registered marketplaces, defined in [`marketplaces.nix`](marketplaces.nix).
 | `claude-md-management@claude-plugins-official` | enabled | CLAUDE.md management |
 | `pyright-lsp@claude-plugins-official` | enabled | Python type checking LSP |
 | `typescript-lsp@claude-plugins-official` | disabled | Minimal TS usage |
-| `ralph-loop@claude-plugins-official` | disabled | Superseded by native agent teams |
 
 ### External Third-Party — [`external.nix`](external.nix)
 
@@ -158,7 +156,6 @@ are discovered at flake update time and enabled automatically as `*@jacobpevans-
 
 | Plugin | Status | Description |
 | ------ | ------ | ----------- |
-| `ralph-loop@claude-plugins-official` | enabled | Autonomous iteration loops (`/ralph-loop`, `/cancel-ralph`) |
 | `codex@cc-dev-tools` | enabled | OpenAI GPT for high-reasoning coding (community) |
 | `codex@openai-codex` | enabled | Official OpenAI Codex (`/codex:review`, `/codex:rescue`) |
 | `gemini@cc-dev-tools` | enabled | Google Gemini with web search + session resumption |
