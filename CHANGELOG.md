@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.54.4](https://github.com/JacobPEvans/nix-ai/compare/v1.54.3...v1.54.4) (2026-04-26)
+
+
+### Bug Fixes
+
+* **plugins:** remove ralph-loop plugin references ([#644](https://github.com/JacobPEvans/nix-ai/issues/644)) ([0370d5e](https://github.com/JacobPEvans/nix-ai/commit/0370d5e42e8a9e1b95b87437ef9a2b01cd6b4270))
+
 ## [1.54.3](https://github.com/JacobPEvans/nix-ai/compare/v1.54.2...v1.54.3) (2026-04-25)
 
 
