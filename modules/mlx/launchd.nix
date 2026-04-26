@@ -82,6 +82,13 @@ in
       run ${pkgs.python3}/bin/python3 "${./seed-config.py}" "${llamaSwapConfigFile}" "${llamaSwapRuntimeConfigPath}"
     '';
 
+    home.activation.discoverMlxModels = lib.hm.dag.entryAfter [ "seedLlamaSwapConfig" ] ''
+      export MLX_HF_HOME="${cfg.huggingFaceHome}"
+      export MLX_LLAMA_SWAP_CONFIG="${llamaSwapRuntimeConfigPath}"
+      export MLX_LLAMA_SWAP_BASE_CONFIG="${llamaSwapConfigFile}"
+      run ${pkgs.python3}/bin/python3 "${./discover-models.py}" --quiet || true
+    '';
+
     launchd.agents.vllm-mlx-logrotate = {
       enable = true;
       config = {
