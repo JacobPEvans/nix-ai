@@ -203,7 +203,13 @@
 
         # Individual modules for selective import
         claude = {
-          imports = [ ./modules/claude ];
+          imports = [
+            ./modules/claude
+            # PAL/MCP runtime previously lived in modules/claude/pal-models.nix;
+            # now sourced from the MCP sub-flake module so it's available even
+            # when Claude is the only homeManagerModule a consumer imports.
+            ./modules/mcp/module.nix
+          ];
           _module.args = {
             inherit
               ai-assistant-instructions
