@@ -109,6 +109,8 @@ let
         url = "anthropics/skills";
       };
     };
+
+    # --- AI/ML ---
     "huggingface-skills" = {
       source = {
         type = "github";

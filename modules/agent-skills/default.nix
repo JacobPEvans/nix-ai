@@ -40,17 +40,20 @@ let
     input:
     let
       skillsPath = "${input}/skills";
-      hasSkills = builtins.pathExists skillsPath;
-      skillDirs =
-        if hasSkills then
-          lib.filterAttrs (_: type: type == "directory") (builtins.readDir skillsPath)
-        else
-          { };
     in
-    lib.mapAttrsToList (name: _: {
-      inherit name;
-      source = "${skillsPath}/${name}/SKILL.md";
-    }) (lib.filterAttrs (name: _: builtins.pathExists "${skillsPath}/${name}/SKILL.md") skillDirs);
+    if builtins.pathExists skillsPath then
+      lib.mapAttrsToList
+        (name: _: {
+          inherit name;
+          source = "${skillsPath}/${name}/SKILL.md";
+        })
+        (
+          lib.filterAttrs (
+            name: type: type == "directory" && builtins.pathExists "${skillsPath}/${name}/SKILL.md"
+          ) (builtins.readDir skillsPath)
+        )
+    else
+      [ ];
 
   # Discovers SKILL.md files from a bare .claude/skills/ directory.
   # Pattern: <repo>/.claude/skills/<skill-name>/SKILL.md
