@@ -84,13 +84,13 @@ in
       '';
 
       # Auto-discover newly downloaded HF models and register them with llama-swap.
-      # Runs after seeding so the runtime config exists. Uses || true so a transient
-      # HF volume absence does not abort the activation.
+      # Runs after seeding so the runtime config exists. The script exits 0 when
+      # the HF volume is absent (scan_models returns []), so no || true needed.
       activation.discoverMlxModels = lib.hm.dag.entryAfter [ "seedLlamaSwapConfig" ] ''
         export MLX_HF_HOME="${cfg.huggingFaceHome}"
         export MLX_LLAMA_SWAP_CONFIG="${llamaSwapRuntimeConfigPath}"
         export MLX_LLAMA_SWAP_BASE_CONFIG="${llamaSwapConfigFile}"
-        run ${pkgs.python3}/bin/python3 "${./discover-models.py}" --quiet || true
+        run ${pkgs.python3}/bin/python3 "${./discover-models.py}" --quiet
       '';
     };
 
