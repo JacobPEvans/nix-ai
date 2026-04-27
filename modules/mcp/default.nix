@@ -100,7 +100,7 @@ in
       "--from"
       "huggingface-mcp-server==0.1.0"
       "--with"
-      "huggingface-hub==1.11.0"
+      "huggingface-hub==1.12.0"
       "huggingface-mcp-server"
     ];
   };
