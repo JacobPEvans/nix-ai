@@ -105,7 +105,7 @@ in
         installOpenWebui = lib.hm.dag.entryAfter [ "writeBoundary" "knownMarketplacesMerge" ] ''
           if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q "^open-webui"; then
             echo "-> Installing open-webui via uv (Python 3.14)..."
-            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "open-webui==0.8.12" --python 3.14
+            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "open-webui==0.9.2" --python 3.14
           fi
         '';
 
