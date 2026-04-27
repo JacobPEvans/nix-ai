@@ -3,11 +3,11 @@
     "ai-assistant-instructions": {
       "flake": false,
       "locked": {
-        "lastModified": 1776544732,
-        "narHash": "sha256-A9ihG1skvNG2WiuQMFw2arwPLFa5c8G9OQyRK9qETwM=",
+        "lastModified": 1777158745,
+        "narHash": "sha256-NqVQO3upbFUHQRU5fvNTSu/CS1v0ZjNLRB/VglW/Kbs=",
         "owner": "JacobPEvans",
         "repo": "ai-assistant-instructions",
-        "rev": "709db03c10deca2a6506992619b00b5de21be0a8",
+        "rev": "414f7272f7937917d75b9ba1e88b460fb6009d51",
         "type": "github"
       },
       "original": {
@@ -19,11 +19,11 @@
     "anthropic-agent-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1776366777,
-        "narHash": "sha256-BMgH43diojdUrGC6ivk87eEm2W1yWNuh2fpR9JpbUnE=",
+        "lastModified": 1776964038,
+        "narHash": "sha256-xFsg66TCtKzSgRIW6Ab771FWEIhei3jPgfE4byMiB44=",
         "owner": "anthropics",
         "repo": "skills",
-        "rev": "2c7ec5e78b8e5d43ea02e90bb8826f6b9f147b0c",
+        "rev": "5128e1865d670f5d6c9cef000e6dfc4e951fb5b9",
         "type": "github"
       },
       "original": {
@@ -67,11 +67,11 @@
     "bitwarden-marketplace": {
       "flake": false,
       "locked": {
-        "lastModified": 1776443846,
-        "narHash": "sha256-yR4BS3Q6KuIZbNPoN9uu4KOZm4u/LyavfWgvZ0TyAbI=",
+        "lastModified": 1777017020,
+        "narHash": "sha256-FWZRq53J9JZAA7iLCVI52fgtkjlbVLk+83i/T80O/QI=",
         "owner": "bitwarden",
         "repo": "ai-plugins",
-        "rev": "565083b273d347d7f41d9fdfb759932d5c34dc2c",
+        "rev": "fc8eea80fff88b77592c65f25256df6e095fa28f",
         "type": "github"
       },
       "original": {
@@ -83,11 +83,11 @@
     "browser-use-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1776292728,
-        "narHash": "sha256-inklr1ZKtsse35V+8mqAmPxZyVyyIa0mCW1jH22ZbYo=",
+        "lastModified": 1777222747,
+        "narHash": "sha256-sKL1Sct9vON0WwuRfCIipAkRfwdC4/CNOB+yo0qqcTQ=",
         "owner": "browser-use",
         "repo": "browser-use",
-        "rev": "702b7352c3dc1d39ab8daef2f076dfe7adcfa1c3",
+        "rev": "d19ec6ef20e5c68bf4ca198e8b0b5aea69280fe6",
         "type": "github"
       },
       "original": {
@@ -131,11 +131,11 @@
     "claude-code-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1776476065,
-        "narHash": "sha256-Sle1bvuZIJba9B4/PD1ZK89XkrSbPERstcY/kvr6Wcc=",
+        "lastModified": 1777082107,
+        "narHash": "sha256-Y8wAKKd+PB5YvSUtzBR2BPL37PyD0oXIdTud1uo5xwg=",
         "owner": "anthropics",
         "repo": "claude-code",
-        "rev": "0385848b4e737831fc3b973d9a78d31950a87d9d",
+        "rev": "7e936457e4e3899460b2be2f2b9b9f0b0174e859",
         "type": "github"
       },
       "original": {
@@ -147,11 +147,11 @@
     "claude-code-plugins-plus": {
       "flake": false,
       "locked": {
-        "lastModified": 1776450457,
-        "narHash": "sha256-DrxbaTtGMmyHQ+91tDrWqvvsqxfNDe3UwRjHKItDR1s=",
+        "lastModified": 1776921897,
+        "narHash": "sha256-wDfJFzpqRYnwktYgF0n7p4TbuZOOFkARh8OhyS1q8s0=",
         "owner": "jeremylongshore",
         "repo": "claude-code-plugins-plus",
-        "rev": "5585c45cec7044807944472b3286ec94e40bb24f",
+        "rev": "3076d78733bbdec692738872e8c960f95019449d",
         "type": "github"
       },
       "original": {
@@ -163,11 +163,11 @@
     "claude-code-workflows": {
       "flake": false,
       "locked": {
-        "lastModified": 1776537034,
-        "narHash": "sha256-SLTEC1rB1dwVcMhitlDp1hjB/fczhefCoAQNJqUJ/ns=",
+        "lastModified": 1777236151,
+        "narHash": "sha256-Yw6yFRqpx2//EcrWUdPvNKxrQzhYUHdKyVNQ8hPKvTc=",
         "owner": "wshobson",
         "repo": "agents",
-        "rev": "27a7ed95755a5c3a2948694343a8e2cd7a7ef6fb",
+        "rev": "adde832d8fc08cfb22ab44ec14661293c7ad9153",
         "type": "github"
       },
       "original": {
@@ -195,11 +195,11 @@
     "claude-plugins-official": {
       "flake": false,
       "locked": {
-        "lastModified": 1776459805,
-        "narHash": "sha256-cAaazLUwLF/c09g2FlDmeC3ZQ/nzp4yTEOa+LTQk+rM=",
+        "lastModified": 1776980748,
+        "narHash": "sha256-ywyOB23pJaOQHf2nPvis1fNqpNPVUM59upxETzl6KCw=",
         "owner": "anthropics",
         "repo": "claude-plugins-official",
-        "rev": "bb7730114d873b91acd477e696066f217f882391",
+        "rev": "020446a4294f09d9c32e60bff0c4ae8fb39205cb",
         "type": "github"
       },
       "original": {
@@ -281,11 +281,11 @@
     "jacobpevans-cc-plugins": {
       "flake": false,
       "locked": {
-        "lastModified": 1776602264,
-        "narHash": "sha256-DJnFVyQdb7eNhZkX/HRwUziqkAz8JrPbd681lYh8jxE=",
+        "lastModified": 1777155001,
+        "narHash": "sha256-y/eGb8TWfkDNLP3oPelQFogdYhdiZjBG1dvnkbRVIXw=",
         "owner": "JacobPEvans",
         "repo": "claude-code-plugins",
-        "rev": "31aa116c9ab77d677378440085c65e3158a2d1a2",
+        "rev": "601b9d3a5cd2d252ff28858122d05c32883fc697",
         "type": "github"
       },
       "original": {
@@ -297,11 +297,11 @@
     "lunar-claude": {
       "flake": false,
       "locked": {
-        "lastModified": 1776435103,
-        "narHash": "sha256-/H7oGbcxbfwqAUItC+2J1Q4fZ61j955oSTAzMW0td20=",
+        "lastModified": 1777228212,
+        "narHash": "sha256-m8yo8zsWqCcPyRJ88G7pHF0IfrgD/eaHffP0SapKmFM=",
         "owner": "basher83",
         "repo": "lunar-claude",
-        "rev": "95ab33f9811810358f9ce3f3694f2134974f5b1f",
+        "rev": "febf0e5dcd5d1946582a0df0cf25b280b19b1a67",
         "type": "github"
       },
       "original": {
@@ -312,11 +312,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1776627215,
-        "narHash": "sha256-ZcidYIfJuwPXIytFdbMUSzjSV+wOk2d4mOnSjGEjZEg=",
+        "lastModified": 1777014176,
+        "narHash": "sha256-OzisFv/K6SRIKNOUsR+9Xij/HnS+UqXWhrheEHPJJ3E=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "755a5bb0f3890c8cbe3f14c53e8e3ec80a24d55c",
+        "rev": "3f05c8657c7016fb8cfec9ca06dac066cdeddb91",
         "type": "github"
       },
       "original": {
