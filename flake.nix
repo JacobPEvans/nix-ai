@@ -211,7 +211,10 @@
 
         # Individual modules for selective import
         claude = {
-          imports = [ ./modules/claude ];
+          imports = [
+            ./modules/mcp
+            ./modules/claude
+          ];
           _module.args = {
             inherit
               ai-assistant-instructions
@@ -230,8 +233,13 @@
           };
         };
 
+        mcp = {
+          imports = [ ./modules/mcp ];
+        };
+
         codex = {
           imports = [
+            ./modules/mcp
             ./modules/agent-skills
             ./modules/codex
           ];
@@ -245,6 +253,7 @@
 
         gemini = {
           imports = [
+            ./modules/mcp
             ./modules/agent-skills
             ./modules/gemini
           ];

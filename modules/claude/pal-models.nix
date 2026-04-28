@@ -61,7 +61,7 @@ in
   config = lib.mkMerge [
     {
       # Install palPkg and pal-mcp wrapper unconditionally — needed by Codex and
-      # Gemini MCP config (mcp/default.nix: `command = "pal-mcp"`) even when
+      # Gemini MCP config (`programs.aiMcp.servers.pal.command = "pal-mcp"`) even when
       # programs.claude.enable = false. Previously only doppler-mcp was unconditional;
       # moving to the wrapper pattern must preserve that availability.
       home.packages = [
