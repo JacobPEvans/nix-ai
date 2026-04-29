@@ -164,59 +164,13 @@
     '')
 
     # ==========================================================================
-    # Doppler MCP Wrapper
+    # MCP Runtime Wrappers — moved to modules/mcp/module.nix (sub-flake)
     # ==========================================================================
-    # Wraps any MCP server command with Doppler secret injection.
-    # Fetches secrets from the ai-ci-automation project at subprocess launch time.
-    # Used by mcp/default.nix withDoppler helper — secrets never stored in plaintext.
-    # Usage: doppler-mcp <command> [args...]
-    #
-    # Logs invocations (command + args) to $XDG_STATE_HOME/doppler-mcp.log.
-    # Doppler auth errors go to stderr (handled by `doppler run` natively).
-    #
-    # IMPORTANT: No synchronous preflight check. A `doppler run -- true` preflight
-    # used to run here, but it caused 100% MCP startup failures in Claude Code.
-    # When Claude Code launches ~17 servers in parallel, the preflight's Doppler API
-    # round-trip (fetching secrets just to run `true`) delayed the MCP server's stdio
-    # handshake past Claude Code's connection timeout. The preflight also fetched
-    # secrets TWICE — once for the check, once for the real `exec doppler run`.
-    # Since `doppler run` already exits non-zero on auth failure with a clear error
-    # message, the preflight provided no safety benefit — just latency.
-    # Removed 2026-03-25. See modules/mcp/README.md → Troubleshooting.
-    (writeShellApplication {
-      name = "doppler-mcp";
-      runtimeInputs = [ doppler ];
-      text = builtins.readFile ./mcp/scripts/doppler-mcp.sh;
-    })
-
-    # sync-mlx-models moved to modules/claude/pal-models.nix
-    # (needs MLX config access for dynamic model discovery)
-
-    # ==========================================================================
-    # Check PAL MCP Health
-    # ==========================================================================
-    # Verifies that doppler-mcp can authenticate and access PAL secrets.
-    # Run after a darwin-rebuild switch to confirm the PAL MCP server will start.
-    # Also useful for diagnosing why PAL is absent from Claude Code sessions.
-    (writeShellApplication {
-      name = "check-pal-mcp";
-      runtimeInputs = [ doppler ];
-      text = builtins.readFile ./mcp/scripts/check-pal-mcp.sh;
-    })
-
-    # ==========================================================================
-    # Splunk MCP Connect Wrapper
-    # ==========================================================================
-    # Wraps the Splunk MCP Server App connection via mcp-remote stdio proxy.
-    # Reads SPLUNK_MCP_ENDPOINT and SPLUNK_MCP_TOKEN from env (injected by
-    # doppler-mcp from Doppler ai-ci-automation/prd project).
-    # MCP server entry: nix-darwin hosts/macbook-m4/home.nix (infrastructure, not AI-specific)
-    # Usage: splunk-mcp-connect (no args — called by Claude Code MCP server config)
-    (writeShellApplication {
-      name = "splunk-mcp-connect";
-      runtimeInputs = [ bun ];
-      text = builtins.readFile ./mcp/scripts/splunk-mcp-connect.sh;
-    })
+    # The doppler-mcp, check-pal-mcp, splunk-mcp-connect, sync-mlx-models, and
+    # sync-pal-cloud-models wrappers are now provided by the MCP sub-flake's
+    # home-manager module (modules/mcp/module.nix). This keeps all MCP runtime
+    # infrastructure self-contained inside the sub-flake so it can be consumed
+    # cross-flake without a hidden dependency on this file.
 
     # ==========================================================================
     # HuggingFace Hub CLI

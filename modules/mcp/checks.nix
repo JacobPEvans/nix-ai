@@ -1,7 +1,14 @@
-# PAL MCP package build-time checks
+# PAL MCP package + script checks
+#
+# Runs at `nix flake check` time inside the MCP sub-flake. Validates that:
+#   - pal-mcp-server builds and produces an executable binary
+#   - sync-pal-cloud-models.sh passes shellcheck
+#
+# Exposed via `checks.<sys>.*` from `./flake.nix`. The home-manager module
+# evaluation tests for nix-ai live in `nix-ai/lib/checks/` (consumer-side).
 { pkgs, pal-mcp-server }:
 let
-  palPkg = pkgs.callPackage ../../modules/mcp/pal-package.nix { inherit pal-mcp-server; };
+  palPkg = pkgs.callPackage ./pal-package.nix { inherit pal-mcp-server; };
 in
 {
   # Verify pal-mcp-server builds and produces an executable binary.
@@ -23,7 +30,7 @@ in
         nativeBuildInputs = [ pkgs.shellcheck ];
       }
       ''
-        shellcheck --severity=warning --exclude=SC1091 ${../../modules/mcp/scripts/sync-pal-cloud-models.sh}
+        shellcheck --severity=warning --exclude=SC1091 ${./scripts/sync-pal-cloud-models.sh}
         echo "PAL cloud sync: shellcheck passed"
         touch $out
       '';

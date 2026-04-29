@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.57.0](https://github.com/JacobPEvans/nix-ai/compare/v1.56.1...v1.57.0) (2026-04-29)
+
+
+### Features
+
+* **mcp:** self-contained sub-flake + lib.aiCommon for cross-flake consumption ([#643](https://github.com/JacobPEvans/nix-ai/issues/643)) ([52aae1d](https://github.com/JacobPEvans/nix-ai/commit/52aae1d98505614bdea11daf0b7cd5818e9fde33))
+
 ## [1.56.1](https://github.com/JacobPEvans/nix-ai/compare/v1.56.0...v1.56.1) (2026-04-29)
 
 

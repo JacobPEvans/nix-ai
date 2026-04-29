@@ -1,5 +1,7 @@
 # nix-ai
 
+[![CI](https://github.com/JacobPEvans/nix-ai/actions/workflows/ci-gate.yml/badge.svg)](https://github.com/JacobPEvans/nix-ai/actions/workflows/ci-gate.yml)
+
 ## Your AI coding toolkit, declared once. Reproduced everywhere
 
 Ever spent hours configuring Claude Code plugins, Gemini settings, and MCP servers

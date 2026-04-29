@@ -1,5 +1,6 @@
 # Nix quality checks - thin aggregator
-# Individual check groups live in lib/checks/{lint,claude,agent-skills,codex,gemini,mlx,pal,fabric}.nix
+# Individual check groups live in lib/checks/{lint,claude,agent-skills,codex,gemini,mlx,fabric}.nix
+# PAL package/script checks live in the MCP sub-flake (modules/mcp/checks.nix).
 {
   pkgs,
   src,
@@ -53,7 +54,7 @@ in
 // (import ./checks/codex.nix { inherit pkgs hmConfig; })
 // (import ./checks/gemini.nix { inherit pkgs hmConfig; })
 // (import ./checks/mlx.nix { inherit pkgs hmConfig; })
-// (import ./checks/pal.nix { inherit pkgs pal-mcp-server; })
+// (import ../modules/mcp/checks.nix { inherit pkgs pal-mcp-server; })
 // (import ./checks/fabric.nix {
   inherit
     pkgs

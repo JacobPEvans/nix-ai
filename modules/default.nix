@@ -82,6 +82,7 @@ in
     ./gemini
     ./fabric
     ./maestro
+    ./mcp/module.nix
     ./mlx
     ./open-webui.nix
     ./routines

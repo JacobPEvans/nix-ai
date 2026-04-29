@@ -37,7 +37,8 @@ in
     ./auto-claude-reporting.nix
     ./menubar.nix
     ./orphan-cleanup.nix
-    ./pal-models.nix
+    # PAL/MCP runtime moved to ../mcp/module.nix (sub-flake) — imported from
+    # modules/default.nix so it's available regardless of which AI tool is enabled.
   ];
 
   config = lib.mkIf cfg.enable {
