@@ -211,7 +211,13 @@
 
         # Individual modules for selective import
         claude = {
-          imports = [ ./modules/claude ];
+          imports = [
+            ./modules/claude
+            # PAL/MCP runtime previously lived in modules/claude/pal-models.nix;
+            # now sourced from the MCP sub-flake module so it's available even
+            # when Claude is the only homeManagerModule a consumer imports.
+            ./modules/mcp/module.nix
+          ];
           _module.args = {
             inherit
               ai-assistant-instructions
@@ -311,6 +317,13 @@
         claude-settings = import ./lib/claude-settings.nix;
         claude-registry = import ./lib/claude-registry.nix;
         versions = import ./lib/versions.nix;
+
+        # Shared permission + formatter engine. Exposed for cross-flake consumers
+        # (e.g., nix-ai-claude) so the source of truth for tool-agnostic command
+        # permissions stays in this flake. Callers pass { lib, config,
+        # ai-assistant-instructions, excludeDenyFiles?, excludeDenyCommands? }
+        # and receive { permissions, formatters } — see modules/common/default.nix.
+        aiCommon = import ./modules/common;
       };
 
       # Quality checks (formatting, linting, dead code, shellcheck, module-eval)
