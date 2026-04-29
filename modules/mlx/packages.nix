@@ -132,7 +132,7 @@ in
         # mlx-bench-raw — raw MLX prefill + decode (no vllm-mlx overhead)
         # renovate: datasource=pypi depName=mlx-lm
         (pkgs.writeShellScriptBin "mlx-bench-raw" ''
-          exec ${pkgs.uv}/bin/uvx --from "mlx-lm==0.31.2" mlx_lm.benchmark "$@"
+          exec ${pkgs.uv}/bin/uvx --from "mlx-lm==0.31.3" mlx_lm.benchmark "$@"
         '')
 
         # mlx-eval — accuracy evaluation against the live vllm-mlx server API
