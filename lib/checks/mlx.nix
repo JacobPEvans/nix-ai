@@ -16,12 +16,14 @@ in
         "defaultModel"
         "enable"
         "enableAutoToolChoice"
+        "enablePrefixCaching"
         "host"
         "huggingFaceHome"
         "maxTokens"
         "maxNumSeqs"
         "memoryHardLimitGb"
         "models"
+        "pagedKvCache"
         "port"
         "prefillBatchSize"
         "proxy"
@@ -69,7 +71,7 @@ in
         {
           name = "mlx.cacheMemoryMb";
           actual = mlxCfg.cacheMemoryMb;
-          expected = 16384;
+          expected = 32768;
         }
         {
           name = "mlx.prefillBatchSize";
@@ -79,12 +81,22 @@ in
         {
           name = "mlx.continuousBatching";
           actual = mlxCfg.continuousBatching;
-          expected = false;
+          expected = true;
         }
         {
           name = "mlx.maxNumSeqs";
           actual = mlxCfg.maxNumSeqs;
-          expected = null;
+          expected = 4;
+        }
+        {
+          name = "mlx.enablePrefixCaching";
+          actual = mlxCfg.enablePrefixCaching;
+          expected = true;
+        }
+        {
+          name = "mlx.pagedKvCache";
+          actual = mlxCfg.pagedKvCache;
+          expected = true;
         }
         {
           name = "mlx.chunkedPrefillTokens";

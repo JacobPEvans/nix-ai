@@ -39,29 +39,46 @@
       description = "Path to HuggingFace model cache (dedicated APFS volume)";
     };
 
-    # ---- vllm-mlx 0.2.6 PERFORMANCE TUNING ----
+    # ---- vllm-mlx 0.2.9 PERFORMANCE TUNING ----
     # Benchmarked 2026-03-19 on M4 Max 128GB with Qwen3.5-122B-A10B-4bit (~65 GB).
     # Memory budgets below reference the 122B MoE model (10B active params, ~20 GB).
     # Baseline: 55-74 tok/s generation, no parallel request benefit (bandwidth-bound).
     #
-    # vllm-mlx 0.2.6 replaced the old token-count KV cache (--max-kv-size) with a
-    # memory-aware cache that auto-sizes based on available RAM and evicts via LRU.
-    # The server default allocates ~20% of RAM (~25.6GB on 128GB), which combined
-    # with ~65GB model weights consumes ~90GB — leaving only ~38GB for macOS + apps.
-    # With 10+ Claude Code sessions this caused V8 OOM crashes and swap exhaustion.
+    # vllm-mlx 0.2.9 adds Paged KV Cache + prefix sharing on top of the
+    # memory-aware cache that auto-sizes based on available RAM. Combined with
+    # iogpu.wired_limit_mb=118000 (set by nix-darwin's apple-silicon-tunables
+    # module) this lets us push the cache budget higher without thrashing.
 
     # cacheMemoryMb — Override the memory-aware cache size (--cache-memory-mb).
-    # Default: 16384 (16GB). Balances prefix cache reuse with OOM prevention.
-    # With a 65GB model, 16GB cache uses ~81GB total, leaving ~47GB on 128GB systems
-    # for macOS + 3 Claude Code sessions. If MLX ever causes another OOM, lower to 8192.
-    # Set to null to restore server auto-detect (~20% RAM = ~25.6GB — too aggressive).
-    # Prevents kernel panic: IOGPUMemory completeMemory() prepare count underflow
-    # on long agentic sessions (58k+ tokens).
+    # Default: 32768 (32GB). Larger cache amortises prefix-cache reuse on
+    # multi-turn agentic workloads. With a 65GB model + 32GB cache the
+    # footprint sits at ~97GB, fitting within the 118GB wired ceiling set by
+    # nix-darwin's apple-silicon-tunables module. Lower to 16384 if reverting.
+    # Set to null to restore server auto-detect (~20% RAM = ~25.6GB).
     # Ref: https://github.com/ml-explore/mlx-lm/issues/883
     cacheMemoryMb = lib.mkOption {
       type = lib.types.nullOr lib.types.ints.positive;
-      default = 16384;
-      description = "Cache memory limit in MB. Null = auto-detect (~20% RAM). Default 16GB prevents OOM with large models. Lower to 8192 if OOM recurs.";
+      default = 32768;
+      description = "Cache memory limit in MB. Null = auto-detect. Default 32GB amortises prefix-cache reuse on multi-turn workloads.";
+    };
+
+    # enablePrefixCaching — Enable prefix sharing across requests (--enable-prefix-caching).
+    # New in vllm-mlx 0.2.9. Eliminates re-prefill of unchanged conversation
+    # context — the single biggest speed win for multi-turn tool-calling workloads.
+    # Pairs with pagedKvCache.
+    enablePrefixCaching = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Enable prefix sharing across requests. New in 0.2.9.";
+    };
+
+    # pagedKvCache — Use paged KV cache (--paged-kv-cache).
+    # New in vllm-mlx 0.2.9. Required for prefix sharing (enablePrefixCaching).
+    # Distinct from the legacy --use-paged-cache experimental flag.
+    pagedKvCache = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Use paged KV cache. New in 0.2.9. Required for prefix sharing.";
     };
 
     # prefillBatchSize — Batch size for prompt prefill processing (--prefill-batch-size).
@@ -75,12 +92,10 @@
       description = "Prefill batch size (tokens). Null = server default. Larger = faster TTFT, more memory.";
     };
 
-    # ---- CONCURRENCY & BATCHING OPTIONS (vllm-mlx 0.2.6) ----
+    # ---- CONCURRENCY & BATCHING OPTIONS (vllm-mlx 0.2.9) ----
     # Complete parameter reference from `vllm-mlx serve --help`.
-    # Each option explains what it does, the server default, why it defaults to off,
-    # and when to enable it. Raw option defaults mirror conservative server
-    # behavior. Keep continuous batching opt-in until the current Qwen3.5/Gemma
-    # MLLM batching path can pass parallel request validation.
+    # 0.2.9 fixed the 0.2.8 MLLM detection bug for Qwen3-class models, so
+    # continuous batching + maxNumSeqs are now defaults rather than opt-in.
 
     # ---- ACTIVE TUNING (uncomment to override server defaults) ----
 
@@ -95,24 +110,24 @@
     # };
 
     # continuousBatching — Enable continuous batching (--continuous-batching).
-    # Server default: disabled. Improves multi-user throughput by interleaving
-    # prefill and decode across requests, but adds scheduling overhead for
-    # single-user workloads (~5% slower per-request in isolation).
-    # Option default: false. Validate with the target model before enabling.
+    # Improves multi-user throughput by interleaving prefill and decode across
+    # requests. The 0.2.8 MLLM-detection bug for Qwen3-class models is fixed
+    # in 0.2.9, so this is now safe to default on. Pairs with maxNumSeqs to
+    # bound concurrent memory pressure.
     continuousBatching = lib.mkOption {
       type = lib.types.bool;
-      default = false;
-      description = "Enable continuous batching. Better multi-user throughput, slight single-user overhead.";
+      default = true;
+      description = "Enable continuous batching. Better throughput across concurrent requests.";
     };
 
     # maxNumSeqs — Max concurrent sequences (--max-num-seqs).
-    # Server default: unset (no limit). Caps parallel request handling.
-    # Option default: null (no limit). Set to 2-8 when enabling continuousBatching
-    # to control memory pressure from concurrent requests.
+    # Default: 4 — bounds memory pressure when continuousBatching is on. With
+    # 32GB cache + prefix sharing, 4 concurrent sequences fit comfortably even
+    # on the 122B MoE model.
     maxNumSeqs = lib.mkOption {
       type = lib.types.nullOr lib.types.ints.positive;
-      default = null;
-      description = "Max concurrent sequences. Null = no limit. Set with continuousBatching.";
+      default = 4;
+      description = "Max concurrent sequences. Default 4 bounds memory pressure with continuousBatching.";
     };
 
     # chunkedPrefillTokens — Max prefill tokens per scheduler step (--chunked-prefill-tokens).
@@ -261,15 +276,13 @@
 
     # reasoningParser — Reasoning content extraction (--reasoning-parser).
     # Extracts <think>...</think> into structured reasoning_content field.
-    # DISABLED: vllm-mlx 0.2.6 has a bug where --reasoning-parser and
-    # --tool-call-parser are mutually exclusive in streaming mode (server.py
-    # L1920-1946 bypasses the tool parser when reasoning parser is active).
-    # This breaks any consumer relying on streaming tool_calls (e.g., agent
-    # frameworks that send stream:true with tools and expect structured
-    # choice.delta.tool_calls in SSE chunks).
+    # DISABLED PENDING VERIFICATION: vllm-mlx 0.2.6 had a bug where
+    # --reasoning-parser and --tool-call-parser were mutually exclusive in
+    # streaming mode (server.py bypassed the tool parser when reasoning parser
+    # was active). 0.2.9 may have fixed this — re-enable cautiously after
+    # verifying that streaming tool_calls still work for Qwen3-class models.
     # Without this flag, <think> blocks still appear in content text — most
     # consumers parse them from text as a fallback.
-    # Re-enable when vllm-mlx integrates both parsers in the streaming path.
     reasoningParser = lib.mkOption {
       type = lib.types.nullOr (
         lib.types.enum [
@@ -415,12 +428,13 @@
           "warn"
           "error"
         ];
-        default = "debug";
+        default = "info";
         description = ''
-          llama-swap log verbosity. "debug" logs every proxied HTTP
-          request/response body (prompts and completions), making
-          `curl http://127.0.0.1:11434/logs/stream` a live I/O tap.
-          Set to "info" to suppress request bodies and reduce log volume.
+          llama-swap log verbosity. "info" is the production default — keeps
+          model load events and swap transitions visible without dumping every
+          weight tensor name. Switch to "debug" only when actively diagnosing
+          proxy behaviour (logs every proxied HTTP request/response body and
+          makes `curl http://127.0.0.1:11434/logs/stream` a live I/O tap).
           Note: debug output rotates within the 10 MB LaunchAgent log limit.
         '';
       };

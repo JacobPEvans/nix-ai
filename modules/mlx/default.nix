@@ -5,7 +5,7 @@
   ...
 }:
 #
-# MLX Inference Server Module (vllm-mlx 0.2.6 + llama-swap proxy)
+# MLX Inference Server Module (vllm-mlx 0.2.9 + llama-swap proxy)
 #
 # Manages the MLX inference stack as a macOS LaunchAgent for Apple Silicon.
 # MLX is ~2x faster than llama.cpp for token generation on M4 Max with ~50% less memory.
@@ -26,20 +26,25 @@
 #
 # Models stored on dedicated APFS volume: /Volumes/HuggingFace
 #
-# Parameter reference: vllm-mlx 0.2.6 `serve --help` output (captured from local binary).
+# Parameter reference: vllm-mlx 0.2.9 `serve --help` output (captured from local binary).
 #
 let
   cfg = config.programs.mlx;
 
   # Pinned versions — single source of truth. Shared via mlxShared so
   # packages.nix uses the same values without duplication.
+  #
+  # Version history (kept above the renovate directive so the regex still
+  # matches the line immediately above the version pin):
+  #   - 0.2.6: stable baseline.
+  #   - 0.2.7: regressed vllm_mlx/utils/tokenizer.py::load_model_with_fallback
+  #     (the success path forgot to return, yielding None implicitly).
+  #   - 0.2.8: fixed that regression but mis-detected Qwen3.5 as MLLM and its
+  #     MLLM continuous-batching path failed parallel text requests.
+  #   - 0.2.9: ships Paged KV Cache + prefix sharing + continuous batching
+  #     (MLLM-detection bug fixed). Loads gemma-4-e4b architectures.
   # renovate: datasource=pypi depName=vllm-mlx
-  # Pinned to 0.2.6: 0.2.7 introduced a regression in
-  # vllm_mlx/utils/tokenizer.py::load_model_with_fallback where the success
-  # path `model, tokenizer = load(...)` forgot to return, returning None
-  # implicitly. 0.2.8 fixes that regression, but detects Qwen3.5 as MLLM and
-  # its MLLM continuous-batching path fails parallel text requests.
-  vllmMlxVersion = "0.2.6";
+  vllmMlxVersion = "0.2.9";
   # renovate: datasource=pypi depName=parakeet-mlx
   parakeetMlxVersion = "0.5.1";
   # renovate: datasource=pypi depName=mlx-vlm
@@ -80,6 +85,8 @@ let
           (toString cfg.prefillBatchSize)
         ]
         ++ lib.optionals cfg.continuousBatching [ "--continuous-batching" ]
+        ++ lib.optionals cfg.enablePrefixCaching [ "--enable-prefix-caching" ]
+        ++ lib.optionals cfg.pagedKvCache [ "--paged-kv-cache" ]
         ++ lib.optionals (cfg.maxNumSeqs != null) [
           "--max-num-seqs"
           (toString cfg.maxNumSeqs)
