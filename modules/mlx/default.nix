@@ -121,20 +121,13 @@ let
   roleModels = config.services.aiStack.models;
 
   # Group roles by physical model. One backend serves many role aliases.
-  rolesByPhysical = lib.foldl' (
-    acc: role:
-    let
-      physical = roleModels.${role};
-      prior = acc.${physical} or [ ];
-    in
-    acc // { ${physical} = prior ++ [ role ]; }
-  ) { } (lib.attrNames roleModels);
+  rolesByPhysical = lib.groupBy (role: roleModels.${role}) (lib.attrNames roleModels);
 
   # One entry per unique physical model. The entry owning the "default"
   # alias is preloaded; others inherit the proxy idle TTL.
   registryModels = lib.mapAttrs (physical: roles: {
     cmd = mkVllmCmd physical;
-    ttl = builtins.elemAt [ cfg.proxy.idleTtl 0 ] (lib.boolToInt (builtins.elem "default" roles));
+    ttl = if builtins.elem "default" roles then 0 else cfg.proxy.idleTtl;
     env = [ "HF_HOME=${cfg.huggingFaceHome}" ];
     checkEndpoint = "/v1/models";
     aliases = roles;
@@ -149,7 +142,7 @@ let
         + lib.optionalString (modelCfg.extraArgs != [ ]) (
           " " + lib.concatStringsSep " " modelCfg.extraArgs
         );
-      ttl = builtins.elemAt [ cfg.proxy.idleTtl modelCfg.ttl ] (lib.boolToInt (modelCfg.ttl > 0));
+      ttl = if modelCfg.ttl > 0 then modelCfg.ttl else cfg.proxy.idleTtl;
       env = [ "HF_HOME=${cfg.huggingFaceHome}" ];
       checkEndpoint = "/v1/models";
     }
