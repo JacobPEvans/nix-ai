@@ -32,14 +32,18 @@
 
     defaultModel = lib.mkOption {
       type = lib.types.str;
-      default = "mlx-community/Qwen3.5-122B-A10B-4bit";
+      default = "default";
       description = ''
         Default model fabric should use when no `--model` flag is specified.
 
-        Routes through the local MLX stack at http://127.0.0.1:11434/v1 by default.
-        Override to use a cloud provider model (e.g. "claude-3-5-sonnet-20241022",
-        "gpt-4o", "gemini-1.5-pro") but be aware fabric needs API keys configured
-        in ~/.config/fabric/.env for those backends.
+        Defaults to the role name "default" so fabric, llama-swap, and the
+        rest of the AI stack share a single source of truth in
+        services.aiStack.models. Routes through the local MLX stack at
+        http://127.0.0.1:11434/v1.
+
+        Override to a cloud provider model name (e.g. "claude-3-5-sonnet-20241022",
+        "gpt-4o", "gemini-1.5-pro") but be aware fabric needs API keys
+        configured in ~/.config/fabric/.env for those backends.
       '';
     };
 
