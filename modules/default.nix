@@ -74,6 +74,7 @@ in
 {
   imports = [
     ./ai-shell.nix
+    ./ai-stack
     ./agent-skills
     ./claude
     ./claude-latest.nix

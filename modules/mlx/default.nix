@@ -5,7 +5,7 @@
   ...
 }:
 #
-# MLX Inference Server Module (vllm-mlx 0.2.6 + llama-swap proxy)
+# MLX Inference Server Module (vllm-mlx 0.2.9 + llama-swap proxy)
 #
 # Manages the MLX inference stack as a macOS LaunchAgent for Apple Silicon.
 # MLX is ~2x faster than llama.cpp for token generation on M4 Max with ~50% less memory.
@@ -26,20 +26,25 @@
 #
 # Models stored on dedicated APFS volume: /Volumes/HuggingFace
 #
-# Parameter reference: vllm-mlx 0.2.6 `serve --help` output (captured from local binary).
+# Parameter reference: vllm-mlx 0.2.9 `serve --help` output (captured from local binary).
 #
 let
   cfg = config.programs.mlx;
 
   # Pinned versions — single source of truth. Shared via mlxShared so
   # packages.nix uses the same values without duplication.
+  #
+  # Version history (kept above the renovate directive so the regex still
+  # matches the line immediately above the version pin):
+  #   - 0.2.6: stable baseline.
+  #   - 0.2.7: regressed vllm_mlx/utils/tokenizer.py::load_model_with_fallback
+  #     (the success path forgot to return, yielding None implicitly).
+  #   - 0.2.8: fixed that regression but mis-detected Qwen3.5 as MLLM and its
+  #     MLLM continuous-batching path failed parallel text requests.
+  #   - 0.2.9: ships Paged KV Cache + prefix sharing + continuous batching
+  #     (MLLM-detection bug fixed). Loads gemma-4-e4b architectures.
   # renovate: datasource=pypi depName=vllm-mlx
-  # Pinned to 0.2.6: 0.2.7 introduced a regression in
-  # vllm_mlx/utils/tokenizer.py::load_model_with_fallback where the success
-  # path `model, tokenizer = load(...)` forgot to return, returning None
-  # implicitly. 0.2.8 fixes that regression, but detects Qwen3.5 as MLLM and
-  # its MLLM continuous-batching path fails parallel text requests.
-  vllmMlxVersion = "0.2.6";
+  vllmMlxVersion = "0.2.9";
   # renovate: datasource=pypi depName=parakeet-mlx
   parakeetMlxVersion = "0.5.1";
   # renovate: datasource=pypi depName=mlx-vlm
@@ -80,6 +85,8 @@ let
           (toString cfg.prefillBatchSize)
         ]
         ++ lib.optionals cfg.continuousBatching [ "--continuous-batching" ]
+        ++ lib.optionals cfg.enablePrefixCaching [ "--enable-prefix-caching" ]
+        ++ lib.optionals cfg.pagedKvCache [ "--paged-kv-cache" ]
         ++ lib.optionals (cfg.maxNumSeqs != null) [
           "--max-num-seqs"
           (toString cfg.maxNumSeqs)
@@ -109,15 +116,24 @@ let
     in
     "${baseCmd}${lib.optionalString (flags != "") " ${flags}"}";
 
-  # Default model entry — always loaded at startup, never auto-unloaded.
-  defaultModelEntry = {
-    cmd = mkVllmCmd cfg.defaultModel;
-    ttl = 0;
+  # Role registry (services.aiStack.models): role-name -> physical model ID.
+  # Single source of truth.
+  roleModels = config.services.aiStack.models;
+
+  # Group roles by physical model. One backend serves many role aliases.
+  rolesByPhysical = lib.groupBy (role: roleModels.${role}) (lib.attrNames roleModels);
+
+  # One entry per unique physical model. The entry owning the "default"
+  # alias is preloaded; others inherit the proxy idle TTL.
+  registryModels = lib.mapAttrs (physical: roles: {
+    cmd = mkVllmCmd physical;
+    ttl = if builtins.elem "default" roles then 0 else cfg.proxy.idleTtl;
     env = [ "HF_HOME=${cfg.huggingFaceHome}" ];
     checkEndpoint = "/v1/models";
-  };
+    aliases = roles;
+  }) rolesByPhysical;
 
-  # Additional model entries from cfg.models — loaded on demand, unloaded after idleTtl.
+  # Additional ad-hoc models from cfg.models (existing extension point).
   additionalModels = lib.mapAttrs (
     name: modelCfg:
     {
@@ -135,10 +151,7 @@ let
     }
   ) cfg.models;
 
-  allModels = {
-    "${cfg.defaultModel}" = defaultModelEntry;
-  }
-  // additionalModels;
+  allModels = registryModels // additionalModels;
 
   llamaSwapConfigAttrs = {
     inherit (cfg.proxy) healthCheckTimeout logLevel logToStdout;
@@ -156,7 +169,9 @@ let
       members = builtins.attrNames allModels;
     };
 
-    hooks.on_startup.preload = [ cfg.defaultModel ];
+    # Preload by role, not physical name. llama-swap resolves "default"
+    # via the alias table on the registryModels entry.
+    hooks.on_startup.preload = [ "default" ];
   };
 
   # Use pkgs.writeText (not builtins.toFile) because content references store paths
@@ -188,4 +203,19 @@ in
       llamaSwapRuntimeConfigPath
       ;
   };
+
+  # Enforce documented option dependencies. Without these, vllm-mlx silently
+  # mis-behaves when consumers flip one boolean and forget the partner.
+  assertions = lib.optionals cfg.enable [
+    {
+      assertion = !cfg.enablePrefixCaching || cfg.pagedKvCache;
+      message = ''
+        programs.mlx.enablePrefixCaching requires programs.mlx.pagedKvCache to
+        also be true. vllm-mlx 0.2.9 builds the prefix-sharing index inside
+        the paged KV cache; turning prefix caching on without paged KV cache
+        either fails to start or silently drops the prefix-share path.
+        Either set both to true (the defaults) or both to false.
+      '';
+    }
+  ];
 }

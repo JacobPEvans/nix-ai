@@ -73,17 +73,17 @@ in
     pal = {
       mlxDefaultModel = lib.mkOption {
         type = lib.types.str;
-        default = lib.attrByPath [
-          "programs"
-          "mlx"
-          "defaultModel"
-        ] "mlx-community/Qwen3.5-27B-4bit" config;
-        defaultText = lib.literalExpression ''
-          config.programs.mlx.defaultModel or "mlx-community/Qwen3.5-27B-4bit"
-        '';
+        default = "default";
         description = ''
-          MLX default model name (HuggingFace path, no `mlx-local/` prefix).
-          The pal-mcp wrapper prepends `mlx-local/` for Bifrost routing.
+          MLX default model identifier (no `mlx-local/` prefix; the pal-mcp
+          wrapper prepends that for Bifrost routing).
+
+          Defaults to the role name "default" so pal-mcp / Bifrost route
+          through services.aiStack.models, the role registry. llama-swap
+          resolves "default" via its alias table to whatever physical
+          mlx-community/* model the registry maps to. Override only when
+          temporarily pinning pal-mcp to a specific physical model that
+          should not appear in the role registry.
         '';
       };
 
