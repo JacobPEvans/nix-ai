@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.58.0](https://github.com/JacobPEvans/nix-ai/compare/v1.57.0...v1.58.0) (2026-04-29)
+
+
+### Features
+
+* **mlx:** :sparkles: bump vllm-mlx 0.2.6 → 0.2.9 with prefix caching ([#665](https://github.com/JacobPEvans/nix-ai/issues/665)) ([86245e0](https://github.com/JacobPEvans/nix-ai/commit/86245e06699310dd4e096ce5403d7b468ebc71cb))
+
 ## [1.57.0](https://github.com/JacobPEvans/nix-ai/compare/v1.56.1...v1.57.0) (2026-04-29)
 
 
