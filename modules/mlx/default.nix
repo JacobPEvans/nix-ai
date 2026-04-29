@@ -132,18 +132,13 @@ let
 
   # One entry per unique physical model. The entry owning the "default"
   # alias is preloaded; others inherit the proxy idle TTL.
-  registryModels = lib.mapAttrs (
-    physical: roles:
-    {
-      cmd = mkVllmCmd physical;
-      ttl = builtins.elemAt [ cfg.proxy.idleTtl 0 ] (
-        lib.boolToInt (builtins.elem "default" roles)
-      );
-      env = [ "HF_HOME=${cfg.huggingFaceHome}" ];
-      checkEndpoint = "/v1/models";
-      aliases = roles;
-    }
-  ) rolesByPhysical;
+  registryModels = lib.mapAttrs (physical: roles: {
+    cmd = mkVllmCmd physical;
+    ttl = builtins.elemAt [ cfg.proxy.idleTtl 0 ] (lib.boolToInt (builtins.elem "default" roles));
+    env = [ "HF_HOME=${cfg.huggingFaceHome}" ];
+    checkEndpoint = "/v1/models";
+    aliases = roles;
+  }) rolesByPhysical;
 
   # Additional ad-hoc models from cfg.models (existing extension point).
   additionalModels = lib.mapAttrs (
@@ -154,9 +149,7 @@ let
         + lib.optionalString (modelCfg.extraArgs != [ ]) (
           " " + lib.concatStringsSep " " modelCfg.extraArgs
         );
-      ttl = builtins.elemAt [ cfg.proxy.idleTtl modelCfg.ttl ] (
-        lib.boolToInt (modelCfg.ttl > 0)
-      );
+      ttl = builtins.elemAt [ cfg.proxy.idleTtl modelCfg.ttl ] (lib.boolToInt (modelCfg.ttl > 0));
       env = [ "HF_HOME=${cfg.huggingFaceHome}" ];
       checkEndpoint = "/v1/models";
     }

@@ -12,17 +12,12 @@
 
     defaultModel = lib.mkOption {
       type = lib.types.str;
-      default = config.services.aiStack.models.default;
+      inherit (config.services.aiStack.models) default;
       defaultText = lib.literalExpression "config.services.aiStack.models.default";
       description = ''
         Physical mlx-community/ HuggingFace model ID for the "default" role.
-        Sourced from services.aiStack.models.default — that is the single
-        source of truth for role → physical model mappings. Override here
-        only when temporarily pinning vllm-mlx to a model that should NOT
-        appear in the role registry.
-        Benchmark-driven rationale and historical default-swap context live
-        on the companion dataset:
-        https://huggingface.co/datasets/JacobPEvans/mlx-benchmarks
+        Sourced from services.aiStack.models.default — see
+        nix-ai/modules/ai-stack/default.nix for the registry.
       '';
     };
 
@@ -102,18 +97,6 @@
     # 0.2.9 fixed the 0.2.8 MLLM detection bug for Qwen3-class models, so
     # continuous batching + maxNumSeqs are now defaults rather than opt-in.
 
-    # ---- ACTIVE TUNING (uncomment to override server defaults) ----
-
-    # cacheMemoryPercent — Fraction of available RAM for cache (--cache-memory-percent).
-    # Server default: 0.20. Alternative to cacheMemoryMb for proportional sizing.
-    # Disabled: auto-detect (20%) is appropriate for 128GB with a 70GB model.
-    # Revisit: if switching models or needing finer memory control.
-    # cacheMemoryPercent = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.float;
-    #   default = null;
-    #   description = "Fraction of RAM for cache (0.0-1.0). Alternative to cacheMemoryMb.";
-    # };
-
     # continuousBatching — Enable continuous batching (--continuous-batching).
     # Improves multi-user throughput by interleaving prefill and decode across
     # requests. The 0.2.8 MLLM-detection bug for Qwen3-class models is fixed
@@ -155,16 +138,6 @@
       description = "Completion batch size. Null = server default. Tune with continuousBatching.";
     };
 
-    # streamInterval — Tokens to batch before streaming (--stream-interval).
-    # Server default: unset. 1 = smooth streaming, higher = more throughput.
-    # Disabled: server default is fine for agentic workloads.
-    # Revisit: if latency-sensitive streaming is needed (set to 1).
-    # streamInterval = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.ints.positive;
-    #   default = null;
-    #   description = "Tokens batched before streaming. 1 = smooth, higher = throughput.";
-    # };
-
     # maxTokens — Default max generation length (--max-tokens).
     # Server default: 32768. Only affects requests that omit max_tokens.
     # Some OpenAI-compatible consumers omit max_tokens even when their model
@@ -176,68 +149,6 @@
       default = null;
       description = "Default max tokens when client omits max_tokens. Null = vllm-mlx server default: 32768.";
     };
-
-    # defaultTemperature — Override default temperature (--default-temperature).
-    # Server default: model-dependent. Overrides for all requests without explicit temperature.
-    # Disabled: consumers set temperature explicitly.
-    # Revisit: only if a consumer relies on server defaults.
-    # defaultTemperature = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.float;
-    #   default = null;
-    #   description = "Override default temperature for requests that don't set it.";
-    # };
-
-    # defaultTopP — Override default top_p (--default-top-p).
-    # Server default: model-dependent.
-    # Disabled: consumers set top_p explicitly.
-    # Revisit: same as defaultTemperature.
-    # defaultTopP = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.float;
-    #   default = null;
-    #   description = "Override default top_p for requests that don't set it.";
-    # };
-
-    # timeout — Request timeout in seconds (--timeout).
-    # Server default: 300. Per-request timeout.
-    # Disabled: 300s is generous for agentic workloads.
-    # Revisit: increase if running very long generation requests.
-    # timeout = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.ints.positive;
-    #   default = null;
-    #   description = "Request timeout in seconds. Server default: 300.";
-    # };
-
-    # ---- EXPERIMENTAL ----
-
-    # pagedCache — Use paged KV cache (--use-paged-cache).
-    # Server default: disabled. Experimental paged cache implementation.
-    # Disabled: experimental, memory-aware cache is production-ready.
-    # Revisit: when paged cache graduates from experimental.
-    # pagedCache = lib.mkOption {
-    #   type = lib.types.bool;
-    #   default = false;
-    #   description = "Use experimental paged KV cache.";
-    # };
-
-    # pagedCacheBlockSize — Tokens per cache block (--paged-cache-block-size).
-    # Server default: 64. Only used with pagedCache.
-    # Disabled: pagedCache is experimental.
-    # Revisit: when enabling pagedCache.
-    # pagedCacheBlockSize = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.ints.positive;
-    #   default = null;
-    #   description = "Tokens per paged cache block. Server default: 64. Only with pagedCache.";
-    # };
-
-    # maxCacheBlocks — Maximum cache blocks (--max-cache-blocks).
-    # Server default: 1000. Only used with pagedCache.
-    # Disabled: pagedCache is experimental.
-    # Revisit: when enabling pagedCache.
-    # maxCacheBlocks = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.ints.positive;
-    #   default = null;
-    #   description = "Maximum paged cache blocks. Server default: 1000. Only with pagedCache.";
-    # };
 
     # ---- TOOL INTEGRATION ----
     # Server-side tool calling returns structured tool_calls in OpenAI API responses.
@@ -299,81 +210,6 @@
       default = null;
       description = "Reasoning content extraction parser. Disabled by default — conflicts with tool-call-parser in streaming mode (vllm-mlx bug).";
     };
-
-    # mcpConfig — MCP configuration file (--mcp-config).
-    # Path to JSON/YAML MCP config for server-side tool integration.
-    # Disabled: MCP managed by consumers (Claude Code, PAL), not the inference server.
-    # Revisit: if the inference server needs direct MCP tool access.
-    # mcpConfig = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.path;
-    #   default = null;
-    #   description = "Path to MCP configuration file (JSON/YAML) for server-side tools.";
-    # };
-
-    # ---- EMBEDDINGS ----
-
-    # embeddingModel — Pre-load embedding model at startup (--embedding-model).
-    # Disabled: embeddings handled by separate services.
-    # Revisit: if consolidating embedding generation into vllm-mlx.
-    # embeddingModel = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.str;
-    #   default = null;
-    #   description = "HuggingFace ID of embedding model to pre-load at startup.";
-    # };
-
-    # ---- SECURITY ----
-
-    # apiKey — API authentication key (--api-key).
-    # Disabled: server binds to 127.0.0.1, no external access.
-    # Revisit: if exposing the server on a network interface.
-    # apiKey = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.str;
-    #   default = null;
-    #   description = "API authentication key. Not needed when binding to localhost.";
-    # };
-
-    # rateLimit — Requests per minute per client (--rate-limit).
-    # Server default: 0 (disabled). Per-client rate limiting.
-    # Disabled: single-user, localhost-only, no abuse vector.
-    # Revisit: if exposing the server externally.
-    # rateLimit = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.ints.unsigned;
-    #   default = null;
-    #   description = "Requests per minute per client. 0 = disabled. Server default: 0.";
-    # };
-
-    # ---- LEGACY (not recommended) ----
-
-    # prefixCacheSize — Max entries in prefix cache (--prefix-cache-size).
-    # Server default: 100. LEGACY MODE ONLY — requires --no-memory-aware-cache.
-    # Memory-aware mode (default) is strictly better: auto-sizes based on RAM.
-    # Disabled: memory-aware mode handles this automatically.
-    # Revisit: only if debugging memory-aware cache issues.
-    # prefixCacheSize = lib.mkOption {
-    #   type = lib.types.nullOr lib.types.ints.positive;
-    #   default = null;
-    #   description = "Legacy prefix cache entry count. Requires noMemoryAwareCache. Server default: 100.";
-    # };
-
-    # noMemoryAwareCache — Disable memory-aware cache (--no-memory-aware-cache).
-    # Server default: memory-aware enabled. Falls back to legacy entry-count mode.
-    # Disabled: memory-aware mode is strictly better.
-    # Revisit: only if debugging memory-aware cache issues.
-    # noMemoryAwareCache = lib.mkOption {
-    #   type = lib.types.bool;
-    #   default = false;
-    #   description = "Disable memory-aware cache, use legacy entry-count mode. Not recommended.";
-    # };
-
-    # disablePrefixCache — Disable prefix caching entirely (--disable-prefix-cache).
-    # Server default: prefix caching enabled. Disabling removes all prefix reuse.
-    # Disabled: prefix caching provides significant TTFT speedup for repeated prompts.
-    # Revisit: only if debugging prefix cache issues.
-    # disablePrefixCache = lib.mkOption {
-    #   type = lib.types.bool;
-    #   default = false;
-    #   description = "Disable prefix caching entirely. Not recommended.";
-    # };
 
     # ---- OOM PREVENTION (2026-03-21 incident: 171.9 GB on 128 GB RAM) ----
     # ProcessType=Background makes vllm-mlx Jetsam-eligible; HardResourceLimits
