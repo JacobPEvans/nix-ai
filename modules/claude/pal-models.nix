@@ -75,7 +75,7 @@ in
           runtimeInputs = [ ]; # doppler-mcp resolved from user PATH at runtime
           text = ''
             export CUSTOM_MODELS_CONFIG_PATH="${outputFile}"
-            export CUSTOM_MODEL_NAME="mlx-local/${mlxCfg.defaultModel}"
+            export CUSTOM_MODEL_NAME="mlx-local/default"
             export OPENROUTER_MODELS_CONFIG_PATH="${outputDir}/openrouter_models.json"
             export PAL_LOG_DIR="${palLogDir}"
             export PAL_MCP_SERVER="${palPkg}/bin/pal-mcp-server"

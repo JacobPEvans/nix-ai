@@ -116,15 +116,36 @@ let
     in
     "${baseCmd}${lib.optionalString (flags != "") " ${flags}"}";
 
-  # Default model entry — always loaded at startup, never auto-unloaded.
-  defaultModelEntry = {
-    cmd = mkVllmCmd cfg.defaultModel;
-    ttl = 0;
-    env = [ "HF_HOME=${cfg.huggingFaceHome}" ];
-    checkEndpoint = "/v1/models";
-  };
+  # Role registry (services.aiStack.models): role-name -> physical model ID.
+  # Single source of truth.
+  roleModels = config.services.aiStack.models;
 
-  # Additional model entries from cfg.models — loaded on demand, unloaded after idleTtl.
+  # Group roles by physical model. One backend serves many role aliases.
+  rolesByPhysical = lib.foldl' (
+    acc: role:
+    let
+      physical = roleModels.${role};
+      prior = acc.${physical} or [ ];
+    in
+    acc // { ${physical} = prior ++ [ role ]; }
+  ) { } (lib.attrNames roleModels);
+
+  # One entry per unique physical model. The entry owning the "default"
+  # alias is preloaded; others inherit the proxy idle TTL.
+  registryModels = lib.mapAttrs (
+    physical: roles:
+    {
+      cmd = mkVllmCmd physical;
+      ttl = builtins.elemAt [ cfg.proxy.idleTtl 0 ] (
+        lib.boolToInt (builtins.elem "default" roles)
+      );
+      env = [ "HF_HOME=${cfg.huggingFaceHome}" ];
+      checkEndpoint = "/v1/models";
+      aliases = roles;
+    }
+  ) rolesByPhysical;
+
+  # Additional ad-hoc models from cfg.models (existing extension point).
   additionalModels = lib.mapAttrs (
     name: modelCfg:
     {
@@ -133,7 +154,9 @@ let
         + lib.optionalString (modelCfg.extraArgs != [ ]) (
           " " + lib.concatStringsSep " " modelCfg.extraArgs
         );
-      ttl = if modelCfg.ttl > 0 then modelCfg.ttl else cfg.proxy.idleTtl;
+      ttl = builtins.elemAt [ cfg.proxy.idleTtl modelCfg.ttl ] (
+        lib.boolToInt (modelCfg.ttl > 0)
+      );
       env = [ "HF_HOME=${cfg.huggingFaceHome}" ];
       checkEndpoint = "/v1/models";
     }
@@ -142,10 +165,7 @@ let
     }
   ) cfg.models;
 
-  allModels = {
-    "${cfg.defaultModel}" = defaultModelEntry;
-  }
-  // additionalModels;
+  allModels = registryModels // additionalModels;
 
   llamaSwapConfigAttrs = {
     inherit (cfg.proxy) healthCheckTimeout logLevel logToStdout;
@@ -163,7 +183,9 @@ let
       members = builtins.attrNames allModels;
     };
 
-    hooks.on_startup.preload = [ cfg.defaultModel ];
+    # Preload by role, not physical name. llama-swap resolves "default"
+    # via the alias table on the registryModels entry.
+    hooks.on_startup.preload = [ "default" ];
   };
 
   # Use pkgs.writeText (not builtins.toFile) because content references store paths

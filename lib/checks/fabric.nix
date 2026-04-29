@@ -67,7 +67,7 @@ in
         {
           name = "fabric.defaultModel";
           actual = cfg.defaultModel;
-          expected = "mlx-community/Qwen3.5-122B-A10B-4bit";
+          expected = "default";
         }
         # Environment variables — FABRIC_PATTERNS_DIR is computed from
         # config.home.homeDirectory + the fixed ".config/fabric/patterns"

@@ -5,16 +5,21 @@
 # Active options are defined normally; inactive options are commented out
 # with rationale for why they're disabled and when to revisit.
 #
-{ lib, ... }:
+{ config, lib, ... }:
 {
   options.programs.mlx = {
     enable = lib.mkEnableOption "MLX inference server via vllm-mlx";
 
     defaultModel = lib.mkOption {
       type = lib.types.str;
-      default = "mlx-community/Qwen3.6-35B-A3B-mxfp4";
+      default = config.services.aiStack.models.default;
+      defaultText = lib.literalExpression "config.services.aiStack.models.default";
       description = ''
-        Default mlx-community/ HuggingFace model to serve via vllm-mlx.
+        Physical mlx-community/ HuggingFace model ID for the "default" role.
+        Sourced from services.aiStack.models.default — that is the single
+        source of truth for role → physical model mappings. Override here
+        only when temporarily pinning vllm-mlx to a model that should NOT
+        appear in the role registry.
         Benchmark-driven rationale and historical default-swap context live
         on the companion dataset:
         https://huggingface.co/datasets/JacobPEvans/mlx-benchmarks
