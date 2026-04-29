@@ -195,4 +195,19 @@ in
       llamaSwapRuntimeConfigPath
       ;
   };
+
+  # Enforce documented option dependencies. Without these, vllm-mlx silently
+  # mis-behaves when consumers flip one boolean and forget the partner.
+  assertions = lib.optionals cfg.enable [
+    {
+      assertion = !cfg.enablePrefixCaching || cfg.pagedKvCache;
+      message = ''
+        programs.mlx.enablePrefixCaching requires programs.mlx.pagedKvCache to
+        also be true. vllm-mlx 0.2.9 builds the prefix-sharing index inside
+        the paged KV cache; turning prefix caching on without paged KV cache
+        either fails to start or silently drops the prefix-share path.
+        Either set both to true (the defaults) or both to false.
+      '';
+    }
+  ];
 }
