@@ -126,10 +126,10 @@ in
   # for each ~/git/<repo>/main path found at home-manager activation time (runtime) via claude-json-merge.sh.
   trustedProjectDirs = [ "~/git" ];
 
-  # Minimal commit attribution — replaces verbose Co-Authored-By trailer
-  # Claude Code appends this string to every commit message automatically
+  # Linux "Assisted-by" trailer — official AI contribution format
+  # Includes LLM tool identity per Linux kernel contribution guidelines
   attribution = {
-    commit = "(claude)";
+    commit = "Assisted-by: Claude <noreply@anthropic.com>";
   };
 
   # Auto-Claude: DISABLED - migrating to ai-workflows repo
