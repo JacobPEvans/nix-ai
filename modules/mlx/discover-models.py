@@ -131,18 +131,27 @@ def main() -> None:
     default_model = preload[0]
 
     models_section = current_config.get("models", {})
-    default_entry = models_section.get(default_model, {})
-    if not default_entry:
+    if not isinstance(models_section, dict):
+        print(
+            "ERROR: Invalid config: models must be a mapping of model ids to entries",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    default_entry = None
+    if default_model in models_section:
+        default_entry = models_section[default_model]
+    else:
         for physical, entry in models_section.items():
-            if default_model in (entry.get("aliases") or []):
+            if isinstance(entry, dict) and default_model in (entry.get("aliases") or []):
                 default_model = physical
                 default_entry = entry
                 break
-    cmd_template = default_entry.get("cmd", "")
+    cmd_template = (default_entry or {}).get("cmd", "")
     if not cmd_template:
         print(
             f"ERROR: Could not resolve preload entry {preload[0]!r} to a "
-            "models[] entry (checked top-level keys and aliases tables)",
+            "models.<id> entry in the models mapping (checked top-level keys and aliases tables)",
             file=sys.stderr,
         )
         sys.exit(1)
