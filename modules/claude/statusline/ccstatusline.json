@@ -1,0 +1,17 @@
+{
+  "version": 3,
+  "lines": [
+    {
+      "items": [
+        { "type": "model" },
+        { "type": "current-working-dir", "metadata": { "abbreviateHome": true } },
+        { "type": "git-worktree" },
+        { "type": "git-branch" },
+        { "type": "tokens-total" },
+        { "type": "thinking-effort" },
+        { "type": "session-usage" },
+        { "type": "weekly-usage" }
+      ]
+    }
+  ]
+}
