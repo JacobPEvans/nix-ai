@@ -115,7 +115,13 @@ def main() -> None:
 
     current_config = json.loads(config_path.read_text())
 
-    # Extract default model and command template
+    # Extract default model and command template.
+    # `preload` may reference a role alias (e.g. "default") rather than a
+    # physical model id, since `hooks.on_startup.preload = ["default"]`
+    # and llama-swap resolves the alias at lookup time. When that's the
+    # case, walk the aliases tables to find the physical entry, then
+    # update default_model so the cmd_template substitution below targets
+    # the right `serve <model>` token.
     preload = (
         current_config.get("hooks", {}).get("on_startup", {}).get("preload", [])
     )
@@ -128,10 +134,24 @@ def main() -> None:
 
     models_section = current_config.get("models", {})
     default_entry = models_section.get(default_model, {})
+    if not default_entry:
+        for physical, entry in models_section.items():
+            if default_model in (entry.get("aliases") or []):
+                default_model = physical
+                default_entry = entry
+                break
+    if not default_entry:
+        print(
+            f"ERROR: Could not resolve preload entry {preload[0]!r} to a "
+            "models[] entry (checked top-level keys and aliases tables)",
+            file=sys.stderr,
+        )
+        sys.exit(1)
     cmd_template = default_entry.get("cmd", "")
     if not cmd_template:
         print(
-            "ERROR: Could not extract command template from default model entry",
+            f"ERROR: Resolved preload entry {preload[0]!r} to model {default_model!r} "
+            "but the entry has no 'cmd' template",
             file=sys.stderr,
         )
         sys.exit(1)
