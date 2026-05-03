@@ -88,37 +88,21 @@ from multiple plugins:
 
 ## File Layout
 
+One file per priority tier. Within each tier file, marketplaces are clearly
+sectioned with `# ====` header blocks so the priority pattern stays obvious
+at a glance.
+
 ```text
 plugins/
-├── default.nix                              # imports + merge
-├── marketplaces.nix                         # marketplace definitions (one entry per repo)
-├── README.md                                # this file
+├── default.nix       # imports + merge (5 tier files)
+├── marketplaces.nix  # marketplace definitions (one entry per repo)
+├── README.md         # this file
 │
-├── tier1-claude-plugins-official.nix        # Anthropic core
-├── tier1-anthropic-agent-skills.nix         # Anthropic skills (xlsx/docx/pdf/pptx)
-│
-├── tier2-openai-codex.nix                   # Official OpenAI codex plugin
-├── tier2-external-mcp-integrations.nix      # GitHub/Slack/Context7/Stripe/etc.
-│
-├── tier3-jacobpevans-cc-plugins.nix         # Auto-discovered personal plugins
-│
-├── tier4-claude-code-workflows.nix          # wshobson/agents (34k★)
-├── tier4-superpowers-marketplace.nix        # obra/superpowers (925★)
-├── tier4-cc-marketplace.nix                 # ananddtyagi/cc-marketplace (679★)
-├── tier4-claude-skills.nix                  # secondsky/claude-skills (129★)
-│
-├── tier5-lunar-claude.nix                   # ansible/proxmox infra
-├── tier5-claude-code-plugins-plus.nix       # terraform/iac
-├── tier5-bitwarden-marketplace.nix          # claude-retrospective, config-validator
-├── tier5-cc-dev-tools.nix                   # codex (community), gemini, telegram
-├── tier5-fabric-patterns.nix                # daniel miessler patterns (synthetic)
-├── tier5-huggingface-skills.nix             # hf-cli
-├── tier5-obsidian-skills.nix
-├── tier5-axton-obsidian-visual-skills.nix
-├── tier5-visual-explainer-marketplace.nix
-├── tier5-browser-use-skills.nix             # synthetic
-├── tier5-vct-cribl-pack-validator-skills.nix # synthetic
-└── tier5-wakatime.nix
+├── tier1.nix         # Anthropic Official (claude-plugins-official core, anthropic-agent-skills)
+├── tier2.nix         # First-party AI/cloud vendors (openai-codex, claude-plugins-official MCP integrations)
+├── tier3.nix         # Personal (jacobpevans-cc-plugins, auto-discovered)
+├── tier4.nix         # Community by GitHub stars (claude-code-workflows, superpowers, cc-marketplace, claude-skills)
+└── tier5.nix         # Niche / specialty (lunar-claude, cc-dev-tools, fabric-patterns, etc.)
 ```
 
 ## Adding a New Marketplace
@@ -132,18 +116,18 @@ plugins/
    - Personal repos → Tier 3
    - Community marketplace with broad scope (>500 stars, multiple plugins) → Tier 4
    - Single-purpose / specialty / synthetic / low-popularity → Tier 5
-4. Create `tierN-<marketplace-name>.nix` using the standard header (copy from any
-   existing tier file).
-5. Add the import + merge entry to `default.nix`.
-6. Run `nix flake check`.
+4. Open the corresponding `tierN.nix` file and add a new section header
+   (`# ====` block) for the marketplace, then list its plugins.
+5. Re-run `nix flake check`.
 
 ## Adding a Plugin
 
-1. Open the marketplace's tier file.
-2. Add `"plugin-name@marketplace-key" = true;` (or `false` to disable).
-3. **If a duplicate exists in a higher tier**: don't enable it — leave it `false`
+1. Open the tier file for the marketplace's priority tier (e.g., `tier4.nix`).
+2. Find the `# ====` section for the marketplace.
+3. Add `"plugin-name@marketplace-key" = true;` (or `false` to disable).
+4. **If a duplicate exists in a higher tier**: don't enable it — leave it `false`
    with an inline comment pointing at the keeper.
-4. Run `nix flake check`.
+5. Run `nix flake check`.
 
 ## Synthetic Marketplaces
 

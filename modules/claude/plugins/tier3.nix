@@ -1,17 +1,16 @@
-# Marketplace: jacobpevans-cc-plugins
-# Source: github.com/JacobPEvans/claude-code-plugins
-# Stars (verified 2026-05-02): 2
-# Priority Tier: 3 (Personal — author's own plugins)
+# Tier 3 — Personal (author's own plugins)
 #
 # Duplicate Resolution Rule:
-#   Variants from this marketplace are PREFERRED over: Tiers 4, 5.
-#   Variants from this marketplace are SUPERSEDED by:  Tiers 1, 2.
+#   Plugins in this file are PREFERRED over Tiers 4, 5.
+#   Plugins in this file are SUPERSEDED by Tiers 1, 2.
 #
-# Plugins from this marketplace are auto-discovered from the flake input at
-# evaluation time. The list is determined by the repository contents (any
-# directory containing .claude-plugin/plugin.json is registered).
+# Marketplaces in this tier:
+#   - jacobpevans-cc-plugins (JacobPEvans/claude-code-plugins, 2★)
+#       Plugins are auto-discovered from the flake input at evaluation time.
+#       The list is determined by the repository contents (any directory
+#       containing .claude-plugin/plugin.json is registered).
 #
-# To disable a specific jacobpevans plugin, override it explicitly here:
+# To disable a specific jacobpevans plugin, override it explicitly below:
 #   "<plugin-name>@jacobpevans-cc-plugins" = false;
 
 {
