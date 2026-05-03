@@ -72,6 +72,7 @@ in
     ./ai-shell.nix
     ./ai-stack
     ./agent-skills
+    ./aider
     ./claude
     ./claude-latest.nix
     ./codex
@@ -139,6 +140,11 @@ in
       claudeStatusline.enable = false;
       claudeStatuslineDaniel3303.enable = false;
       claudeStatuslineCcstatusline.enable = true;
+
+      # Aider AI pair programming (settings handled by modules/aider/)
+      aider = {
+        enable = true;
+      };
 
       # OpenAI Codex configuration (settings handled by modules/codex/)
       codex = {
