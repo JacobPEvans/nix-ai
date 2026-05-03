@@ -185,7 +185,8 @@ in
         the current accepted values.
         null leaves Gemini CLI's own model resolution alone.
         NOTE: Google-hosted model values execute in Google's cloud. For
-        on-device generation see modules/gemini/README.md.
+        on-device generation via local MLX inference, configure
+        GOOGLE_GEMINI_BASE_URL to point at the Bifrost genai translator.
       '';
     };
 
