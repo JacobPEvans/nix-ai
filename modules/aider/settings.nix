@@ -23,8 +23,9 @@ let
 
   # Endpoint selection: llama-swap (default) or Bifrost
 
-  endpointBase =
-    if cfg.routing == "bifrost" then "http://localhost:30080/v1" else "http://127.0.0.1:11434/v1";
+  isBifrost = cfg.routing == "bifrost";
+
+  endpointBase = if isBifrost then "http://localhost:30080/v1" else "http://127.0.0.1:11434/v1";
 
   # Model name resolution:
   # llama-swap routing: keep openai/<role> - llama-swap resolves via useModelName.
@@ -38,7 +39,11 @@ let
     let
       n = lib.removePrefix "openai/" m;
     in
-    if cfg.routing == "bifrost" then "openai/mlx-local/" + (models.${n} or n) else m;
+    if isBifrost then "openai/mlx-local/" + (models.${n} or n) else m;
+
+  prefixedWeakModel = prefixModel cfg.weakModel;
+
+  yamlFormat = pkgs.formats.yaml { };
 
   # History and metadata file paths, extracted to let-bindings so that
   # quoted-key attrset bindings below use plain identifiers as values
@@ -59,7 +64,7 @@ let
     openai-api-base = endpointBase;
     openai-api-key = "dummy"; # llama-swap/Bifrost authenticate upstream; local hop is open
     model = prefixModel cfg.model;
-    weak-model = prefixModel cfg.weakModel;
+    weak-model = prefixedWeakModel;
     editor-model = prefixModel cfg.editorModel;
     auto-commits = cfg.autoCommits;
     dirty-commits = cfg.dirtyCommits;
@@ -84,7 +89,7 @@ let
   }
   // cfg.extraConfig;
 
-  yamlConf = (pkgs.formats.yaml { }).generate "aider-conf.yml" configAttrs;
+  yamlConf = yamlFormat.generate "aider-conf.yml" configAttrs;
 
   # Model metadata
   #
@@ -136,7 +141,7 @@ let
     in
     {
       inherit name;
-      weak_model_name = prefixModel cfg.weakModel;
+      weak_model_name = prefixedWeakModel;
       use_repo_map = true;
       streaming = cfg.stream;
     }
@@ -148,18 +153,13 @@ let
     role: physicalId: makeSettingsEntry "openai/mlx-local/${physicalId}" role
   ) models;
 
-  # Regex catch-all for any mlx-local/* model not explicitly listed above
-  catchAllEntry = {
-    name = "openai/mlx-local/.*";
-    weak_model_name = prefixModel cfg.weakModel;
-    use_repo_map = true;
-    streaming = cfg.stream;
-  }
-  // lib.optionalAttrs (cfg.editFormat != null) { edit_format = cfg.editFormat; };
+  # Regex catch-all for any mlx-local/* model not explicitly listed above;
+  # "default" is a codeRole so this entry correctly inherits editFormat (not weakEditFormat).
+  catchAllEntry = makeSettingsEntry "openai/mlx-local/.*" "default";
 
   modelSettings = roleAliasSettings ++ physicalIdSettings ++ [ catchAllEntry ];
 
-  modelSettingsYaml = (pkgs.formats.yaml { }).generate "aider-model-settings.yml" modelSettings;
+  modelSettingsYaml = yamlFormat.generate "aider-model-settings.yml" modelSettings;
 
 in
 {
