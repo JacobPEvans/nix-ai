@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.62.0](https://github.com/JacobPEvans/nix-ai/compare/v1.61.0...v1.62.0) (2026-05-03)
+
+
+### Features
+
+* **ai-stack:** export aiStackModels as flake output ([#698](https://github.com/JacobPEvans/nix-ai/issues/698)) ([7121d7d](https://github.com/JacobPEvans/nix-ai/commit/7121d7d8a6c131f784d66b74eaa22107f35a6039))
+* **aider:** add home-manager module with MLX routing ([#699](https://github.com/JacobPEvans/nix-ai/issues/699)) ([670b29d](https://github.com/JacobPEvans/nix-ai/commit/670b29df6a07351f41097fc0ab4d33ed8f04f5c0))
+
 ## [1.61.0](https://github.com/JacobPEvans/nix-ai/compare/v1.60.1...v1.61.0) (2026-05-03)
 
 
