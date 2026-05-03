@@ -32,6 +32,7 @@ let
       marketplaceInputs
       claude-cookbooks
       fabric-src
+      browserUseVersion
       ;
   };
 
@@ -69,10 +70,8 @@ let
 
   # renovate: datasource=pypi depName=open-webui
   openWebuiVersion = "0.9.2";
-  # Keep in sync with modules/claude/marketplace-overrides.nix browserUseVersion.
-  # Renovate updates both files in a single PR (same datasource+depName = one update).
   # renovate: datasource=pypi depName=browser-use
-  browserUseInstallVersion = "0.12.6";
+  browserUseVersion = "0.12.6";
 in
 {
   imports = [
@@ -132,7 +131,7 @@ in
         installBrowserUse = lib.hm.dag.entryAfter [ "writeBoundary" "knownMarketplacesMerge" ] ''
           if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q "^browser-use"; then
             echo "-> Installing browser-use via uv..."
-            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "browser-use==${browserUseInstallVersion}"
+            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "browser-use==${browserUseVersion}"
           fi
         '';
       };
