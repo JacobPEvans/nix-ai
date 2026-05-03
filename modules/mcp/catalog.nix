@@ -53,7 +53,7 @@ in
   # ================================================================
   # Official Anthropic MCP Servers
   # ================================================================
-  # Versions pinned as literal strings for Renovate regex tracking.
+  # Versions are let-bound above with Renovate annotation comments for regex tracking.
   # Archived servers remain unpinned unless a maintained replacement exists.
 
   everything = bunx [ "@modelcontextprotocol/server-everything@${mcpEverythingVersion}" ];
