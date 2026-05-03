@@ -76,7 +76,7 @@ prefix-free without duplicating the registry.
 ```nix
 inputs.nix-ai.url = "github:JacobPEvans/nix-ai";
 # ...
-# Build Bifrost alias table: default → mlx-local/mlx-community/Qwen3.6-35B-A3B-mxfp4
+# Build Bifrost alias table from role names to mlx-local/ prefixed physical IDs
 aliases = lib.mapAttrs
   (_role: physical: "mlx-local/${physical}")
   inputs.nix-ai.lib.aiStackModels;
