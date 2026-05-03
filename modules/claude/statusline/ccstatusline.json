@@ -12,7 +12,7 @@
       { "id": "8", "type": "git-changes", "color": "yellow" },
       { "id": "9", "type": "separator" },
       { "id": "10", "type": "context-length", "color": "white" },
-      { "id": "11", "type": "context-bar", "color": "green" },
+      { "id": "11", "type": "context-bar", "color": "green", "rawValue": true, "metadata": { "display": "slider-only" } },
       { "id": "12", "type": "separator" },
       { "id": "13", "type": "thinking-effort" },
       { "id": "14", "type": "flex-separator" },
