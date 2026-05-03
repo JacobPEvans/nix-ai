@@ -2,6 +2,9 @@
 { pkgs, hmConfig }:
 let
   mlxCfg = hmConfig.config.programs.mlx;
+  # Read the canonical capability-class registry so this regression test
+  # tracks the var file instead of duplicating the model ID.
+  registry = import ../../vars/ai-stack.nix;
 in
 {
   # Verify all expected MLX option paths exist.
@@ -51,7 +54,7 @@ in
         {
           name = "mlx.defaultModel";
           actual = mlxCfg.defaultModel;
-          expected = "mlx-community/Qwen3.6-35B-A3B-mxfp4";
+          expected = registry.models.default;
         }
         {
           name = "mlx.port";
