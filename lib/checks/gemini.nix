@@ -10,9 +10,11 @@ in
     let
       expectedOptions = [
         "commands"
+        "defaultModel"
         "enable"
         "excludedMcpServers"
         "extensions"
+        "gemmaModelRouter"
         "hooks"
         "sandbox"
         "trustedFolders"
@@ -89,6 +91,31 @@ in
           name = "gemini.sandboxAllowedPaths";
           actual = cfg.sandboxAllowedPaths;
           expected = [ ];
+        }
+        {
+          name = "gemini.defaultModel";
+          actual = cfg.defaultModel;
+          expected = null;
+        }
+        {
+          name = "gemini.gemmaModelRouter.enable";
+          actual = cfg.gemmaModelRouter.enable;
+          expected = false;
+        }
+        {
+          name = "gemini.gemmaModelRouter.autoStartServer";
+          actual = cfg.gemmaModelRouter.autoStartServer;
+          expected = false;
+        }
+        {
+          name = "gemini.gemmaModelRouter.port";
+          actual = cfg.gemmaModelRouter.port;
+          expected = 9379;
+        }
+        {
+          name = "gemini.gemmaModelRouter.binaryPath";
+          actual = cfg.gemmaModelRouter.binaryPath;
+          expected = "";
         }
       ];
       failures = builtins.filter (c: c.actual != c.expected) checks;
