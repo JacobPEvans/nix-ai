@@ -49,7 +49,6 @@ graph TD
     EYES --> OPENCV
 
     BRAIN --> MLX_LM
-    BRAIN --> EYES
     BRAIN --> MLX_EMB
     BRAIN --> TRANSFORMERS
     BRAIN --> HF_HUB
@@ -57,7 +56,6 @@ graph TD
     MLX_LM --> MLX
     MLX_LM --> TRANSFORMERS
     MLX_EMB --> MLX
-    MLX_EMB --> EYES
 ```
 
 ## Version Management

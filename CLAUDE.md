@@ -79,7 +79,7 @@ secrets-and-injection, mlx-stack. Design decisions in [`docs/adr/`](docs/adr/REA
 - `modules/mcp/` — MCP server definitions
 - `modules/mlx/` — MLX inference server (vllm-mlx LaunchAgent, CLI tools)
 - `modules/common/` — Shared permission engine and formatters
-- `lib/claude-settings.nix` — Pure settings generator (CI-only)
+- `lib/claude-settings.nix` — Pure settings generator (CI-only; deployment uses `modules/claude/settings.nix`)
 - `lib/claude-registry.nix` — Marketplace format functions
 - `lib/checks/` — Per-domain regression tests (lint, claude, mlx)
 
@@ -93,6 +93,6 @@ Port allocation lives in [`docs/architecture/system-integration-map.md`](docs/ar
 
 ## Related Repos
 
-Quartet membership and roles are documented in `~/git/CLAUDE.md`. This repo exports
-home-manager modules consumed by `nix-darwin`; sibling repos are `nix-home` (dev env)
-and `nix-devenv` (reusable dev shells).
+This repo exports home-manager modules consumed by [`nix-darwin`](https://github.com/JacobPEvans/nix-darwin).
+Sibling repos: [`nix-home`](https://github.com/JacobPEvans/nix-home) (user dev environment) and
+[`nix-devenv`](https://github.com/JacobPEvans/nix-devenv) (reusable dev shells).
