@@ -324,6 +324,14 @@
         claude-registry = import ./lib/claude-registry.nix;
         versions = import ./lib/versions.nix;
 
+        # Role-name → physical mlx-community/* model ID registry.
+        # Exported as a plain attrset so foreign consumers (e.g.
+        # orbstack-kubernetes Bifrost config) can consume it without
+        # importing the home-manager module system. The module at
+        # modules/ai-stack/default.nix uses this same file as its option
+        # default — one source of truth.
+        aiStackModels = import ./lib/ai-stack-models.nix;
+
         # Shared permission + formatter engine. Exposed for cross-flake consumers
         # (e.g., nix-ai-claude) so the source of truth for tool-agnostic command
         # permissions stays in this flake. Callers pass { lib, config,
