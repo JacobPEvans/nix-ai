@@ -14,8 +14,9 @@ Setting a plugin to `true` enables it; `false` keeps it visible but disabled.
 
 ## Priority Tier System
 
-Files in this directory are organized **one-per-marketplace** with a `tierN-` prefix.
-The tier number governs duplicate-resolution: when two plugins from different
+Files in this directory are organized **one-per-tier** with a zero-padded `NN-descriptor`
+prefix so filenames are self-documenting without opening the file, and sort order survives
+beyond tier 9. The tier number governs duplicate-resolution: when two plugins from different
 marketplaces ship the same agent or skill, keep the **higher-tier** variant and
 disable the lower-tier one. Document each disable inline with a reason.
 
@@ -68,8 +69,8 @@ All registered marketplaces, defined in [`marketplaces.nix`](marketplaces.nix). 
 | `bills-claude-skills` | `BillChirico/bills-claude-skills` (registered, no plugins enabled) | — | — |
 
 `claude-plugins-official` is split across Tier 1 (Anthropic-authored core plugins
-in `tier1-claude-plugins-official.nix`) and Tier 2 (first-party MCP integrations
-to GitHub/Slack/Stripe/etc. in `tier2-external-mcp-integrations.nix`).
+in `01-official.nix`) and Tier 2 (first-party MCP integrations
+to GitHub/Slack/Stripe/etc. in `02-vendors.nix`).
 
 ## Duplicate Resolution Rule
 
@@ -87,7 +88,7 @@ from multiple plugins:
 
 4. If you can't disable a plugin (because it bundles unique agents alongside the
    duplicate), keep it enabled and **document the tolerated duplicate** in the
-   file's plugin comment block — see `tier4-claude-code-workflows.nix` for the
+   file's plugin comment block — see `04-community.nix` for the
    `backend-development` example (kept for `python-pro`/`fastapi-pro` despite a
    duplicate `test-automator`).
 5. Within the same tier, prefer the marketplace with higher GitHub stars; fall
@@ -101,15 +102,15 @@ at a glance.
 
 ```text
 plugins/
-├── default.nix       # imports + merge (5 tier files)
-├── marketplaces.nix  # marketplace definitions (one entry per repo)
-├── README.md         # this file
+├── default.nix          # imports + merge (5 tier files)
+├── marketplaces.nix     # marketplace definitions (one entry per repo)
+├── README.md            # this file
 │
-├── tier1.nix         # Anthropic Official (claude-plugins-official core, anthropic-agent-skills)
-├── tier2.nix         # First-party AI/cloud vendors (openai-codex, claude-plugins-official MCP integrations)
-├── tier3.nix         # Personal (jacobpevans-cc-plugins, auto-discovered)
-├── tier4.nix         # Community by GitHub stars (claude-code-workflows, superpowers, cc-marketplace, claude-skills)
-└── tier5.nix         # Niche / specialty (lunar-claude, cc-dev-tools, fabric-patterns, etc.)
+├── 01-official.nix      # Anthropic Official (claude-plugins-official core, anthropic-agent-skills)
+├── 02-vendors.nix       # First-party AI/cloud vendors (openai-codex, claude-plugins-official MCP integrations)
+├── 03-personal.nix      # Personal (jacobpevans-cc-plugins, auto-discovered)
+├── 04-community.nix     # Community by GitHub stars (claude-code-workflows, superpowers, cc-marketplace, claude-skills)
+└── 05-specialty.nix     # Niche / specialty (lunar-claude, cc-dev-tools, fabric-patterns, etc.)
 ```
 
 ## Adding a New Marketplace
@@ -118,18 +119,18 @@ plugins/
    key matching the `name` field from the repo's `.claude-plugin/marketplace.json`.
 2. Verify popularity: `gh repo view <owner>/<repo> --json stargazerCount`.
 3. Decide tier:
-   - Anthropic official → Tier 1
-   - First-party AI vendor (OpenAI, Google, GitHub-as-vendor) → Tier 2
-   - Personal repos → Tier 3
-   - Community marketplace with broad scope (>500 stars, multiple plugins) → Tier 4
-   - Single-purpose / specialty / synthetic / low-popularity → Tier 5
-4. Open the corresponding `tierN.nix` file and add a new section header
+   - Anthropic official → Tier 1 (`01-official.nix`)
+   - First-party AI vendor (OpenAI, Google, GitHub-as-vendor) → Tier 2 (`02-vendors.nix`)
+   - Personal repos → Tier 3 (`03-personal.nix`)
+   - Community marketplace with broad scope (>500 stars, multiple plugins) → Tier 4 (`04-community.nix`)
+   - Single-purpose / specialty / synthetic / low-popularity → Tier 5 (`05-specialty.nix`)
+4. Open the corresponding tier file and add a new section header
    (`# ====` block) for the marketplace, then list its plugins.
 5. Re-run `nix flake check`.
 
 ## Adding a Plugin
 
-1. Open the tier file for the marketplace's priority tier (e.g., `tier4.nix`).
+1. Open the tier file for the marketplace's priority tier (e.g., `04-community.nix`).
 2. Find the `# ====` section for the marketplace.
 3. Add `"plugin-name@marketplace-key" = true;` (or `false` to disable).
 4. **If a duplicate exists in a higher tier**: don't enable it — leave it `false`

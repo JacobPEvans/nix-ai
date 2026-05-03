@@ -1,3 +1,4 @@
+# Tier 5 — Niche, specialty, and synthetic marketplaces (superseded by all higher tiers).
 # Tier 5 — Niche / specialty
 #
 # Duplicate Resolution Rule:

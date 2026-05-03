@@ -1,3 +1,4 @@
+# Tier 4 — Community marketplaces ordered by GitHub stars (preferred over specialty tier only).
 # Tier 4 — Community by GitHub-stars popularity
 #
 # Duplicate Resolution Rule:

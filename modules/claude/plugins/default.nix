@@ -27,11 +27,11 @@ let
   marketplacesModule = import ./marketplaces.nix { inherit lib; };
 
   # One file per priority tier
-  tier1 = import ./tier1.nix { };
-  tier2 = import ./tier2.nix { };
-  tier3 = import ./tier3.nix { inherit lib jacobpevans-cc-plugins; };
-  tier4 = import ./tier4.nix { };
-  tier5 = import ./tier5.nix { };
+  tier1 = import ./01-official.nix { };
+  tier2 = import ./02-vendors.nix { };
+  tier3 = import ./03-personal.nix { inherit lib jacobpevans-cc-plugins; };
+  tier4 = import ./04-community.nix { };
+  tier5 = import ./05-specialty.nix { };
 
   # Merge all enabled plugins. Tier ordering reflects priority — every key
   # contains its `@marketplace` suffix so collisions across files would be a

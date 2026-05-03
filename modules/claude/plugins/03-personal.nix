@@ -1,3 +1,4 @@
+# Tier 3 — Personal (author's own plugins; preferred over community and specialty tiers).
 # Tier 3 — Personal (author's own plugins)
 #
 # Duplicate Resolution Rule:
