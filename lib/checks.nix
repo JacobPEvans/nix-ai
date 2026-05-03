@@ -49,6 +49,7 @@ let
   };
 in
 (import ./checks/lint.nix { inherit pkgs src; })
+// (import ./checks/ai-stack.nix { inherit pkgs; })
 // (import ./checks/claude.nix { inherit pkgs hmConfig; })
 // (import ./checks/agent-skills.nix { inherit pkgs hmConfig; })
 // (import ./checks/codex.nix { inherit pkgs hmConfig; })
