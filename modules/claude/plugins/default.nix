@@ -1,17 +1,17 @@
 # Claude Code Plugins - Main Configuration
 #
-# Modular plugin configuration organized by category:
-# - marketplaces.nix: All available plugin marketplaces
-# - official.nix: Official Anthropic plugins
-# - external.nix: External third-party plugins (via claude-plugins-official)
-# - community.nix: Community marketplace plugins
-# - infrastructure.nix: Infrastructure, DevOps, and cloud operations
-# - development.nix: Software development and engineering tools
-# - monitoring.nix: Time tracking and monitoring tools
-# - experimental.nix: Experimental and autonomous plugins
+# File layout: one file per priority tier. Within each tier file, marketplaces
+# are clearly sectioned with header comments. See README.md for the full
+# duplicate-resolution rules.
 #
-# Each module exports an enabledPlugins attrset that gets merged.
-# The marketplaces module exports a marketplaces attrset.
+# Tier 1 — Anthropic Official
+# Tier 2 — First-party AI/cloud vendors (Codex official, GitHub/Slack/etc. MCP integrations)
+# Tier 3 — Personal (jacobpevans-cc-plugins, auto-discovered)
+# Tier 4 — Community by GitHub-stars popularity
+# Tier 5 — Niche / specialty
+#
+# Each tier file exports `enabledPlugins`. The marketplaces module exports
+# `marketplaces`. All `enabledPlugins` attrsets are merged below.
 
 {
   lib,
@@ -23,30 +23,27 @@ let
   # Extract specific inputs needed by sub-modules
   inherit (marketplaceInputs) jacobpevans-cc-plugins;
 
-  # Import all plugin category modules
+  # Marketplace definitions (separate from plugin enablement)
   marketplacesModule = import ./marketplaces.nix { inherit lib; };
-  officialModule = import ./official.nix { };
-  externalModule = import ./external.nix { };
-  communityModule = import ./community.nix { };
-  infrastructureModule = import ./infrastructure.nix { };
-  developmentModule = import ./development.nix { inherit lib jacobpevans-cc-plugins; };
-  monitoringModule = import ./monitoring.nix { };
-  experimentalModule = import ./experimental.nix { };
-  fabricModule = import ./fabric.nix { };
 
-  # Merge all enabled plugins from category modules
+  # One file per priority tier; variable names match the file descriptors.
+  official = import ./01-official.nix { };
+  vendors = import ./02-vendors.nix { };
+  personal = import ./03-personal.nix { inherit lib jacobpevans-cc-plugins; };
+  community = import ./04-community.nix { };
+  specialty = import ./05-specialty.nix { };
+
+  # Merge all enabled plugins. Tier ordering (1→5) reflects priority — every
+  # key contains its `@marketplace` suffix so collisions across files would be
+  # a bug (would show up at evaluation time).
   enabledPlugins =
-    officialModule.enabledPlugins
-    // externalModule.enabledPlugins
-    // communityModule.enabledPlugins
-    // infrastructureModule.enabledPlugins
-    // developmentModule.enabledPlugins
-    // monitoringModule.enabledPlugins
-    // experimentalModule.enabledPlugins
-    // fabricModule.enabledPlugins;
+    official.enabledPlugins
+    // vendors.enabledPlugins
+    // personal.enabledPlugins
+    // community.enabledPlugins
+    // specialty.enabledPlugins;
 in
 {
-  # Return the complete plugin configuration
   inherit enabledPlugins;
   inherit (marketplacesModule) marketplaces;
 }
