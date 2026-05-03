@@ -42,7 +42,7 @@ in
       script = ''
         #!/usr/bin/env bash
         # ccstatusline by sirmalloc (semver-pinned for stability)
-        exec ${pkgs.bun}/bin/bunx ccstatusline@'^2' --config=${configFile} "$@"
+        exec ${pkgs.bun}/bin/bunx ccstatusline@'^2' --config ${configFile} "$@"
       '';
     };
   };
