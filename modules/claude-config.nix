@@ -10,6 +10,7 @@
   marketplaceInputs,
   claude-cookbooks,
   fabric-src,
+  browserUseVersion,
   ...
 }:
 
@@ -71,6 +72,7 @@ let
       marketplaceInputs
       fabric-src
       fabricVersion
+      browserUseVersion
       ;
   };
   inherit (marketplaceOverrides)

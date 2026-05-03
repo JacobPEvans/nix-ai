@@ -159,6 +159,7 @@ in
         inherit (pkgs) lib;
         # The browser-use and jacobpevans wrappers also live in this file but
         # are unused by the fabric check — pass nulls to satisfy module args.
+        browserUseVersion = null;
         marketplaceInputs = {
           browser-use-skills = null;
           jacobpevans-cc-plugins = null;

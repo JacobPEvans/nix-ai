@@ -9,6 +9,7 @@
   marketplaceInputs,
   fabric-src,
   fabricVersion,
+  browserUseVersion,
   ...
 }:
 
@@ -16,9 +17,6 @@
   # Synthetic marketplace wrapper for browser-use skills (repo lacks .claude-plugin structure)
   browserUseMarketplace =
     let
-      # Pinned to match uv-installed CLI version (modules/default.nix installBrowserUse)
-      # renovate: datasource=pypi depName=browser-use
-      browserUseVersion = "0.12.6";
       manifestJson = builtins.toFile "marketplace.json" (
         builtins.toJSON {
           name = "browser-use-skills";
