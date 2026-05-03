@@ -12,9 +12,30 @@ Arguments:
 
 import hashlib
 import os
-import shutil
 import sys
+import tempfile
 from pathlib import Path
+
+
+def _atomic_write(target: Path, content: bytes) -> None:
+    """Write ``content`` to ``target`` atomically with user-writable mode.
+
+    shutil.copy2 would preserve the read-only mode of the Nix-store source,
+    making the runtime config un-overwritable on the next activation. Using
+    tmp + rename gives us atomicity AND lets us set an explicit mode.
+    """
+    fd, tmp = tempfile.mkstemp(
+        dir=target.parent, prefix=target.name + ".", suffix=".tmp"
+    )
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(content)
+        os.chmod(tmp, 0o644)
+        os.replace(tmp, target)
+    except Exception:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+        raise
 
 
 def main() -> None:
@@ -47,8 +68,7 @@ def main() -> None:
     prev_hash = marker.read_text().strip() if marker.exists() else ""
 
     if base_hash != prev_hash:
-        shutil.copy2(base, runtime)
-        runtime.chmod(0o600)
+        _atomic_write(runtime, base_content)
         marker.write_text(base_hash + "\n")
         print("Updated llama-swap runtime config (base config changed)")
     else:
