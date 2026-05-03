@@ -1,0 +1,50 @@
+# Marketplace: jacobpevans-cc-plugins
+# Source: github.com/JacobPEvans/claude-code-plugins
+# Stars (verified 2026-05-02): 2
+# Priority Tier: 3 (Personal — author's own plugins)
+#
+# Duplicate Resolution Rule:
+#   Variants from this marketplace are PREFERRED over: Tiers 4, 5.
+#   Variants from this marketplace are SUPERSEDED by:  Tiers 1, 2.
+#
+# Plugins from this marketplace are auto-discovered from the flake input at
+# evaluation time. The list is determined by the repository contents (any
+# directory containing .claude-plugin/plugin.json is registered).
+#
+# To disable a specific jacobpevans plugin, override it explicitly here:
+#   "<plugin-name>@jacobpevans-cc-plugins" = false;
+
+{
+  lib,
+  jacobpevans-cc-plugins,
+  ...
+}:
+
+let
+  entries = builtins.readDir jacobpevans-cc-plugins;
+  # Plugin directories: exclude dotfiles, regular files, and known non-plugin dirs
+  nonPluginDirs = [
+    "docs"
+    "schemas"
+    ".claude-plugin"
+    ".github"
+    "scripts"
+    "tests"
+  ];
+  isPluginDir =
+    name: type:
+    type == "directory"
+    && !(lib.hasPrefix "." name)
+    && !(builtins.elem name nonPluginDirs)
+    && builtins.pathExists "${jacobpevans-cc-plugins}/${name}/.claude-plugin/plugin.json";
+  pluginNames = builtins.attrNames (lib.filterAttrs isPluginDir entries);
+  jacobpevansPlugins = lib.genAttrs (map (name: "${name}@jacobpevans-cc-plugins") pluginNames) (
+    _: true
+  );
+in
+{
+  enabledPlugins = jacobpevansPlugins // {
+    # Per-plugin overrides go here (e.g., to disable a specific plugin):
+    # "<plugin-name>@jacobpevans-cc-plugins" = false;
+  };
+}

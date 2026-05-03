@@ -1,192 +1,175 @@
 # Claude Code Plugin Catalog
 
-Complete reference for all plugin marketplaces and enabled plugins managed by this module.
+Reference for all plugin marketplaces and enabled plugins managed by this module.
 
 Parent doc: [`modules/claude/README.md`](../README.md)
 
 ## How Plugins Work
 
-Plugins are referenced as `"plugin-name@marketplace-name"` pairs. Most marketplaces are GitHub repos
-containing a `.claude-plugin/marketplace.json` manifest; synthetic marketplaces (see below) are adapted
-via Nix derivations without requiring the native structure. Nix pins every marketplace as a flake input
-for reproducible deployments. Setting a plugin to `true` enables it; `false` keeps it visible but disabled.
+Plugins are referenced as `"plugin-name@marketplace-name"` pairs. Most marketplaces are
+GitHub repos containing a `.claude-plugin/marketplace.json` manifest; synthetic
+marketplaces (see bottom) are adapted via Nix derivations without requiring the native
+structure. Nix pins every marketplace as a flake input for reproducible deployments.
+Setting a plugin to `true` enables it; `false` keeps it visible but disabled.
+
+## Priority Tier System
+
+Files in this directory are organized **one-per-marketplace** with a `tierN-` prefix.
+The tier number governs duplicate-resolution: when two plugins from different
+marketplaces ship the same agent or skill, keep the **higher-tier** variant and
+disable the lower-tier one. Document each disable inline with a reason.
+
+| Tier | Source | Marketplaces |
+| ---- | ------ | ------------ |
+| **1** | Anthropic Official | `claude-plugins-official`, `anthropic-agent-skills` |
+| **2** | First-party AI/cloud vendors | `openai-codex`, MCP integrations under `claude-plugins-official/external_plugins/*` |
+| **3** | Personal | `jacobpevans-cc-plugins` |
+| **4** | Community by GitHub-stars popularity (verified at edit time) | `claude-code-workflows` (34k★), `superpowers-marketplace` (925★), `cc-marketplace` (679★), `claude-skills` (129★) |
+| **5** | Niche / specialty | `lunar-claude`, `claude-code-plugins-plus`, `bitwarden-marketplace`, `cc-dev-tools`, `fabric-patterns`, `huggingface-skills`, `obsidian-skills`, `axton-obsidian-visual-skills`, `visual-explainer-marketplace`, `browser-use-skills`, `vct-cribl-pack-validator-skills`, `wakatime` |
+
+**Star counts are verified at edit time** via `gh repo view <owner>/<repo> --json
+stargazerCount` and embedded in each tier file's header. Re-verify yearly or when
+significantly reorganizing tiers.
 
 ## Marketplaces
 
-Registered marketplaces, defined in [`marketplaces.nix`](marketplaces.nix).
+All registered marketplaces, defined in [`marketplaces.nix`](marketplaces.nix). The
+"Tier" column matches the priority system above.
 
-| Key | GitHub | Category |
-| --- | ------ | -------- |
-| `jacobpevans-cc-plugins` | `JacobPEvans/claude-code-plugins` | Personal |
-| `claude-plugins-official` | `anthropics/claude-plugins-official` | Official Anthropic |
-| `anthropic-agent-skills` | `anthropics/skills` | Official Anthropic |
-| `cc-marketplace` | `ananddtyagi/cc-marketplace` | Community |
-| `bills-claude-skills` | `BillChirico/bills-claude-skills` | Community |
-| `superpowers-marketplace` | `obra/superpowers-marketplace` | Community |
-| `obsidian-skills` | `kepano/obsidian-skills` | Community |
-| `axton-obsidian-visual-skills` | `axtonliu/axton-obsidian-visual-skills` | Community |
-| `visual-explainer-marketplace` | `nicobailon/visual-explainer` | Community |
-| `bitwarden-marketplace` | `bitwarden/ai-plugins` | Community |
-| `lunar-claude` | `basher83/lunar-claude` | Infrastructure |
-| `claude-code-plugins-plus` | `jeremylongshore/claude-code-plugins-plus` | Infrastructure |
-| `claude-code-workflows` | `wshobson/agents` | Infrastructure / Dev |
-| `claude-skills` | `secondsky/claude-skills` | Dev Tools |
-| `cc-dev-tools` | `Lucklyric/cc-dev-tools` | AI Integrations |
-| `wakatime` | `wakatime/claude-code-wakatime` | Time Tracking |
-| `openai-codex` | `openai/codex-plugin-cc` | AI Integrations |
-| `huggingface-skills` | `huggingface/skills` | AI/ML |
-| `browser-use-skills` | `browser-use/browser-use` | Synthetic |
-| `fabric-patterns` | `danielmiessler/fabric` | Synthetic |
+| Key | GitHub | Stars (2026-05-02) | Tier |
+| --- | ------ | -----------------: | ---- |
+| `anthropic-agent-skills` | `anthropics/skills` | 127235 | 1 |
+| `claude-plugins-official` | `anthropics/claude-plugins-official` | 18410 | 1 / 2 |
+| `openai-codex` | `openai/codex-plugin-cc` | 17071 | 2 |
+| `jacobpevans-cc-plugins` | `JacobPEvans/claude-code-plugins` | 2 | 3 |
+| `claude-code-workflows` | `wshobson/agents` | 34640 | 4 |
+| `superpowers-marketplace` | `obra/superpowers-marketplace` | 925 | 4 |
+| `cc-marketplace` | `ananddtyagi/cc-marketplace` | 679 | 4 |
+| `claude-skills` | `secondsky/claude-skills` | 129 | 4 |
+| `browser-use-skills` | `browser-use/browser-use` (synthetic) | 91681 | 5 |
+| `fabric-patterns` | `danielmiessler/fabric` (synthetic) | 41428 | 5 |
+| `obsidian-skills` | `kepano/obsidian-skills` | 28277 | 5 |
+| `huggingface-skills` | `huggingface/skills` | 10371 | 5 |
+| `visual-explainer-marketplace` | `nicobailon/visual-explainer` | 7816 | 5 |
+| `axton-obsidian-visual-skills` | `axtonliu/axton-obsidian-visual-skills` | 2651 | 5 |
+| `claude-code-plugins-plus` | `jeremylongshore/claude-code-plugins-plus` | 2083 | 5 |
+| `bitwarden-marketplace` | `bitwarden/ai-plugins` | 90 | 5 |
+| `wakatime` | `wakatime/claude-code-wakatime` | 73 | 5 |
+| `cc-dev-tools` | `Lucklyric/cc-dev-tools` | 29 | 5 |
+| `lunar-claude` | `basher83/lunar-claude` | 18 | 5 |
+| `vct-cribl-pack-validator-skills` | `VisiCore/vct-cribl-pack-validator` (synthetic) | 0 | 5 |
+| `bills-claude-skills` | `BillChirico/bills-claude-skills` (registered, no plugins enabled) | — | — |
 
-## Enabled Plugins by Category
+`claude-plugins-official` is split across Tier 1 (Anthropic-authored core plugins
+in `tier1-claude-plugins-official.nix`) and Tier 2 (first-party MCP integrations
+to GitHub/Slack/Stripe/etc. in `tier2-external-mcp-integrations.nix`).
 
-> **Note on status values**: Each table reflects the value set in the named `.nix` file, not the
-> final merged result. When a plugin appears in multiple sections, the last-merged file wins
-> (see `plugins/default.nix`).
+## Duplicate Resolution Rule
 
-### Official Anthropic — [`official.nix`](official.nix)
+When the same role (e.g., `code-reviewer`, `test-automator`, `playwright`) ships
+from multiple plugins:
 
-| Plugin | Status | Description |
-| ------ | ------ | ----------- |
-| `document-skills@anthropic-agent-skills` | enabled | xlsx, docx, pptx, pdf document creation |
-| `commit-commands@claude-plugins-official` | enabled | Git commit workflows |
-| `code-review@claude-plugins-official` | enabled | Code review |
-| `pr-review-toolkit@claude-plugins-official` | enabled | PR review suite |
-| `feature-dev@claude-plugins-official` | enabled | Feature development guidance |
-| `security-guidance@claude-plugins-official` | enabled | Security guidance for infra work |
-| `plugin-dev@claude-plugins-official` | enabled | Plugin development tools |
-| `hookify@claude-plugins-official` | enabled | Hook creation from conversation analysis |
-| `claude-code-setup@claude-plugins-official` | enabled | Claude Code setup and configuration |
-| `claude-md-management@claude-plugins-official` | enabled | CLAUDE.md management |
-| `pyright-lsp@claude-plugins-official` | enabled | Python type checking LSP |
-| `typescript-lsp@claude-plugins-official` | disabled | Minimal TS usage |
+1. **Keep** the variant from the highest-tier marketplace.
+2. **Disable** the lower-tier duplicate(s) by setting `false` in their tier file.
+3. **Inline-comment** the disable line with a reason citing the keeper's tier and
+   marketplace, e.g.:
 
-### External Third-Party — [`external.nix`](external.nix)
+   ```nix
+   "playwright@claude-skills" = false; # Superseded by Tier 2 playwright@claude-plugins-official.
+   ```
 
-| Plugin | Status | Auth Required | Description |
-| ------ | ------ | ------------- | ----------- |
-| `github@claude-plugins-official` | enabled | `GITHUB_PERSONAL_ACCESS_TOKEN` | Repository, issues, PRs |
-| `context7@claude-plugins-official` | enabled | Optional API key | Library documentation lookup |
-| `playwright@claude-plugins-official` | enabled | Playwright installed | Browser automation and testing |
-| `slack@claude-plugins-official` | enabled | Slack OAuth | Team communication |
-| `asana@claude-plugins-official` | disabled | Asana API token | Task management |
-| `linear@claude-plugins-official` | disabled | Linear API key | Issue tracking |
-| `gitlab@claude-plugins-official` | disabled | GitLab API token | GitLab integration |
-| `greptile@claude-plugins-official` | disabled | — | Removed: not worth cost |
-| `firebase@claude-plugins-official` | disabled | Firebase credentials | Firebase platform |
-| `supabase@claude-plugins-official` | disabled | Supabase API key | Supabase platform |
-| `stripe@claude-plugins-official` | disabled | Stripe API key | Payment processing |
-| `laravel-boost@claude-plugins-official` | disabled | Laravel project | Laravel framework |
-| `serena@claude-plugins-official` | disabled | Serena API key | AI memory management |
+4. If you can't disable a plugin (because it bundles unique agents alongside the
+   duplicate), keep it enabled and **document the tolerated duplicate** in the
+   file's plugin comment block — see `tier4-claude-code-workflows.nix` for the
+   `backend-development` example (kept for `python-pro`/`fastapi-pro` despite a
+   duplicate `test-automator`).
+5. Within the same tier, prefer the marketplace with higher GitHub stars; fall
+   back to best judgement if the gap is small.
 
-### Community — [`community.nix`](community.nix)
+## File Layout
 
-| Plugin | Status | Description |
-| ------ | ------ | ----------- |
-| `analyze-issue@cc-marketplace` | enabled | GitHub issue analysis |
-| `create-worktrees@cc-marketplace` | enabled | Git worktree creation |
-| `python-expert@cc-marketplace` | enabled | Python expertise |
-| `devops-automator@cc-marketplace` | enabled | CI/CD, cloud infra, deployment |
-| `superpowers@superpowers-marketplace` | enabled | Comprehensive Claude enhancement suite |
-| `superpowers-lab@superpowers-marketplace` | enabled | Experimental superpowers |
-| `superpowers-developing-for-claude-code@superpowers-marketplace` | enabled | Plugin development superpowers |
-| `obsidian@obsidian-skills` | enabled | 5 skills: markdown, bases, canvas, CLI, utilities |
-| `obsidian-visual-skills@axton-obsidian-visual-skills` | enabled | 3 skills: Excalidraw, Mermaid, Canvas Creator |
-| `visual-explainer@visual-explainer-marketplace` | enabled | 1 skill + 8 commands: HTML diagrams, diff reviews, slides |
-| `claude-retrospective@bitwarden-marketplace` | enabled | 3 skills: retrospecting, session data, git analysis |
-| `claude-config-validator@bitwarden-marketplace` | enabled | 1 skill: reviewing-claude-config |
-| `browser-use@browser-use-skills` | enabled | Browser automation (requires `browser-use` via uv) |
-| `hf-cli@huggingface-skills` | enabled | HF CLI: download/upload models, datasets, manage Hub repos |
+```text
+plugins/
+├── default.nix                              # imports + merge
+├── marketplaces.nix                         # marketplace definitions (one entry per repo)
+├── README.md                                # this file
+│
+├── tier1-claude-plugins-official.nix        # Anthropic core
+├── tier1-anthropic-agent-skills.nix         # Anthropic skills (xlsx/docx/pdf/pptx)
+│
+├── tier2-openai-codex.nix                   # Official OpenAI codex plugin
+├── tier2-external-mcp-integrations.nix      # GitHub/Slack/Context7/Stripe/etc.
+│
+├── tier3-jacobpevans-cc-plugins.nix         # Auto-discovered personal plugins
+│
+├── tier4-claude-code-workflows.nix          # wshobson/agents (34k★)
+├── tier4-superpowers-marketplace.nix        # obra/superpowers (925★)
+├── tier4-cc-marketplace.nix                 # ananddtyagi/cc-marketplace (679★)
+├── tier4-claude-skills.nix                  # secondsky/claude-skills (129★)
+│
+├── tier5-lunar-claude.nix                   # ansible/proxmox infra
+├── tier5-claude-code-plugins-plus.nix       # terraform/iac
+├── tier5-bitwarden-marketplace.nix          # claude-retrospective, config-validator
+├── tier5-cc-dev-tools.nix                   # codex (community), gemini, telegram
+├── tier5-fabric-patterns.nix                # daniel miessler patterns (synthetic)
+├── tier5-huggingface-skills.nix             # hf-cli
+├── tier5-obsidian-skills.nix
+├── tier5-axton-obsidian-visual-skills.nix
+├── tier5-visual-explainer-marketplace.nix
+├── tier5-browser-use-skills.nix             # synthetic
+├── tier5-vct-cribl-pack-validator-skills.nix # synthetic
+└── tier5-wakatime.nix
+```
 
-### Infrastructure — [`infrastructure.nix`](infrastructure.nix)
+## Adding a New Marketplace
 
-| Plugin | Status | Description |
-| ------ | ------ | ----------- |
-| `proxmox-infrastructure@lunar-claude` | enabled | Proxmox VM/LXC management |
-| `ansible-workflows@lunar-claude` | enabled | Ansible playbook workflows |
-| `infrastructure-as-code-generator@claude-code-plugins-plus` | enabled | IaC generation |
-| `terraform-module-builder@claude-code-plugins-plus` | enabled | OpenTofu module authoring |
-| `cicd-automation@claude-code-workflows` | enabled | GitHub Actions CI/CD |
+1. Add the marketplace entry to [`marketplaces.nix`](marketplaces.nix) with the
+   key matching the `name` field from the repo's `.claude-plugin/marketplace.json`.
+2. Verify popularity: `gh repo view <owner>/<repo> --json stargazerCount`.
+3. Decide tier:
+   - Anthropic official → Tier 1
+   - First-party AI vendor (OpenAI, Google, GitHub-as-vendor) → Tier 2
+   - Personal repos → Tier 3
+   - Community marketplace with broad scope (>500 stars, multiple plugins) → Tier 4
+   - Single-purpose / specialty / synthetic / low-popularity → Tier 5
+4. Create `tierN-<marketplace-name>.nix` using the standard header (copy from any
+   existing tier file).
+5. Add the import + merge entry to `default.nix`.
+6. Run `nix flake check`.
 
-### Development — [`development.nix`](development.nix)
+## Adding a Plugin
 
-**Auto-discovered personal plugins:** All plugin directories in `JacobPEvans/claude-code-plugins`
-are discovered at flake update time and enabled automatically as `*@jacobpevans-cc-plugins`:
-
-`ai-delegation`, `code-standards`, `codeql-resolver`, `config-management`, `content-guards`,
-`git-guards`, `git-standards`, `git-workflows`, `github-workflows`, `infra-orchestration`,
-`infra-standards`, `pal-health`, `pr-lifecycle`, `process-cleanup`, `project-standards`,
-`script-guards`, `session-analytics`, `skill-guards`
-
-**Explicit plugins:**
-
-| Plugin | Status | Description |
-| ------ | ------ | ----------- |
-| `backend-development@claude-code-workflows` | enabled | Python/Shell backend; multiple skills |
-| `unit-testing@claude-code-workflows` | enabled | Unit test workflows |
-| `tdd-workflows@claude-code-workflows` | enabled | TDD red/green/refactor cycle |
-| `code-refactoring@claude-code-workflows` | enabled | Refactoring assistance |
-| `codebase-cleanup@claude-code-workflows` | enabled | Dead code, cleanup |
-| `agent-orchestration@claude-code-workflows` | enabled | Multi-agent coordination |
-| `observability-monitoring@claude-code-workflows` | enabled | Distributed tracing, SLO |
-| `python-development@claude-code-workflows` | enabled | Django/FastAPI with 5 specialized skills |
-| `full-stack-orchestration@claude-code-workflows` | enabled | 7+ agent multi-agent workflows |
-| `developer-essentials@claude-code-workflows` | enabled | Common dev tools and utilities |
-| `performance-testing-review@claude-code-workflows` | enabled | Performance analysis, test coverage |
-| `api-design-principles@claude-skills` | enabled | REST/GraphQL API design |
-| `rest-api-design@claude-skills` | enabled | REST design patterns |
-| `graphql-implementation@claude-skills` | enabled | GraphQL implementation |
-| `websocket-implementation@claude-skills` | enabled | WebSocket patterns |
-| `playwright@claude-skills` | enabled | Browser testing skills |
-| `vitest-testing@claude-skills` | enabled | Vitest unit testing |
-| `jest-generator@claude-skills` | enabled | Jest test generation |
-| `vulnerability-scanning@claude-skills` | enabled | Security scanning |
-| `csrf-protection@claude-skills` | enabled | CSRF protection patterns |
-| `xss-prevention@claude-skills` | enabled | XSS prevention patterns |
-| `recommendation-engine@claude-skills` | enabled | Recommendation systems |
-| `sql-query-optimization@claude-skills` | enabled | SQL optimization |
-| `better-auth@claude-skills` | enabled | Auth implementation |
-| `oauth-implementation@claude-skills` | enabled | OAuth flows |
-
-### Monitoring — [`monitoring.nix`](monitoring.nix)
-
-| Plugin | Status | Description |
-| ------ | ------ | ----------- |
-| `claude-code-wakatime@wakatime` | enabled | Time tracking via WakaTime |
-
-### Experimental — [`experimental.nix`](experimental.nix)
-
-| Plugin | Status | Description |
-| ------ | ------ | ----------- |
-| `codex@cc-dev-tools` | enabled | OpenAI GPT for high-reasoning coding (community) |
-| `codex@openai-codex` | enabled | Official OpenAI Codex (`/codex:review`, `/codex:rescue`) |
-| `gemini@cc-dev-tools` | enabled | Google Gemini with web search + session resumption |
-| `telegram-notifier@cc-dev-tools` | disabled | Requires `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` |
-
-### Fabric Patterns — [`fabric.nix`](fabric.nix)
-
-| Plugin | Status | Description |
-| ------ | ------ | ----------- |
-| `fabric-patterns@fabric-patterns` | enabled | Curated patterns from danielmiessler/fabric |
-
-Curated pattern list is in [`fabric-curated-patterns.json`](../fabric-curated-patterns.json).
-See [`modules/fabric/README.md`](../../fabric/README.md) for full Fabric documentation.
+1. Open the marketplace's tier file.
+2. Add `"plugin-name@marketplace-key" = true;` (or `false` to disable).
+3. **If a duplicate exists in a higher tier**: don't enable it — leave it `false`
+   with an inline comment pointing at the keeper.
+4. Run `nix flake check`.
 
 ## Synthetic Marketplaces
 
-Three marketplaces lack native `.claude-plugin/` structure in their upstream repos. Nix wraps
-them via derivations in [`marketplace-overrides.nix`](../marketplace-overrides.nix):
+Three marketplaces lack native `.claude-plugin/` structure in their upstream repos.
+Nix wraps them via derivations in [`marketplace-overrides.nix`](../marketplace-overrides.nix):
 
 | Marketplace | Upstream Repo | Wrapping Strategy |
 | ----------- | ------------- | ----------------- |
 | `browser-use-skills` | `browser-use/browser-use` | Wraps upstream skills directory |
+| `vct-cribl-pack-validator-skills` | `VisiCore/vct-cribl-pack-validator` | Wraps bare `.claude/skills/` layout |
 | `fabric-patterns` | `danielmiessler/fabric` | Wraps curated subset of 252+ patterns as individual skills |
 | `jacobpevans-cc-plugins` | `JacobPEvans/claude-code-plugins` | Auto-generates `marketplace.json` from discovered `plugin.json` files |
 
-## Adding a Plugin
+## Token-Cost Awareness
 
-1. Check if the marketplace exists in [`marketplaces.nix`](marketplaces.nix). If not, add it
-   with the key matching the `name` field from the repo's `.claude-plugin/marketplace.json`.
-2. Add `"plugin-name@marketplace-key" = true;` to the appropriate category `.nix` file.
-3. Run `nix flake check` to validate.
-4. Deploy with `darwin-rebuild switch` and verify in a live Claude Code session.
+Every enabled plugin contributes its skill descriptions and agent metadata to the
+**eager** session-start context (typically 50-200 tokens per plugin). Even disabled
+plugins listed in `enabledPlugins: { name: false }` are free — only `true` plugins
+load. **Reduce per-session overhead** by:
+
+1. Disabling lower-tier duplicates (this directory's primary mechanism).
+2. Committing per-repo `.claude/settings.json` overrides into individual project
+   repositories to disable plugins that aren't relevant to that repo's stack.
+3. Verifying `ENABLE_TOOL_SEARCH = "auto:10"` in `modules/claude/settings.nix`
+   so MCP schemas defer until needed.
+
+See [`docs/architecture/token-optimization.md`](../../../docs/architecture/token-optimization.md)
+for the full rationale and per-session measurements (if it exists; otherwise consult
+the user-level plan file at `~/.claude/plans/`).
