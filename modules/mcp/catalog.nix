@@ -43,7 +43,7 @@ let
   # renovate: datasource=pypi depName=huggingface-mcp-server
   hfMcpServerVersion = "0.1.0";
   # renovate: datasource=pypi depName=huggingface-hub
-  huggingfaceHubVersion = "1.12.0";
+  huggingfaceHubVersion = "1.13.0";
   # renovate: datasource=pypi depName=fabric-mcp
   fabricMcpVersion = "1.1.0";
   # renovate: datasource=pypi depName=google-workspace-mcp
