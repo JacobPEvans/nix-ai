@@ -1,10 +1,11 @@
 #
-# Aider Module — Option Declarations
+# cecli Module — Option Declarations
 #
-# programs.aider.* options mirror the codex/gemini convention:
-# nullableStr, enum, listOf str, attrsOf bool.
+# Mirrors the codex/gemini convention: nullableStr, enum, listOf str,
+# attrsOf bool. Drop-in API surface for muscle memory from the previous
+# programs.aider module — same option names where they make sense.
 #
-{ pkgs, lib, ... }:
+{ lib, ... }:
 
 let
   hookType = lib.types.nullOr (lib.types.either lib.types.path lib.types.lines);
@@ -20,27 +21,21 @@ let
   );
 in
 {
-  options.programs.aider = {
-    enable = lib.mkEnableOption "Aider AI pair programming CLI";
+  options.programs.cecli = {
+    enable = lib.mkEnableOption "cecli (maintained Aider fork) AI pair programming CLI";
 
-    package = lib.mkOption {
-      type = lib.types.nullOr lib.types.package;
-      default = pkgs.aider-chat-full;
-      defaultText = lib.literalExpression "pkgs.aider-chat-full";
+    installVia = lib.mkOption {
+      type = lib.types.enum [
+        "uvx"
+        "nixpkgs"
+        "brew"
+      ];
+      default = "uvx";
       description = ''
-        Aider package. Set to null when useUvx = true.
-        Override to pkgs.aider-chat for the base package without extras.
-      '';
-    };
-
-    useUvx = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = ''
-        When true, install a writeShellScriptBin "aider" wrapper that runs
-        `uv tool run --from "aider-chat" aider` instead of the nixpkgs package.
-        Gives access to the latest upstream release at the cost of reproducibility.
-        Set package = null when enabling this.
+        Install source. cecli is uvx-only today — neither nixpkgs nor
+        Homebrew packages it. Option exists for forward compatibility
+        when packaging arrives. Selecting nixpkgs or brew today raises
+        an assertion at evaluation time.
       '';
     };
 
@@ -63,7 +58,7 @@ in
       type = lib.types.str;
       default = "openai/default";
       description = ''
-        Main Aider model. Use openai/<role> names; the role is resolved by
+        Main model. Use openai/<role> names; the role is resolved by
         llama-swap to the physical HF id (see services.aiStack.models).
       '';
     };
@@ -83,7 +78,7 @@ in
     editFormat = lib.mkOption {
       type = editFormatType;
       default = "diff";
-      description = "Aider edit format for the main model. diff works well with Qwen3-Coder.";
+      description = "Edit format for the main model. diff works well with Qwen3-Coder.";
     };
 
     weakEditFormat = lib.mkOption {
@@ -107,19 +102,19 @@ in
     attributeAuthor = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Add Aider attribution to git author metadata.";
+      description = "Add cecli attribution to git author metadata.";
     };
 
     attributeCommitter = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Add Aider attribution to git committer metadata.";
+      description = "Add cecli attribution to git committer metadata.";
     };
 
     gitignore = lib.mkOption {
       type = lib.types.bool;
       default = true;
-      description = "Auto-add Aider artifact files to .gitignore.";
+      description = "Auto-add cecli artifact files to .gitignore.";
     };
 
     lint = lib.mkOption {
@@ -159,21 +154,21 @@ in
         "AGENTS.md"
         "GEMINI.md"
       ];
-      description = "Files always added as read-only context in every Aider session.";
+      description = "Files always added as read-only context in every session.";
     };
 
     hooks = {
       notification = lib.mkOption {
         type = hookType;
         default = null;
-        description = "Aider notification hook (path or inline script). Reserved for future use.";
+        description = "Notification hook (path or inline script). Reserved for future use.";
       };
     };
 
     extraConfig = lib.mkOption {
       type = lib.types.attrs;
       default = { };
-      description = "Free-form attrs merged into ~/.aider.conf.yml. Keys override typed options.";
+      description = "Free-form attrs merged into ~/.cecli.conf.yml. Keys override typed options.";
     };
   };
 }

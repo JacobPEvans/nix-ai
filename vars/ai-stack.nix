@@ -53,4 +53,23 @@
     cribl_stream_ui = 30900;
     cribl_edge_ui = 30910;
   };
+
+  # CLI tool versions for non-nix-managed installs (uvx / brew / npm).
+  # Renovate updates each entry via the comment hint immediately above it.
+  # Per nix-package-placement: nixpkgs first, then brew, then uvx/npm —
+  # entries here are tools that fall to brew or uvx because nixpkgs is
+  # missing or broken on darwin.
+  cliVersions = {
+    # cecli — actively maintained Aider fork. PyPI distribution name is
+    # `cecli-dev`; entry-point binary is `cecli`. uvx-installed because
+    # neither nixpkgs nor homebrew package it.
+    # renovate: datasource=pypi depName=cecli-dev
+    cecli = "0.99.10";
+
+    # Qwen Code — Alibaba's terminal coding agent. Brew-installed via
+    # nix-darwin's homebrew.brews; this pin documents the expected
+    # version so consumers can sanity-check what brew has.
+    # renovate: datasource=github-releases depName=QwenLM/qwen-code
+    qwen-code = "0.15.6";
+  };
 }

@@ -61,6 +61,18 @@ notes covering tool-call parser compatibility, idle eviction, and MoE vs dense t
 **Read when**: Adding a new MLX tool, debugging a model loading or tool-calling issue,
 or understanding why the 35B model is preloaded vs the 122B MoE.
 
+### [per-agent-flakes.md](per-agent-flakes.md)
+
+The uniform module layout each AI agent module follows (`default.nix`, `options.nix`,
+`packages.nix`, `settings.nix`, `README.md`), the install-source preference rule
+(nixpkgs → brew → uvx/npm), the contract for sharing brew formulae with nix-darwin,
+and the recipe for graduating an in-tree agent module to its own standalone flake.
+Reference implementations: `modules/cecli/` (uvx) and `modules/qwen-code/` (brew + npm).
+
+**Read when**: Adding a new AI agent CLI to nix-ai, refactoring one of the existing
+modules (Claude/Gemini/Codex/fabric) to the uniform layout, or extracting a module
+into a standalone flake.
+
 ## ADRs
 
 [`docs/adr/`](../adr/README.md) contains the decisions behind non-obvious design choices.

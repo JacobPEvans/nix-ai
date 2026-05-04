@@ -78,7 +78,7 @@ in
     ./ai-shell.nix
     ./ai-stack
     ./agent-skills
-    ./aider
+    ./cecli
     ./claude
     ./claude-latest.nix
     ./codex
@@ -89,6 +89,7 @@ in
     ./mcp/module.nix
     ./mlx
     ./open-webui.nix
+    ./qwen-code
     ./routines
   ];
 
@@ -147,8 +148,13 @@ in
       claudeStatuslineDaniel3303.enable = false;
       claudeStatuslineCcstatusline.enable = true;
 
-      # Aider AI pair programming (settings handled by modules/aider/)
-      aider = {
+      # cecli — actively maintained Aider fork (settings handled by modules/cecli/)
+      cecli = {
+        enable = true;
+      };
+
+      # Qwen Code — Alibaba's CLI agent (settings handled by modules/qwen-code/)
+      qwen-code = {
         enable = true;
       };
 

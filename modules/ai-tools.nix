@@ -57,8 +57,9 @@
 #   hf: huggingface-hub CLI (model downloads, used with HuggingFace MCP)
 #   vllm-mlx: defined in modules/mlx.nix (owns the wrapper + LaunchAgent)
 #
-# DECLARATIVE MODULE (package + config managed by modules/aider/):
-#   aider-chat: AI pair programming — see modules/aider/ (programs.aider)
+# DECLARATIVE MODULES (package + config managed by per-agent modules):
+#   cecli      — actively maintained Aider fork; see modules/cecli/ (programs.cecli)
+#   qwen-code  — Qwen agent CLI; see modules/qwen-code/ (programs.qwen-code)
 #
 # NOTE: These are home-manager packages, not system packages.
 # Imported in hosts/macbook-m4/home.nix via home.packages.
@@ -197,10 +198,12 @@ in
     '')
 
     # ==========================================================================
-    # Aider - AI pair programming in the terminal
+    # AI agent CLIs (cecli, qwen-code)
     # ==========================================================================
-    # Package and configuration managed by modules/aider/ (programs.aider).
-    # See that module for routing, model selection, and YAML config generation.
+    # Package install + configuration managed by per-agent modules:
+    #   modules/cecli/      → programs.cecli      (uvx install)
+    #   modules/qwen-code/  → programs.qwen-code  (homebrew install via nix-darwin)
+    # See those modules for routing, model selection, and config generation.
 
   ];
 }

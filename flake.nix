@@ -268,10 +268,20 @@
           };
         };
 
-        aider = {
+        cecli = {
           imports = [
             ./modules/ai-stack
-            ./modules/aider
+            ./modules/cecli
+          ];
+          _module.args = {
+            inherit ai-assistant-instructions;
+          };
+        };
+
+        qwen-code = {
+          imports = [
+            ./modules/ai-stack
+            ./modules/qwen-code
           ];
           _module.args = {
             inherit ai-assistant-instructions;
@@ -341,6 +351,15 @@
         # modules/ai-stack/default.nix uses this same file as its option
         # default — one source of truth.
         aiStackModels = import ./lib/ai-stack-models.nix;
+
+        # Homebrew formula list required by per-agent modules whose
+        # preferred install path is brew. nix-darwin reads this from the
+        # nix-ai flake input and merges into homebrew.brews. Keeps each
+        # agent module self-contained and ready for future graduation
+        # to its own flake — see docs/architecture/per-agent-flakes.md.
+        brewFormulae = [
+          "qwen-code" # programs.qwen-code with installVia = "brew"
+        ];
 
         # Shared permission + formatter engine. Exposed for cross-flake consumers
         # (e.g., nix-ai-claude) so the source of truth for tool-agnostic command
