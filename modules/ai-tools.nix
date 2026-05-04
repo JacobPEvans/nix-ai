@@ -85,7 +85,7 @@ let
   # renovate: datasource=npm depName=@googleworkspace/cli
   gwsCliVersion = "0.22.5";
   # renovate: datasource=pypi depName=huggingface-hub
-  huggingfaceHubVersion = "1.12.0";
+  huggingfaceHubVersion = "1.13.0";
 in
 {
   # AI-specific development tools
