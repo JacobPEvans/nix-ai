@@ -68,22 +68,6 @@ in
         '';
       })
 
-      (lib.mkIf (cfg.installVia == "brew" && !pkgs.stdenv.isDarwin) {
-        # Brew is the default but only meaningful on darwin. On Linux,
-        # explicitly steer the user to npm with an eval-time assertion
-        # rather than silently doing nothing or emitting a misleading
-        # nix-darwin warning.
-        assertions = [
-          {
-            assertion = false;
-            message = ''
-              programs.qwen-code.installVia = "brew" requires darwin.
-              On Linux, set installVia = "npm" instead.
-            '';
-          }
-        ];
-      })
-
       (lib.mkIf (cfg.installVia == "npm") {
         home.packages = [
           npmWrapper

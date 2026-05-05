@@ -26,14 +26,16 @@ let
   # interpreter + venv under ~/.local/share/uv/. cecli ships two
   # entry points; expose both so muscle-memory `aider-ce` invocations
   # work even when ~/.local/bin is not on PATH.
-  mkUvxWrapper = name: pkgs.writeShellScriptBin name ''
-    if [ ! -x "$HOME/.local/bin/${name}" ]; then
-      echo "${name}: ~/.local/bin/${name} is missing." >&2
-      echo "Re-run darwin-rebuild switch — the activation hook installs it." >&2
-      exit 127
-    fi
-    exec "$HOME/.local/bin/${name}" "$@"
-  '';
+  mkUvxWrapper =
+    name:
+    pkgs.writeShellScriptBin name ''
+      if [ ! -x "$HOME/.local/bin/${name}" ]; then
+        echo "${name}: ~/.local/bin/${name} is missing." >&2
+        echo "Re-run darwin-rebuild switch — the activation hook installs it." >&2
+        exit 127
+      fi
+      exec "$HOME/.local/bin/${name}" "$@"
+    '';
 in
 {
   config = lib.mkIf cfg.enable {

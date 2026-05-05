@@ -154,8 +154,13 @@ in
       };
 
       # Qwen Code — Alibaba's CLI agent (settings handled by modules/qwen-code/)
+      # Platform-sensitive default: brew on darwin (preferred per the
+      # install-order rule), npm everywhere else (Homebrew has no Linux
+      # bottle for qwen-code today). Users can still override
+      # explicitly via programs.qwen-code.installVia.
       qwen-code = {
         enable = true;
+        installVia = if pkgs.stdenv.isDarwin then "brew" else "npm";
       };
 
       # OpenAI Codex configuration (settings handled by modules/codex/)
