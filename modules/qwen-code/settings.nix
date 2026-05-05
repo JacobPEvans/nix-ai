@@ -34,12 +34,13 @@ let
 
   # llama-swap routes capability-class aliases (default, coding, ...);
   # Bifrost requires the mlx-local/ prefix on physical IDs. Generate the
-  # provider's model list to match the routing target.
+  # provider's model list to match the routing target. The qwen-code
+  # model schema only accepts `name` and `description` — routing is
+  # implicit in the provider's baseUrl, not a per-model field.
   modelEntries =
     if isBifrost then
       lib.mapAttrsToList (role: physical: {
         name = "mlx-local/${physical}";
-        inherit (cfg) routing;
         description = "${role} → ${physical} via Bifrost";
       }) models
     else
@@ -77,9 +78,15 @@ let
     model.name = defaultModelName;
   };
 
-  # Deep merge user extras over our base. attrsets.recursiveUpdate is the
-  # standard merge for layered settings.
-  finalSettings = lib.recursiveUpdate baseSettings cfg.extraSettings;
+  # Deep merge user extras over our base. recursiveUpdate replaces leaf
+  # values, including lists — so modelProviders gets special handling:
+  # base providers stay, user providers append. Everything else
+  # (env entries, security, model.name) deep-merges normally.
+  extraProviders = cfg.extraSettings.modelProviders or [ ];
+  extraWithoutProviders = builtins.removeAttrs cfg.extraSettings [ "modelProviders" ];
+  finalSettings = (lib.recursiveUpdate baseSettings extraWithoutProviders) // {
+    modelProviders = baseSettings.modelProviders ++ extraProviders;
+  };
 
   settingsJson = pkgs.writeText "qwen-settings.json" (builtins.toJSON finalSettings);
 in

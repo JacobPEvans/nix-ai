@@ -23,8 +23,8 @@ if [ -z "$uv_bin" ]; then
   exit 0
 fi
 
-installed_version="$("$uv_bin" tool list 2>/dev/null \
-  | awk '$1 == "cecli-dev" { print $2; exit }')"
+installed_version="$("$uv_bin" tool list \
+  | awk '$1 == "cecli-dev" { sub(/^v/, "", $2); print $2; exit }')"
 
 if [ "$installed_version" = "$target_version" ]; then
   exit 0

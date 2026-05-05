@@ -47,6 +47,6 @@ in
   config.home.activation.writeAiStackRegistry = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     target="$HOME/.config/ai-stack/registry.json"
     $DRY_RUN_CMD mkdir -p "$(dirname "$target")"
-    $DRY_RUN_CMD install -m 0644 -T ${registryJson} "$target"
+    $DRY_RUN_CMD install -m 0644 ${registryJson} "$target"
   '';
 }

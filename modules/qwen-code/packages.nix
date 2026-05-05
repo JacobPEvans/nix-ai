@@ -6,9 +6,11 @@
 # home-manager, so this module's contribution is:
 #
 #   1. A soft assertion that the binary is on PATH when installVia="brew"
-#      (catches the "you forgot to add the formula in nix-darwin" case).
+#      on darwin (catches the "you forgot to add the formula in
+#      nix-darwin" case). On Linux + brew, an eval-time assertion fires
+#      directly — brew is darwin-only here.
 #   2. An npm pre-warm activation when installVia="npm" (fallback path
-#      for hosts without Homebrew).
+#      for hosts without Homebrew, or when the user opts out of brew).
 #
 # The flake-output `lib.brewFormulae` is what nix-darwin reads to know
 # which formulae this module needs — see flake.nix.
@@ -51,40 +53,48 @@ in
         ];
       }
 
-      (lib.mkIf (cfg.installVia == "brew") {
+      (lib.mkIf (cfg.installVia == "brew" && pkgs.stdenv.isDarwin) {
         # nix-darwin actually installs the formula via homebrew.brews,
-        # consuming the lib.brewFormulae flake output. The check below
-        # fires AT activation time (warning, not eval-time failure) so
-        # users who haven't yet run the companion nix-darwin rebuild get
-        # a clear pointer instead of a `command not found`.
+        # consuming the lib.brewFormulae flake output. The activation
+        # check fires AT activation time (warning, not eval-time
+        # failure) so users who haven't yet run the companion
+        # nix-darwin rebuild get a clear pointer instead of a
+        # `command not found`. Gated by isDarwin so non-darwin systems
+        # with the default config don't see an irrelevant
+        # nix-darwin/homebrew warning — they hit the assertion below
+        # instead.
         home.activation.checkQwenInstalled = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          if ! command -v qwen >/dev/null 2>&1; then
-            echo "WARNING: programs.qwen-code is enabled but \`qwen\` is not on PATH." >&2
-            echo "  Add \"qwen-code\" to homebrew.brews in nix-darwin and rebuild." >&2
-            echo "  Or set programs.qwen-code.installVia = \"npm\" for a Nix-managed install." >&2
-          fi
+          $DRY_RUN_CMD ${pkgs.bash}/bin/bash ${./scripts/check-qwen-installed.sh}
         '';
       })
 
+      (lib.mkIf (cfg.installVia == "brew" && !pkgs.stdenv.isDarwin) {
+        # Brew is the default but only meaningful on darwin. On Linux,
+        # explicitly steer the user to npm with an eval-time assertion
+        # rather than silently doing nothing or emitting a misleading
+        # nix-darwin warning.
+        assertions = [
+          {
+            assertion = false;
+            message = ''
+              programs.qwen-code.installVia = "brew" requires darwin.
+              On Linux, set installVia = "npm" instead.
+            '';
+          }
+        ];
+      })
+
       (lib.mkIf (cfg.installVia == "npm") {
-        # nodejs is referenced via ${pkgs.nodejs}/bin/npm in the activation
-        # hook below, which keeps it in the closure without putting another
-        # node interpreter on PATH.
         home.packages = [
           npmWrapper
         ];
 
+        # npm and jq paths are baked in as Nix store references so the
+        # script doesn't need to hunt for them on PATH (and so the
+        # closure tracks them as real dependencies).
         home.activation.installQwenCode = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          target_version="${qwenVersion}"
-          npm_prefix="$HOME/.local/share/npm"
-          installed_version="$(${pkgs.nodejs}/bin/npm --prefix "$npm_prefix" ls --depth 0 --json 2>/dev/null \
-            | ${pkgs.jq}/bin/jq -r '.dependencies."@qwen-code/qwen-code".version // ""')"
-          if [ "$installed_version" != "$target_version" ]; then
-            echo "-> Installing @qwen-code/qwen-code@$target_version via npm..."
-            $DRY_RUN_CMD mkdir -p "$npm_prefix"
-            $DRY_RUN_CMD ${pkgs.nodejs}/bin/npm install --prefix "$npm_prefix" \
-              "@qwen-code/qwen-code@$target_version"
-          fi
+          $DRY_RUN_CMD ${pkgs.bash}/bin/bash ${./scripts/install-qwen-code.sh} \
+            "${qwenVersion}" "${pkgs.nodejs}/bin/npm" "${pkgs.jq}/bin/jq"
         '';
       })
     ]

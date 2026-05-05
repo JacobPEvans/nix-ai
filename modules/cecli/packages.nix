@@ -21,16 +21,18 @@ let
   registry = import ../../vars/ai-stack.nix;
   cecliVersion = registry.cliVersions.cecli;
 
-  # Wrapper that delegates to the uvx-installed binary. Gives us a
-  # deterministic Nix-managed PATH entry; uvx still owns the actual
-  # interpreter + venv under ~/.local/share/uv/.
-  cecliWrapper = pkgs.writeShellScriptBin "cecli" ''
-    if [ ! -x "$HOME/.local/bin/cecli" ]; then
-      echo "cecli: ~/.local/bin/cecli is missing." >&2
+  # Wrappers that delegate to the uvx-installed binaries. Gives us
+  # deterministic Nix-managed PATH entries; uvx still owns the actual
+  # interpreter + venv under ~/.local/share/uv/. cecli ships two
+  # entry points; expose both so muscle-memory `aider-ce` invocations
+  # work even when ~/.local/bin is not on PATH.
+  mkUvxWrapper = name: pkgs.writeShellScriptBin name ''
+    if [ ! -x "$HOME/.local/bin/${name}" ]; then
+      echo "${name}: ~/.local/bin/${name} is missing." >&2
       echo "Re-run darwin-rebuild switch — the activation hook installs it." >&2
       exit 127
     fi
-    exec "$HOME/.local/bin/cecli" "$@"
+    exec "$HOME/.local/bin/${name}" "$@"
   '';
 in
 {
@@ -47,7 +49,8 @@ in
     ];
 
     home.packages = [
-      cecliWrapper
+      (mkUvxWrapper "cecli")
+      (mkUvxWrapper "aider-ce")
     ];
 
     # Pre-warm install via uv (script extracted per no-scripts-in-nix rule).
@@ -58,7 +61,7 @@ in
     # already in home.packages from modules/ai-tools.nix, so the runtime
     # PATH lookup is reliable.
     home.activation.installCecli = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      $DRY_RUN_CMD ${./scripts/install-cecli.sh} "${cecliVersion}"
+      $DRY_RUN_CMD ${pkgs.bash}/bin/bash ${./scripts/install-cecli.sh} "${cecliVersion}"
     '';
   };
 }
