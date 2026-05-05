@@ -6,13 +6,10 @@ OpenAI/Anthropic/Gemini-compatible endpoint. Apache-2.0.
 
 ## What it manages
 
-- A soft assertion that the brew-installed `qwen` binary is on PATH
-  (when `installVia = "brew"`, the default on darwin). The actual brew
-  install lives in nix-darwin's `homebrew.brews`, sourced from
-  nix-ai's `lib.brewFormulae` flake output.
-- Optional npm-based install (`installVia = "npm"`) for hosts without
-  Homebrew — pre-warms `@qwen-code/qwen-code` into
-  `~/.local/share/npm/` and provides a Nix-managed wrapper on PATH.
+- A soft activation check that the brew-installed `qwen` binary is on
+  PATH (only fires on darwin). The actual brew install lives in
+  nix-darwin's `homebrew.brews`, sourced from nix-ai's
+  `lib.brewFormulae` flake output.
 - A generated `~/.qwen/settings.json` wired to local llama-swap (or
   Bifrost) with one provider entry per capability-class alias from
   `services.aiStack.models`. Default startup model is the `coding`
@@ -20,18 +17,23 @@ OpenAI/Anthropic/Gemini-compatible endpoint. Apache-2.0.
 - Doppler-wrapped `d-qwen` shell alias (declared in
   `modules/ai-aliases.zsh`) for sessions that need cloud-provider keys
   (Dashscope, OpenRouter, OpenAI, etc.).
+- On non-darwin hosts the module short-circuits silently — no
+  install, no warning. Linux users need brew (or Linuxbrew) to use
+  qwen-code through this module.
 
 ## Install matrix
 
 | Order | Source | Implementation status |
 | --- | --- | --- |
-| 1 | nixpkgs | Not packaged; option exists for forward compatibility |
-| 2 | Homebrew (`qwen-code`) | **Default** — formula lives in nix-darwin's `homebrew.brews` |
-| 3 | npm (`@qwen-code/qwen-code`) | Implemented as fallback |
+| 1 | nixpkgs | Not packaged upstream |
+| 2 | Local Nix derivation (`buildNpmPackage`) | Deferred — qwen-code's npm workspace + cross-platform `optionalDependencies` (six per-OS `@lydell/node-pty` wheels + transitive ENOTCACHED gaps) need deeper packaging work than this PR's scope |
+| 3 | Homebrew (`qwen-code`) | **Active** — formula lives in nix-darwin's `homebrew.brews` |
 
-Per the repo's install-order rule. Brew is the right home today —
-bottled, ~9k installs/30d, Apache-2.0, deps are `node` + `ripgrep`
-(both already common).
+Per the repo's install-order rule. Brew works today — bottled,
+~9k installs/30d, Apache-2.0, deps are `node` + `ripgrep` (both
+already common). The `buildNpmPackage` path stays open as a future
+follow-up when someone has the cycles to handle the workspace
+optional-dep resolution properly.
 
 ## Routing
 

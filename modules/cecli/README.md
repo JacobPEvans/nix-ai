@@ -11,33 +11,45 @@ under `programs.cecli` to ease migration.
 
 ## What it manages
 
-- Pre-warmed `cecli-dev` install via `uv tool install` at
-  home-manager activation time, version-pinned through
-  `vars/ai-stack.nix#cliVersions.cecli`.
-- A nix-managed `cecli` wrapper on PATH that exec's the uvx-installed
-  binary, so `which cecli` returns a deterministic store-path entry.
+- A real Nix derivation built from cecli-dev's PyPI sdist via
+  `python3Packages.buildPythonApplication`. See
+  [`modules/cecli/package.nix`](./package.nix) for the build
+  definition; exposed as `pkgs.cecli` through this flake's
+  `packages.<system>` output. Three entry points land on PATH:
+  `cecli`, `aider-ce`, `ce.cli`.
 - Three read-only generated config files — `~/.cecli.conf.yml`,
   `~/.cecli/cecli-meta.json`, `~/.cecli/cecli-settings.yml` — wired
   to the local MLX endpoint and the capability-class registry.
 - Doppler-wrapped `d-cecli` shell alias (declared in
-  `modules/ai-aliases.zsh`) for sessions that need cloud-provider keys.
+  `modules/ai-aliases.zsh`) for sessions that need cloud-provider
+  keys.
 
-## Why uvx (and not nixpkgs / homebrew)
+## Why a local derivation (and not uvx / homebrew)
 
 Per the repo install-order rule:
 
 1. nixpkgs (if available)
-2. Homebrew (if available)
-3. uvx / npm as last resort
+2. Local Nix derivation (`buildPythonApplication`)
+3. Homebrew (if it makes sense)
 
-cecli is currently published to PyPI only — no nixpkgs derivation, no
-Homebrew formula. uvx is the only sane path. As a bonus, uvx installs
-in user-space so we sidestep the macOS Nix sandbox SIGKILL/SIGTRAP
-issues that plague aider's deep ML transitive deps (sounddevice,
-soundfile, pydub, etc.) when built in the nix sandbox.
+cecli isn't in nixpkgs and Homebrew has no formula, so we build from
+PyPI as a real derivation in `package.nix`. This keeps everything
+under Nix's deterministic graph — no `uv tool install` activation
+hooks, no `~/.local/bin` shims, just a normal `home.packages` entry.
 
-The `installVia` option exists for forward compatibility — flip to
-`"nixpkgs"` or `"brew"` once upstream packaging arrives.
+Four transitive deps required local packaging because nixpkgs-25.11
+doesn't ship them: three tree-sitter language modules
+(`tree-sitter-c-sharp`, `tree-sitter-embedded-template`,
+`tree-sitter-yaml`, all wheel-based) and `tree-sitter-language-pack`
+0.13.0 (the version cecli pins to, also wheel). An `mcp` 1.24.0+
+override is also inline because cecli imports a symbol added in
+1.24 that the nixpkgs 1.15 doesn't have.
+
+Six version pins (`pypandoc>=1.15`, `litellm>=1.80.11`,
+`watchfiles>=1.1.0`, `tomlkit>=0.14.0`, `xxhash>=3.6.0`) are relaxed
+via `postPatch` against `requirements/requirements.in` — nixpkgs
+ships slightly older versions, functionally compatible. The gap
+closes the next time we bump nixpkgs.
 
 ## Routing
 
@@ -66,7 +78,9 @@ alias — it loads `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, etc. from
 
 ## Version pin
 
-Pinned in `vars/ai-stack.nix` under `cliVersions.cecli`. Renovate bumps
-the version via the `# renovate: datasource=pypi depName=cecli-dev`
-comment hint. The activation hook re-runs `uv tool install --upgrade`
-on every `darwin-rebuild switch` and is idempotent.
+Pinned inside [`modules/cecli/package.nix`](./package.nix) with a
+`# renovate: datasource=pypi depName=cecli-dev` annotation. Renovate
+bumps the version + sha256; rebuilding picks up the new derivation.
+The `cliVersions.cecli` entry in `vars/ai-stack.nix` documents the
+intended version for non-Nix consumers but is no longer the source of
+truth for the install.

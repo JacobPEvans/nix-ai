@@ -397,6 +397,7 @@
           gh-aw = pkgs.callPackage ./modules/gh-extensions/gh-aw.nix { };
           pal-mcp-server = pkgs.callPackage ./modules/mcp/pal-package.nix { inherit pal-mcp-server; };
           fabric-ai = pkgs.callPackage ./modules/fabric/package.nix { inherit fabric-src; };
+          cecli = pkgs.callPackage ./modules/cecli/package.nix { };
         }
       );
 

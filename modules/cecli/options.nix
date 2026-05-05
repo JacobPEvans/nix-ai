@@ -24,21 +24,6 @@ in
   options.programs.cecli = {
     enable = lib.mkEnableOption "cecli (maintained Aider fork) AI pair programming CLI";
 
-    installVia = lib.mkOption {
-      type = lib.types.enum [
-        "uvx"
-        "nixpkgs"
-        "brew"
-      ];
-      default = "uvx";
-      description = ''
-        Install source. cecli is uvx-only today — neither nixpkgs nor
-        Homebrew packages it. Option exists for forward compatibility
-        when packaging arrives. Selecting nixpkgs or brew today raises
-        an assertion at evaluation time.
-      '';
-    };
-
     routing = lib.mkOption {
       type = lib.types.enum [
         "llama-swap"

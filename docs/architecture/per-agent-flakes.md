@@ -20,17 +20,29 @@ the entire nix-ai surface area.
 modules/<agent>/
 ├── default.nix     ← module entry: imports + cfg.enable wiring
 ├── options.nix     ← user-facing options (model, routing, edit format, etc.)
-├── packages.nix    ← install-source selection (nixpkgs | brew | uvx | npm)
+├── package.nix     ← Nix derivation for the agent (nixpkgs path)
+├── packages.nix    ← install-source wiring (home.packages = [pkgs.<agent>])
 ├── settings.nix    ← config-file generation (consumes vars/ai-stack.nix)
-├── activation.nix  ← (optional) pre-warm install + cache hygiene
+├── scripts/        ← (optional) READ-ONLY helpers (status checks etc.) —
+│                     never install scripts; deps come from package.nix
 └── README.md       ← what the agent does, install matrix, opt-in knobs
 ```
 
 Reference implementations:
 
-- `modules/cecli/` — uvx install path; mirrors aider's option surface.
-- `modules/qwen-code/` — brew install path with npm fallback;
-  separate config file (`~/.qwen/settings.json`).
+- `modules/cecli/` — Python derivation built from PyPI sdist via
+  `python3Packages.buildPythonApplication`. Three transitive deps
+  missing from nixpkgs-25.11 (`tree-sitter-language-pack`,
+  `py-cymbal`, `diff-match-patch`) plus an `mcp` ≥1.24.0 override are
+  packaged inline in `package.nix` as `let` bindings. Six version
+  pins relaxed via `postPatch` against `requirements/requirements.in`
+  (the gap closes when nixpkgs refreshes).
+- `modules/qwen-code/` — brew-only install on darwin. The formula is
+  declared by nix-darwin's `homebrew.brews`, sourced from this
+  flake's `lib.brewFormulae` output. A `buildNpmPackage` derivation
+  was attempted; qwen-code's workspace + cross-platform
+  `optionalDependencies` need deeper packaging work and that path is
+  deferred.
 
 Existing modules (`modules/claude/`, `modules/gemini/`, `modules/codex/`,
 `modules/fabric/`) predate this pattern. They work fine and are not
@@ -42,13 +54,24 @@ separately.
 Per the repo's `nix-package-placement` rule:
 
 1. **nixpkgs** if available (deterministic, GC-safe, cached binary)
-2. **Homebrew** if available, declared via nix-darwin's `homebrew.brews`
-3. **uvx / npm** as last resort for tools the first two don't ship
+2. **Local Nix derivation** (`modules/<agent>/package.nix`) when
+   nixpkgs lacks the package — `buildPythonApplication`,
+   `buildNpmPackage`, `buildGoModule`, etc. Override missing
+   transitive deps inline as `let`-bound mini-derivations.
+3. **Homebrew** if available, declared via nix-darwin's
+   `homebrew.brews` (only when (1) and (2) are infeasible — e.g.
+   GUI app, vendor-only distribution, or upstream packaging
+   complexity beyond reasonable scope).
 
-Each `packages.nix` exposes a `programs.<agent>.installVia` enum option
-whose `default` reflects the preferred source for that agent today.
-Other values are accepted with assertions when they're not yet
-implemented, providing forward compatibility without surprise behavior.
+**Install scripts in home-manager activation are not on this list.**
+They were the wrong answer for both cecli and qwen-code in an earlier
+iteration of these modules; the correct answer is always one of the
+three above, even when packaging requires extra work.
+
+Each `packages.nix` exposes a `programs.<agent>.installVia` enum
+option whose `default` reflects the preferred source for that agent
+today. The enum is intentionally small — only sources that are
+actually implemented — to surface bugs at eval time.
 
 ## Settings consumption — the central registry
 
@@ -79,40 +102,39 @@ contract:
 
 `qwen-code` is the reference for this pattern.
 
-## uvx-installed agents
+## Locally-derived agents (Python from PyPI)
 
-uvx installs in user-space (`~/.local/share/uv/`), so the binary is
-not directly in any Nix store path. The module:
+When nixpkgs lacks the agent and brew isn't on the table (Linux, or
+the agent isn't bottled), package it from upstream as a real Nix
+derivation in `modules/<agent>/package.nix`. Use
+`python3Packages.buildPythonApplication` for Python tools,
+`buildNpmPackage` for Node, `buildGoModule` for Go.
 
-1. Pre-warms the install at home-manager activation:
-   `uv tool install --upgrade --native-tls --python python3.12 "<pkg>==<ver>"`
-   reading the version from `vars/ai-stack.nix#cliVersions.<pkg>`.
-2. Provides a `pkgs.writeShellScriptBin "<binary>"` wrapper that
-   exec's `~/.local/bin/<binary>`. This keeps `which <binary>`
-   deterministic — it always resolves to a Nix-managed wrapper —
-   without paying the cost of building the package in nix.
-3. Uses a `# renovate: datasource=pypi depName=<pkg>` comment hint on
-   the version pin so dependency bumps are managed automatically.
+`cecli` is the reference for this pattern (Python). The shape:
 
-`cecli` is the reference for this pattern.
+1. `fetchPypi { pname = "<pkg>"; version = ...; hash = ...; }`
+2. Explicit `build-system` and `dependencies` lists from upstream's
+   `requirements.in` / `pyproject.toml`.
+3. `# renovate: datasource=pypi depName=<pkg>` annotation on the
+   version pin so Renovate manages bumps automatically.
+4. Inline `let`-bound mini-derivations for transitive deps that
+   nixpkgs lacks. cecli currently overrides four packages in this
+   pattern: three tree-sitter language modules (wheels) and `mcp`
+   1.24.0+ (sdist override of nixpkgs's older 1.15).
+5. `postPatch` to relax `>=` lower bounds on deps that nixpkgs ships
+   at slightly older versions (functionally compatible, the bounds
+   reflect upstream's "latest known good" tracking, not hard
+   breakage).
 
-### Known uvx weaknesses + mitigations
+### Risks worth tracking
 
-| Weakness | Mitigation |
+| Risk | Mitigation |
 | --- | --- |
-| Not GC'd by Nix; `~/.local/share/uv/` accumulates | `uv cache prune` documented in module READMEs; future weekly launchd job |
-| First-invocation network for download | Activation pre-warm makes the binary available post-rebuild |
-| Updates not declarative / Renovate-blind | Version pin in `vars/ai-stack.nix` with renovate hint comment |
-| Stale interpreter refs after Python upgrade | Pin `--python python3.12` explicitly; activation re-installs on Python bump |
-| Wrapper indirection (~/.local/bin → uv) | `writeShellScriptBin` wrapper gives a deterministic Nix-managed PATH entry |
-
-## npm-installed agents (fallback)
-
-Same pattern as uvx but with `npm install --prefix ~/.local/share/npm`
-instead of `uv tool install`. Used only when an agent has neither a
-nixpkgs derivation nor a Homebrew formula AND its upstream is npm
-(common for JS/TS-based CLIs). qwen-code's `installVia = "npm"` branch
-is the reference.
+| Transitive dep missing from nixpkgs | Add as inline `let`-bound mini-derivation in `package.nix` |
+| Upstream version bound is tighter than nixpkgs | `substituteInPlace` to relax bound; verify cecli still works |
+| Wheel uses platform-specific binaries | Conditional `fetchurl` on `stdenv.isDarwin` for wheel src |
+| Sandbox-hostile transitive (test SIGKILL on darwin) | Skip via `skipDarwinChecks` in nix-home overlay |
+| Native code missing symbols | Prefer `cp310-abi3` wheel over sdist when upstream offers both |
 
 ## Path to standalone flakes
 
@@ -157,8 +179,11 @@ or `modules/fabric/` to this pattern:
       that should be in `vars/ai-stack.nix` (or already are).
 - [ ] If the agent's preferred install source is brew, surface it via
       `lib.brewFormulae`.
-- [ ] If the agent has an npm/uvx install path, add the appropriate
-      pre-warm activation + version pin.
+- [ ] If the agent isn't in nixpkgs and brew isn't suitable, package
+      it as a real Nix derivation in `modules/<agent>/package.nix`
+      (see cecli for the Python pattern). NEVER add an
+      `home.activation` hook that calls `pip install`, `npm install`,
+      `uv tool install`, or similar.
 - [ ] Write a README mirroring the cecli + qwen-code shape (What it
       manages, Install matrix, Routing, Version pin).
 - [ ] Verify with `nix flake check` and a real `darwin-rebuild switch`.

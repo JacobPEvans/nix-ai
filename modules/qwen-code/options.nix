@@ -10,15 +10,16 @@
     installVia = lib.mkOption {
       type = lib.types.enum [
         "brew"
-        "npm"
-        "nixpkgs"
       ];
       default = "brew";
       description = ''
-        Install source. Defaults to brew (preferred per install-order
-        rule on darwin). npm is the fallback for hosts without
-        Homebrew. nixpkgs is a placeholder for forward compatibility —
-        no nixpkgs derivation exists today.
+        Install source. Currently brew-only — declared via nix-darwin's
+        homebrew.brews, sourced from this flake's lib.brewFormulae.
+        The npm activation-script fallback was removed in favor of
+        proper Nix derivations elsewhere; a buildNpmPackage derivation
+        for qwen-code's workspace + cross-platform optionalDependencies
+        layout is non-trivial and deferred. Linux hosts need brew (or
+        Linuxbrew) to use qwen-code through this module.
       '';
     };
 
