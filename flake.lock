@@ -294,6 +294,22 @@
         "type": "github"
       }
     },
+    "karpathy-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776679504,
+        "narHash": "sha256-4z/wRdYH7UXRzF8RJU0sw8xbpx0BW/7CBv5sVEC2knY=",
+        "owner": "forrestchang",
+        "repo": "andrej-karpathy-skills",
+        "rev": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "forrestchang",
+        "repo": "andrej-karpathy-skills",
+        "type": "github"
+      }
+    },
     "lunar-claude": {
       "flake": false,
       "locked": {
@@ -394,6 +410,7 @@
         "home-manager": "home-manager",
         "huggingface-skills": "huggingface-skills",
         "jacobpevans-cc-plugins": "jacobpevans-cc-plugins",
+        "karpathy-skills": "karpathy-skills",
         "lunar-claude": "lunar-claude",
         "nixpkgs": "nixpkgs",
         "obsidian-skills": "obsidian-skills",

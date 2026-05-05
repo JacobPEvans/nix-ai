@@ -102,6 +102,12 @@
       flake = false;
     };
 
+    # Behavioral / Workflow guidelines derived from Andrej Karpathy's observations
+    karpathy-skills = {
+      url = "github:forrestchang/andrej-karpathy-skills";
+      flake = false;
+    };
+
     # Skill-only repos (no marketplace structure — wrapped via synthetic derivation)
     browser-use-skills = {
       url = "github:browser-use/browser-use";
@@ -153,6 +159,7 @@
       visual-explainer-marketplace,
       wakatime,
       huggingface-skills,
+      karpathy-skills,
       browser-use-skills,
       vct-cribl-pack-validator-skills,
       pal-mcp-server,
@@ -173,6 +180,7 @@
           bitwarden-marketplace
           browser-use-skills
           huggingface-skills
+          karpathy-skills
           vct-cribl-pack-validator-skills
           cc-dev-tools
           cc-marketplace
