@@ -70,10 +70,9 @@ is gitignored and won't propagate to teammates or worktrees).
 
 ## Budget headroom
 
-`modules/claude/options.nix` sets `skillListingBudgetFraction = 0.03` (3%) — well above
-the 1% upstream default. The extra budget is comfortable headroom for the universal
-plugin set without dropping descriptions even if a few project plugins are also
-enabled per-repo.
+`modules/claude/options.nix` sets `skillListingBudgetFraction = 0.02` (2%) — double
+the 1% upstream default. The extra budget is headroom for the universal plugin set
+without dropping descriptions even if a few project plugins are also enabled per-repo.
 
 If `/doctor` ever reports drops again:
 

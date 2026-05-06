@@ -133,7 +133,7 @@ in
         {
           name = "skillListingBudgetFraction";
           actual = cfg.settings.skillListingBudgetFraction;
-          expected = 0.03;
+          expected = 0.02;
         }
         {
           name = "autoUpdatesChannel";
