@@ -344,8 +344,8 @@ in
           every session. Claude Code's upstream default is 0.01 (1%), which
           drops descriptions when many plugins are enabled.
 
-          0.03 (3%) ≈ 6k tokens of a 200k context — comfortable headroom for
-          ~250 skills without dropping descriptions. Raise further only if
+          Default 0.03 (3%) gives comfortable headroom for the universal
+          plugin set without dropping descriptions. Raise further only if
           /doctor still reports "skill descriptions dropped".
         '';
       };

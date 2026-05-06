@@ -1,13 +1,11 @@
 # Tier 5 — Niche, specialty, and synthetic marketplaces (superseded by all higher tiers).
-# Tier 5 — Niche / specialty
 #
 # Duplicate Resolution Rule:
 #   Plugins in this file are SUPERSEDED by ALL higher tiers (1, 2, 3, 4).
 #
 # Per-repo overrides:
-#   Project-specific plugins disabled here can be re-enabled in consumer repos
-#   via committed `.claude/settings.json`. Claude Code deep-merges project-scoped
-#   settings into the global config. See docs/architecture/plugin-scoping.md.
+#   Disabled globally but can be re-enabled in consumer repos via
+#   `.claude/settings.json`. See docs/architecture/plugin-scoping.md.
 #
 # Marketplaces in this tier (sorted by relevance to user's stack, not stars —
 # stars are unreliable for niche-classification because some upstreams like
