@@ -26,7 +26,11 @@ let
 in
 {
   imports = [
-    ./options.nix
+    ./options-runtime.nix
+    ./options-content.nix
+    ./options-events.nix
+    ./options-settings.nix
+    ./options-features.nix
     ./registry.nix
     ./plugins.nix
     ./components.nix
