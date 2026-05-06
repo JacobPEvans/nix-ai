@@ -65,13 +65,24 @@ or understanding why the 35B model is preloaded vs the 122B MoE.
 
 The uniform module layout each AI agent module follows (`default.nix`, `options.nix`,
 `packages.nix`, `settings.nix`, `README.md`), the install-source preference rule
-(nixpkgs → brew → uvx/npm), the contract for sharing brew formulae with nix-darwin,
-and the recipe for graduating an in-tree agent module to its own standalone flake.
-Reference implementations: `modules/cecli/` (uvx) and `modules/qwen-code/` (brew + npm).
+(nixpkgs → local Nix derivation → brew), uv2nix as the standard for PyPI-fetched
+Python tools, the contract for sharing brew formulae with nix-darwin, and the recipe
+for graduating an in-tree agent module to its own standalone flake. Reference
+implementations: `modules/cecli/` (uv2nix) and `modules/qwen-code/` (brew).
 
 **Read when**: Adding a new AI agent CLI to nix-ai, refactoring one of the existing
 modules (Claude/Gemini/Codex/fabric) to the uniform layout, or extracting a module
 into a standalone flake.
+
+### [plugin-scoping.md](plugin-scoping.md)
+
+The two-layer model partitioning Claude Code plugins between user-level (every session)
+and per-repo (only inside specific worktrees). Covers the skill listing budget, the
+`enabledPlugins` deep-merge mechanism, and the mapping of project-specific plugins to
+consumer repos.
+
+**Read when**: `/doctor` reports "skill descriptions dropped", adding a new plugin to nix-ai,
+or enabling a project-specific plugin in a consumer repo.
 
 ## ADRs
 

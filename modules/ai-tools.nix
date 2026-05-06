@@ -75,18 +75,12 @@
 
 { pkgs, ... }:
 let
-  # renovate: datasource=npm depName=@felixgeelhaar/cclint
-  cclintVersion = "0.12.1";
-  # renovate: datasource=npm depName=@githubnext/github-copilot-cli
-  ghCopilotVersion = "0.1.36";
-  # renovate: datasource=npm depName=chatgpt-cli
-  chatgptCliVersion = "3.3.0";
-  # renovate: datasource=npm depName=claude-flow
-  claudeFlowVersion = "3.5";
-  # renovate: datasource=npm depName=@googleworkspace/cli
-  gwsCliVersion = "0.22.5";
-  # renovate: datasource=pypi depName=huggingface-hub
-  huggingfaceHubVersion = "1.12.0";
+  versions = import ../lib/versions.nix;
+  cclintVersion = versions.cclint;
+  ghCopilotVersion = versions.ghCopilot;
+  chatgptCliVersion = versions.chatgptCli;
+  claudeFlowVersion = versions.claudeFlow;
+  gwsCliVersion = versions.gwsCli;
 in
 {
   # AI-specific development tools
@@ -194,7 +188,7 @@ in
     # PyPI: huggingface-hub (provides `hf` entry point)
     # Requires: HF_TOKEN env var (from macOS Keychain via nix-darwin shell init)
     (writeShellScriptBin "hf" ''
-      exec ${uv}/bin/uvx --from "huggingface-hub==${huggingfaceHubVersion}" hf "$@"
+      exec ${uv}/bin/uvx --from "huggingface-hub==${versions.huggingfaceHub}" hf "$@"
     '')
 
     # ==========================================================================
