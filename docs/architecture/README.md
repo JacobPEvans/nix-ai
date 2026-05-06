@@ -65,10 +65,10 @@ or understanding why the 35B model is preloaded vs the 122B MoE.
 
 The uniform module layout each AI agent module follows (`default.nix`, `options.nix`,
 `packages.nix`, `settings.nix`, `README.md`), the install-source preference rule
-(nixpkgs → local Nix derivation → brew), uv2nix as the standard for PyPI-fetched
-Python tools, the contract for sharing brew formulae with nix-darwin, and the recipe
-for graduating an in-tree agent module to its own standalone flake. Reference
-implementations: `modules/cecli/` (uv2nix) and `modules/qwen-code/` (brew).
+(nixpkgs → local Nix derivation → brew), the contract for sharing brew formulae with
+nix-darwin, and the recipe for graduating an in-tree agent module to its own standalone
+flake. Reference implementations: `modules/cecli/` (`buildPythonApplication`) and
+`modules/qwen-code/` (brew). Includes a "Why not uv2nix" trade-off analysis.
 
 **Read when**: Adding a new AI agent CLI to nix-ai, refactoring one of the existing
 modules (Claude/Gemini/Codex/fabric) to the uniform layout, or extracting a module
