@@ -22,9 +22,9 @@
 # The brew install itself lives in nix-darwin (homebrew.brews is a
 # nix-darwin option, not a home-manager one). This module exposes the
 # required formula list via the lib.brewFormulae flake output for
-# nix-darwin to consume; the module itself handles config, an
-# eval-time assertion that gates installVia="brew" to darwin, and a
-# soft activation-time warning when the binary is missing.
+# nix-darwin to consume; the module itself handles config plus a soft
+# activation-time warning when the binary is missing. Non-darwin
+# hosts get a silent no-op (see modules/qwen-code/packages.nix).
 #
 {
   config,
