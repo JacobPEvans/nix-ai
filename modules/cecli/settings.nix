@@ -1,14 +1,15 @@
 #
-# Aider Module - Settings Generation
+# cecli Module — Settings Generation
 #
-# Generates three read-only files via home.file (Aider does NOT rewrite them):
+# Generates three read-only files via home.file (cecli does NOT rewrite them):
 #
-#   ~/.aider.conf.yml             Main config; picked up before project-level overrides
-#   ~/.aider/aider-meta.json      Context limits / cost data for local MLX models
-#   ~/.aider/aider-settings.yml   Per-model edit format and streaming overrides
+#   ~/.cecli.conf.yml             Main config; picked up before project-level overrides
+#   ~/.cecli/cecli-meta.json      Context limits / cost data for local MLX models
+#   ~/.cecli/cecli-settings.yml   Per-model edit format and streaming overrides
 #
-# All three files are read-only Nix-store symlinks - no activation merge script
-# needed because Aider treats them as static config, not runtime state.
+# All three files are read-only Nix-store symlinks — cecli treats them as
+# static config, not runtime state. cecli still uses litellm internally so
+# the metadata format is unchanged from the previous Aider module.
 #
 {
   pkgs,
@@ -18,20 +19,17 @@
 }:
 
 let
-  cfg = config.programs.aider;
+  cfg = config.programs.cecli;
   homeDir = config.home.homeDirectory;
 
   # Endpoint selection: llama-swap (default) or Bifrost
-
   isBifrost = cfg.routing == "bifrost";
-
   endpointBase = if isBifrost then "http://localhost:30080/v1" else "http://127.0.0.1:11434/v1";
 
   # Model name resolution:
   # llama-swap routing: keep openai/<role> - llama-swap resolves via useModelName.
   # Bifrost routing: convert to openai/mlx-local/<physical-hf-id> - Bifrost
   # requires the mlx-local/ prefix to route to the local MLX stack.
-
   inherit (config.services.aiStack) models;
 
   prefixModel =
@@ -45,20 +43,11 @@ let
 
   yamlFormat = pkgs.formats.yaml { };
 
-  # History and metadata file paths, extracted to let-bindings so that
-  # quoted-key attrset bindings below use plain identifiers as values
-  # (avoids statix W04 cross-boundary false positives on quoted keys).
-  pathChatHistory = "${homeDir}/.aider/history/aider-chat.md";
-  pathInputHistory = "${homeDir}/.aider/history/aider-input";
-  pathLlmHistory = "${homeDir}/.aider/history/aider-llm.md";
-  pathModelMeta = "${homeDir}/.aider/aider-meta.json";
-  pathModelSettings = "${homeDir}/.aider/aider-settings.yml";
-
-  # Main Aider config
-  #
-  # History files use aider- prefixed names so their path components share no
-  # prefix with the config-key names (chat-history-file, input-history-file, etc.)
-  # Override via extraConfig to use different paths.
+  pathChatHistory = "${homeDir}/.cecli/history/cecli-chat.md";
+  pathInputHistory = "${homeDir}/.cecli/history/cecli-input";
+  pathLlmHistory = "${homeDir}/.cecli/history/cecli-llm.md";
+  pathModelMeta = "${homeDir}/.cecli/cecli-meta.json";
+  pathModelSettings = "${homeDir}/.cecli/cecli-settings.yml";
 
   configAttrs = {
     openai-api-base = endpointBase;
@@ -89,15 +78,12 @@ let
   }
   // cfg.extraConfig;
 
-  yamlConf = yamlFormat.generate "aider-conf.yml" configAttrs;
+  yamlConf = yamlFormat.generate "cecli-conf.yml" configAttrs;
 
-  # Model metadata
-  #
-  # Aider uses LiteLLM; unknown models fall back to GPT-4 limits which may be
-  # wrong. Generate entries for both naming conventions:
+  # Model metadata — cecli uses LiteLLM. Unknown models fall back to GPT-4
+  # limits which may be wrong. Generate entries for both naming conventions:
   #   - openai/<role>            used with llama-swap routing
-  #   - openai/mlx-local/<id>   used with Bifrost routing
-
+  #   - openai/mlx-local/<id>    used with Bifrost routing
   metadataEntry = {
     max_input_tokens = 32768;
     max_output_tokens = 8192;
@@ -115,16 +101,13 @@ let
 
   modelMetadata = roleAliasMetadata // physicalIdMetadata;
 
-  metadataJson = pkgs.writeText "aider-model-metadata.json" (builtins.toJSON modelMetadata);
+  metadataJson = pkgs.writeText "cecli-model-metadata.json" (builtins.toJSON modelMetadata);
 
-  # Model settings
-  #
   # Per-model edit format and streaming overrides. Entries for:
   #   - each role alias (llama-swap routing)
   #   - each physical HF id with mlx-local/ prefix (Bifrost routing)
   # A catch-all regex entry covers additional openai/mlx-local/* variants
   # that might appear if the user extends services.aiStack.models later.
-
   codeRoles = [
     "default"
     "coding"
@@ -154,21 +137,21 @@ let
   ) models;
 
   # Regex catch-all for any mlx-local/* model not explicitly listed above;
-  # "default" is a codeRole so this entry correctly inherits editFormat (not weakEditFormat).
+  # "default" is a codeRole so this entry correctly inherits editFormat.
   catchAllEntry = makeSettingsEntry "openai/mlx-local/.*" "default";
 
   modelSettings = roleAliasSettings ++ physicalIdSettings ++ [ catchAllEntry ];
 
-  modelSettingsYaml = yamlFormat.generate "aider-model-settings.yml" modelSettings;
+  modelSettingsYaml = yamlFormat.generate "cecli-model-settings.yml" modelSettings;
 
 in
 {
   config = lib.mkIf cfg.enable {
     home.file = {
-      ".aider.conf.yml".source = yamlConf;
-      ".aider/aider-meta.json".source = metadataJson;
-      ".aider/aider-settings.yml".source = modelSettingsYaml;
-      ".aider/history/.keep".text = "# Managed by Nix - programs.aider\n";
+      ".cecli.conf.yml".source = yamlConf;
+      ".cecli/cecli-meta.json".source = metadataJson;
+      ".cecli/cecli-settings.yml".source = modelSettingsYaml;
+      ".cecli/history/.keep".text = "# Managed by Nix - programs.cecli\n";
     };
   };
 }

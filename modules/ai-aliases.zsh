@@ -20,7 +20,9 @@ alias d-claude="doppler run -p ai-ci-automation -c prd -- claude"
 # that need BOTH AWS credentials AND AI MCP secrets loaded.
 alias tf-claude="aws-vault exec terraform -- doppler run -p ai-ci-automation -c prd -- claude"
 
-# Doppler-wrapped Aider — injects ai-ci-automation/prd secrets for cloud-provider
-# fallback paths (OPENAI_API_KEY, OPENROUTER_API_KEY, etc.).
-# Default sessions use local MLX directly; no Doppler needed.
-alias d-aider="doppler run -p ai-ci-automation -c prd -- aider"
+# Doppler-wrapped agent CLIs — inject ai-ci-automation/prd secrets for
+# cloud-provider fallback paths (OPENAI_API_KEY, OPENROUTER_API_KEY,
+# DASHSCOPE_API_KEY, etc.). Default sessions use local MLX directly; no
+# Doppler needed.
+alias d-cecli="doppler run -p ai-ci-automation -c prd -- cecli"
+alias d-qwen="doppler run -p ai-ci-automation -c prd -- qwen"

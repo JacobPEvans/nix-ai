@@ -13,8 +13,22 @@
 # tool-calling, coding, large-context, most-capable) plus oss for explicit
 # Apache-2/MIT model preference. Add new roles here; do not embed physical
 # names in consumer modules.
+#
+# vars/ai-stack.nix is the data file (models + endpoints + nodeports). The
+# home-manager activation below serializes it to ~/.config/ai-stack/registry.json
+# on every rebuild so non-Nix consumers (orbstack-kubernetes, ansible, shell
+# scripts) can read the same values via plain `jq`.
 
-{ lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  registryAttrs = import ../../vars/ai-stack.nix;
+  registryJson = pkgs.writeText "ai-stack-registry.json" (builtins.toJSON registryAttrs);
+in
 {
   options.services.aiStack.models = lib.mkOption {
     type = lib.types.attrsOf lib.types.str;
@@ -24,9 +38,15 @@
       first-class llama-swap entry whose cmd runs `vllm-mlx serve <physical>`.
       Physical names also remain queryable for direct curl / debugging.
 
-      This is the ONLY place real MLX model strings should live in the Nix
-      tree. Consumer modules (fabric.defaultModel, pal-mcp CUSTOM_MODEL_NAME,
-      screenpipe presets, zsh aliases) reference role names instead.
+      The default reads from vars/ai-stack.nix. To change the registry,
+      edit that file. Override here only when a consumer needs a private
+      mapping that should not propagate to ~/.config/ai-stack/registry.json.
     '';
   };
+
+  config.home.activation.writeAiStackRegistry = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    target="$HOME/.config/ai-stack/registry.json"
+    $DRY_RUN_CMD mkdir -p "$(dirname "$target")"
+    $DRY_RUN_CMD install -m 0644 ${registryJson} "$target"
+  '';
 }

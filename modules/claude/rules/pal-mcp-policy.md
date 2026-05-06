@@ -43,10 +43,12 @@ the failure mode this rule exists to prevent.
   work this flows through `CUSTOM_API_URL` → Bifrost → the right provider.
   `clink`/`consensus` use their own multi-provider fan-out, not Bifrost.
 - **MLX model prefix**: Bifrost requires `provider/model` format. Local MLX
-  models are addressed as `mlx-local/mlx-community/<model-id>` (e.g.
-  `mlx-local/mlx-community/Qwen3.5-35B-A3B-4bit`). The `mlx-local/` prefix
-  is baked into `custom_models.json` and `CUSTOM_MODEL_NAME` by the Nix module
-  — do not use bare `mlx-community/` names when calling Bifrost directly.
+  models are addressed as `mlx-local/mlx-community/<model-id>` — substitute
+  any physical ID from `~/.config/ai-stack/registry.json` (or any
+  capability-class alias like `default`, `quickest`, `coding` once Bifrost
+  aliases land). The `mlx-local/` prefix is baked into `custom_models.json`
+  and `CUSTOM_MODEL_NAME` by the Nix module — do not use bare
+  `mlx-community/` names when calling Bifrost directly.
 - **Secrets**: Local PAL subprocess secrets (API keys, config) are injected by
   the `doppler-mcp` wrapper at launch time. This is separate from the Doppler
   **K8s Operator** that syncs Bifrost's in-cluster provider keys — different

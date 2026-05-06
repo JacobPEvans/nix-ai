@@ -128,6 +128,7 @@
       url = "github:danielmiessler/fabric/v1.4.444";
       flake = false;
     };
+
   };
 
   outputs =
@@ -195,95 +196,15 @@
       };
     in
     {
-      # Home-manager modules
-      homeManagerModules = {
-        # Full AI CLI module
-        default = {
-          imports = [ ./modules/default.nix ];
-          _module.args = {
-            inherit
-              ai-assistant-instructions
-              marketplaceInputs
-              claude-code-plugins
-              claude-cookbooks
-              pal-mcp-server
-              fabric-src
-              ;
-          };
-        };
-
-        # Individual modules for selective import
-        claude = {
-          imports = [
-            ./modules/claude
-            # PAL/MCP runtime previously lived in modules/claude/pal-models.nix;
-            # now sourced from the MCP sub-flake module so it's available even
-            # when Claude is the only homeManagerModule a consumer imports.
-            ./modules/mcp/module.nix
-          ];
-          _module.args = {
-            inherit
-              ai-assistant-instructions
-              marketplaceInputs
-              claude-code-plugins
-              claude-cookbooks
-              pal-mcp-server
-              ;
-          };
-        };
-
-        agent-skills = {
-          imports = [ ./modules/agent-skills ];
-          _module.args = {
-            inherit marketplaceInputs;
-          };
-        };
-
-        mcp = {
-          imports = [ ./modules/mcp ];
-        };
-
-        codex = {
-          imports = [
-            ./modules/mcp
-            ./modules/agent-skills
-            ./modules/codex
-          ];
-          _module.args = {
-            inherit
-              ai-assistant-instructions
-              marketplaceInputs
-              ;
-          };
-        };
-
-        gemini = {
-          imports = [
-            ./modules/mcp
-            ./modules/agent-skills
-            ./modules/gemini
-          ];
-          _module.args = {
-            inherit
-              ai-assistant-instructions
-              marketplaceInputs
-              ;
-          };
-        };
-
-        aider = {
-          imports = [
-            ./modules/ai-stack
-            ./modules/aider
-          ];
-          _module.args = {
-            inherit ai-assistant-instructions;
-          };
-        };
-
-        maestro = {
-          imports = [ ./modules/maestro ];
-        };
+      homeManagerModules = import ./flake/home-manager-modules.nix {
+        inherit
+          ai-assistant-instructions
+          marketplaceInputs
+          claude-code-plugins
+          claude-cookbooks
+          pal-mcp-server
+          fabric-src
+          ;
       };
 
       # CI-friendly outputs
@@ -345,6 +266,15 @@
         # default — one source of truth.
         aiStackModels = import ./lib/ai-stack-models.nix;
 
+        # Homebrew formula list required by per-agent modules whose
+        # preferred install path is brew. nix-darwin reads this from the
+        # nix-ai flake input and merges into homebrew.brews. Keeps each
+        # agent module self-contained and ready for future graduation
+        # to its own flake — see docs/architecture/per-agent-flakes.md.
+        brewFormulae = [
+          "qwen-code" # programs.qwen-code with installVia = "brew"
+        ];
+
         # Shared permission + formatter engine. Exposed for cross-flake consumers
         # (e.g., nix-ai-claude) so the source of truth for tool-agnostic command
         # permissions stays in this flake. Callers pass { lib, config,
@@ -381,6 +311,7 @@
           gh-aw = pkgs.callPackage ./modules/gh-extensions/gh-aw.nix { };
           pal-mcp-server = pkgs.callPackage ./modules/mcp/pal-package.nix { inherit pal-mcp-server; };
           fabric-ai = pkgs.callPackage ./modules/fabric/package.nix { inherit fabric-src; };
+          cecli = pkgs.callPackage ./modules/cecli/package.nix { };
         }
       );
 
