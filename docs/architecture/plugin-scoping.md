@@ -47,7 +47,7 @@ and re-enabled per-repo. Mapping:
 | Repo | Plugins to enable in `<repo>/.claude/settings.json` |
 | --- | --- |
 | `terraform-proxmox` | `terraform-module-builder@claude-code-plugins-plus`, `infrastructure-as-code-generator@claude-code-plugins-plus`, `proxmox-infrastructure@lunar-claude` |
-| `terraform-aws`, `terraform-aws-bedrock`, `terraform-aws-static-website`, `terraform-runs-on` | `terraform-module-builder@claude-code-plugins-plus`, `infrastructure-as-code-generator@claude-code-plugins-plus` |
+| `terraform-aws`, `terraform-aws-bedrock`, `terraform-aws-static-website`, `terraform-runs-on`, `tf-splunk-aws` | `terraform-module-builder@claude-code-plugins-plus`, `infrastructure-as-code-generator@claude-code-plugins-plus` |
 | `ansible-proxmox`, `ansible-proxmox-apps` | `ansible-workflows@lunar-claude`, `proxmox-infrastructure@lunar-claude` |
 | `ansible-splunk` | `ansible-workflows@lunar-claude` |
 | `cribl`, `cc-edge-*`, `cc-stream-*` | `cribl-pack-validator@vct-cribl-pack-validator-skills` |
