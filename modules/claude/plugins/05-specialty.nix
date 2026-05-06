@@ -31,17 +31,12 @@ _:
     # ========================================================================
     # lunar-claude — basher83/lunar-claude (Proxmox + Ansible)
     # ========================================================================
-    # DISABLED globally — re-enable in ansible-* and terraform-proxmox repos
-    # via per-repo .claude/settings.json overrides. See
-    # docs/architecture/plugin-scoping.md.
     "proxmox-infrastructure@lunar-claude" = false;
     "ansible-workflows@lunar-claude" = false;
 
     # ========================================================================
     # claude-code-plugins-plus — jeremylongshore/claude-code-plugins-plus
     # ========================================================================
-    # DISABLED globally — re-enable in terraform-* repos via per-repo
-    # .claude/settings.json overrides. See docs/architecture/plugin-scoping.md.
     "infrastructure-as-code-generator@claude-code-plugins-plus" = false;
     "terraform-module-builder@claude-code-plugins-plus" = false;
 

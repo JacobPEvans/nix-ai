@@ -73,15 +73,14 @@ is gitignored and won't propagate to teammates or worktrees).
 `modules/claude/options.nix` sets `skillListingBudgetFraction = 0.03` (3%) — well above
 the 1% upstream default. The extra budget is comfortable headroom for the universal
 plugin set without dropping descriptions even if a few project plugins are also
-enabled per-repo. (3% of a 200k context window ≈ 6k tokens — adjust mental math
-if Claude Code's context window changes.)
+enabled per-repo.
 
 If `/doctor` ever reports drops again:
 
 1. Check whether new universal-tier plugins were added (Tier 1–4) — prefer pruning over
    raising the budget.
 2. If pruning is not viable, raise `skillListingBudgetFraction` in
-   `modules/claude/options.nix` (each 0.01 ≈ 2k tokens).
+   `modules/claude/options.nix`.
 
 ## Verification
 
