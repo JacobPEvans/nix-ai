@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.64.0](https://github.com/JacobPEvans/nix-ai/compare/v1.63.0...v1.64.0) (2026-05-07)
+
+
+### Features
+
+* **flake:** export overlays.default for downstream consumers ([#726](https://github.com/JacobPEvans/nix-ai/issues/726)) ([ba9b464](https://github.com/JacobPEvans/nix-ai/commit/ba9b4644f38191474bf17a9491572ed760919c0c))
+
 ## [1.63.0](https://github.com/JacobPEvans/nix-ai/compare/v1.62.2...v1.63.0) (2026-05-06)
 
 
