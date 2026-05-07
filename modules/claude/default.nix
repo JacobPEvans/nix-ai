@@ -26,11 +26,17 @@ let
 
   # Bundle get-api-key.py + bws_helper.py into a single Nix store directory
   # so Path(__file__).parent in get-api-key.py resolves bws_helper correctly.
-  apiKeyHelperSrc = pkgs.runCommand "claude-api-key-helper-src" { } ''
-    mkdir -p $out
-    cp ${./get-api-key.py} $out/get-api-key.py
-    cp ${./bws_helper.py} $out/bws_helper.py
-  '';
+  # linkFarm creates a directory of symlinks — more idiomatic than runCommand cp.
+  apiKeyHelperSrc = pkgs.linkFarm "claude-api-key-helper-src" [
+    {
+      name = "get-api-key.py";
+      path = ./get-api-key.py;
+    }
+    {
+      name = "bws_helper.py";
+      path = ./bws_helper.py;
+    }
+  ];
 
   # Wrap get-api-key.py as a self-contained shell app.
   # runtimeInputs injects python314+keyring into PATH only when the wrapper
