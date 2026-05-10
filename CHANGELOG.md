@@ -337,7 +337,6 @@
 ### Bug Fixes
 
 * **mcp:** env vars, wrappers, tool restoration ([#563](https://github.com/JacobPEvans/nix-ai/issues/563)) ([68ce7fc](https://github.com/JacobPEvans/nix-ai/commit/68ce7fc6f3173e775e0da92d8c801811a9277bda))
-* remove cspell spell checker entirely ([#573](https://github.com/JacobPEvans/nix-ai/issues/573)) ([54f439d](https://github.com/JacobPEvans/nix-ai/commit/54f439d9f2f2f757108bbe69370bdb6823e58eff))
 
 ## [1.45.2](https://github.com/JacobPEvans/nix-ai/compare/v1.45.1...v1.45.2) (2026-04-17)
 
@@ -484,7 +483,6 @@
 
 * add concurrency groups to prevent duplicate PR creation ([#114](https://github.com/JacobPEvans/nix-ai/issues/114)) ([8c6a543](https://github.com/JacobPEvans/nix-ai/commit/8c6a54382db529bdb843bd00d6742ada92489f30))
 * add diagnostic logging to doppler-mcp and check-pal-mcp health script ([#130](https://github.com/JacobPEvans/nix-ai/issues/130)) ([a88b266](https://github.com/JacobPEvans/nix-ai/commit/a88b26611db1deb81aa725d829253403df3d5410))
-* add missing words to cspell dictionary ([#437](https://github.com/JacobPEvans/nix-ai/issues/437)) ([4a6fc0e](https://github.com/JacobPEvans/nix-ai/commit/4a6fc0e1c9ed31a3b8222611375d5cf16e53714b))
 * add MLX perf tuning flags and remove Ollama from stack ([#243](https://github.com/JacobPEvans/nix-ai/issues/243)) ([f375d87](https://github.com/JacobPEvans/nix-ai/commit/f375d8758903d7e1909514237ec36349c5d158bb))
 * add MLX performance tuning flags for vllm-mlx LaunchAgent ([f375d87](https://github.com/JacobPEvans/nix-ai/commit/f375d8758903d7e1909514237ec36349c5d158bb))
 * add port allocation docs and negative regression tests ([#262](https://github.com/JacobPEvans/nix-ai/issues/262)) ([f3e192d](https://github.com/JacobPEvans/nix-ai/commit/f3e192dff69f09a8ba76c99a88e555b1f8572132))
@@ -512,7 +510,6 @@
 * **claude:** switch auto-update channel from stable to latest ([#414](https://github.com/JacobPEvans/nix-ai/issues/414)) ([a76ae00](https://github.com/JacobPEvans/nix-ai/commit/a76ae0050631f48a2230c87eb5d5cb96636e64fa))
 * correct best-practices permissions and add ref-scoped concurrency ([#115](https://github.com/JacobPEvans/nix-ai/issues/115)) ([197d1aa](https://github.com/JacobPEvans/nix-ai/commit/197d1aaea84a95a36b1173c7b7d734d7b1e66854))
 * cross-repo cleanup after unstable overlay removal ([#249](https://github.com/JacobPEvans/nix-ai/issues/249)) ([9093bd9](https://github.com/JacobPEvans/nix-ai/commit/9093bd9424a70ea870c226a6d7855eb38238e2c9))
-* **cspell:** migrate to shared org-wide dictionary hierarchy ([#498](https://github.com/JacobPEvans/nix-ai/issues/498)) ([a93300b](https://github.com/JacobPEvans/nix-ai/commit/a93300b5e4f505d99a9f0461a4ddab2932efd338))
 * defer cache purge when Claude Code sessions are active ([#268](https://github.com/JacobPEvans/nix-ai/issues/268)) ([8b63780](https://github.com/JacobPEvans/nix-ai/commit/8b6378041feb499f5cc087c9d6b6657fc36ee5e3))
 * **deps:** centralize Python version and Renovate pep621 policy ([#373](https://github.com/JacobPEvans/nix-ai/issues/373)) ([4fce2a9](https://github.com/JacobPEvans/nix-ai/commit/4fce2a962be645260e58cdddbcb80c6387975c33))
 * **deps:** close Renovate automation gaps for all version-pinned packages ([#321](https://github.com/JacobPEvans/nix-ai/issues/321)) ([3d7e2a7](https://github.com/JacobPEvans/nix-ai/commit/3d7e2a767f8edbc70b9ea4f6981042ec53098e0b))
@@ -534,7 +531,6 @@
 * **docs:** drop "quartet" and numeric group words from CLAUDE.md ([#488](https://github.com/JacobPEvans/nix-ai/issues/488)) ([a48d8f3](https://github.com/JacobPEvans/nix-ai/commit/a48d8f3d80e132e890c72976e6ac19bc1fc38611))
 * **docs:** remove inline keychain password from testing docs ([#240](https://github.com/JacobPEvans/nix-ai/issues/240)) ([5dee71e](https://github.com/JacobPEvans/nix-ai/commit/5dee71e72721ec579045384a18b95eb7ed7a9179))
 * dual-backend MLX module with CLI flag validation ([#248](https://github.com/JacobPEvans/nix-ai/issues/248)) ([1152927](https://github.com/JacobPEvans/nix-ai/commit/11529279aed497c8e2aad82640565ef5c830d5a3))
-* fix cspell.json word array and pin copilot-setup-steps.yml action SHAs ([#97](https://github.com/JacobPEvans/nix-ai/issues/97)) ([d816596](https://github.com/JacobPEvans/nix-ai/commit/d816596fabe42c6643ba77c68740fc0062ddad53))
 * **gemini:** replace shell grep validation with pure Nix assertions ([#518](https://github.com/JacobPEvans/nix-ai/issues/518)) ([78672a5](https://github.com/JacobPEvans/nix-ai/commit/78672a506f3cd8e77c2e4a6c1b15ae73400ae937))
 * golden standard — bugs, cross-platform, dead code, style ([#174](https://github.com/JacobPEvans/nix-ai/issues/174)) ([4954bd1](https://github.com/JacobPEvans/nix-ai/commit/4954bd1e6a7c6e388dbb26c85736f3cecf8e1ee7))
 * **mcp:** document Obsidian CLI integration, remove REST API port ([#493](https://github.com/JacobPEvans/nix-ai/issues/493)) ([171d946](https://github.com/JacobPEvans/nix-ai/commit/171d9469d94c27b1f4df6979f0c051c393d06d59))
@@ -628,13 +624,6 @@
 
 * **fabric:** add zsh completions and AI tool decision tree ([28af185](https://github.com/JacobPEvans/nix-ai/commit/28af1856d02d23da1b33d090d5ebb681ab2cc8e4))
 
-## [1.38.1](https://github.com/JacobPEvans/nix-ai/compare/v1.38.0...v1.38.1) (2026-04-12)
-
-
-### Bug Fixes
-
-* **cspell:** migrate to shared org-wide dictionary hierarchy ([#498](https://github.com/JacobPEvans/nix-ai/issues/498)) ([a93300b](https://github.com/JacobPEvans/nix-ai/commit/a93300b5e4f505d99a9f0461a4ddab2932efd338))
-
 ## [1.38.0](https://github.com/JacobPEvans/nix-ai/compare/v1.37.1...v1.38.0) (2026-04-12)
 
 
@@ -699,13 +688,6 @@
 ### Features
 
 * **mcp:** add Bifrost AI gateway MCP server and check-bifrost CLI ([#456](https://github.com/JacobPEvans/nix-ai/issues/456)) ([efc4501](https://github.com/JacobPEvans/nix-ai/commit/efc4501a39ffba2a78ea0f63e1f1744a4ffd811f))
-
-## [1.32.5](https://github.com/JacobPEvans/nix-ai/compare/v1.32.4...v1.32.5) (2026-04-10)
-
-
-### Bug Fixes
-
-* add missing words to cspell dictionary ([#437](https://github.com/JacobPEvans/nix-ai/issues/437)) ([4a6fc0e](https://github.com/JacobPEvans/nix-ai/commit/4a6fc0e1c9ed31a3b8222611375d5cf16e53714b))
 
 ## [1.32.4](https://github.com/JacobPEvans/nix-ai/compare/v1.32.3...v1.32.4) (2026-04-10)
 
@@ -1260,7 +1242,6 @@
 * correct best-practices permissions and add ref-scoped concurrency ([#115](https://github.com/JacobPEvans/nix-ai/issues/115)) ([197d1aa](https://github.com/JacobPEvans/nix-ai/commit/197d1aaea84a95a36b1173c7b7d734d7b1e66854))
 * **deps:** remove manual input list from flake update workflow ([#118](https://github.com/JacobPEvans/nix-ai/issues/118)) ([cd7946d](https://github.com/JacobPEvans/nix-ai/commit/cd7946d0a2be24da35254abb0811be16a11ac30c))
 * disable hash pinning for trusted actions, use version tags ([#116](https://github.com/JacobPEvans/nix-ai/issues/116)) ([29510d5](https://github.com/JacobPEvans/nix-ai/commit/29510d59c56d0333580797af6a210c92ea1c16b6))
-* fix cspell.json word array and pin copilot-setup-steps.yml action SHAs ([#97](https://github.com/JacobPEvans/nix-ai/issues/97)) ([d816596](https://github.com/JacobPEvans/nix-ai/commit/d816596fabe42c6643ba77c68740fc0062ddad53))
 * remove blanket auto-merge workflow ([#117](https://github.com/JacobPEvans/nix-ai/issues/117)) ([cc0315b](https://github.com/JacobPEvans/nix-ai/commit/cc0315b19ef3bddd62fae25c6252d010e0cda0eb))
 * remove redundant .markdownlint-cli2.yaml ([#91](https://github.com/JacobPEvans/nix-ai/issues/91)) ([6de3e82](https://github.com/JacobPEvans/nix-ai/commit/6de3e8291525ec9f77c79829f48776a2d0aa5e2f))
 * rename GH_APP_ID secret to GH_ACTION_JACOBPEVANS_APP_ID ([#132](https://github.com/JacobPEvans/nix-ai/issues/132)) ([ed48910](https://github.com/JacobPEvans/nix-ai/commit/ed4891083564906a6b0fbd87e5302cfbc7e5b5d6))
