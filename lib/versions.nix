@@ -79,8 +79,6 @@
   lmEval = "0.4.11";
 
   # AI tools (pypi)
-  # renovate: datasource=pypi depName=open-webui
-  openWebui = "0.9.2";
   # renovate: datasource=pypi depName=browser-use
   browserUse = "0.12.6";
 

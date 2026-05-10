@@ -69,7 +69,6 @@ let
   };
 
   versions = import ../lib/versions.nix;
-  openWebuiVersion = versions.openWebui;
   browserUseVersion = versions.browserUse;
 in
 {
@@ -116,14 +115,6 @@ in
                 $DRY_RUN_CMD rm "$gemini_md"
                 ;;
             esac
-          fi
-        '';
-
-        # open-webui: installed via uv (nixpkgs broken on darwin — see modules/open-webui.nix)
-        installOpenWebui = lib.hm.dag.entryAfter [ "writeBoundary" "knownMarketplacesMerge" ] ''
-          if ! ${lib.getExe pkgs.uv} tool list 2>/dev/null | grep -q "^open-webui"; then
-            echo "-> Installing open-webui via uv (Python 3.14)..."
-            $DRY_RUN_CMD ${lib.getExe pkgs.uv} tool install "open-webui==${openWebuiVersion}" --python 3.14
           fi
         '';
 
