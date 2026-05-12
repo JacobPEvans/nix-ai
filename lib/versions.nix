@@ -32,7 +32,7 @@
   # renovate: datasource=npm depName=chatgpt-cli
   chatgptCli = "3.3.0";
   # renovate: datasource=npm depName=claude-flow
-  claudeFlow = "3.6.12";
+  claudeFlow = "3.6.30";
   # renovate: datasource=npm depName=@googleworkspace/cli
   gwsCli = "0.22.5";
 
