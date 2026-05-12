@@ -24,5 +24,20 @@
       "matchFileNames": ["orchestrator/**"],
       "groupName": "orchestrator-packages",
     },
+    {
+      "description": [
+        "30-day stabilization hold for manually pinned MLX packages — see",
+        "lib/versions.nix comments and nix-ai#751. mlx 0.31.2 introduced",
+        "thread-local stream semantics that break vllm-mlx's scheduler thread,",
+        "so we rolled back to mlx 0.31.1 + mlx-lm 0.31.2. Holding 30 days gives",
+        "upstream time to ship a fix (vllm-mlx per-thread generation_stream",
+        "init, or MLX cross-thread visibility restored) before Renovate proposes",
+        "the next bump. Remove this rule once vllm-mlx ships a compatible release.",
+      ],
+      "matchDatasources": ["pypi"],
+      "matchPackageNames": ["mlx", "mlx-lm", "mlx-metal"],
+      "minimumReleaseAge": "30 days",
+      "automerge": false,
+    },
   ],
 }
