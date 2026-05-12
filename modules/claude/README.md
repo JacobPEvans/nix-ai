@@ -40,15 +40,21 @@ brew upgrade --cask claude-code
 
 To force a fresh Anthropic-installer pull for `~/.local/bin/claude` (useful when
 `claude update` says it's already current but a new release exists), delete the
-symlink and re-run the installer:
+symlink and re-run the module-provided installer wrapper:
 
 ```bash
-rm ~/.local/bin/claude
-curl -fsSL https://claude.ai/install.sh | bash
+rm -f ~/.local/bin/claude
+claude-latest-install
 ```
 
-`~/.local/bin/claude` wins on PATH over `/opt/homebrew/bin/claude`, so the
-Anthropic-installer binary is what Claude Code sessions actually run.
+The `claude-latest-install` command is the managed wrapper from
+[`modules/claude-latest.nix`](../claude-latest.nix) (on PATH after a rebuild). It uses
+declared `runtimeInputs` and is the same script the LaunchAgent calls — it just
+has its idempotency check bypassed by removing the symlink first.
+
+Use `which claude` to confirm which binary `claude` resolves to. The `claude-latest`
+shell alias (from [`ai-aliases.zsh`](../ai-aliases.zsh)) always points directly to
+`~/.local/bin/claude` regardless of PATH order.
 
 ## Component Map
 
