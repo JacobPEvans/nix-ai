@@ -126,8 +126,11 @@ let
   # Group roles by physical model. One backend serves many role aliases.
   rolesByPhysical = lib.groupBy (role: roleModels.${role}) (lib.attrNames roleModels);
 
-  # One entry per unique physical model. The entry owning the "default"
-  # alias is preloaded; others inherit the proxy idle TTL.
+  # One entry per unique physical model. Every model — including the entry
+  # owning the "default" alias — inherits the uniform proxy idle TTL.
+  # The default model is still preloaded on startup via hooks.on_startup.preload
+  # below, so the first request never pays a cold-start cost; after one hour
+  # of idle it unloads and the next request reloads it (~15-30 s).
   #
   # useModelName makes llama-swap rewrite the OpenAI-compatible request body's
   # `model` field to the physical model id before forwarding to vllm-mlx.
@@ -139,7 +142,7 @@ let
   # works end-to-end through the local proxy without needing Bifrost in front.
   registryModels = lib.mapAttrs (physical: roles: {
     cmd = mkVllmCmd physical;
-    ttl = if builtins.elem "default" roles then 0 else cfg.proxy.idleTtl;
+    ttl = cfg.proxy.idleTtl;
     env = [ "HF_HOME=${cfg.huggingFaceHome}" ];
     checkEndpoint = "/v1/models";
     aliases = roles;

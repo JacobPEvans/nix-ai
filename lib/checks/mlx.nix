@@ -74,7 +74,12 @@ in
         {
           name = "mlx.cacheMemoryMb";
           actual = mlxCfg.cacheMemoryMb;
-          expected = 32768;
+          expected = 8192;
+        }
+        {
+          name = "mlx.proxy.idleTtl";
+          actual = mlxCfg.proxy.idleTtl;
+          expected = 3600;
         }
         {
           name = "mlx.prefillBatchSize";
