@@ -2,14 +2,24 @@
 # MLX Module — KV cache and prefill options
 #
 # vllm-mlx 0.2.9 PERFORMANCE TUNING.
-# Benchmarked 2026-03-19 on M4 Max 128GB with Qwen3.5-122B-A10B-4bit (~65 GB).
-# Memory budgets reference the 122B MoE model (10B active params, ~20 GB).
-# Baseline: 55-74 tok/s generation, no parallel request benefit (bandwidth-bound).
+# Sizing target: M4 Max 128 GB. Effective wired ceiling 118 GB (from
+# nix-darwin's apple-silicon-tunables module via iogpu.wired_limit_mb=118000).
 #
 # vllm-mlx 0.2.9 adds Paged KV Cache + prefix sharing on top of the
-# memory-aware cache that auto-sizes based on available RAM. Combined with
-# iogpu.wired_limit_mb=118000 (set by nix-darwin's apple-silicon-tunables
-# module) this lets us push the cache budget higher without thrashing.
+# memory-aware cache that auto-sizes based on available RAM.
+#
+# Cache-size rationale (cacheMemoryMb default = 8192):
+#   The KV cache working set is bounded by maxNumSeqs * maxTokens * 2 (K and V)
+#   times the per-layer state. For the Qwen3.x MoE models in this registry, 4
+#   active sequences at 8192 tokens fit comfortably in 6-8 GB. The default of
+#   8192 MB covers that plus prefix-cache headroom. Larger reservations just
+#   wire memory that is never used.
+#
+# History note (2026-05-13): the previous default of 32768 MB combined with
+# hot-swap activity drove the host into 24 GB of swap and ~1 tok/s decode on
+# the flagship model. Lowering to 8192 restores expected throughput. Raise on
+# a per-host basis if a workload genuinely benefits from larger cache; do not
+# raise the module default.
 #
 { lib, ... }:
 {
@@ -23,8 +33,8 @@
     # Ref: https://github.com/ml-explore/mlx-lm/issues/883
     cacheMemoryMb = lib.mkOption {
       type = lib.types.nullOr lib.types.ints.positive;
-      default = 32768;
-      description = "Cache memory limit in MB. Null = auto-detect. Default 32GB amortises prefix-cache reuse on multi-turn workloads.";
+      default = 8192;
+      description = "KV cache reservation in MB (vllm-mlx --cache-memory-mb). Null = server auto-detect. Default 8 GB right-sized for maxNumSeqs=4 and maxTokens=8192; raise per-host if a workload needs more.";
     };
 
     # enablePrefixCaching — Enable prefix sharing across requests (--enable-prefix-cache).
