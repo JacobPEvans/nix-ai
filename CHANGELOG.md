@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.64.8](https://github.com/JacobPEvans/nix-ai/compare/v1.64.7...v1.64.8) (2026-05-14)
+
+
+### Bug Fixes
+
+* **deps:** refresh gh-aw action SHA pins ([#765](https://github.com/JacobPEvans/nix-ai/issues/765)) ([3a77581](https://github.com/JacobPEvans/nix-ai/commit/3a77581f46c70de2947cd21c7011e9b726e2ce11))
+
+## [1.64.7](https://github.com/JacobPEvans/nix-ai/compare/v1.64.6...v1.64.7) (2026-05-12)
+
+
+### Bug Fixes
+
+* **mlx:** pin mlx==0.31.1 + mlx-lm==0.31.2 to restore inference ([#756](https://github.com/JacobPEvans/nix-ai/issues/756)) ([2934e52](https://github.com/JacobPEvans/nix-ai/commit/2934e52e2eae5b7f8c4d281ae0c58ba4d1d289c1))
+
+## [1.64.6](https://github.com/JacobPEvans/nix-ai/compare/v1.64.5...v1.64.6) (2026-05-12)
+
+
+### Bug Fixes
+
+* **mlx:** query /running for load state, not /v1/models[0] ([#752](https://github.com/JacobPEvans/nix-ai/issues/752)) ([0c4236d](https://github.com/JacobPEvans/nix-ai/commit/0c4236dca8bbe7fed82d32abb8509e81a2d50b34))
+
+## [1.64.5](https://github.com/JacobPEvans/nix-ai/compare/v1.64.4...v1.64.5) (2026-05-11)
+
+
+### Bug Fixes
+
+* **ci:** opt out of --all-systems for nix-validate ([#754](https://github.com/JacobPEvans/nix-ai/issues/754)) ([8a6493c](https://github.com/JacobPEvans/nix-ai/commit/8a6493cdb9ee4614fdb6af95270e25632904067b))
+
 ## [1.64.4](https://github.com/JacobPEvans/nix-ai/compare/v1.64.3...v1.64.4) (2026-05-11)
 
 

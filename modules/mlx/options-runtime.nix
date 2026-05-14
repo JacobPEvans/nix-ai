@@ -42,7 +42,7 @@
         }
       );
       default = { };
-      description = "Additional models available for on-demand switching via llama-swap proxy. The defaultModel is always available with TTL 0.";
+      description = "Additional models available for on-demand switching via llama-swap proxy. All models (including the default-aliased one) share the uniform proxy.idleTtl unless overridden per-model.";
     };
 
     proxy = {
@@ -53,8 +53,8 @@
       };
       idleTtl = lib.mkOption {
         type = lib.types.ints.unsigned;
-        default = 1800;
-        description = "Default idle TTL in seconds for non-default models. 0 = never auto-unload. Default 30 min.";
+        default = 3600;
+        description = "Idle TTL in seconds applied uniformly to every model in the registry (including the default-aliased one). 0 = never auto-unload (escape hatch). Default 3600 s (1 hour) gives a long warm window without permanently wiring a model's weights.";
       };
       logLevel = lib.mkOption {
         type = lib.types.enum [
