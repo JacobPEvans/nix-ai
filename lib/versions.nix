@@ -86,7 +86,7 @@
   # renovate: datasource=pypi depName=mlx-lm
   mlxLm = "0.31.2";
   # renovate: datasource=pypi depName=lm-eval
-  lmEval = "0.4.11";
+  lmEval = "0.4.12";
 
   # AI tools (pypi)
   # renovate: datasource=pypi depName=browser-use
