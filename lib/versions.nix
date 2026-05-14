@@ -80,7 +80,7 @@
   # See nix-ai#751. Re-evaluate when vllm-mlx is updated to initialize
   # generation_stream per-thread or MLX restores cross-thread stream visibility.
   # renovate: datasource=pypi depName=mlx
-  mlx = "0.31.1";
+  mlx = "0.31.2";
   # Pinned to 0.31.2 to stay compatible with mlx 0.31.1 (mlx_lm 0.31.3 was
   # released alongside mlx 0.31.2 and requires it). See nix-ai#751.
   # renovate: datasource=pypi depName=mlx-lm
