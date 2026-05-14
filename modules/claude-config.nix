@@ -241,7 +241,7 @@ in
       let
         file = "${ai-assistant-instructions}/agentsmd/settings/skill-overrides.json";
       in
-      if builtins.pathExists file then (lib.importJSON file).skillOverrides else { };
+      if builtins.pathExists file then (lib.importJSON file).skillOverrides or { } else { };
 
     # Consumed by modules/claude/settings.nix via cfg.settings.additionalDirectories.
     # lib/claude-settings.nix (CI-only) accepts a separate caller-provided parameter.

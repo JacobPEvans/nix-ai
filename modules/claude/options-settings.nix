@@ -58,16 +58,16 @@
         "saga-orchestration" = "name-only";
       };
       description = ''
-        Per-skill visibility overrides written to ~/.claude/settings.json.
-        Map of "plugin:skill" (or bare skill name) to one of:
+        Per-skill visibility overrides written to ~/.claude/settings.json
+        for personal, project, and managed skills (not plugin skills — those
+        are controlled via /plugin). Keys are bare skill names. Values:
           on                    — full description + /menu entry (default)
-          name-only             — name in listing; description dropped from context
+          name-only             — name listed; description dropped from context
           user-invocable-only   — hidden from Claude; only / invocation works
           off                   — hidden everywhere; removed from context entirely
 
-        Plugin skills are not affected by this map — manage those via /plugin
-        instead. Loaded from agentsmd/permissions/skill-overrides.json in
-        claude-config.nix; safe to leave empty in tests.
+        Loaded from agentsmd/settings/skill-overrides.json in
+        claude-config.nix; safe to leave empty.
       '';
     };
 

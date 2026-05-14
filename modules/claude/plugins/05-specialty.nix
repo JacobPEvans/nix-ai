@@ -87,10 +87,13 @@ _:
     # ========================================================================
     # obsidian-skills + axton-obsidian-visual-skills + visual-explainer
     # ========================================================================
-    # axton-obsidian-visual-skills enabled per user request — diagrams + visual
-    # explainers reach Claude, Codex, and Gemini via the agentskills module.
-    # obsidian@obsidian-skills disabled globally; re-enable in Obsidian-vault
-    # repos via per-repo .claude/settings.json when working on notes/canvas.
+    # axton-obsidian-visual-skills enabled per user request — makes the
+    # mermaid/excalidraw/canvas skills available in Claude. The repo uses a
+    # non-standard `<root>/<skill>/SKILL.md` layout that the current
+    # `modules/agent-skills/default.nix` discovery doesn't yet match, so
+    # Codex/Gemini won't pick them up until that module is extended (tracked
+    # separately). obsidian@obsidian-skills stays disabled globally; re-enable
+    # in Obsidian-vault repos via per-repo .claude/settings.json.
     "obsidian@obsidian-skills" = false;
     "obsidian-visual-skills@axton-obsidian-visual-skills" = true;
     "visual-explainer@visual-explainer-marketplace" = false;
