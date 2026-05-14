@@ -84,7 +84,7 @@
   # Pinned to 0.31.2 to stay compatible with mlx 0.31.1 (mlx_lm 0.31.3 was
   # released alongside mlx 0.31.2 and requires it). See nix-ai#751.
   # renovate: datasource=pypi depName=mlx-lm
-  mlxLm = "0.31.2";
+  mlxLm = "0.31.3";
   # renovate: datasource=pypi depName=lm-eval
   lmEval = "0.4.11";
 
