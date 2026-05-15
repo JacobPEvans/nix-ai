@@ -76,7 +76,7 @@ let
     src = fetchPypi {
       pname = "mcp";
       version = mcpVersion;
-      hash = "sha256-rqrRNGZM5W8nIdGr8wBmah6DSFY/TTuv82HDtlJEjvw=";
+      hash = "sha256-D0fhgg+Pj5QUZrOXSesdGDmgTK3corxg6dRuipmRSSQ=";
     };
     build-system = with python3Packages; [
       hatchling
@@ -115,7 +115,7 @@ python3Packages.buildPythonApplication {
   src = fetchPypi {
     pname = "cecli_dev";
     inherit version;
-    hash = "sha256-kDJ+DfCFz+CJxEjWWeISodAcFdUGSl6wElOZH8rYmVE=";
+    hash = "sha256-27LzYHD2DQYd8TTv+MAOazz4UTUF9GAt9iSLzA4/HOs=";
   };
 
   # nixpkgs-25.11 ships older versions of several deps than cecli's
@@ -200,6 +200,9 @@ python3Packages.buildPythonApplication {
   # test of the install layout.
   doCheck = false;
   pythonImportsCheck = [ "cecli" ];
+
+  # Expose mcp as passthru so nix-update can manage its hash via --flake mcp
+  passthru.mcp = mcp;
 
   meta = with lib; {
     description = "AI pair-programming CLI (maintained fork of Aider)";
