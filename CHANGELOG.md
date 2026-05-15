@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.64.12](https://github.com/JacobPEvans/nix-ai/compare/v1.64.11...v1.64.12) (2026-05-15)
+
+
+### Bug Fixes
+
+* **fabric:** update vendorHash for nixpkgs-25.11 Go toolchain ([#780](https://github.com/JacobPEvans/nix-ai/issues/780)) ([31bfd7f](https://github.com/JacobPEvans/nix-ai/commit/31bfd7f733084edee6c80addd0e2790657a311e1))
+
 ## [1.64.11](https://github.com/JacobPEvans/nix-ai/compare/v1.64.10...v1.64.11) (2026-05-15)
 
 
