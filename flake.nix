@@ -314,13 +314,14 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
+          cecliPkg = pkgs.callPackage ./modules/cecli/package.nix { };
         in
         {
           gh-aw = pkgs.callPackage ./modules/gh-extensions/gh-aw.nix { };
           pal-mcp-server = pkgs.callPackage ./modules/mcp/pal-package.nix { inherit pal-mcp-server; };
           fabric-ai = pkgs.callPackage ./modules/fabric/package.nix { inherit fabric-src; };
-          cecli = pkgs.callPackage ./modules/cecli/package.nix { };
-          inherit ((pkgs.callPackage ./modules/cecli/package.nix { }).passthru) mcp;
+          cecli = cecliPkg;
+          inherit (cecliPkg.passthru) mcp;
         }
       );
 
