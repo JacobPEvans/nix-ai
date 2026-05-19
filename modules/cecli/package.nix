@@ -115,7 +115,7 @@ python3Packages.buildPythonApplication {
   src = fetchPypi {
     pname = "cecli_dev";
     inherit version;
-    hash = "sha256-27LzYHD2DQYd8TTv+MAOazz4UTUF9GAt9iSLzA4/HOs=";
+    hash = "sha256-d1PZ2qco87+yQJPfzTxEygH1TLjXN+bwgrwaqTu8tls=";
   };
 
   # nixpkgs-25.11 ships older versions of several deps than cecli's
