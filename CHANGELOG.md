@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.65.4](https://github.com/JacobPEvans/nix-ai/compare/v1.65.3...v1.65.4) (2026-05-19)
+
+
+### Bug Fixes
+
+* **mlx:** enforce loop-prevention penalties via llama-swap setParams ([#797](https://github.com/JacobPEvans/nix-ai/issues/797)) ([222ad24](https://github.com/JacobPEvans/nix-ai/commit/222ad2444091c28012fd73e9827bc276762b7303))
+
 ## [1.65.3](https://github.com/JacobPEvans/nix-ai/compare/v1.65.2...v1.65.3) (2026-05-19)
 
 
