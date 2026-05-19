@@ -160,6 +160,12 @@ def main() -> None:
     model_env = default_entry.get("env", [])
     check_endpoint = default_entry.get("checkEndpoint", "/v1/models")
     idle_ttl = current_config.get("idleTtl", 1800)
+    # Propagate concurrentRequests from the default entry so auto-discovered
+    # models inherit the serialization the Nix module enforces (default: 1).
+    # Without this, llama-swap's unlimited default would let concurrent pipes
+    # hit vllm-mlx in parallel for discovered models and reintroduce the
+    # crash pattern fixed by programs.mlx.proxy.concurrentRequests.
+    concurrent_requests = default_entry.get("concurrentRequests", 1)
 
     available_gb = get_memory_budget_gb()
     discovered = 0
@@ -203,6 +209,7 @@ def main() -> None:
             "ttl": idle_ttl,
             "env": model_env,
             "checkEndpoint": check_endpoint,
+            "concurrentRequests": concurrent_requests,
         }
 
         new_models[model_id] = entry
