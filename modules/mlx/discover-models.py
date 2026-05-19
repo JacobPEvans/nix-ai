@@ -160,6 +160,12 @@ def main() -> None:
     model_env = default_entry.get("env", [])
     check_endpoint = default_entry.get("checkEndpoint", "/v1/models")
     idle_ttl = current_config.get("idleTtl", 1800)
+    # Propagate concurrencyLimit from the default entry so auto-discovered
+    # models inherit the same proxy-side cap (default: 4, matches
+    # maxNumSeqs=4). Without this, discovered models would fall back to
+    # llama-swap's internal default of 10, diverging from the Nix-managed
+    # registry models.
+    concurrency_limit = default_entry.get("concurrencyLimit", 4)
 
     available_gb = get_memory_budget_gb()
     discovered = 0
@@ -203,6 +209,7 @@ def main() -> None:
             "ttl": idle_ttl,
             "env": model_env,
             "checkEndpoint": check_endpoint,
+            "concurrencyLimit": concurrency_limit,
         }
 
         new_models[model_id] = entry

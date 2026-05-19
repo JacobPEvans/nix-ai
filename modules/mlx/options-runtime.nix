@@ -88,6 +88,26 @@
           behaviour) shows only proxy-level events.
         '';
       };
+      concurrencyLimit = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 4;
+        description = ''
+          Max in-flight requests llama-swap will forward to vllm-mlx per
+          model. Maps directly to the YAML key llama-swap reads
+          (`concurrencyLimit`); excess requests get HTTP 429.
+
+          Default 4 matches `maxNumSeqs = 4` so vllm-mlx continuous batching
+          stays fully utilized (1.5x–3x throughput on M4 Max 128 GB per
+          upstream benchmarks) while still bounding runaway callers so they
+          can't pile on faster than vllm-mlx can schedule. The 2026-05-15
+          finish_reason:error incident is tracked separately as a vllm-mlx
+          scheduler bug — a proxy-side cap is the safety valve, not the fix.
+
+          Setting this to 1 silently defeats continuous batching and is
+          almost never what you want; raise it only if vllm-mlx adds more
+          headroom (and bump `maxNumSeqs` in lockstep).
+        '';
+      };
     };
   };
 }
