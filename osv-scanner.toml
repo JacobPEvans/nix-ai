@@ -6,7 +6,7 @@
 #
 # Each ignored vulnerability MUST:
 #   1. Link to the umbrella tracking issue (#812).
-#   2. Set ignoreUntil ≤ 90 days — forces quarterly review.
+#   2. Set ignoreUntil within ~3 months — forces quarterly review.
 #   3. Document the reason and the actual exploitability surface.
 #
 # This is per-CVE acknowledgement, not a blanket disable. New findings still
@@ -16,9 +16,14 @@
 # transformers 5.8.1 — Hugging Face Transformers model-parsing RCE chain
 # ============================================================================
 # Lockfiles: mlx-server/uv.lock, orchestrator/uv.lock
-# Local AV — requires user to load a malicious model file.
-# nix-ai's mlx-server and orchestrator only load models we publish to our
-# Hugging Face workspace, so the input path is trusted.
+# Local AV — requires loading a malicious model file (deserialization-on-load).
+# Exposure: the default model registry (vars/ai-stack.nix) pulls only from
+# mlx-community/* on Hugging Face, but orchestrator skills (CECLI, LiteLLM
+# proxies, user-supplied skill configs) CAN reference arbitrary model IDs.
+# Mitigation today is operational: the user controls which models are loaded;
+# nothing in nix-ai auto-loads attacker-controlled identifiers. Anyone running
+# this on their own machine with their own configs accepts the same trust
+# boundary they accept for any locally-installed Python ML stack.
 # Upstream status (2026-05-20): no fix; OSV reports introduced=0 / no fixed
 # event for every version, including the brand-new 5.9.0.
 # Tracked in: https://github.com/JacobPEvans/nix-ai/issues/812
