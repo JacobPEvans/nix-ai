@@ -31,6 +31,7 @@ let
   mcpPuppeteerVersion = versions.mcpPuppeteer;
   mcpSlackVersion = versions.mcpSlack;
   mcpServerTimeVersion = versions.mcpServerTime;
+  mcpAppleEventsVersion = versions.mcpAppleEvents;
   hfMcpServerVersion = versions.hfMcpServer;
   fabricMcpVersion = versions.fabricMcp;
   gwsMcpVersion = versions.gwsMcp;
@@ -145,6 +146,13 @@ in
     command = "codex";
     args = [ "mcp-server" ];
   };
+
+  # ================================================================
+  # Apple Events - native macOS Reminders + Calendar via EventKit
+  # ================================================================
+  # Source: https://github.com/FradSer/mcp-server-apple-events
+  # First call triggers macOS TCC prompts for Reminders + Calendar.
+  apple-events = bunx [ "mcp-server-apple-events@${mcpAppleEventsVersion}" ];
 
   # ================================================================
   # Database (disabled by default)

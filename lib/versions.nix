@@ -55,6 +55,8 @@
   mcpPuppeteer = "2025.5.12";
   # renovate: datasource=npm depName=@modelcontextprotocol/server-slack
   mcpSlack = "2025.4.25";
+  # renovate: datasource=npm depName=mcp-server-apple-events
+  mcpAppleEvents = "1.4.0";
 
   # MCP servers (pypi)
   # renovate: datasource=pypi depName=mcp-server-time
