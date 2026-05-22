@@ -30,8 +30,8 @@ let
   mcpGoogleMapsVersion = versions.mcpGoogleMaps;
   mcpPuppeteerVersion = versions.mcpPuppeteer;
   mcpSlackVersion = versions.mcpSlack;
-  mcpServerTimeVersion = versions.mcpServerTime;
   mcpAppleEventsVersion = versions.mcpAppleEvents;
+  mcpServerTimeVersion = versions.mcpServerTime;
   hfMcpServerVersion = versions.hfMcpServer;
   fabricMcpVersion = versions.fabricMcp;
   gwsMcpVersion = versions.gwsMcp;
