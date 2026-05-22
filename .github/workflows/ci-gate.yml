@@ -133,6 +133,9 @@ jobs:
     uses: JacobPEvans/.github/.github/workflows/_python-security.yml@main
     with:
       python-dirs: 'mlx-server orchestrator'
+      # PYSEC-2026-139: torch 2.10.0 deserialization (no upstream fix yet,
+      # local-only attack vector). Remove once PyTorch releases a fix.
+      ignore-vulns: 'PYSEC-2026-139'
       runner_label: ${{ github.event.pull_request.head.repo.full_name == github.repository && format('runs-on={0}/runner=2cpu-linux-x64', github.run_id) || 'ubuntu-latest' }}
 
   osv-scan:
