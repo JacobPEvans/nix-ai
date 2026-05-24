@@ -109,6 +109,17 @@ let
   // lib.optionalAttrs (cfg.settings.skillOverrides != { }) {
     inherit (cfg.settings) skillOverrides;
   }
+  // (
+    let
+      # Filter autoMode sub-fields that exactly equal [ "$defaults" ] —
+      # semantically a no-op since the classifier already uses defaults
+      # when a field is unset. Keeps settings.json minimal while still
+      # honoring consumer customizations to any sub-field.
+      isDefaultOnly = v: v == [ "$defaults" ];
+      kept = lib.filterAttrs (_: v: !isDefaultOnly v) cfg.settings.autoMode;
+    in
+    lib.optionalAttrs (kept != { }) { autoMode = kept; }
+  )
   // lib.optionalAttrs (cfg.model != null) { inherit (cfg) model; }
   // lib.optionalAttrs (cfg.remoteControlAtStartup != null) { inherit (cfg) remoteControlAtStartup; }
   // lib.optionalAttrs (envAttrs != { }) { env = envAttrs; }
