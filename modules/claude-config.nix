@@ -147,11 +147,11 @@ in
   # for each ~/git/<repo>/main path found at home-manager activation time (runtime) via claude-json-merge.sh.
   trustedProjectDirs = [ "~/git" ];
 
-  # Linux "Assisted-by" trailer — official AI contribution format
-  # Includes LLM tool identity per Linux kernel contribution guidelines
-  # Claude Code automatically appends this string to every commit message
+  # Commit trailer per https://docs.kernel.org/process/coding-assistants.html.
+  # Format: Assisted-by: Agent:model  (no email address)
+  # The git-guards PreToolUse hook in claude-code-plugins substitutes {model} at commit time.
   attribution = {
-    commit = "Assisted-by: Claude <noreply@anthropic.com>";
+    commit = "Assisted-by: Claude:{model}";
   };
 
   plugins = {
