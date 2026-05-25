@@ -139,7 +139,7 @@ in
   # Enable Remote Control for all sessions (Feb 2026 feature).
   # Writes remoteControlAtStartup = true into ~/.claude.json via home.activation.
   # Allows monitoring/controlling sessions from claude.ai or the mobile app.
-  # Requires a Claude Max subscription; no-op if not logged in.
+  # Requires a Claude subscription that includes the feature; no-op if not logged in.
   remoteControlAtStartup = true;
 
   # Auto-approve CLAUDE.md external imports for all repos discovered under ~/git/.
