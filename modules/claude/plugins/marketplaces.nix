@@ -118,6 +118,16 @@ let
       };
     };
 
+    # --- Behavioral / Workflow ---
+    # Behavioral guidelines for reducing common LLM coding mistakes (Think Before
+    # Coding, Simplicity First, Surgical Changes, Goal-Driven Execution).
+    "karpathy-skills" = {
+      source = {
+        type = "github";
+        url = "forrestchang/andrej-karpathy-skills";
+      };
+    };
+
     # --- Community ---
     "cc-marketplace" = {
       source = {
