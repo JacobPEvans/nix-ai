@@ -113,6 +113,57 @@
       };
     };
 
+    # Auto-mode classifier configuration. Lands at top-level `autoMode`
+    # in settings.json (NOT under permissions). See
+    # https://code.claude.com/docs/en/auto-mode-config.
+    #
+    # Setting defaultMode = "auto" enables the classifier; this block
+    # configures what it trusts. Out of the box the classifier trusts
+    # only the working directory and the active repo's remotes, so
+    # populating `environment` is the single highest-leverage tuning
+    # action — it stops the classifier from blocking routine cross-repo,
+    # cross-org, cloud, and homelab operations.
+    autoMode = {
+      environment = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ "$defaults" ];
+        description = ''
+          Trusted infrastructure entries. Prose strings, read as
+          natural-language rules. Include `"$defaults"` to inherit the
+          built-in entries (working repo plus configured remotes) and
+          splice your entries before/after. Omit `"$defaults"` to
+          replace the entire built-in list — rarely desired.
+        '';
+      };
+      allow = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ "$defaults" ];
+        description = ''
+          Exceptions to `soft_deny` rules. Prose strings. Include
+          `"$defaults"` to inherit built-ins.
+        '';
+      };
+      soft_deny = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ "$defaults" ];
+        description = ''
+          Destructive actions blocked unless overridden by explicit user
+          intent or an `allow` entry. Include `"$defaults"` to inherit
+          the built-in soft-block list (force-push, `curl | bash`,
+          production deploys, etc.).
+        '';
+      };
+      hard_deny = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ "$defaults" ];
+        description = ''
+          Unconditional blocks. Include `"$defaults"` to inherit the
+          built-in list (data exfiltration patterns, auto-mode bypass
+          attempts, etc.).
+        '';
+      };
+    };
+
     additionalDirectories = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
