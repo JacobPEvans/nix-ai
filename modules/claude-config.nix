@@ -73,7 +73,7 @@ let
   # Marketplace catalog and synthetic-marketplace derivations come from
   # nix-claude-code. Catalog defines names + source URLs; overrides build
   # the four synthetic derivations (browser-use, cribl, jacobpevans, fabric).
-  marketplaceCatalog = nix-claude-code.lib.marketplaceCatalog;
+  inherit (nix-claude-code.lib) marketplaceCatalog;
   marketplaceOverrides = nix-claude-code.lib.marketplaceOverrides {
     inherit
       pkgs
