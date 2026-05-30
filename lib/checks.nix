@@ -7,7 +7,6 @@
   home-manager,
   aiModule,
   pal-mcp-server,
-  fabric-src,
 }:
 let
   # Shared test module configuration — used by claude, mlx, and fabric regression checks
@@ -18,6 +17,7 @@ let
       {
         _module.args.userConfig = {
           ai.claudeSchemaUrl = "https://json.schemastore.org/claude-code-settings.json";
+          user.fullName = "JacobPEvans";
         };
         home = {
           username = "test-user";
@@ -37,6 +37,7 @@ let
       {
         _module.args.userConfig = {
           ai.claudeSchemaUrl = "https://json.schemastore.org/claude-code-settings.json";
+          user.fullName = "JacobPEvans";
         };
         home = {
           username = "test-user";
@@ -61,7 +62,6 @@ in
     pkgs
     hmConfig
     hmConfigFabricServer
-    fabric-src
     src
     ;
 })
