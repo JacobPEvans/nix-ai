@@ -18,6 +18,7 @@ let
       {
         _module.args.userConfig = {
           ai.claudeSchemaUrl = "https://json.schemastore.org/claude-code-settings.json";
+          user.fullName = "JacobPEvans";
         };
         home = {
           username = "test-user";
@@ -37,6 +38,7 @@ let
       {
         _module.args.userConfig = {
           ai.claudeSchemaUrl = "https://json.schemastore.org/claude-code-settings.json";
+          user.fullName = "JacobPEvans";
         };
         home = {
           username = "test-user";
