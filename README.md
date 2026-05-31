@@ -1,5 +1,6 @@
 # nix-ai
 
+[![SafeSkill 50/100](https://img.shields.io/badge/SafeSkill-50%2F100_Use%20with%20Caution-orange)](https://safeskill.dev/scan/dryvist-nix-ai)
 ## Your AI coding toolkit, declared once. Reproduced everywhere
 
 Ever spent hours configuring Claude Code plugins, Gemini settings, and MCP servers
