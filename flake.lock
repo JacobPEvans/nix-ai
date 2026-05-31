@@ -424,6 +424,22 @@
         "type": "github"
       }
     },
+    "karpathy-skills_2": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776679504,
+        "narHash": "sha256-4z/wRdYH7UXRzF8RJU0sw8xbpx0BW/7CBv5sVEC2knY=",
+        "owner": "forrestchang",
+        "repo": "andrej-karpathy-skills",
+        "rev": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "forrestchang",
+        "repo": "andrej-karpathy-skills",
+        "type": "github"
+      }
+    },
     "lunar-claude": {
       "flake": false,
       "locked": {
@@ -469,6 +485,7 @@
         ],
         "huggingface-skills": "huggingface-skills",
         "jacobpevans-cc-plugins": "jacobpevans-cc-plugins",
+        "karpathy-skills": "karpathy-skills_2",
         "lunar-claude": "lunar-claude",
         "nixpkgs": [
           "nixpkgs"
@@ -482,11 +499,11 @@
         "wakatime": "wakatime"
       },
       "locked": {
-        "lastModified": 1780184581,
-        "narHash": "sha256-0EA6Tr7wuVJ68EQ3HPEr02d9LhtCijIHSkXu6hR7sPs=",
+        "lastModified": 1780195187,
+        "narHash": "sha256-IsYx/jkCLyaWkJXZYYogjumtyg0lusFAmAs+suhzGq0=",
         "owner": "dryvist",
         "repo": "nix-claude-code",
-        "rev": "1e691ac7208bef33c63ceb20631b324b7ca54476",
+        "rev": "9fe7a2e86265a96d69f97e6514a5a3e012743b9c",
         "type": "github"
       },
       "original": {
